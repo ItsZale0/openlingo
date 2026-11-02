@@ -233,16 +233,21 @@ object PercorsoLezioni {
      * della spiegazione si tengono solo le clausole che NON contengono la
      * risposta corretta e che la teoria non dice già.
      *
+     * Il filtro guarda SOLO le risposte corrette, non le parole delle domande:
+     * una regola come "Mann è maschile" è utile proprio perché nomina il nome
+     * su cui si risponde, e senza di essa il promemoria si svuotava. Restano
+     * fuori le clausole con la forma da scegliere.
+     *
      * Esempio: "Mann è maschile; all'accusativo der diventa den." diventa
      * "Mann è maschile" perché la seconda parte contiene la risposta "den".
      */
     fun promemoriaEsercizi(unita: UnitaGrammatica, max: Int = 6): List<String> {
         val testoTeoria = DeduplicaEsercizi.normalizza(testoTeoria(unita))
-        // Parole che compaiono nelle domande e nelle risposte della unità.
-        // Una regola che nomina una di queste parole è troppo vicina alla
-        // soluzione (spesso è proprio la parola su cui si risponde): fuori.
-        val paroleUnita = unita.esercizi
-            .flatMap { e -> listOf(e.domanda) + e.opzioni + risposteCorrette(e) }
+        // Parole delle sole risposte corrette: sono quelle che svelerebbero
+        // l'esercizio. Le parole delle domande sono il vocabolario su cui la
+        // regola ragiona e possono restare.
+        val paroleRisposta = unita.esercizi
+            .flatMap { e -> risposteCorrette(e) }
             .flatMap { testo -> testo.split(Regex("[^\\p{L}\\p{N}]+")) }
             .map { DeduplicaEsercizi.normalizza(it) }
             .filter { it.length >= 2 }
@@ -262,7 +267,7 @@ object PercorsoLezioni {
                     .filter { it.isNotEmpty() }
                 if (parole.size < 3) return@clausola
                 if (parole.none { it in paroleGrammaticali }) return@clausola
-                if (parole.any { radice(it) in paroleUnita }) return@clausola
+                if (parole.any { radice(it) in paroleRisposta }) return@clausola
                 val normale = DeduplicaEsercizi.normalizza(clausola)
                 if (normale.isEmpty()) return@clausola
                 if (testoTeoria.contains(normale)) return@clausola

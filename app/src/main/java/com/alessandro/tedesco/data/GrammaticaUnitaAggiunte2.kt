@@ -232,7 +232,7 @@ internal fun unitaB1AdjektiveAlsNomen(): UnitaGrammatica = unitaGrammatica(
     merksatz = "Aggettivo sostantivato = maiuscola + declinazione aggettivale (come dopo articolo).",
     esercizi = listOf(
         sceltaUnita("adjnom-01", "Der ___ wartet an der Ecke.", listOf("Alte", "Alten", "Alter", "Altes"), 0, "Nominativo maschile: der Alte."),
-        sceltaUnita("adjnom-02", "Ich helfe dem ___.", listOf("Alte", "Alten", "Alter", "Altes"), 1, "Dativo: dem Alten."),
+        sceltaUnita("adjnom-02", "Ich danke dem ___.", listOf("Alte", "Alten", "Alter", "Altes"), 1, "Dativo: dem Alten."),
         sceltaUnita("adjnom-03", "Die ___ werden behandelt.", listOf("Kranke", "Kranken", "Kranker", "Krankes"), 1, "Plurale nominativo: die Kranken."),
         sceltaUnita("adjnom-04", "Das ___ an der Reise ist das Wetter.", listOf("Schöne", "Schönen", "Schöner", "Schönes"), 0, "Nominativo neutro: das Schöne."),
         sceltaUnita("adjnom-05", "Der ___ arbeitet im Büro.", listOf("Angestellte", "Angestellten", "Angestellter", "Angestelltes"), 0, "Nominativo maschile: der Angestellte."),

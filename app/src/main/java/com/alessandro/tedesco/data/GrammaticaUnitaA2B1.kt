@@ -1138,7 +1138,7 @@ internal fun unitaB1Konnektoren(): UnitaGrammatica = unitaGrammatica(
     esercizi = listOf(
         sceltaUnita(
             "kon-01",
-            "Ich bleibe zu Hause, ___ ich krank bin.",
+            "Er lernt Deutsch, ___ er in Berlin arbeiten will.",
             listOf("weil", "denn", "deshalb", "aber"),
             0,
             "weil introduce la causa e manda il verbo alla fine."
@@ -1302,10 +1302,10 @@ internal fun unitaB1Konjunktiv2(): UnitaGrammatica = unitaGrammatica(
         ),
         sceltaUnita(
             "konj-03",
-            "___ Sie mir bitte helfen?",
+            "___ Sie bitte leiser sprechen?",
             listOf("Können", "Könnten", "Konnten", "Könnt"),
             1,
-            "Richiesta cortese: Könnten Sie ...?"
+            "Richiesta cortese: Könnten Sie bitte leiser sprechen?"
         ),
         sceltaUnita(
             "konj-04",

@@ -112,14 +112,88 @@ class SessioneLezioneTest {
     }
 
     @Test
-    fun `la sessione contiene tutti i tipi presenti nel banco`() {
+    fun `la prima sessione non chiede di produrre ma copre gli altri tipi`() {
+        // Chi apre l'argomento per la prima volta deve vedere la regola in
+        // azione, non essere subito messo alla prova con una frase da scrivere.
         unita.filter { it.esercizi.size >= 12 }.forEach { u ->
-            val tipiUnita = u.esercizi.map { it.tipo }.toSet()
+            val senzaProduzione = u.esercizi.count {
+                it.tipo != TipoEsercizioGrammatica.PRODUZIONE
+            }
+            val n = SessioneLezione.dimensione(u.esercizi.size)
             val sessione = SessioneLezione.nuovaSessione(banco(u), RotazioneUnita(), seme = 42)
+            if (senzaProduzione >= n) {
+                assertTrue(
+                    "${u.id}: la prima sessione contiene una PRODUZIONE",
+                    sessione.esercizi.none { it.tipo == TipoEsercizioGrammatica.PRODUZIONE }
+                )
+            }
+            val tipiAttesi = u.esercizi.map { it.tipo }.toSet() -
+                TipoEsercizioGrammatica.PRODUZIONE
             val tipiSessione = sessione.esercizi.map { it.tipo }.toSet()
             assertTrue(
-                "${u.id}: tipi mancanti ${tipiUnita - tipiSessione}",
-                tipiSessione.containsAll(tipiUnita)
+                "${u.id}: tipi mancanti ${tipiAttesi - tipiSessione}",
+                tipiSessione.containsAll(tipiAttesi)
+            )
+        }
+    }
+
+    @Test
+    fun `le sessioni successive propongono al massimo una produzione e un picco`() {
+        unita.filter { it.esercizi.size >= 12 }.forEach { u ->
+            var rotazione = RotazioneUnita()
+            val banco = banco(u)
+            repeat(4) { tentativo ->
+                val sessione = SessioneLezione.nuovaSessione(
+                    banco = banco,
+                    rotazione = rotazione,
+                    seme = tentativo * 7919 + 3
+                )
+                val produzioni = sessione.esercizi.count { it.tipo == TipoEsercizioGrammatica.PRODUZIONE }
+                val picchi = sessione.esercizi.count {
+                    it.tipo != TipoEsercizioGrammatica.PRODUZIONE && DifficoltaEsercizi.ePicco(it)
+                }
+                assertTrue(
+                    "${u.id}: $produzioni produzioni nel tentativo $tentativo",
+                    produzioni <= 1
+                )
+                assertTrue(
+                    "${u.id}: $picchi picchi (oltre alla produzione) nel tentativo $tentativo",
+                    picchi <= 1
+                )
+                rotazione = sessione.rotazione
+            }
+        }
+    }
+
+    @Test
+    fun `dopo la prima sessione la produzione torna disponibile`() {
+        // Una rotazione con un id non più nel banco non è una "prima sessione":
+        // il vincolo guarda ciò che lo studente ha già visto, non i contenuti
+        // rimossi da un aggiornamento.
+        val u = unita.first { unita ->
+            unita.esercizi.any { it.tipo == TipoEsercizioGrammatica.PRODUZIONE } &&
+                unita.esercizi.size >= 12
+        }
+        val sessione = SessioneLezione.nuovaSessione(
+            banco = banco(u),
+            rotazione = RotazioneUnita(visti = listOf("id-sparito")),
+            seme = 11
+        )
+        assertTrue(
+            "${u.id}: la produzione non compare più",
+            sessione.esercizi.any { it.tipo == TipoEsercizioGrammatica.PRODUZIONE }
+        )
+    }
+
+    @Test
+    fun `la sessione va dal facile al difficile`() {
+        unita.forEach { u ->
+            val sessione = SessioneLezione.nuovaSessione(banco(u), RotazioneUnita(), seme = 17)
+            val punteggi = sessione.esercizi.map { DifficoltaEsercizi.punteggio(it) }
+            assertEquals(
+                "${u.id}: sessione non ordinata per difficolta: $punteggi",
+                punteggi.sorted(),
+                punteggi
             )
         }
     }

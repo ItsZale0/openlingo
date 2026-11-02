@@ -47,8 +47,8 @@ internal val EserciziExtra: Map<String, List<EsercizioUnita>> = mapOf(
             "maschile → ein."),
         completaUnita("a0-articoli-xe5", "Das ist ___ Apotheke.", "eine",
             "femminile → eine."),
-        produciUnita("a0-articoli-xe6", "„Il dottore parla tedesco.“", "Der Arzt spricht Deutsch.",
-            "Arzt è maschile → der.")
+        completaUnita("a0-articoli-xe6", "___ Zimmer ist frei. (la camera)", "Das",
+            "Zimmer è neutro → das.")
     ),
 
     // ---- A0: plurale ----
@@ -186,7 +186,7 @@ internal val EserciziExtra: Map<String, List<EsercizioUnita>> = mapOf(
             "Fieber è neutro: negazione → kein."),
         sceltaUnita("a1-akkusativ-xe4", "Du liest ___ Buch. (il libro, neutro)", listOf("das", "den", "dem", "des"), 0,
             "Neutro: nominativo e accusativo coincidono → das."),
-        completaUnita("a1-akkusativ-xe5", "Sie kauft ___ Ball. (il pallone)", "einen",
+        completaUnita("a1-akkusativ-xe5", "Sie kauft ___ Ball. (un pallone)", "einen",
             "Maschile accusativo indeterminato → einen."),
         produciUnita("a1-akkusativ-xe6", "„Prendo un appuntamento per martedì.“", "Ich nehme einen Termin am Dienstag.",
             "Termin maschile: accusativo einen.", "Scrivi la frase completa in tedesco.",

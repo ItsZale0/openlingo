@@ -148,12 +148,12 @@ internal fun unitaA0Alfabeto(): UnitaGrammatica = unitaGrammatica(
             "Inizia con Ich.",
             listOf("Ich heisse Luca.")
         ),
-        produciUnita(
+        completaUnita(
             "alf-11",
-            "Scrivi la frase: «Vorrei imparare il tedesco.»",
-            "Ich möchte Deutsch lernen.",
-            "möchte è la forma cortese di mögen; l'infinito lernen va alla fine.",
-            "Usa Ich möchte ... lernen."
+            "Come si scrive «ospedale» in tedesco?",
+            "Krankenhaus",
+            "Krankenhaus è un composto: Kranken + Haus, con la h di Haus.",
+            "Scrivi il sostantivo, con l'iniziale maiuscola."
         ),
         sceltaUnita(
             "alf-12",
@@ -161,6 +161,13 @@ internal fun unitaA0Alfabeto(): UnitaGrammatica = unitaGrammatica(
             listOf("Schule", "Straße", "Sonne", "Zeit"),
             2,
             "Sonne inizia con s davanti a vocale: [z]. Schule e Straße iniziano con [ʃ], Zeit con [ts]."
+        ),
+        produciUnita(
+            "alf-13",
+            "Scrivi in tedesco: «strada».",
+            "Straße",
+            "Straße si scrive con sch, a e ß: la ß vale come ss.",
+            "Una parola sola, con l'iniziale maiuscola."
         )
     )
 )
@@ -1202,9 +1209,9 @@ internal fun unitaA1PreposizioniLuogo(): UnitaGrammatica = unitaGrammatica(
         ),
         completaUnita(
             "luogo-07",
-            "Er ist ___ Arzt.",
-            "beim",
-            "bei + dem = beim: beim Arzt."
+            "Sie geht ___ Lehrerin.",
+            "zur",
+            "zu + der = zur: zur Lehrerin gehen."
         ),
         completaUnita(
             "luogo-08",

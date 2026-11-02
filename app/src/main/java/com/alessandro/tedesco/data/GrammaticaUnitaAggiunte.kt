@@ -135,7 +135,7 @@ internal fun unitaA2Konjunktiv2Basis(): UnitaGrammatica = unitaGrammatica(
     esercizi = listOf(
         sceltaUnita("konj2-01", "Ich ___ gern einen Kaffee.", listOf("würde haben", "hätte", "habe", "hatte"), 1, "Vorrei un caffè: hätte."),
         sceltaUnita("konj2-02", "___ Sie mir bitte helfen?", listOf("Können", "Könnten", "Müssen", "Müssten"), 1, "Richiesta cortese: Könnten Sie...?"),
-        sceltaUnita("konj2-03", "Wenn ich Zeit ___, würde ich kommen.", listOf("habe", "hatte", "hätte", "würde haben"), 2, "Ipotesi irrealizzabile: hätte."),
+        sceltaUnita("konj2-03", "Wenn wir mehr Zeit ___, würden wir mehr lesen.", listOf("haben", "hatten", "hätten", "würde haben"), 2, "Ipotesi irrealizzabile: hätten."),
         sceltaUnita("konj2-04", "Du ___ mehr schlafen.", listOf("sollst", "solltest", "musst", "müsstest"), 1, "Consiglio cortese: solltest."),
         sceltaUnita("konj2-05", "Ich ___ gern nach Italien fahren.", listOf("würde", "wäre", "hätte", "könnte"), 0, "Desiderio con verbo normale: würde fahren."),
         produciUnita("a2-konj2-prod", "„Se avessi tempo, verrei.“", "Wenn ich Zeit hätte, würde ich kommen.", "Ipotesi irreale: hätte (avere) + würde + infinito."),

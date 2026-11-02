@@ -226,14 +226,14 @@ internal fun unitaA2Wechselpraepositionen(): UnitaGrammatica = unitaGrammatica(
     esercizi = listOf(
         sceltaUnita(
             "wechsel-01",
-            "Ich gehe ___ Kino.",
-            listOf("ins", "im", "am", "beim"),
+            "Ich gehe ___ Park.",
+            listOf("in den", "im", "am", "beim"),
             0,
-            "Movimento verso il cinema: in das Kino = ins Kino."
+            "Movimento verso il parco (maschile): in den Park."
         ),
         sceltaUnita(
             "wechsel-02",
-            "Das Buch liegt ___ Tisch.",
+            "Die Schlüssel liegen ___ Tisch.",
             listOf("auf den", "auf dem", "auf der", "auf die"),
             1,
             "Posizione sul tavolo: auf dem Tisch (dativo)."

@@ -208,7 +208,7 @@ internal fun unitaB2Referenzwoerter(): UnitaGrammatica = unitaGrammatica(
         sceltaUnita("ref-01", "Die Stadt ist schön. ___ Stadt liegt am Meer.", listOf("Diese", "Dies", "Das", "Es"), 0, "Riferimento a sostantivo: Diese Stadt."),
         sceltaUnita("ref-02", "Er lernte viel. ___ bestand er die Prüfung.", listOf("Dadurch", "Diese", "Dies", "Das"), 0, "Riferimento a frase: Dadurch."),
         sceltaUnita("ref-03", "Er kam zu spät. ___ war ein Problem.", listOf("Dadurch", "Diese", "Dies", "Das"), 3, "Riferimento a frase intera: Das."),
-        sceltaUnita("ref-04", "Der Mann, ___ dort steht, ist mein Chef.", listOf("der", "dieser", "das", "es"), 0, "Relativpronome: der."),
+        sceltaUnita("ref-04", "Der Mann, ___ ich gestern getroffen habe, ist mein Chef.", listOf("der", "den", "dem", "dessen"), 1, "Relativpronome all'accusativo: den."),
         sceltaUnita("ref-05", "Er übte täglich. ___ wurde er besser.", listOf("Dadurch", "Diese", "Dies", "Das"), 0, "Riferimento a frase: Dadurch."),
         produciUnita("b2-referenz-prod", "„Lo stesso problema si ripete ogni anno.“", "Dasselbe Problem wiederholt sich jedes Jahr.", "dasselbe = la stessa cosa (identica), non solo simile."),
     )

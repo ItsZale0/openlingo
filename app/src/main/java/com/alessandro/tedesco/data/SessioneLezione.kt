@@ -141,7 +141,8 @@ object SessioneLezione {
             quanti = candidati.size,
             seme = seme
         )
-        val scelti = conTuttiITipi(candidati, ordine, n).map { candidati[it] }
+        val primaSessione = rotazione.visti.isEmpty()
+        val scelti = scegliPerDifficolta(candidati, ordine, n, primaSessione).map { candidati[it] }
         val ids = scelti.map { it.id }
         val nuova = RotazioneUnita(
             visti = (visti + ids).distinct(),
@@ -170,28 +171,87 @@ object SessioneLezione {
     }
 
     /**
-     * Garantisce che la sessione contenga almeno un esercizio per ogni tipo
-     * presente nel banco (scegliere, completare, trasformare, produrre): una
-     * sessione di sole scelte multiple non allena la produzione.
+     * Sceglie gli esercizi della sessione rispettando due tetti:
+     * - al massimo una PRODUZIONE;
+     * - al massimo un altro esercizio "picco" ([DifficoltaEsercizi.PESO_ALTO] o più).
+     *
+     * Nella prima sessione di una unità la produzione non compare: chi apre
+     * l'argomento per la prima volta deve prima vedere la regola in azione.
+     * Alla fine la sessione è ordinata per difficoltà crescente, così il
+     * tentativo ha una scala e non un salto casuale.
      */
-    private fun conTuttiITipi(
+    private fun scegliPerDifficolta(
         banco: List<EsercizioUnita>,
         mescolati: List<Int>,
-        n: Int
+        n: Int,
+        primaSessione: Boolean
     ): List<Int> {
+        // In prima sessione la produzione è esclusa; se il banco non ha
+        // abbastanza altri esercizi si torna al banco completo, perché una
+        // sessione troppo corta sarebbe peggio di una produzione in anticipo.
+        val disponibili = if (primaSessione) {
+            val senzaProduzione = mescolati.filter {
+                banco[it].tipo != TipoEsercizioGrammatica.PRODUZIONE
+            }
+            if (senzaProduzione.size >= n) senzaProduzione else mescolati
+        } else {
+            mescolati
+        }
+
         val scelti = LinkedHashSet<Int>()
-        TipoEsercizioGrammatica.entries.forEach { tipo ->
-            if (scelti.size < n) {
-                mescolati.firstOrNull { banco[it].tipo == tipo && it !in scelti }
-                    ?.let { scelti += it }
+        var produzioni = 0
+        var picchi = 0
+
+        fun ammesso(indice: Int): Boolean {
+            val esercizio = banco[indice]
+            if (DifficoltaEsercizi.eProduzione(esercizio)) return produzioni < 1
+            if (DifficoltaEsercizi.ePicco(esercizio)) return picchi < 1
+            return true
+        }
+
+        fun aggiungi(indice: Int) {
+            if (!scelti.add(indice)) return
+            val esercizio = banco[indice]
+            if (DifficoltaEsercizi.eProduzione(esercizio)) {
+                produzioni++
+            } else if (DifficoltaEsercizi.ePicco(esercizio)) {
+                // La produzione ha già il suo tetto: qui si contano solo gli
+                // altri esercizi molto impegnativi.
+                picchi++
             }
         }
-        for (indice in mescolati) {
-            if (scelti.size >= n) break
-            scelti += indice
+
+        // Un esercizio per ogni tipo presente: non deve mancare la produzione
+        // (quando è ammessa) né la trasformazione, altrimenti la sessione
+        // allena solo il riconoscimento.
+        TipoEsercizioGrammatica.entries.forEach { tipo ->
+            if (scelti.size >= n) return@forEach
+            disponibili.firstOrNull {
+                banco[it].tipo == tipo && it !in scelti && ammesso(it)
+            }?.let { aggiungi(it) }
         }
-        // Mantiene l'ordine mescolato, non l'ordine dei tipi.
-        return mescolati.filter { it in scelti }
+        for (indice in disponibili) {
+            if (scelti.size >= n) break
+            if (indice in scelti) continue
+            if (ammesso(indice)) aggiungi(indice)
+        }
+        // Rete di sicurezza: se i tetti hanno lasciato meno del minimo, meglio
+        // una sessione completa (e un picco in più) che una sessione monca.
+        if (scelti.size < minOf(n, MINIMO_PER_SESSIONE)) {
+            for (indice in disponibili) {
+                if (scelti.size >= n) break
+                aggiungi(indice)
+            }
+        }
+
+        // Facile -> difficile. A parità di punteggio resta l'ordine mescolato,
+        // così due sessioni con gli stessi esercizi non sono identiche.
+        return scelti.sortedWith(
+            compareBy(
+                { DifficoltaEsercizi.punteggio(banco[it]) },
+                { disponibili.indexOf(it) }
+            )
+        )
     }
 }
 

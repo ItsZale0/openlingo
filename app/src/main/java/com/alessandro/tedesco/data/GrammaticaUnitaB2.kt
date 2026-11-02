@@ -448,7 +448,7 @@ internal fun unitaB2VerbenPraepositionen(): UnitaGrammatica = unitaGrammatica(
     esercizi = listOf(
         sceltaUnita(
             "b2vp-01",
-            "Ich warte ___ den Bus.",
+            "Wir warten ___ den Arzt.",
             listOf("für", "auf", "an", "über"),
             1,
             "warten auf + accusativo."
@@ -568,7 +568,7 @@ internal fun unitaB2RelativeWasWo(): UnitaGrammatica = unitaGrammatica(
         ),
         sceltaUnita(
             "b2rw-02",
-            "Das Buch, ___ ich lese, ist spannend.",
+            "Das Buch, ___ auf dem Tisch liegt, gehört mir.",
             listOf("was", "das", "wo", "wer"),
             1,
             "Nome concreto neutro: das."
