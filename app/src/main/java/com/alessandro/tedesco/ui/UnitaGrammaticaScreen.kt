@@ -476,15 +476,14 @@ private fun TeoriaUnita(
             }
         }
 
-        // Regole testate dagli esercizi ma non ancora esplicitate nella teoria:
-        // senza questa sezione l'esercizio può chiedere qualcosa che la lezione
-        // non ha mai spiegato.
-        val dettagli = remember(unita) { PercorsoLezioni.dettagliEsercizi(unita) }
-        if (dettagli.isNotEmpty()) {
+        // Regole che gli esercizi mettono alla prova ma che la teoria non dice
+        // ancora. NON contiene le risposte: sarebbe un aiuto, non una lezione.
+        val promemoria = remember(unita) { PercorsoLezioni.promemoriaEsercizi(unita) }
+        if (promemoria.isNotEmpty()) {
             Spacer(Modifier.height(Spaziature.md))
             SezioneTitolo(
-                "Cosa serve per gli esercizi",
-                "Le regole che gli esercizi di questa unità mettono alla prova."
+                "Promemoria",
+                "Le regole che gli esercizi mettono alla prova, senza svelare le risposte."
             )
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -494,7 +493,7 @@ private fun TeoriaUnita(
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
             ) {
                 Column(Modifier.padding(Spaziature.md)) {
-                    dettagli.forEach { testo ->
+                    promemoria.forEach { testo ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()

@@ -125,20 +125,67 @@ class PercorsoLezioniTest {
     }
 
     @Test
-    fun laTeoriaSpiegaAncheCioCheChiedonoGliEsercizi() {
-        val unita = GrammaticaSyllabus.perId("a1-akkusativ")!!
-        val dettagli = PercorsoLezioni.dettagliEsercizi(unita)
+    fun ilPromemoriaDellaTeoriaNonSvelaLeRisposte() {
+        // La teoria deve spiegare le regole testate dagli esercizi, ma NON può
+        // dire quale opzione scegliere: sarebbe un esercizio già risolto.
+        fun radice(parola: String) = if (parola.length >= 5) parola.take(5) else parola
 
-        assertTrue("Ci sono regole degli esercizi non spiegate", dettagli.isNotEmpty())
-        assertTrue(
-            "La regola del neutro (Buch) deve comparire tra i dettagli",
-            dettagli.any { it.contains("Buch") }
+        GrammaticaSyllabus.unita.forEach { unita ->
+            val parolePromemoria = DeduplicaEsercizi
+                .normalizza(PercorsoLezioni.promemoriaEsercizi(unita).joinToString(" | "))
+                .split(Regex("\\s+"))
+                .filter { it.isNotBlank() }
+                .map { radice(it) }
+                .toSet()
+            unita.esercizi.forEach { esercizio ->
+                val risposte = when (esercizio.tipo) {
+                    TipoEsercizioGrammatica.SCELTA_MULTIPLA ->
+                        listOf(esercizio.opzioni[esercizio.rispostaCorretta])
+
+                    else -> listOf(esercizio.rispostaTesto) + esercizio.alternative
+                }
+                risposte.filter { it.isNotBlank() }.forEach { risposta ->
+                    val r = DeduplicaEsercizi.normalizza(risposta)
+                    if (r.length >= 2) {
+                        assertFalse(
+                            "Il promemoria di ${unita.id} svela la risposta \"$risposta\": " +
+                                PercorsoLezioni.promemoriaEsercizi(unita),
+                            radice(r) in parolePromemoria
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun ilPromemoriaNonRipeteCioCheLaTeoriaGiaDice() {
+        val unita = GrammaticaSyllabus.perId("a1-akkusativ")!!
+        val testoTeoria = DeduplicaEsercizi.normalizza(
+            PercorsoLezioni.teoriaMarkdown(unita).substringBefore("### Promemoria")
         )
-        val markdown = PercorsoLezioni.teoriaMarkdown(unita)
-        assertTrue(
-            "Il testo della teoria deve contenere la sezione dedicata",
-            markdown.contains("Cosa serve per gli esercizi")
-        )
+        PercorsoLezioni.promemoriaEsercizi(unita).forEach { voce ->
+            val normale = DeduplicaEsercizi.normalizza(voce)
+            assertFalse(
+                "Promemoria duplicato della teoria: $voce",
+                testoTeoria.contains(normale)
+            )
+        }
+    }
+
+    @Test
+    fun laSezionePromemoriaCompareSoloQuandoServe() {
+        // Le unità con la teoria già completa non devono mostrare una sezione
+        // vuota; quelle con regole mancanti sì, senza risposte dentro.
+        val conPromemoria = GrammaticaSyllabus.unita.filter {
+            PercorsoLezioni.promemoriaEsercizi(it).isNotEmpty()
+        }
+        assertTrue("Nessuna unità ha un promemoria", conPromemoria.isNotEmpty())
+        conPromemoria.forEach { unita ->
+            assertTrue(
+                PercorsoLezioni.teoriaMarkdown(unita).contains("### Promemoria")
+            )
+        }
     }
 
     @Test

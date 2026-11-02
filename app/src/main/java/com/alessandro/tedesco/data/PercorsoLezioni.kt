@@ -190,54 +190,131 @@ object PercorsoLezioni {
             appendLine()
         }
 
-        val dettagli = dettagliEsercizi(unita)
-        if (dettagli.isNotEmpty()) {
-            appendLine("### Cosa serve per gli esercizi")
-            appendLine("_Ogni esercizio testa una di queste cose: qui le trovi tutte._")
+        val promemoria = promemoriaEsercizi(unita)
+        if (promemoria.isNotEmpty()) {
+            appendLine("### Promemoria")
+            appendLine("_Le regole che gli esercizi mettono alla prova, senza svelare le risposte._")
             appendLine()
-            dettagli.forEach { appendLine("- $it") }
+            promemoria.forEach { appendLine("- $it") }
         }
     }.trim()
 
+    private val separatoriSpiegazione = Regex("[:;.]|→|->|=>|\\n")
+
     /**
-     * Spiegazioni degli esercizi che NON sono già nella teoria.
-     *
-     * Serve a chiudere il caso "la teoria non spiega quello che poi chiedono
-     * gli esercizi": il testo della lezione viene completato con le regole
-     * effettivamente testate, senza duplicare ciò che è già spiegato.
+     * Parole che rendono una clausola una vera regola grammaticale. Senza
+     * questo filtro restano frasi generiche o spezzoni senza valore didattico
+     * ("era ovviamente chiaro", "A inizio frase").
      */
-    fun dettagliEsercizi(unita: UnitaGrammatica, max: Int = 10): List<String> {
-        val teoria = buildString {
-            unita.teoria.regola.forEach { appendLine(it) }
-            unita.teoria.tabelle.forEach { tabella ->
-                appendLine(tabella.titolo)
-                appendLine(tabella.intestazioni.joinToString(" "))
-                tabella.righe.forEach { appendLine(it.joinToString(" ")) }
-                appendLine(tabella.nota)
+    private val paroleGrammaticali: Set<String> = setOf(
+        "accusativo", "dativo", "genitivo", "nominativo", "plurale", "singolare",
+        "articolo", "articoli", "verbo", "verbi", "aggettivo", "aggettivi",
+        "sostantivo", "sostantivi", "nome", "nomi", "preposizione", "preposizioni",
+        "pronome", "pronomi", "femminile", "maschile", "neutro", "desinenza",
+        "desinenze", "suffisso", "suffissi", "posizione", "congiunzione",
+        "subordinata", "principale", "passivo", "ausiliare", "infinito",
+        "participio", "imperativo", "comparativo", "superlativo", "possessivo",
+        "negazione", "modale", "modali", "prefisso", "frase", "frasi", "caso",
+        "declinazione", "pronuncia", "suono", "vocale", "consonante", "accento",
+        "confronto", "riflessivo", "riflessivi", "congiuntivo", "konjunktiv",
+        "präteritum", "perfekt", "plusquamperfekt", "futuro", "genere", "forma",
+        "forme", "inversione", "ordine", "complemento", "oggetto", "soggetto",
+        "relativa", "relativo", "domanda", "risposta", "tempi", "passato",
+        "presente", "declinazione", "desinenze", "imperfetto", "traduzione"
+    )
+
+    /**
+     * Promemoria delle regole che gli esercizi mettono alla prova, SENZA le
+     * risposte.
+     *
+     * Un esercizio non deve diventare banale solo perché la teoria ha appena
+     * detto quale opzione scegliere: la spiegazione di un esercizio contiene
+     * sempre la soluzione, quindi non può essere copiata nella lezione. Qui
+     * della spiegazione si tengono solo le clausole che NON contengono la
+     * risposta corretta e che la teoria non dice già.
+     *
+     * Esempio: "Mann è maschile; all'accusativo der diventa den." diventa
+     * "Mann è maschile" perché la seconda parte contiene la risposta "den".
+     */
+    fun promemoriaEsercizi(unita: UnitaGrammatica, max: Int = 6): List<String> {
+        val testoTeoria = DeduplicaEsercizi.normalizza(testoTeoria(unita))
+        // Parole che compaiono nelle domande e nelle risposte della unità.
+        // Una regola che nomina una di queste parole è troppo vicina alla
+        // soluzione (spesso è proprio la parola su cui si risponde): fuori.
+        val paroleUnita = unita.esercizi
+            .flatMap { e -> listOf(e.domanda) + e.opzioni + risposteCorrette(e) }
+            .flatMap { testo -> testo.split(Regex("[^\\p{L}\\p{N}]+")) }
+            .map { DeduplicaEsercizi.normalizza(it) }
+            .filter { it.length >= 2 }
+            .map { radice(it) }
+            .toSet()
+        // Chiave = "forma" della clausola: così cinque frasi del tipo
+        // "X è maschile" non occupano cinque righe.
+        val perForma = LinkedHashMap<String, String>()
+        unita.esercizi.forEach { esercizio ->
+            val spiegazione = esercizio.spiegazione.trim()
+            if (spiegazione.isEmpty()) return@forEach
+            if (spiegazione.equals("Nessuna spiegazione disponibile.", ignoreCase = true)) return@forEach
+            spiegazione.split(separatoriSpiegazione).forEach clausola@{ grezza ->
+                val clausola = grezza.trim(' ', ',', ';', ':', '-', '–', '—', '(', ')', '"', '«', '»')
+                val parole = clausola.split(Regex("[^\\p{L}\\p{N}]+"))
+                    .map { DeduplicaEsercizi.normalizza(it) }
+                    .filter { it.isNotEmpty() }
+                if (parole.size < 3) return@clausola
+                if (parole.none { it in paroleGrammaticali }) return@clausola
+                if (parole.any { radice(it) in paroleUnita }) return@clausola
+                val normale = DeduplicaEsercizi.normalizza(clausola)
+                if (normale.isEmpty()) return@clausola
+                if (testoTeoria.contains(normale)) return@clausola
+                perForma.putIfAbsent(forma(normale), clausola)
             }
-            unita.teoria.esempi.forEach {
-                appendLine(it.tedesco)
-                appendLine(it.italiano)
-                appendLine(it.nota)
-            }
-            unita.teoria.erroriTipici.forEach {
-                appendLine(it.sbagliato)
-                appendLine(it.corretto)
-                appendLine(it.spiegazione)
-            }
-            appendLine(unita.teoria.merksatz)
         }
-        val testoTeoria = DeduplicaEsercizi.normalizza(teoria)
-        return unita.esercizi.asSequence()
-            .map { it.spiegazione.trim() }
-            .filter { it.isNotEmpty() }
-            .filterNot { it.equals("Nessuna spiegazione disponibile.", ignoreCase = true) }
-            .filter { s ->
-                val normalizzata = DeduplicaEsercizi.normalizza(s)
-                normalizzata.isNotEmpty() && !testoTeoria.contains(normalizzata)
-            }
-            .distinctBy { DeduplicaEsercizi.chiave(it) }
-            .take(max)
-            .toList()
+        return perForma.values.take(max).toList()
+    }
+
+    /** Testo della teoria in un'unica stringa, per capire cosa è già spiegato. */
+    private fun testoTeoria(unita: UnitaGrammatica): String = buildString {
+        unita.teoria.regola.forEach { appendLine(it) }
+        unita.teoria.tabelle.forEach { tabella ->
+            appendLine(tabella.titolo)
+            appendLine(tabella.intestazioni.joinToString(" "))
+            tabella.righe.forEach { appendLine(it.joinToString(" ")) }
+            appendLine(tabella.nota)
+        }
+        unita.teoria.esempi.forEach {
+            appendLine(it.tedesco)
+            appendLine(it.italiano)
+            appendLine(it.nota)
+        }
+        unita.teoria.erroriTipici.forEach {
+            appendLine(it.sbagliato)
+            appendLine(it.corretto)
+            appendLine(it.spiegazione)
+        }
+        appendLine(unita.teoria.merksatz)
+    }
+
+    /** Le risposte corrette di un esercizio, in qualunque formato sia scritto. */
+    private fun risposteCorrette(esercizio: EsercizioUnita): List<String> = when (esercizio.tipo) {
+        TipoEsercizioGrammatica.SCELTA_MULTIPLA ->
+            listOfNotNull(esercizio.opzioni.getOrNull(esercizio.rispostaCorretta))
+
+        else -> (listOf(esercizio.rispostaTesto) + esercizio.alternative)
+            .filter { it.isNotBlank() }
+    }
+
+    /**
+     * Radice approssimativa di una parola tedesca/italiana: i primi 5 caratteri.
+     * Serve a riconoscere "heiße"/"heißen" o "Freund"/"Freundin" come la stessa
+     * parola senza un vero stemmer: se una forma della risposta compare nella
+     * spiegazione (anche con desinenza diversa), la clausola va scartata.
+     */
+    private fun radice(parola: String): String =
+        if (parola.length >= 5) parola.take(5) else parola
+
+    /** Forma della clausola senza la prima parola (spesso il nome tedesco). */
+    private fun forma(normale: String): String {
+        val resto = normale.substringAfter(' ', "")
+        return resto.ifBlank { normale }
     }
 }
