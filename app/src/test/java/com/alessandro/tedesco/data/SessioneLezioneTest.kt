@@ -211,4 +211,25 @@ class SessioneLezioneTest {
             SessioneLezione.daGenerato(rotto.copy(rispostaCorretta = 1))
         )
     }
+
+    @Test
+    fun `un esercizio AI con accordo sbagliato viene scartato`() {
+        // "einen Buch" è sbagliato: Buch è neutro. L'esercizio non deve arrivare
+        // allo studente solo perché l'AI lo ha prodotto.
+        val sbagliato = EsercizioGenEntity(
+            id = "ai-sbagliato",
+            tipo = "grammatica",
+            domanda = "Ich habe ___ Buch.",
+            opzioni = listOf("einen", "eine", "ein", "einem"),
+            rispostaCorretta = 0,
+            spiegazione = "Accusativo maschile."
+        )
+        assertNull(SessioneLezione.daGenerato(sbagliato))
+
+        val corretto = sbagliato.copy(
+            opzioni = listOf("ein", "eine", "einen", "einem"),
+            rispostaCorretta = 0
+        )
+        assertNotNull(SessioneLezione.daGenerato(corretto))
+    }
 }

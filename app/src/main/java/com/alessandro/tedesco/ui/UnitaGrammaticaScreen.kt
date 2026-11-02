@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import com.alessandro.tedesco.data.EsempioGrammatica
 import com.alessandro.tedesco.data.EsercizioUnita
 import com.alessandro.tedesco.data.GrammaticaSyllabus
+import com.alessandro.tedesco.data.PercorsoLezioni
 import com.alessandro.tedesco.data.local.RotazioneUnita
 import com.alessandro.tedesco.data.SessioneLezione
 import com.alessandro.tedesco.data.TabellaGrammatica
@@ -471,6 +472,49 @@ private fun TeoriaUnita(
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onTertiaryContainer
                     )
+                }
+            }
+        }
+
+        // Regole testate dagli esercizi ma non ancora esplicitate nella teoria:
+        // senza questa sezione l'esercizio può chiedere qualcosa che la lezione
+        // non ha mai spiegato.
+        val dettagli = remember(unita) { PercorsoLezioni.dettagliEsercizi(unita) }
+        if (dettagli.isNotEmpty()) {
+            Spacer(Modifier.height(Spaziature.md))
+            SezioneTitolo(
+                "Cosa serve per gli esercizi",
+                "Le regole che gli esercizi di questa unità mettono alla prova."
+            )
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                ),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+            ) {
+                Column(Modifier.padding(Spaziature.md)) {
+                    dettagli.forEach { testo ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 3.dp),
+                            verticalAlignment = Alignment.Top
+                        ) {
+                            Text(
+                                "-",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                testo,
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
                 }
             }
         }

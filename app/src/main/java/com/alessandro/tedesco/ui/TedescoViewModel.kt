@@ -27,6 +27,7 @@ import com.alessandro.tedesco.data.WordRepository
 import com.alessandro.tedesco.data.local.ProfiloStato
 import com.alessandro.tedesco.data.local.LivelloIniziale
 import com.alessandro.tedesco.data.CalcoloCompetenze
+import com.alessandro.tedesco.data.ControlloGrammatica
 import com.alessandro.tedesco.data.local.LivelloCEFR
 import com.alessandro.tedesco.data.ProfiliPreset
 import com.alessandro.tedesco.data.local.ProfiloUtente
@@ -242,7 +243,10 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
     val percorsoGrammatica: StateFlow<List<UnitaConStato>> = profileManager.repositoryFlow
         .map { r ->
             val stato = r.profiloAttivoId?.let { r.profili[it]?.stato } ?: ProfiloStato()
-            GrammaticaSyllabus.percorso(stato.padronanzaGrammatica)
+            GrammaticaSyllabus.percorso(
+                mappa = stato.padronanzaGrammatica,
+                livelloProfilo = stato.progresso.livelloCorrente.label
+            )
         }
         .stateIn(
             viewModelScope,
@@ -340,7 +344,10 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
         if (stats == null) return@combine null
         val profilo = repo.profiloAttivoId?.let { repo.profili[it] } ?: return@combine null
         val oggi = oggiKey()
-        val prossima = GrammaticaSyllabus.prossimaUnita(profilo.stato.padronanzaGrammatica)
+        val prossima = GrammaticaSyllabus.prossimaUnita(
+            mappa = profilo.stato.padronanzaGrammatica,
+            livelloProfilo = profilo.stato.progresso.livelloCorrente.label
+        )
         val persistiti = if (profilo.stato.passiGiornoData == oggi) {
             profilo.stato.passiGiornoIds.toSet()
         } else {
@@ -1532,6 +1539,17 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
             try {
                 val esistenti = profilo.stato.eserciziUnitaAi[unitaId].orEmpty()
                 val evita = unita.esercizi.map { it.domanda } + esistenti.map { it.domanda }
+                // Le regole della unità entrano nel prompt: l'AI deve restare
+                // dentro la teoria che lo studente ha appena letto.
+                val tema = buildString {
+                    append(unita.titolo)
+                    append(" — ")
+                    append(unita.obiettivo)
+                    if (unita.teoria.regola.isNotEmpty()) {
+                        append("\nRegole della unità: ")
+                        append(unita.teoria.regola.take(5).joinToString(" "))
+                    }
+                }
                 val generati = app.generatoreEserciziInstance.genera(
                     apiKey = tutorApiKey.value,
                     tipo = TipoEsercizio.GRAMMATICA,
@@ -1539,15 +1557,19 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                     quanti = quanti,
                     contestoMedico = profilo.config.mostraContestoMedico,
                     evita = evita,
-                    tema = "${unita.titolo} — ${unita.obiettivo}"
+                    tema = tema
                 )
                 if (generati.isEmpty()) return@launch
                 val attuale = profileManager.profiloAttivo() ?: return@launch
+                // Ripulisce anche gli esercizi AI già salvati: una versione
+                // precedente può aver accettato forme sbagliate ("einen Buch").
                 val giaPresenti = attuale.stato.eserciziUnitaAi[unitaId].orEmpty()
+                    .filter { ControlloGrammatica.problemi(it.domanda, it.opzioni, it.rispostaCorretta).isEmpty() }
                 val chiavi = (unita.esercizi.map { it.domanda } + giaPresenti.map { it.domanda })
                     .mapTo(HashSet()) { DeduplicaEsercizi.chiave(it) }
                 val nuovi = DeduplicaEsercizi.distinti(generati) { DeduplicaEsercizi.chiave(it.domanda) }
                     .filter { DeduplicaEsercizi.chiave(it.domanda) !in chiavi }
+                    .filter { ControlloGrammatica.problemi(it.domanda, it.opzioni, it.rispostaCorretta).isEmpty() }
                     .map { e ->
                         EsercizioGenEntity(
                             id = e.id,

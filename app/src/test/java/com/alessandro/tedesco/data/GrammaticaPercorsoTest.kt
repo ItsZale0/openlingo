@@ -308,6 +308,25 @@ class GrammaticaPercorsoTest {
     }
 
     @Test
+    fun cambiareLivelloSbloccaLeUnitaFinoAQuelLivello() {
+        // Emma è B1: senza prerequisiti deve comunque poter aprire tutto fino al B1.
+        val percorso = GrammaticaSyllabus.percorso(emptyMap(), adesso, livelloProfilo = "B1")
+        val finoAB1 = percorso.filter { it.unita.livello in listOf("A0", "A1", "A2", "B1") }
+        assertTrue(
+            "Le unità fino al B1 devono essere accessibili",
+            finoAB1.all { it.accessibile }
+        )
+        assertTrue(
+            "Il B2 resta bloccato finché i prerequisiti non sono completati",
+            percorso.filter { it.unita.livello == "B2" }.none { it.accessibile }
+        )
+
+        // Alzando ancora il livello si apre anche il B2.
+        val b2 = GrammaticaSyllabus.percorso(emptyMap(), adesso, livelloProfilo = "B2")
+        assertTrue("Con livello B2 tutto è accessibile", b2.all { it.accessibile })
+    }
+
+    @Test
     fun normalizzaMaiuscoleSpaziEPunteggiatura() {
         assertEquals("ich sehe den hund", GrammaticaSyllabus.normalizza("  Ich  sehe   den Hund.  "))
         assertEquals("ich sehe den hund", GrammaticaSyllabus.normalizza("ICH SEHE DEN HUND!"))

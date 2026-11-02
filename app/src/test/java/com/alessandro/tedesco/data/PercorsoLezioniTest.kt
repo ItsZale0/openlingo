@@ -125,6 +125,23 @@ class PercorsoLezioniTest {
     }
 
     @Test
+    fun laTeoriaSpiegaAncheCioCheChiedonoGliEsercizi() {
+        val unita = GrammaticaSyllabus.perId("a1-akkusativ")!!
+        val dettagli = PercorsoLezioni.dettagliEsercizi(unita)
+
+        assertTrue("Ci sono regole degli esercizi non spiegate", dettagli.isNotEmpty())
+        assertTrue(
+            "La regola del neutro (Buch) deve comparire tra i dettagli",
+            dettagli.any { it.contains("Buch") }
+        )
+        val markdown = PercorsoLezioni.teoriaMarkdown(unita)
+        assertTrue(
+            "Il testo della teoria deve contenere la sezione dedicata",
+            markdown.contains("Cosa serve per gli esercizi")
+        )
+    }
+
+    @Test
     fun laLezioneApertaRiprendeDalPuntoSalvato() {
         val lezione = PercorsoLezioni.perId("a1-akkusativ", emptyMap(), "B1")!!
         val totale = lezione.unita.esercizi.size

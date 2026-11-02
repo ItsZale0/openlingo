@@ -92,7 +92,13 @@ enum class StatoUnita {
 data class UnitaConStato(
     val unita: UnitaGrammatica,
     val stato: StatoUnita,
-    val padronanza: PadronanzaGrammatica?
+    val padronanza: PadronanzaGrammatica?,
+    /**
+     * True se lo studente può aprirla: prerequisiti fatti OPPURE livello già
+     * raggiunto. È diverso da [stato]: una unità sotto il livello del profilo
+     * resta formalmente "bloccata" dai prerequisiti, ma deve essere apribile.
+     */
+    val accessibile: Boolean = true
 )
 
 /**
@@ -216,22 +222,49 @@ object GrammaticaSyllabus {
 
     fun perId(id: String): UnitaGrammatica? = unita.firstOrNull { it.id == id }
 
-    /** Calcola lo stato di tutte le unità a partire dalla mappa salvata. */
+    /**
+     * Calcola lo stato di tutte le unità a partire dalla mappa salvata.
+     *
+     * [livelloProfilo] serve a NON lasciare tutto bloccato quando lo studente
+     * cambia livello a mano: chi è B1 deve poter aprire tutte le unità fino al
+     * B1 anche senza i prerequisiti, altrimenti il cambio livello non produce
+     * nessun effetto visibile.
+     */
     fun percorso(
         mappa: Map<String, PadronanzaGrammatica>,
-        now: Long = System.currentTimeMillis()
-    ): List<UnitaConStato> = unita.map { unita ->
-        val padronanza = mappa[unita.id]
-        val stato = when {
-            padronanza?.completata == true &&
-                padronanza.prossimaRipasso > 0L &&
-                padronanza.prossimaRipasso <= now -> StatoUnita.DA_RIPASSARE
+        now: Long = System.currentTimeMillis(),
+        livelloProfilo: String? = null
+    ): List<UnitaConStato> {
+        val soglia = sogliaLivello(livelloProfilo)
+        return unita.map { unita ->
+            val padronanza = mappa[unita.id]
+            val stato = when {
+                padronanza?.completata == true &&
+                    padronanza.prossimaRipasso > 0L &&
+                    padronanza.prossimaRipasso <= now -> StatoUnita.DA_RIPASSARE
 
-            padronanza?.completata == true -> StatoUnita.COMPLETATA
-            sbloccata(unita, mappa) -> StatoUnita.DISPONIBILE
-            else -> StatoUnita.BLOCCATA
+                padronanza?.completata == true -> StatoUnita.COMPLETATA
+                sbloccata(unita, mappa) -> StatoUnita.DISPONIBILE
+                else -> StatoUnita.BLOCCATA
+            }
+            val perLivello = soglia >= 0 && ordineLivello(unita.livello) <= soglia
+            UnitaConStato(unita, stato, padronanza, stato != StatoUnita.BLOCCATA || perLivello)
         }
-        UnitaConStato(unita, stato, padronanza)
+    }
+
+    /** Ordine CEFR di un livello ("B1 - Intermedio" -> 3). -1 se assente. */
+    private fun sogliaLivello(livello: String?): Int {
+        if (livello.isNullOrBlank()) return -1
+        val codice = livello.uppercase(Locale.ROOT)
+            .substringBefore(" - ")
+            .substringBefore(" ")
+            .trim()
+        return ordineLivelli.indexOf(codice)
+    }
+
+    private fun ordineLivello(livello: String?): Int {
+        val indice = sogliaLivello(livello)
+        return if (indice < 0) ordineLivelli.lastIndex else indice
     }
 
     /** Una unità è sbloccata quando tutti i prerequisiti sono completati. */
@@ -243,14 +276,22 @@ object GrammaticaSyllabus {
     /**
      * Prossima azione consigliata: prima i ripassi scaduti, poi la prima
      * unità disponibile, infine una unità completata da ripassare a mano.
+     * Con [livelloProfilo] non propone unità troppo facili per chi ha già un
+     * livello alto (Emma B1 non deve ripartire dall'alfabeto).
      */
     fun prossimaUnita(
         mappa: Map<String, PadronanzaGrammatica>,
-        now: Long = System.currentTimeMillis()
+        now: Long = System.currentTimeMillis(),
+        livelloProfilo: String? = null
     ): UnitaConStato? {
-        val lista = percorso(mappa, now)
+        val lista = percorso(mappa, now, livelloProfilo)
+        val soglia = sogliaLivello(livelloProfilo)
         return lista.firstOrNull { it.stato == StatoUnita.DA_RIPASSARE }
-            ?: lista.firstOrNull { it.stato == StatoUnita.DISPONIBILE }
+            ?: lista.firstOrNull {
+                it.accessibile && it.stato != StatoUnita.COMPLETATA &&
+                    soglia >= 0 && ordineLivello(it.unita.livello) >= soglia
+            }
+            ?: lista.firstOrNull { it.accessibile && it.stato != StatoUnita.COMPLETATA }
             ?: lista.firstOrNull { it.stato == StatoUnita.COMPLETATA }
     }
 

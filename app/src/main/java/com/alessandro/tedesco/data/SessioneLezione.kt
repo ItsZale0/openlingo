@@ -70,6 +70,11 @@ object SessioneLezione {
         if (e.domanda.isBlank()) return null
         if (e.opzioni.size < 2) return null
         if (e.rispostaCorretta !in e.opzioni.indices) return null
+        // Un esercizio grammaticalmente sbagliato insegna una regola falsa:
+        // meglio scartarlo e restare con il banco scritto a mano.
+        if (ControlloGrammatica.problemi(e.domanda, e.opzioni, e.rispostaCorretta).isNotEmpty()) {
+            return null
+        }
         return EsercizioUnita(
             id = "ai-${e.id}",
             tipo = TipoEsercizioGrammatica.SCELTA_MULTIPLA,

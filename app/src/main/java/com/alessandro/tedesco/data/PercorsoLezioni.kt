@@ -74,18 +74,17 @@ object PercorsoLezioni {
         livelloProfilo: String? = null,
         now: Long = System.currentTimeMillis()
     ): List<LezionePercorso> {
-        val soglia = ordineLivello(livelloProfilo)
-        return GrammaticaSyllabus.percorso(mappa, now).mapIndexed { indice, unitaConStato ->
-            val unita = unitaConStato.unita
-            LezionePercorso(
-                numero = indice + 1,
-                unita = unita,
-                stato = unitaConStato.stato,
-                padronanza = unitaConStato.padronanza,
-                accessibile = unitaConStato.stato != StatoUnita.BLOCCATA ||
-                    ordineLivello(unita.livello) <= soglia
-            )
-        }
+        return GrammaticaSyllabus.percorso(mappa, now, livelloProfilo)
+            .mapIndexed { indice, unitaConStato ->
+                val unita = unitaConStato.unita
+                LezionePercorso(
+                    numero = indice + 1,
+                    unita = unita,
+                    stato = unitaConStato.stato,
+                    padronanza = unitaConStato.padronanza,
+                    accessibile = unitaConStato.accessibile
+                )
+            }
     }
 
     fun perId(
@@ -188,6 +187,57 @@ object PercorsoLezioni {
 
         if (teoria.merksatz.isNotBlank()) {
             appendLine("> **Merksatz:** ${teoria.merksatz}")
+            appendLine()
+        }
+
+        val dettagli = dettagliEsercizi(unita)
+        if (dettagli.isNotEmpty()) {
+            appendLine("### Cosa serve per gli esercizi")
+            appendLine("_Ogni esercizio testa una di queste cose: qui le trovi tutte._")
+            appendLine()
+            dettagli.forEach { appendLine("- $it") }
         }
     }.trim()
+
+    /**
+     * Spiegazioni degli esercizi che NON sono già nella teoria.
+     *
+     * Serve a chiudere il caso "la teoria non spiega quello che poi chiedono
+     * gli esercizi": il testo della lezione viene completato con le regole
+     * effettivamente testate, senza duplicare ciò che è già spiegato.
+     */
+    fun dettagliEsercizi(unita: UnitaGrammatica, max: Int = 10): List<String> {
+        val teoria = buildString {
+            unita.teoria.regola.forEach { appendLine(it) }
+            unita.teoria.tabelle.forEach { tabella ->
+                appendLine(tabella.titolo)
+                appendLine(tabella.intestazioni.joinToString(" "))
+                tabella.righe.forEach { appendLine(it.joinToString(" ")) }
+                appendLine(tabella.nota)
+            }
+            unita.teoria.esempi.forEach {
+                appendLine(it.tedesco)
+                appendLine(it.italiano)
+                appendLine(it.nota)
+            }
+            unita.teoria.erroriTipici.forEach {
+                appendLine(it.sbagliato)
+                appendLine(it.corretto)
+                appendLine(it.spiegazione)
+            }
+            appendLine(unita.teoria.merksatz)
+        }
+        val testoTeoria = DeduplicaEsercizi.normalizza(teoria)
+        return unita.esercizi.asSequence()
+            .map { it.spiegazione.trim() }
+            .filter { it.isNotEmpty() }
+            .filterNot { it.equals("Nessuna spiegazione disponibile.", ignoreCase = true) }
+            .filter { s ->
+                val normalizzata = DeduplicaEsercizi.normalizza(s)
+                normalizzata.isNotEmpty() && !testoTeoria.contains(normalizzata)
+            }
+            .distinctBy { DeduplicaEsercizi.chiave(it) }
+            .take(max)
+            .toList()
+    }
 }

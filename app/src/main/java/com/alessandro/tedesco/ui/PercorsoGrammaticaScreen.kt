@@ -65,8 +65,8 @@ fun PercorsoGrammaticaScreen(
     )
 
     val prossima = remember(percorso) {
-        percorso.firstOrNull { it.stato == StatoUnita.DA_RIPASSARE }
-            ?: percorso.firstOrNull { it.stato == StatoUnita.DISPONIBILE }
+        percorso.firstOrNull { it.stato == StatoUnita.DA_RIPASSARE && it.accessibile }
+            ?: percorso.firstOrNull { it.accessibile && it.stato != StatoUnita.COMPLETATA }
             ?: percorso.firstOrNull { it.stato == StatoUnita.COMPLETATA }
     }
     val completate = percorso.count { it.padronanza?.completata == true }
@@ -266,11 +266,11 @@ private fun CardProssimaUnita(
     onApri: () -> Unit
 ) {
     val unita = voce.unita
-    val (etichetta, azione) = when (voce.stato) {
-        StatoUnita.DA_RIPASSARE -> "Ripasso in scadenza" to "Ripassa"
-        StatoUnita.DISPONIBILE -> "Prossima unità" to "Inizia"
-        StatoUnita.COMPLETATA -> "Percorso completato" to "Ripassa"
-        StatoUnita.BLOCCATA -> "Bloccata" to "Apri"
+    val (etichetta, azione) = when {
+        !voce.accessibile -> "Bloccata" to "Apri"
+        voce.stato == StatoUnita.DA_RIPASSARE -> "Ripasso in scadenza" to "Ripassa"
+        voce.stato == StatoUnita.COMPLETATA -> "Percorso completato" to "Ripassa"
+        else -> "Prossima unità" to "Inizia"
     }
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -321,17 +321,17 @@ private fun CardUnita(
     onApri: () -> Unit
 ) {
     val unita = voce.unita
-    val bloccata = voce.stato == StatoUnita.BLOCCATA
+    val bloccata = !voce.accessibile
     val coloreSfondo = when (voce.stato) {
         StatoUnita.DA_RIPASSARE -> MaterialTheme.colorScheme.tertiaryContainer
         StatoUnita.COMPLETATA -> MaterialTheme.colorScheme.primaryContainer
         else -> MaterialTheme.colorScheme.surface
     }
-    val (icona, descrizioneStato) = when (voce.stato) {
-        StatoUnita.BLOCCATA -> Icons.Filled.Lock to "Bloccata"
-        StatoUnita.DISPONIBILE -> Icons.Filled.PlayArrow to "Da iniziare"
-        StatoUnita.COMPLETATA -> Icons.Filled.CheckCircle to "Completata"
-        StatoUnita.DA_RIPASSARE -> Icons.Filled.Refresh to "Da ripassare"
+    val (icona, descrizioneStato) = when {
+        bloccata -> Icons.Filled.Lock to "Bloccata"
+        voce.stato == StatoUnita.DA_RIPASSARE -> Icons.Filled.Refresh to "Da ripassare"
+        voce.stato == StatoUnita.COMPLETATA -> Icons.Filled.CheckCircle to "Completata"
+        else -> Icons.Filled.PlayArrow to "Da iniziare"
     }
     val prerequisiti = remember(unita) {
         unita.prerequisiti.mapNotNull { id -> GrammaticaSyllabus.perId(id)?.titolo }

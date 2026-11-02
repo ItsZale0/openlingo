@@ -7,6 +7,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
+import com.alessandro.tedesco.data.ControlloGrammatica
 import com.alessandro.tedesco.data.DeduplicaEsercizi
 import com.alessandro.tedesco.di.HttpCondiviso
 import okhttp3.Request
@@ -258,12 +259,21 @@ class GeneratoreEsercizi {
             TEMA OBBLIGATORIO (vincolo assoluto):
             - Tutti gli esercizi devono allenare esattamente questa regola: $tema
             - NON cambiare argomento e NON mescolare altre regole grammaticali.
+            - Usa SOLO la grammatica spiegata nel tema: se un esercizio richiede una
+              regola che non è nel tema, non generarlo.
             - Formato preferito: frase tedesca con un buco ___ (es. "Der ___ Hund spielt im Garten.")
               e 4 forme candidate nelle opzioni; una sola corretta.
             - Se la regola non si presta al buco, usa una domanda in italiano con 4 frasi
               tedesche tra cui scegliere quella corretta.
             - Ogni esercizio deve essere DIVERSO dagli altri dello stesso batch: cambia
               soggetto, verbo, caso o numero, non solo una parola.
+            - CORRETTEZZA OBBLIGATORIA: controlla l'accordo articolo/nome PRIMA di rispondere.
+              * maschile: der/ein/kein + Mann, Hund, Tisch, Apfel, Kaffee, Termin, Schlüssel
+              * femminile: die/eine/keine + Frau, Stadt, Wohnung, Schule, Frage
+              * neutro: das/ein/kein + Buch, Kind, Haus, Auto, Zimmer, Problem
+              * all'accusativo cambia SOLO il maschile: den/einen/keinen.
+              * Forme VIETATE (sbagliate): "einen Buch", "die Buch", "den Buch",
+                "eine Hund", "einen Frau", "einen Kind", "einen Auto".
         """.trimIndent()
 
         // Con un tema (esercizi di una unità) le opzioni SONO forme tedesche:
@@ -427,6 +437,12 @@ class GeneratoreEsercizi {
             if (contieneNonLatino(domanda) || opzioni.any { contieneNonLatino(it) }) return@mapIndexedNotNull null
             // Scarta se la spiegazione è in tedesco invece che in italiano (modello che ignora la lingua)
             if (!e.spiegazione.isNullOrBlank() && contieneNonLatino(e.spiegazione)) return@mapIndexedNotNull null
+            // Correttezza grammaticale: un esercizio con "einen Buch" (Buch è
+            // neutro) insegnerebbe una regola falsa. Il controllo copre articoli,
+            // possessivi e negazione per i nomi di genere noto.
+            if (ControlloGrammatica.problemi(domanda, opzioni, rispostaCorretta).isNotEmpty()) {
+                return@mapIndexedNotNull null
+            }
             // ASCOLTO richiede la frase da ascoltare e la traduzione
             if (tipo == TipoEsercizio.ASCOLTO && (e.fraseTedesca.isNullOrBlank() || e.traduzioneItaliana.isNullOrBlank())) return@mapIndexedNotNull null
             // COMPRENSIONE (Lesen) richiede il testo di lettura, e NON deve essere in alfabeto non latino
