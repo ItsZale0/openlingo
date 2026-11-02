@@ -1,7 +1,7 @@
 {
-  "versionCode": 241,
-  "versionName": "1.48.8",
-  "changelog": "Teoria completa: possessivi e kein spiegati all'accusativo e al dativo; nuovo test che blocca esercizi senza teoria",
+  "versionCode": 242,
+  "versionName": "1.48.9",
+  "changelog": "Audit completo: teoria senza spoiler, possessivi e kein all'accusativo/dativo, reflexivi, am, von, derselbe, dative; test permanenti di copertura e spoiler",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.8/Tedesco-v1.48.8.apk"
+  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.9/Tedesco-v1.48.9.apk"
 }

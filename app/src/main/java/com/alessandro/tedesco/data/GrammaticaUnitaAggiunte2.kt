@@ -15,7 +15,7 @@ internal fun unitaB1Plusquamperfekt(): UnitaGrammatica = unitaGrammatica(
     minuti = 12,
     prerequisiti = listOf("a2-praeteritum"),
     regola = listOf(
-        "Il Plusquamperfekt esprime un'azione conclusa prima di un'altra azione passata: Als ich ankam, hatte er schon gegessen.",
+        "Il Plusquamperfekt esprime un'azione conclusa prima di un'altra azione passata: Als ich ankam, war er schon gegangen.",
         "Forma: ausiliare al Präteritum (hatte/war) + Partizip II — come il Perfekt, ma con hatte/war invece di hat/ist.",
         "Ausiliare (come nel Perfekt): haben per la maggior parte dei verbi, sein per i verbi di movimento/cambiamento di stato.",
         "Con nachdem la frase con il Plusquamperfekt va prima: Nachdem er gegessen hatte, ging er.",
@@ -34,13 +34,13 @@ internal fun unitaB1Plusquamperfekt(): UnitaGrammatica = unitaGrammatica(
         )
     ),
     esempi = listOf(
-        esempioUnita("Als ich ankam, hatte er schon gegessen.", "Quando arrivai, aveva già mangiato."),
+        esempioUnita("Als ich ankam, war er schon gegangen.", "Quando arrivai, era già partito."),
         esempioUnita("Nachdem sie gegangen war, räumte ich auf.", "Dopo che se ne era andata, feci ordine."),
         esempioUnita("Ich hatte das Buch schon gelesen, als du mir davon erzähltest.", "Avevo già letto il libro quando me ne parlasti."),
         esempioUnita("Er war schon abgereist, als wir ankamen.", "Era già partito quando arrivammo.")
     ),
     errori = listOf(
-        erroreUnita("Als ich ankam, hat er schon gegessen.", "Als ich ankam, hatte er schon gegessen.", "Azione precedente in contesto passato: Plusquamperfekt (hatte)."),
+        erroreUnita("Als ich ankam, hat er schon gegessen.", "Als ich ankam, war er schon gegangen.", "Azione precedente in contesto passato: Plusquamperfekt (war ... gegangen)."),
         erroreUnita("Nachdem er gegessen hat, ging er.", "Nachdem er gegessen hatte, ging er.", "Dopo nachdem il verbo va al Plusquamperfekt."),
         erroreUnita("Er hatte gegangen.", "Er war gegangen.", "Verbi di movimento: ausiliare sein (war).")
     ),
@@ -68,7 +68,8 @@ internal fun unitaB1NDeklination(): UnitaGrammatica = unitaGrammatica(
         "Lista tipica: der Herr, der Junge, der Mensch, der Student, der Kollege, der Polizist, der Patient, der Kunde, der Präsident, der Held, der Experte, der Neffe, der Affe, der Löwe, der Nachbar, der Bauer, der Deutsche, der Franzose.",
         "Genitivo singolare: -n (der Studenten) oppure -ens (des Herrn).",
         "Plurale: forma regolare + -n se non termina già in -n.",
-        "La desinenza si aggiunge al nominativo singolare: Student → Studenten (akk/dat/gen), Herr → Herrn (akk/dat) / Herrn(s) (gen)."
+        "La desinenza si aggiunge al nominativo singolare: Student → Studenten (akk/dat/gen), Herr → Herrn (akk/dat) / Herrn(s) (gen).",
+        "Con preposizioni come mit, bei, zu il dativo resta: mit dem Kollegen."
     ),
     tabelle = listOf(
         tabellaUnita(
@@ -130,7 +131,8 @@ internal fun unitaB1GenitivPraepositionen(): UnitaGrammatica = unitaGrammatica(
         "trotz esprime la concessione (nonostante): Trotz der Kälte gehen wir spazieren.",
         "während esprime il tempo (durante): Während des Films schlief er ein.",
         "anstatt/statt esprime la sostituzione: Anstatt zu arbeiten, spielte er.",
-        "Eccezione: con i pronomi personali queste preposizioni reggono il dativo: wegen mir, trotz dir, währenddessen."
+        "Eccezione: con i pronomi personali queste preposizioni reggono il dativo: wegen mir, trotz dir, währenddessen.",
+        "Attenzione ai verbi separabili: ausgehen → gehen ... aus (Trotz des Regens gehe ich aus.)."
     ),
     tabelle = listOf(
         tabellaUnita(

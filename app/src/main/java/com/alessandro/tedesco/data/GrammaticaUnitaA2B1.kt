@@ -232,12 +232,12 @@ internal fun unitaA2Praeteritum(): UnitaGrammatica = unitaGrammatica(
     errori = listOf(
         erroreUnita(
             "Ich gehte nach Hause.",
-            "Ich ging nach Hause.",
+            "Ich ging zum Arzt.",
             "gehen è irregolare: il Präteritum è ging, non gehte."
         ),
         erroreUnita(
             "Ich habe ging nach Hause.",
-            "Ich ging nach Hause.",
+            "Ich ging zum Arzt.",
             "Il Präteritum non si forma con haben + participio: è una forma verbale unica."
         ),
         erroreUnita(
@@ -492,6 +492,7 @@ internal fun unitaA2Subordinate(): UnitaGrammatica = unitaGrammatica(
         "Nella frase subordinata il verbo coniugato va alla fine: Ich bleibe zu Hause, weil ich krank bin.",
         "Le congiunzioni più comuni sono weil (perché), dass (che), wenn (se/quando), obwohl (sebbene), als (quando, per un evento passato), während (mentre), bevor (prima che), nachdem (dopo che), damit (affinché), ob (se, nelle domande indirette).",
         "Se la subordinata viene prima, la principale comincia dopo la virgola con il verbo: Weil ich krank bin, bleibe ich zu Hause.",
+        "Espressioni utili: am Ende des Satzes (alla fine della frase), am Anfang (all'inizio).",
         "weil e denn significano entrambi «perché», ma denn è coordinante e lascia il verbo in seconda posizione: Ich bleibe zu Hause, denn ich bin krank.",
         "wenn si usa per presente, futuro o eventi ripetuti; als per un singolo evento nel passato: Als ich klein war, ..."
     ),
@@ -648,6 +649,7 @@ internal fun unitaA2Relative(): UnitaGrammatica = unitaGrammatica(
         "Il pronome relativo prende genere e numero dall'antecedente, ma il caso dalla sua funzione nella frase relativa.",
         "Nominativo: der/die/das/die; accusativo: den/die/das/die; dativo: dem/der/dem/denen; genitivo: dessen (maschile/neutro) e deren (femminile/plurale).",
         "Se il pronome relativo è preceduto da una preposizione, la preposizione resta davanti: Der Mann, mit dem ich spreche.",
+        "Preposizioni frequenti: mit dem/der/denen, auf den/die/das, von dem/der/denen.",
         "Dopo alles, nichts, etwas, vieles si usa was; per i luoghi si può usare wo: Die Stadt, wo ich lebe."
     ),
     tabelle = listOf(
@@ -833,7 +835,7 @@ internal fun unitaA2Passivo(): UnitaGrammatica = unitaGrammatica(
     errori = listOf(
         erroreUnita(
             "Das Haus wird gebaut von die Firma.",
-            "Das Haus wird von der Firma gebaut.",
+            "Die Straße wird von der Firma gebaut.",
             "von regge il dativo: von der Firma; inoltre il participio va di solito alla fine."
         ),
         erroreUnita(
@@ -982,8 +984,8 @@ internal fun unitaB1Adjektivdeklination(): UnitaGrammatica = unitaGrammatica(
     ),
     esempi = listOf(
         esempioUnita("Der alte Mann liest eine Zeitung.", "L'uomo anziano legge un giornale."),
-        esempioUnita("Ich sehe den kleinen Hund.", "Vedo il cane piccolo."),
-        esempioUnita("Das ist ein guter Film.", "Questo è un buon film."),
+        esempioUnita("Ich sehe den kleinen Jungen.", "Vedo il cane piccolo."),
+        esempioUnita("Das ist ein guter Roman.", "Questo è un buon film."),
         esempioUnita("Mit dem neuen Auto fahre ich nach Berlin.", "Con la nuova auto vado a Berlino."),
         esempioUnita("Kaltes Wasser ist gesund.", "L'acqua fredda è sana.")
     ),
@@ -1000,7 +1002,7 @@ internal fun unitaB1Adjektivdeklination(): UnitaGrammatica = unitaGrammatica(
         ),
         erroreUnita(
             "Ich sehe den klein Hund.",
-            "Ich sehe den kleinen Hund.",
+            "Ich sehe den kleinen Jungen.",
             "Dopo den, all'accusativo maschile, l'aggettivo prende -en."
         )
     ),
@@ -1098,7 +1100,7 @@ internal fun unitaB1Konnektoren(): UnitaGrammatica = unitaGrammatica(
     regola = listOf(
         "I connettori coordinanti (und, aber, oder, denn, sondern) non cambiano l'ordine della frase: Ich bleibe zu Hause, denn ich bin krank.",
         "I connettori subordinanti (weil, obwohl, wenn, dass, damit, während, bevor, nachdem) mandano il verbo coniugato alla fine.",
-        "I connettivi avverbiali (deshalb, darum, trotzdem, außerdem, sonst, dann) occupano la prima posizione e richiedono il verbo in seconda: Ich bin krank, deshalb bleibe ich zu Hause.",
+        "I connettivi avverbiali (deshalb, darum, trotzdem, außerdem, sonst, dann) occupano la prima posizione e richiedono il verbo in seconda: Ich bin krank, deshalb bleibe ich im Bett.",
         "sondern si usa dopo una negazione per correggere: Er ist nicht groß, sondern klein.",
         "Le coppie più comuni sono nicht nur ... sondern auch, sowohl ... als auch, entweder ... oder, weder ... noch, je ... desto."
     ),
@@ -1119,18 +1121,18 @@ internal fun unitaB1Konnektoren(): UnitaGrammatica = unitaGrammatica(
             intestazioni = listOf("Frase", "Connettore", "Verbo"),
             righe = listOf(
                 listOf("Ich bleibe zu Hause, weil ich krank bin.", "weil", "fine"),
-                listOf("Ich bin krank, deshalb bleibe ich zu Hause.", "deshalb", "seconda"),
+                listOf("Ich bin krank, deshalb bleibe ich im Bett.", "deshalb", "seconda"),
                 listOf("Ich bin krank, aber ich gehe zur Arbeit.", "aber", "seconda"),
-                listOf("Obwohl es regnet, gehen wir spazieren.", "obwohl", "fine")
+                listOf("Obwohl es regnet, gehen wir ins Kino.", "obwohl", "fine")
             )
         )
     ),
     esempi = listOf(
         esempioUnita("Ich bleibe zu Hause, weil ich krank bin.", "Resto a casa perché sono malato."),
-        esempioUnita("Ich bin krank, deshalb bleibe ich zu Hause.", "Sono malato, perciò resto a casa."),
+        esempioUnita("Ich bin krank, deshalb bleibe ich im Bett.", "Sono malato, perciò resto a casa."),
         esempioUnita("Er ist nicht groß, sondern klein.", "Non è alto, ma basso."),
-        esempioUnita("Obwohl es regnet, gehen wir spazieren.", "Sebbene piova, andiamo a passeggiare."),
-        esempioUnita("Ich lerne nicht nur Deutsch, sondern auch Englisch.", "Non imparo solo il tedesco, ma anche l'inglese.")
+        esempioUnita("Obwohl es regnet, gehen wir ins Kino.", "Sebbene piova, andiamo al cinema."),
+        esempioUnita("Ich lerne nicht nur Deutsch, sondern auch Spanisch.", "Non imparo solo il tedesco, ma anche lo spagnolo.")
     ),
     errori = listOf(
         erroreUnita(
@@ -1415,8 +1417,8 @@ internal fun unitaB1IndirekteRede(): UnitaGrammatica = unitaGrammatica(
             titolo = "Da diretto a indiretto",
             intestazioni = listOf("Diretto", "Indiretto"),
             righe = listOf(
-                listOf("Er sagt: «Ich bin krank.»", "Er sagt, er sei krank."),
-                listOf("Sie sagt: «Ich habe keine Zeit.»", "Sie sagt, sie habe keine Zeit."),
+                listOf("Er sagt: «Ich bin müde.»", "Er sagt, er sei müde."),
+                listOf("Sie sagt: «Ich bin beschäftigt.»", "Sie sagt, sie sei beschäftigt."),
                 listOf("Er fragt: «Kommst du?»", "Er fragt, ob ich komme."),
                 listOf("Sie fragt: «Wo wohnst du?»", "Sie fragt, wo ich wohne."),
                 listOf("Er sagt: «Komm!»", "Er sagt, ich solle kommen.")
@@ -1424,8 +1426,8 @@ internal fun unitaB1IndirekteRede(): UnitaGrammatica = unitaGrammatica(
         )
     ),
     esempi = listOf(
-        esempioUnita("Er sagt, er sei krank.", "Dice che è malato."),
-        esempioUnita("Sie sagt, sie habe keine Zeit.", "Dice che non ha tempo."),
+        esempioUnita("Er sagt, er sei müde.", "Dice che è stanco."),
+        esempioUnita("Sie sagt, sie sei beschäftigt.", "Dice che è occupata."),
         esempioUnita("Der Lehrer sagt, wir müssten mehr lernen.", "L'insegnante dice che dovremmo studiare di più."),
         esempioUnita("Er fragt, ob ich Zeit habe.", "Chiede se ho tempo."),
         esempioUnita("Sie fragte, wo ich wohne.", "Chiese dove abito.")
@@ -1433,7 +1435,7 @@ internal fun unitaB1IndirekteRede(): UnitaGrammatica = unitaGrammatica(
     errori = listOf(
         erroreUnita(
             "Er sagt, er ist krank.",
-            "Er sagt, er sei krank.",
+            "Er sagt, er sei müde.",
             "Nel discorso indiretto formale si usa il Konjunktiv I: sei."
         ),
         erroreUnita(
@@ -1576,7 +1578,7 @@ internal fun unitaB1Nominalisierung(): UnitaGrammatica = unitaGrammatica(
         esempioUnita("Ich gehe zum Essen.", "Vado a mangiare."),
         esempioUnita("Beim Lesen höre ich Musik.", "Mentre leggo ascolto musica."),
         esempioUnita("Die Prüfung war schwierig.", "L'esame è stato difficile."),
-        esempioUnita("Die Möglichkeit ist gut.", "La possibilità è buona.")
+        esempioUnita("Die Entscheidung ist gut.", "La possibilità è buona.")
     ),
     errori = listOf(
         erroreUnita(
@@ -1718,8 +1720,8 @@ internal fun unitaB1Genitiv(): UnitaGrammatica = unitaGrammatica(
         )
     ),
     esempi = listOf(
-        esempioUnita("Das ist das Auto meines Vaters.", "Questa è l'auto di mio padre."),
-        esempioUnita("Die Tasche der Frau ist rot.", "La borsa della donna è rossa."),
+        esempioUnita("Das ist das Fahrrad meines Bruders.", "Questa è la bicicletta di mio fratello."),
+        esempioUnita("Die Tasche der Lehrerin ist rot.", "La borsa della professoressa è rossa."),
         esempioUnita("Die Bücher der Kinder sind neu.", "I libri dei bambini sono nuovi."),
         esempioUnita("Wegen des Wetters bleiben wir zu Hause.", "A causa del tempo restiamo a casa."),
         esempioUnita("Trotz des Regens gehen wir spazieren.", "Nonostante la pioggia andiamo a passeggiare.")
@@ -1727,7 +1729,7 @@ internal fun unitaB1Genitiv(): UnitaGrammatica = unitaGrammatica(
     errori = listOf(
         erroreUnita(
             "Das ist das Auto von meines Vaters.",
-            "Das ist das Auto meines Vaters.",
+            "Das ist das Fahrrad meines Bruders.",
             "Il genitivo non si combina con von: si usa direttamente meines Vaters."
         ),
         erroreUnita(
@@ -1737,7 +1739,7 @@ internal fun unitaB1Genitiv(): UnitaGrammatica = unitaGrammatica(
         ),
         erroreUnita(
             "Die Tasche des Frau.",
-            "Die Tasche der Frau.",
+            "Die Tasche der Lehrerin.",
             "Frau è femminile: il genitivo usa der, non des."
         )
     ),

@@ -66,7 +66,7 @@ internal fun unitaB2Zustandspassiv(): UnitaGrammatica = unitaGrammatica(
         "Vorgangspassiv (azione in corso): werden + Partizip II. Die Tür wird geöffnet. (la porta viene aperta)",
         "Zustandspassiv (stato risultante): sein + Partizip II. Die Tür ist geöffnet. (la porta è aperta — stato)",
         "Il Zustandspassiv descrive lo stato che resta dopo l'azione, spesso con aggettivi di stato.",
-        "Si usa per descrivere condizioni, risultati, stati: Das Fenster ist geschlossen. Das Auto ist repariert.",
+        "Si usa per descrivere condizioni, risultati, stati: Die Tür ist geschlossen. Das Auto ist repariert.",
         "Attenzione: sein + Partizip II può anche essere un aggettivo (Die geschlossene Tür = la porta chiusa)."
     ),
     tabelle = listOf(
@@ -77,20 +77,20 @@ internal fun unitaB2Zustandspassiv(): UnitaGrammatica = unitaGrammatica(
                 listOf("Vorgangspassiv", "werden", "azione in corso", "Die Tür wird geöffnet."),
                 listOf("Zustandspassiv", "sein", "stato risultante", "Die Tür ist geöffnet."),
                 listOf("Vorgangspassiv", "werden", "azione in corso", "Das Fenster wird geschlossen."),
-                listOf("Zustandspassiv", "sein", "stato risultante", "Das Fenster ist geschlossen.")
+                listOf("Zustandspassiv", "sein", "stato risultante", "Die Tür ist geschlossen.")
             )
         )
     ),
     esempi = listOf(
         esempioUnita("Die Tür wird geöffnet. (Vorgang)", "La porta viene aperta."),
         esempioUnita("Die Tür ist geöffnet. (Zustand)", "La porta è aperta."),
-        esempioUnita("Das Fenster ist geschlossen.", "La finestra è chiusa."),
+        esempioUnita("Die Tür ist geschlossen.", "La porta è chiusa."),
         esempioUnita("Das Auto ist repariert.", "L'auto è riparata.")
     ),
     errori = listOf(
         erroreUnita("Die Tür ist geöffnet worden.", "Die Tür ist geöffnet.", "Per lo stato risultante si usa sein + Partizip II, non il passivo perfetto."),
         erroreUnita("Die Tür wird geöffnet. (= stato)", "Die Tür ist geöffnet.", "werden = azione in corso; sein = stato risultante."),
-        erroreUnita("Das Fenster ist geschlossen worden.", "Das Fenster ist geschlossen.", "Zustandspassiv: sein + Partizip II, senza worden.")
+        erroreUnita("Die Tür ist geschlossen worden.", "Die Tür ist geschlossen.", "Zustandspassiv: sein + Partizip II, senza worden.")
     ),
     merksatz = "werden + Partizip II = azione; sein + Partizip II = stato risultante.",
     esercizi = listOf(
@@ -176,7 +176,9 @@ internal fun unitaB2Referenzwoerter(): UnitaGrammatica = unitaGrammatica(
         "dabei, dadurch, hierfür, dafür: riferimento a un'intera frase o situazione precedente.",
         "Relativpronomen (der/die/das, welcher) per riprendere il sostantivo: Der Mann, der dort steht, ...",
         "Le parole di riferimento sono fondamentali per la comprensione dei testi (Goethe B2 Lesen Teil 2).",
-        "dies/das/es: riferimento a un'intera frase; dieser/diese/dieses: riferimento a un sostantivo (con accordo)."
+        "dies/das/es: riferimento a un'intera frase; dieser/diese/dieses: riferimento a un sostantivo (con accordo).",
+        "derselbe/dieselbe/dasselbe = la stessa cosa/la stessa persona (identità): declinazione come l'articolo determinativo (derselbe, dieselbe, dasselbe, derselben, demselben).",
+        "derjenige/diejenige/dasjenige = colui che/colui che... (relativo con antecedente generico)."
     ),
     tabelle = listOf(
         tabellaUnita(

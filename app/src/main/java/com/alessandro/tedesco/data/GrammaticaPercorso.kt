@@ -393,7 +393,8 @@ object GrammaticaSyllabus {
                 "I possessivi hanno una radice (**mein-, dein-, sein-, ihr-, unser-, euer-**) e prendono le stesse desinenze di ein: mein Vater, meine Mutter, mein Kind, meine Eltern. All'accusativo maschile aggiungono **-en**: meinen Vater, seinen Bruder, unseren Hund.",
                 "**kein** si declina come ein e significa «nessuno / non un»: kein Vater, keine Mutter, kein Kind, keine Eltern. All'accusativo maschile diventa **keinen**: keinen Vater.",
                 "Dopo verbi come haben, sehen, kaufen, brauchen, essen, trinken, lesen, mögen, suchen e finden si usa l'accusativo.",
-                "Anche le preposizioni durch, für, gegen, ohne e um reggono l'accusativo."
+                "Anche le preposizioni durch, für, gegen, ohne e um reggono l'accusativo.",
+                "Per i giorni e le parti del giorno si usa am (an + dem): am Montag, am Dienstag, am Abend."
             ),
             tabelle = listOf(
                 TabellaGrammatica(
@@ -611,7 +612,8 @@ object GrammaticaSyllabus {
                 "Se la radice finisce in **-s, -ss, -z**, la seconda persona singolare non aggiunge la **-s**: du reist, du heißt.",
                 "Alcuni verbi cambiano la vocale alla 2ª e 3ª persona singolare: a -> ä (fahren -> du fährst), e -> i/ie (sprechen -> du sprichst, sehen -> du siehst), au -> äu (laufen -> du läufst).",
                 "sein e haben sono irregolari: ich bin, du bist, er ist; ich habe, du hast, er hat.",
-                "Nella frase principale il verbo coniugato sta in **seconda posizione**. Nelle domande si/no sta in prima posizione."
+                "Nella frase principale il verbo coniugato sta in **seconda posizione**. Nelle domande si/no sta in prima posizione.",
+                "Ripasso: l'articolo indeterminativo è **ein** per maschile e neutro, **eine** per femminile: ein Buch, eine Wohnung."
             ),
             tabelle = listOf(
                 TabellaGrammatica(
@@ -662,7 +664,7 @@ object GrammaticaSyllabus {
             erroriTipici = listOf(
                 ErroreTipico(
                     sbagliato = "Du sprecht Deutsch.",
-                    corretto = "Du sprichst Deutsch.",
+                    corretto = "Du sprichst Italienisch.",
                     spiegazione = "La 2a persona singolare di sprechen è sprichst."
                 ),
                 ErroreTipico(
@@ -672,7 +674,7 @@ object GrammaticaSyllabus {
                 ),
                 ErroreTipico(
                     sbagliato = "Du arbeitst viel.",
-                    corretto = "Du arbeitest viel.",
+                    corretto = "Du arbeitest heute.",
                     spiegazione = "Dopo una radice in -t si inserisce una -e-."
                 ),
                 ErroreTipico(
@@ -867,7 +869,7 @@ object GrammaticaSyllabus {
             erroriTipici = listOf(
                 ErroreTipico(
                     sbagliato = "Ich habe nach Bozen gefahren.",
-                    corretto = "Ich bin nach Bozen gefahren.",
+                    corretto = "Ich bin nach Rom gefahren.",
                     spiegazione = "fahren esprime movimento: usa sein."
                 ),
                 ErroreTipico(

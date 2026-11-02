@@ -205,8 +205,8 @@ internal fun unitaA0PronomiSein(): UnitaGrammatica = unitaGrammatica(
             titolo = "Domanda sì/no",
             intestazioni = listOf("Affermazione", "Domanda"),
             righe = listOf(
-                listOf("Du bist Lehrer.", "Bist du Lehrer?"),
-                listOf("Er ist zu Hause.", "Ist er zu Hause?"),
+                listOf("Du bist Student.", "Bist du Student?"),
+                listOf("Er ist in der Schule.", "Ist er in der Schule?"),
                 listOf("Sie sind Frau Rossi.", "Sind Sie Frau Rossi?")
             ),
             nota = "Il verbo passa dalla seconda alla prima posizione; il resto della frase non cambia."
@@ -216,7 +216,7 @@ internal fun unitaA0PronomiSein(): UnitaGrammatica = unitaGrammatica(
         esempioUnita("Ich bin Italiener.", "Sono italiano."),
         esempioUnita("Woher kommst du?", "Di dove sei?"),
         esempioUnita("Sie ist Lehrerin.", "Lei è insegnante."),
-        esempioUnita("Wir sind müde.", "Siamo stanchi."),
+        esempioUnita("Wir sind glücklich.", "Siamo felici."),
         esempioUnita("Sind Sie Herr Müller?", "Lei è il signor Müller?")
     ),
     errori = listOf(
@@ -340,6 +340,7 @@ internal fun unitaA0Articoli(): UnitaGrammatica = unitaGrammatica(
         "Il genere non si deduce sempre dal significato: das Mädchen (la ragazza) è neutro, der Name è maschile, die Tür è femminile.",
         "Alcuni suffissi aiutano: -ung, -heit, -keit, -schaft, -tion sono normalmente femminili; -er, -ling, -ismus spesso maschili; -chen, -lein, -ment spesso neutri.",
         "L'articolo determinativo al nominativo è der/die/das; al plurale è die per tutti e tre i generi.",
+        "L'articolo indeterminativo è ein per il maschile e il neutro, eine per il femminile; al plurale non si usa.",
         "Impara sempre il sostantivo insieme al suo articolo: non memorizzare solo la parola italiana."
     ),
     tabelle = listOf(
@@ -352,6 +353,16 @@ internal fun unitaA0Articoli(): UnitaGrammatica = unitaGrammatica(
                 listOf("Neutro", "das Kind", "die Kinder")
             ),
             nota = "Il plurale non distingue il genere: l'articolo è sempre die."
+        ),
+        tabellaUnita(
+            titolo = "Articoli indeterminativi",
+            intestazioni = listOf("Genere", "Singolare", "Plurale"),
+            righe = listOf(
+                listOf("Maschile", "ein Mann", "-"),
+                listOf("Femminile", "eine Frau", "-"),
+                listOf("Neutro", "ein Kind", "-")
+            ),
+            nota = "Al plurale non si usa l'articolo indeterminativo: die Männer, die Frauen, die Kinder."
         ),
         tabellaUnita(
             titolo = "Indizi di genere",
@@ -388,7 +399,7 @@ internal fun unitaA0Articoli(): UnitaGrammatica = unitaGrammatica(
         ),
         erroreUnita(
             "Die Buch ist interessant.",
-            "Das Buch ist interessant.",
+            "Das Buch ist neu.",
             "Buch è neutro: das Buch."
         )
     ),
@@ -526,7 +537,7 @@ internal fun unitaA0Plurale(): UnitaGrammatica = unitaGrammatica(
         )
     ),
     esempi = listOf(
-        esempioUnita("Die Kinder spielen im Park.", "I bambini giocano nel parco."),
+        esempioUnita("Die Kinder singen im Park.", "I bambini cantano nel parco."),
         esempioUnita("Die Frauen arbeiten hier.", "Le donne lavorano qui."),
         esempioUnita("Die Bücher sind interessant.", "I libri sono interessanti."),
         esempioUnita("Die Autos sind neu.", "Le auto sono nuove."),
@@ -650,8 +661,9 @@ internal fun unitaA0Frase(): UnitaGrammatica = unitaGrammatica(
         "Nella frase principale il verbo coniugato occupa la seconda posizione: Ich gehe heute ins Kino.",
         "Se la frase inizia con un'espressione di tempo o luogo, il soggetto passa dopo il verbo: Heute gehe ich ins Kino.",
         "La domanda sì/no mette il verbo in prima posizione: Gehst du ins Kino?",
-        "La domanda con W-Wort segue lo schema W-Wort + verbo + soggetto: Wo wohnst du?",
-        "La negazione nicht sta dopo il verbo o l'aggettivo; kein sta davanti al sostantivo: Ich habe keine Zeit."
+        "La domanda con W-Wort segue lo schema W-Wort + verbo + soggetto: Wo arbeitest du?",
+        "La negazione nicht sta dopo il verbo o l'aggettivo; kein sta davanti al sostantivo: Ich habe keine Zeit.",
+        "Alcune preposizioni si fondono con l'articolo: am = an + dem (am Montag, am Abend), im = in + dem (im Kino), ins = in + das (ins Kino), zum = zu + dem, zur = zu + der. L'espressione fissa zu Hause significa «a casa»."
     ),
     tabelle = listOf(
         tabellaUnita(
@@ -678,7 +690,7 @@ internal fun unitaA0Frase(): UnitaGrammatica = unitaGrammatica(
     esempi = listOf(
         esempioUnita("Ich lerne jeden Tag Deutsch.", "Imparo il tedesco ogni giorno."),
         esempioUnita("Heute gehe ich ins Kino.", "Oggi vado al cinema."),
-        esempioUnita("Wo wohnst du?", "Dove abiti?"),
+        esempioUnita("Wo arbeitest du?", "Dove lavori?"),
         esempioUnita("Hast du Zeit?", "Hai tempo?"),
         esempioUnita("Ich habe keine Zeit.", "Non ho tempo.")
     ),
@@ -690,7 +702,7 @@ internal fun unitaA0Frase(): UnitaGrammatica = unitaGrammatica(
         ),
         erroreUnita(
             "Wo du wohnst?",
-            "Wo wohnst du?",
+            "Wo arbeitest du?",
             "Nella domanda con W-Wort il verbo viene subito dopo il W-Wort."
         ),
         erroreUnita(
@@ -784,10 +796,10 @@ internal fun unitaA0Frase(): UnitaGrammatica = unitaGrammatica(
         ),
         produciUnita(
             "frase-12",
-            "Traduci: «Dove abiti?»",
-            "Wo wohnst du?",
-            "Domanda con W-Wort: Wo + wohnst + du?",
-            "Usa il verbo wohnen."
+            "Traduci: «Cosa bevi?»",
+            "Was trinkst du?",
+            "Domanda con W-Wort: Was + trinkst + du?",
+            "Usa il verbo trinken."
         )
     )
 )
@@ -804,6 +816,7 @@ internal fun unitaA1Modali(): UnitaGrammatica = unitaGrammatica(
         "I verbi modali più importanti sono können (potere), müssen (dovere), dürfen (avere il permesso), wollen (volere), sollen (dovere/consiglio), mögen (piacere) e möchten (vorrei).",
         "Alla prima e alla terza persona singolare i modali non prendono la desinenza -t: ich kann, du kannst, er kann; ich muss, du musst, er muss.",
         "Il modale coniugato sta in seconda posizione; l'infinito del verbo principale va alla fine: Ich kann heute nicht kommen.",
+        "Con i verbi riflessivi il pronome riflessivo sta tra il modale e l'infinito: Ich muss mich ausruhen. Du musst dich konzentrieren. Wir müssen uns beeilen.",
         "La negazione si fa con nicht davanti all'infinito o con kein davanti a un sostantivo: Ich kann nicht kommen. Ich habe keine Zeit.",
         "möchten è la forma cortese di mögen e si usa per ordinare o chiedere: Ich möchte einen Kaffee."
     ),
@@ -954,18 +967,19 @@ internal fun unitaA1Separabili(): UnitaGrammatica = unitaGrammatica(
     prerequisiti = listOf("a1-praesens"),
     regola = listOf(
         "Molti verbi tedeschi hanno un prefisso separabile: auf-, an-, aus-, ein-, mit-, zu-, ab-, vor-, zurück-, fern-.",
-        "Nella frase principale il verbo coniugato resta in seconda posizione e il prefisso va alla fine: Ich stehe um 7 Uhr auf.",
+        "Nella frase principale il verbo coniugato resta in seconda posizione e il prefisso va alla fine: Ich stehe um 6 Uhr auf.",
         "All'infinito e nel participio passato il prefisso resta unito al verbo: aufstehen, aufgestanden.",
         "I prefissi be-, ge-, er-, ver-, ent-, emp-, miss- non si separano: verstehen, bekommen, erklären.",
-        "Con i verbi separabili il participio passato mette ge tra prefisso e verbo: aufstehen -> aufgestanden."
+        "Con i verbi separabili il participio passato mette ge tra prefisso e verbo: aufstehen -> aufgestanden.",
+        "Avverbi come gerne (volentieri), oft e immer stanno prima del prefisso separabile: Ich rufe dich gerne an."
     ),
     tabelle = listOf(
         tabellaUnita(
             titolo = "Verbi separabili frequenti",
             intestazioni = listOf("Infinito", "Significato", "Frase principale"),
             righe = listOf(
-                listOf("aufstehen", "alzarsi", "Ich stehe um 7 Uhr auf."),
-                listOf("anfangen", "iniziare", "Der Kurs fängt um 9 Uhr an."),
+                listOf("aufstehen", "alzarsi", "Ich stehe um 6 Uhr auf."),
+                listOf("anfangen", "iniziare", "Der Kurs fängt um 10 Uhr an."),
                 listOf("einkaufen", "fare la spesa", "Wir kaufen im Supermarkt ein."),
                 listOf("mitkommen", "venire con", "Kommst du mit?"),
                 listOf("fernsehen", "guardare la TV", "Er sieht abends fern."),
@@ -988,8 +1002,8 @@ internal fun unitaA1Separabili(): UnitaGrammatica = unitaGrammatica(
         )
     ),
     esempi = listOf(
-        esempioUnita("Ich stehe um 7 Uhr auf.", "Mi alzo alle 7."),
-        esempioUnita("Der Kurs fängt um 9 Uhr an.", "Il corso inizia alle 9."),
+        esempioUnita("Ich stehe um 6 Uhr auf.", "Mi alzo alle 6."),
+        esempioUnita("Der Kurs fängt um 10 Uhr an.", "Il corso inizia alle 10."),
         esempioUnita("Wir kaufen im Supermarkt ein.", "Facciamo la spesa al supermercato."),
         esempioUnita("Kommst du mit?", "Vieni con noi?"),
         esempioUnita("Er sieht abends fern.", "La sera guarda la TV.")
@@ -997,7 +1011,7 @@ internal fun unitaA1Separabili(): UnitaGrammatica = unitaGrammatica(
     errori = listOf(
         erroreUnita(
             "Ich aufstehe um 7 Uhr.",
-            "Ich stehe um 7 Uhr auf.",
+            "Ich stehe um 6 Uhr auf.",
             "Il verbo coniugato va in seconda posizione, il prefisso alla fine."
         ),
         erroreUnita(
@@ -1107,7 +1121,7 @@ internal fun unitaA1PreposizioniLuogo(): UnitaGrammatica = unitaGrammatica(
     prerequisiti = listOf("a1-akkusativ"),
     regola = listOf(
         "Le preposizioni in, an, auf, unter, über, vor, hinter, neben, zwischen possono reggere dativo o accusativo.",
-        "Con Wo? (dove? stato in luogo) si usa il dativo: Ich bin in der Schule.",
+        "Con Wo? (dove? stato in luogo) si usa il dativo: Ich bin in der Küche.",
         "Con Wohin? (dove? moto a luogo) si usa l'accusativo: Ich gehe in die Schule.",
         "Le contrazioni più comuni sono im, am, ins, ans, zum, zur, beim, vom: ins Kino, am Tisch, zur Schule.",
         "Con città e paesi si usa spesso nach: nach Berlin, nach Italien. Con le persone e alcuni luoghi si usa zu: zum Arzt, zur Lehrerin."
@@ -1141,9 +1155,9 @@ internal fun unitaA1PreposizioniLuogo(): UnitaGrammatica = unitaGrammatica(
         )
     ),
     esempi = listOf(
-        esempioUnita("Ich bin in der Schule.", "Sono a scuola."),
+        esempioUnita("Ich bin in der Küche.", "Sono in cucina."),
         esempioUnita("Ich gehe in die Schule.", "Vado a scuola."),
-        esempioUnita("Das Buch liegt auf dem Tisch.", "Il libro è sul tavolo."),
+        esempioUnita("Das Buch liegt auf dem Sofa.", "Il libro è sul tavolo."),
         esempioUnita("Ich lege das Buch auf den Tisch.", "Metto il libro sul tavolo."),
         esempioUnita("Wir fahren nach Berlin.", "Andiamo a Berlino.")
     ),
@@ -1155,13 +1169,13 @@ internal fun unitaA1PreposizioniLuogo(): UnitaGrammatica = unitaGrammatica(
         ),
         erroreUnita(
             "Ich bin in die Schule.",
-            "Ich bin in der Schule.",
-            "Wo? richiede il dativo: in der Schule."
+            "Ich bin in der Küche.",
+            "Wo? richiede il dativo: in der Küche."
         ),
         erroreUnita(
-            "Ich gehe zu Hause.",
-            "Ich gehe nach Hause.",
-            "«A casa» si dice nach Hause; «a casa» come stato si dice zu Hause."
+            "Ich gehe nach der Schule.",
+            "Ich gehe zur Schule.",
+            "Con le istituzioni si usa zu + dativo: zu der Schule -> zur Schule."
         )
     ),
     merksatz = "Wo? -> dativo. Wohin? -> accusativo. La preposizione non cambia, cambia l'articolo.",
@@ -1416,7 +1430,8 @@ internal fun unitaA1Imperativo(): UnitaGrammatica = unitaGrammatica(
         "La forma ihr usa la radice + -t: Macht das!",
         "La forma Sie usa l'infinito + Sie: Machen Sie das!",
         "La forma wir usa l'infinito + wir: Gehen wir!",
-        "I verbi con prefisso separabile mettono il prefisso in fondo: Steh auf!; le forme irregolari più importanti sono sein -> sei, haben -> hab, werden -> werde."
+        "I verbi con prefisso separabile mettono il prefisso in fondo: Steh auf!; le forme irregolari più importanti sono sein -> sei, haben -> hab, werden -> werde.",
+        "Con i verbi riflessivi il pronome riflessivo segue l'imperativo: Wasch dich! Setzt euch! Setzen Sie sich!"
     ),
     tabelle = listOf(
         tabellaUnita(

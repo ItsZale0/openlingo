@@ -225,4 +225,30 @@ class AuditContenutiTest {
             }
         }
     }
+
+    /**
+     * La teoria non deve ripetere la risposta esatta di un esercizio nei suoi
+     * esempi o negli errori tipici: altrimenti l'esercizio è già svolto.
+     * Si controllano solo le risposte di almeno 4 parole, per non bloccare
+     * le forme grammaticali che la teoria deve necessariamente nominare.
+     */
+    @Test
+    fun `la teoria non ripete le risposte degli esercizi`() {
+        val problemi = mutableListOf<String>()
+        unita.forEach { u ->
+            val spoiler = buildString {
+                u.teoria.esempi.forEach { appendLine(it.tedesco) }
+                u.teoria.erroriTipici.forEach { appendLine(it.corretto) }
+            }.lowercase()
+            u.esercizi.forEach { e ->
+                val risposta = DifficoltaEsercizi.risposta(e).trim().lowercase()
+                if (risposta.split(Regex("\\s+")).size >= 4 &&
+                    Regex("\\b${Regex.escape(risposta)}\\b").containsMatchIn(spoiler)
+                ) {
+                    problemi += "${u.id}/${e.id}: «${DifficoltaEsercizi.risposta(e)}»"
+                }
+            }
+        }
+        assertTrue("Risposte spoilerate nella teoria: $problemi", problemi.isEmpty())
+    }
 }

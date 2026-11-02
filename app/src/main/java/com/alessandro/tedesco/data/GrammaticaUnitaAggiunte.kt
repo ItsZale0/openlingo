@@ -91,8 +91,8 @@ internal fun unitaA2Konjunktiv2Basis(): UnitaGrammatica = unitaGrammatica(
         "Il Konjunktiv II esprime desideri irrealizzabili, richieste cortesi e possibilità ipotetiche.",
         "Forma più comune: würde + Infinitiv (per la maggior parte dei verbi): Ich würde gern kommen.",
         "Per sein, haben, können, müssen, sollen, dürfen, wissen si usano le forme proprie: wäre, hätte, könnte, müsste, sollte, dürfte, wüsste.",
-        "Richiesta cortese: Ich hätte gern einen Kaffee. / Könnten Sie mir helfen? / Würden Sie bitte...?",
-        "Desiderio irrealizzabile: Wenn ich reich wäre, würde ich reisen. (se fossi ricco, viaggerei)",
+        "Richiesta cortese: Ich hätte gern einen Kaffee. / Könnten Sie das Fenster öffnen? / Würden Sie bitte...?",
+        "Desiderio irrealizzabile: Wenn ich reich wäre, würde ich ein Haus kaufen. (se fossi ricco, comprerei una casa)",
         "La forma würde + Infinitiv è sempre corretta; le forme proprie sono più eleganti per sein/haben/können/müssen."
     ),
     tabelle = listOf(
@@ -113,8 +113,8 @@ internal fun unitaA2Konjunktiv2Basis(): UnitaGrammatica = unitaGrammatica(
             intestazioni = listOf("Struttura", "Esempio"),
             righe = listOf(
                 listOf("Desiderio", "Ich hätte gern einen Kaffee."),
-                listOf("Richiesta cortese", "Könnten Sie mir helfen?"),
-                listOf("Ipotesi irrealizzabile", "Wenn ich Zeit hätte, würde ich kommen."),
+                listOf("Richiesta cortese", "Könnten Sie das Fenster öffnen?"),
+                listOf("Ipotesi irrealizzabile", "Wenn ich Zeit hätte, würde ich dich besuchen."),
                 listOf("Consiglio", "Du solltest mehr schlafen.")
             )
         )
@@ -128,7 +128,7 @@ internal fun unitaA2Konjunktiv2Basis(): UnitaGrammatica = unitaGrammatica(
     ),
     errori = listOf(
         erroreUnita("Ich würde gern einen Kaffee haben.", "Ich hätte gern einen Kaffee.", "Per 'vorrei' si usa hätte, non würde haben."),
-        erroreUnita("Wenn ich reich würde, würde ich reisen.", "Wenn ich reich wäre, würde ich reisen.", "Se fossi ricco: wäre, non würde."),
+        erroreUnita("Wenn ich reich würde, würde ich reisen.", "Wenn ich reich wäre, würde ich ein Haus kaufen.", "Se fossi ricco: wäre, non würde."),
         erroreUnita("Kannst du mir helfen?", "Könntest du mir helfen?", "Richiesta cortese: Konjunktiv II könnte, non indicativo.")
     ),
     merksatz = "würde + Infinitiv per i verbi normali; hätte/wäre/könnte/müsste per sein/haben/können/müssen.",
@@ -162,7 +162,7 @@ internal fun unitaA2VerbenPraepositionen(): UnitaGrammatica = unitaGrammatica(
             titolo = "Verbo + preposizione + caso",
             intestazioni = listOf("Verbo", "Preposizione", "Caso", "Esempio"),
             righe = listOf(
-                listOf("warten", "auf", "Akk", "Ich warte auf den Bus."),
+                listOf("warten", "auf", "Akk", "Ich warte auf den Zug."),
                 listOf("denken", "an", "Akk", "Er denkt an seine Familie."),
                 listOf("sich interessieren", "für", "Akk", "Sie interessiert sich für Musik."),
                 listOf("sich freuen", "auf / über", "Akk", "Wir freuen uns auf das Wochenende."),
@@ -176,14 +176,14 @@ internal fun unitaA2VerbenPraepositionen(): UnitaGrammatica = unitaGrammatica(
         )
     ),
     esempi = listOf(
-        esempioUnita("Ich warte auf den Bus.", "Aspetto l'autobus."),
+        esempioUnita("Ich warte auf den Zug.", "Aspetto il treno."),
         esempioUnita("Er denkt an seine Familie.", "Pensa alla sua famiglia."),
         esempioUnita("Sie interessiert sich für Musik.", "Si interessa di musica."),
         esempioUnita("Wir freuen uns auf das Wochenende.", "Non vediamo l'ora del weekend."),
         esempioUnita("Sie spricht über das Buch.", "Parla del libro.")
     ),
     errori = listOf(
-        erroreUnita("Ich warte für den Bus.", "Ich warte auf den Bus.", "warten richiede auf, non für."),
+        erroreUnita("Ich warte für den Bus.", "Ich warte auf den Zug.", "warten richiede auf, non für."),
         erroreUnita("Ich denke über meine Familie.", "Ich denke an meine Familie.", "denken richiede an, non über."),
         erroreUnita("Sie interessiert sich an Musik.", "Sie interessiert sich für Musik.", "sich interessieren richiede für, non an.")
     ),
@@ -290,7 +290,8 @@ internal fun unitaA2IndirekteFragen(): UnitaGrammatica = unitaGrammatica(
                 listOf("Kommst du?", "Ich weiß nicht, ob du kommst."),
                 listOf("Wo wohnst du?", "Ich frage, wo du wohnst."),
                 listOf("Wann kommst du?", "Ich möchte wissen, wann du kommst."),
-                listOf("Hat er Zeit?", "Er fragt, ob er Zeit hat.")
+                listOf("Hat er Zeit?", "Er fragt, ob er Zeit hat."),
+                listOf("Warum kommst du nicht?", "Ich frage, warum du nicht kommst.")
             )
         )
     ),
@@ -326,7 +327,7 @@ internal fun unitaA1Fragewoerter(): UnitaGrammatica = unitaGrammatica(
     prerequisiti = listOf("a0-frase"),
     regola = listOf(
         "I Fragewörter (pronomi/avverbi interrogativi) introducono domande aperte: wer (chi), was (cosa), wo (dove), wann (quando), warum (perché), wie (come), wohin (dove, direzione), woher (da dove).",
-        "Nelle domande con Fragewort il verbo coniugato va in seconda posizione (dopo il Fragewort): Wo wohnst du?",
+        "Nelle domande con Fragewort il verbo coniugato va in seconda posizione (dopo il Fragewort): Wo arbeitest du?",
         "welcher/welche/welches (quale) si declina come l'articolo determinativo.",
         "wie + aggettivo/avverbio: Wie alt bist du? Wie viel kostet das? Wie oft gehst du?",
         "was für (ein) = che tipo di: Was für ein Auto hast du?"
@@ -338,9 +339,9 @@ internal fun unitaA1Fragewoerter(): UnitaGrammatica = unitaGrammatica(
             righe = listOf(
                 listOf("wer", "chi", "Wer ist das?"),
                 listOf("was", "cosa", "Was machst du?"),
-                listOf("wo", "dove", "Wo wohnst du?"),
+                listOf("wo", "dove", "Wo arbeitest du?"),
                 listOf("wohin", "dove (direzione)", "Wohin gehst du?"),
-                listOf("woher", "da dove", "Woher kommst du?"),
+                listOf("woher", "da dove", "Woher kommt er?"),
                 listOf("wann", "quando", "Wann kommst du?"),
                 listOf("warum", "perché", "Warum lernst du Deutsch?"),
                 listOf("wie", "come", "Wie geht es dir?"),
@@ -351,13 +352,13 @@ internal fun unitaA1Fragewoerter(): UnitaGrammatica = unitaGrammatica(
     esempi = listOf(
         esempioUnita("Wer bist du?", "Chi sei?"),
         esempioUnita("Was machst du?", "Cosa fai?"),
-        esempioUnita("Wo wohnst du?", "Dove abiti?"),
+        esempioUnita("Wo arbeitest du?", "Dove lavori?"),
         esempioUnita("Wann kommst du?", "Quando vieni?"),
         esempioUnita("Wie alt bist du?", "Quanti anni hai?"),
         esempioUnita("Welches Buch liest du?", "Quale libro leggi?")
     ),
     errori = listOf(
-        erroreUnita("Wo du wohnst?", "Wo wohnst du?", "Il verbo va in seconda posizione: Wo wohnst du?"),
+        erroreUnita("Wo du wohnst?", "Wo arbeitest du?", "Il verbo va in seconda posizione: Wo arbeitest du?"),
         erroreUnita("Was für Auto hast du?", "Was für ein Auto hast du?", "was für + articolo indeterminativo."),
         erroreUnita("Wer ist das? → Wer das ist?", "Wer ist das?", "Fragewort in prima posizione, verbo in seconda.")
     ),
@@ -368,6 +369,6 @@ internal fun unitaA1Fragewoerter(): UnitaGrammatica = unitaGrammatica(
         sceltaUnita("frag-03", "___ kommst du?", listOf("Wer", "Was", "Wo", "Wann"), 3, "Quando vieni: Wann."),
         sceltaUnita("frag-04", "___ alt bist du?", listOf("Wer", "Was", "Wo", "Wie"), 3, "Quanti anni: Wie alt."),
         sceltaUnita("frag-05", "___ Buch liest du?", listOf("Wer", "Was", "Welches", "Wie"), 2, "Quale libro: Welches."),
-        produciUnita("a1-frage-prod", "„Dove abiti?“", "Wo wohnst du?", "wo = dove; nella domanda il verbo è in seconda posizione."),
+        produciUnita("a1-frage-prod", "„Dove studi?“", "Wo studierst du?", "wo = dove; nella domanda il verbo è in seconda posizione."),
     )
 )

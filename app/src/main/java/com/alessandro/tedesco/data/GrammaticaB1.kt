@@ -260,7 +260,7 @@ object GrammaticaB1 {
             opzioni = listOf("Der", "Die", "Das", "Den"),
             rispostaCorretta = 2,
             spiegazione = "'Buch' è neutro, Nominativ -> 'das'.",
-            esempio = "Das Buch liegt auf dem Tisch."
+            esempio = "Das Buch liegt auf dem Sofa."
         ),
         EsercizioGrammatica(
             id = "ar2",

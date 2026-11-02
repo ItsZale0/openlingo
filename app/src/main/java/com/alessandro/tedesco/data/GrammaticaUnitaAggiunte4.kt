@@ -43,6 +43,21 @@ internal fun unitaA2VerbenAkkDativ(): UnitaGrammatica = unitaGrammatica(
                 listOf("Dativo pronome", "dativo prima, accusativo dopo", "Ich sage dir das Buch.")
             ),
             nota = "Se entrambi sono pronomi: accusativo prima, dativo dopo (Ich sage es dir)."
+        ),
+        tabellaUnita(
+            titolo = "Pronomi al dativo (ripasso)",
+            intestazioni = listOf("Nominativo", "Dativo"),
+            righe = listOf(
+                listOf("ich", "mir"),
+                listOf("du", "dir"),
+                listOf("er", "ihm"),
+                listOf("sie", "ihr"),
+                listOf("es", "ihm"),
+                listOf("wir", "uns"),
+                listOf("ihr", "euch"),
+                listOf("sie / Sie", "ihnen / Ihnen")
+            ),
+            nota = "Plurale: den + -n sul sostantivo (den Kindern)."
         )
     ),
     esempi = listOf(

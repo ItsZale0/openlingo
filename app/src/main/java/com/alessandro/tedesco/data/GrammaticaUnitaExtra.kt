@@ -176,7 +176,7 @@ internal fun unitaA2Wechselpraepositionen(): UnitaGrammatica = unitaGrammatica(
             titolo = "Dativo o accusativo?",
             intestazioni = listOf("Domanda", "Caso", "Esempio"),
             righe = listOf(
-                listOf("Wo? (posizione)", "Dativo", "Das Buch liegt auf dem Tisch."),
+                listOf("Wo? (posizione)", "Dativo", "Das Buch liegt auf dem Sofa."),
                 listOf("Wohin? (movimento)", "Accusativo", "Ich lege das Buch auf den Tisch."),
                 listOf("Wo? (posizione)", "Dativo", "Ich bin in der Schule."),
                 listOf("Wohin? (movimento)", "Accusativo", "Ich gehe in die Schule.")
@@ -201,7 +201,7 @@ internal fun unitaA2Wechselpraepositionen(): UnitaGrammatica = unitaGrammatica(
     esempi = listOf(
         esempioUnita("Ich bin in der Schule.", "Sono a scuola."),
         esempioUnita("Ich gehe in die Schule.", "Vado a scuola."),
-        esempioUnita("Das Buch liegt auf dem Tisch.", "Il libro è sul tavolo."),
+        esempioUnita("Das Buch liegt auf dem Sofa.", "Il libro è sul tavolo."),
         esempioUnita("Ich lege das Buch auf den Tisch.", "Metto il libro sul tavolo."),
         esempioUnita("Die Katze sitzt unter dem Sofa.", "Il gatto è sotto il divano.")
     ),
@@ -497,7 +497,7 @@ internal fun unitaB1Futur(): UnitaGrammatica = unitaGrammatica(
     ),
     esempi = listOf(
         esempioUnita("Ich werde morgen nach Bozen fahren.", "Domani andrò a Bolzano."),
-        esempioUnita("Wir werden unsere Eltern besuchen.", "Visiteremo i nostri genitori."),
+        esempioUnita("Wir werden unsere Freunde besuchen.", "Visiteremo i nostri genitori."),
         esempioUnita("Ich versuche, pünktlich zu kommen.", "Cerco di arrivare puntuale."),
         esempioUnita("Ich habe vor, Deutsch zu lernen.", "Ho intenzione di imparare il tedesco."),
         esempioUnita("Ich muss heute arbeiten.", "Oggi devo lavorare.")
@@ -611,9 +611,9 @@ internal fun unitaB1Doppelkonnektoren(): UnitaGrammatica = unitaGrammatica(
     minuti = 16,
     prerequisiti = listOf("b1-konnektoren"),
     regola = listOf(
-        "entweder ... oder = o ... o: Entweder komme ich heute oder morgen.",
+        "entweder ... oder = o ... o: Entweder komme ich heute oder am Freitag.",
         "weder ... noch = né ... né: Ich habe weder Zeit noch Geld.",
-        "sowohl ... als auch = sia ... sia: Sie spricht sowohl Deutsch als auch Englisch.",
+        "sowohl ... als auch = sia ... sia: Sie spricht sowohl Deutsch als auch Französisch.",
         "nicht nur ... sondern auch = non solo ... ma anche: Er ist nicht nur intelligent, sondern auch fleißig.",
         "je ... desto/umso = quanto più ... tanto più: Je mehr ich lerne, desto besser verstehe ich.",
         "zwar ... aber = certo ... ma: Er ist zwar jung, aber sehr erfahren.",
@@ -644,9 +644,9 @@ internal fun unitaB1Doppelkonnektoren(): UnitaGrammatica = unitaGrammatica(
         )
     ),
     esempi = listOf(
-        esempioUnita("Entweder komme ich heute oder morgen.", "O vengo oggi o domani."),
+        esempioUnita("Entweder komme ich heute oder am Freitag.", "O vengo oggi o domani."),
         esempioUnita("Ich habe weder Zeit noch Geld.", "Non ho né tempo né soldi."),
-        esempioUnita("Sie spricht sowohl Deutsch als auch Englisch.", "Parla sia tedesco sia inglese."),
+        esempioUnita("Sie spricht sowohl Deutsch als auch Französisch.", "Parla sia tedesco sia inglese."),
         esempioUnita("Je mehr ich lerne, desto besser verstehe ich.", "Più imparo, meglio capisco."),
         esempioUnita("Er ist zwar jung, aber sehr erfahren.", "È giovane, ma molto esperto.")
     ),
@@ -797,7 +797,7 @@ internal fun unitaB1Partizipien(): UnitaGrammatica = unitaGrammatica(
         esempioUnita("Das gelesene Buch liegt auf dem Tisch.", "Il libro letto è sul tavolo."),
         esempioUnita("Die gekochte Suppe schmeckt gut.", "La zuppa cotta è buona."),
         esempioUnita("Die in Berlin lebenden Studenten kommen aus Italien.", "Gli studenti che vivono a Berlino vengono dall'Italia."),
-        esempioUnita("Die geöffnete Tür ist kaputt.", "La porta aperta è rotta.")
+        esempioUnita("Das geöffnete Fenster ist kaputt.", "La porta aperta è rotta.")
     ),
     errori = listOf(
         erroreUnita(

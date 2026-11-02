@@ -19,7 +19,7 @@ internal fun unitaB2PassivModal(): UnitaGrammatica = unitaGrammatica(
     prerequisiti = listOf("a2-passivo", "b1-futur"),
     regola = listOf(
         "Nel passivo con modale la frase ha **due infiniti in fondo**: il modale coniugato in seconda posizione e `Partizip II + werden` alla fine.",
-        "Schema: **Subjekt + Modalverb + ... + Partizip II + werden**. Es: Das Formular muss ausgefüllt werden.",
+        "Schema: **Subjekt + Modalverb + ... + Partizip II + werden**. Es: Der Antrag muss ausgefüllt werden.",
         "Il soggetto della frase passiva è ciò che subisce l'azione; l'agente, se espresso, va con **von + dativo**.",
         "Con i modali il passivo si usa molto nel linguaggio amministrativo e sanitario: Die Tabletten müssen zweimal täglich genommen werden.",
         "Al passato: **modalverb al Präteritum + Partizip II + werden**: Das Formular musste ausgefüllt werden.",
@@ -51,7 +51,7 @@ internal fun unitaB2PassivModal(): UnitaGrammatica = unitaGrammatica(
         )
     ),
     esempi = listOf(
-        esempioUnita("Das Formular muss ausgefüllt werden.", "Il modulo deve essere compilato."),
+        esempioUnita("Der Antrag muss ausgefüllt werden.", "Il modulo deve essere compilato."),
         esempioUnita("Die Patienten müssen regelmäßig untersucht werden.", "I pazienti devono essere visitati regolarmente."),
         esempioUnita("Hier darf nicht geraucht werden.", "Qui non è permesso fumare."),
         esempioUnita("Der Termin konnte leider nicht verschoben werden.", "L'appuntamento purtroppo non ha potuto essere spostato."),
@@ -60,12 +60,12 @@ internal fun unitaB2PassivModal(): UnitaGrammatica = unitaGrammatica(
     errori = listOf(
         erroreUnita(
             "Das Formular muss ausgefüllt wird.",
-            "Das Formular muss ausgefüllt werden.",
+            "Der Antrag muss ausgefüllt werden.",
             "Dopo il modale il passivo resta all'infinito: werden, non wird."
         ),
         erroreUnita(
             "Das Formular muss werden ausgefüllt.",
-            "Das Formular muss ausgefüllt werden.",
+            "Der Antrag muss ausgefüllt werden.",
             "Partizip II prima di werden, entrambi in fondo."
         ),
         erroreUnita(
@@ -120,7 +120,7 @@ internal fun unitaB2PassivModal(): UnitaGrammatica = unitaGrammatica(
             "b2pm-07",
             "Man muss das Formular ausfüllen. (passivo con modale)",
             "Das Formular muss ausgefüllt werden.",
-            "Il complemento oggetto diventa soggetto: Das Formular muss ausgefüllt werden."
+            "Il complemento oggetto diventa soggetto: Der Antrag muss ausgefüllt werden."
         ),
         produciUnita(
             "b2pm-08",
@@ -176,7 +176,7 @@ internal fun unitaB2Konjunktiv2Vergangenheit(): UnitaGrammatica = unitaGrammatic
         )
     ),
     esempi = listOf(
-        esempioUnita("Wenn ich das gewusst hätte, wäre ich gekommen.", "Se l'avessi saputo, sarei venuto."),
+        esempioUnita("Wenn ich das gewusst hätte, wäre ich geblieben.", "Se l'avessi saputo, sarei rimasto."),
         esempioUnita("Ich hätte mehr lernen sollen.", "Avrei dovuto studiare di più."),
         esempioUnita("Wir wären früher gefahren, aber es hat geregnet.", "Saremmo partiti prima, ma ha piovuto."),
         esempioUnita("Hätte ich Zeit gehabt, hätte ich dir geholfen.", "Se avessi avuto tempo, ti avrei aiutato."),
@@ -185,7 +185,7 @@ internal fun unitaB2Konjunktiv2Vergangenheit(): UnitaGrammatica = unitaGrammatic
     errori = listOf(
         erroreUnita(
             "Wenn ich das gewusst habe, wäre ich gekommen.",
-            "Wenn ich das gewusst hätte, wäre ich gekommen.",
+            "Wenn ich das gewusst hätte, wäre ich geblieben.",
             "L'ipotesi irreale vuole il Konjunktiv II: hätte gewusst."
         ),
         erroreUnita(
@@ -393,6 +393,7 @@ internal fun unitaB2VerbenPraepositionen(): UnitaGrammatica = unitaGrammatica(
         "Per cose si usa **da-/wo- + preposizione**: Ich warte darauf. Worauf wartest du?",
         "Per persone si usa **preposizione + pronome**: Ich warte auf dich. Ich denke an sie.",
         "Alcune coppie frequenti: sich freuen **auf** (attesa) / sich freuen **über** (cosa già avvenuta), denken **an**, sprechen **über** / **von**, sich erinnern **an**.",
+        "Altre coppie frequenti: sich bewerben **um** + accusativo, abhängen **von** + dativo (separabile: hängt ... ab).",
         "La preposizione non cambia con il tempo verbale: Ich habe auf dich gewartet."
     ),
     tabelle = listOf(
@@ -406,7 +407,9 @@ internal fun unitaB2VerbenPraepositionen(): UnitaGrammatica = unitaGrammatica(
                 listOf("sich interessieren", "für", "accusativo", "Er interessiert sich für Medizin."),
                 listOf("helfen", "bei", "dativo", "Sie hilft mir bei der Arbeit."),
                 listOf("sich beschäftigen", "mit", "dativo", "Wir beschäftigen uns mit dem Thema."),
-                listOf("danken", "für", "accusativo", "Ich danke dir für die Hilfe.")
+                listOf("danken", "für", "accusativo", "Ich danke dir für die Hilfe."),
+                listOf("sich bewerben", "um", "accusativo", "Sie bewirbt sich um die Stelle."),
+                listOf("abhängen", "von", "dativo", "Die Entscheidung hängt vom Wetter ab.")
             )
         ),
         tabellaUnita(
@@ -661,7 +664,7 @@ internal fun unitaB2Nominalstil(): UnitaGrammatica = unitaGrammatica(
         esempioUnita("Wegen seiner Krankheit konnte er nicht kommen.", "A causa della sua malattia non ha potuto venire."),
         esempioUnita("Trotz des Regens gehen wir spazieren.", "Nonostante la pioggia andiamo a passeggio."),
         esempioUnita("Das Lesen hilft beim Lernen.", "La lettura aiuta nell'apprendimento."),
-        esempioUnita("Die Verbesserung der Qualität ist wichtig.", "Il miglioramento della qualità è importante.")
+        esempioUnita("Die Verbesserung der Qualität ist notwendig.", "Il miglioramento della qualità è necessario.")
     ),
     errori = listOf(
         erroreUnita(
