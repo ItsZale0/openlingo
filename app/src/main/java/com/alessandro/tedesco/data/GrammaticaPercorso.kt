@@ -390,6 +390,8 @@ object GrammaticaSyllabus {
                 "L'accusativo è il caso del complemento oggetto: risponde a **Wen?** (chi?) o **Was?** (cosa?).",
                 "Per gli articoli e i possessivi cambia solo il **maschile singolare**: der -> den, ein -> einen, mein -> meinen, kein -> keinen.",
                 "Femminile, neutro e plurale restano uguali al nominativo: die, das, die; eine, ein, eine.",
+                "I possessivi hanno una radice (**mein-, dein-, sein-, ihr-, unser-, euer-**) e prendono le stesse desinenze di ein: mein Vater, meine Mutter, mein Kind, meine Eltern. All'accusativo maschile aggiungono **-en**: meinen Vater, seinen Bruder, unseren Hund.",
+                "**kein** si declina come ein e significa «nessuno / non un»: kein Vater, keine Mutter, kein Kind, keine Eltern. All'accusativo maschile diventa **keinen**: keinen Vater.",
                 "Dopo verbi come haben, sehen, kaufen, brauchen, essen, trinken, lesen, mögen, suchen e finden si usa l'accusativo.",
                 "Anche le preposizioni durch, für, gegen, ohne e um reggono l'accusativo."
             ),
@@ -411,6 +413,29 @@ object GrammaticaSyllabus {
                         listOf("Accusativo", "einen", "eine", "ein", "-")
                     ),
                     nota = "Al plurale non si usa l'articolo indefinito."
+                ),
+                TabellaGrammatica(
+                    titolo = "Possessivi all'accusativo",
+                    intestazioni = listOf("Persona", "Maschile", "Femminile", "Neutro", "Plurale"),
+                    righe = listOf(
+                        listOf("ich", "meinen", "meine", "mein", "meine"),
+                        listOf("du", "deinen", "deine", "dein", "deine"),
+                        listOf("er / es", "seinen", "seine", "sein", "seine"),
+                        listOf("sie (lei)", "ihren", "ihre", "ihr", "ihre"),
+                        listOf("wir", "unseren", "unsere", "unser", "unsere"),
+                        listOf("ihr", "euren", "eure", "euer", "eure"),
+                        listOf("sie / Sie", "ihren / Ihren", "ihre / Ihre", "ihr / Ihr", "ihre / Ihre")
+                    ),
+                    nota = "Solo il maschile aggiunge -en. Femminile, neutro e plurale hanno le stesse forme del nominativo."
+                ),
+                TabellaGrammatica(
+                    titolo = "kein all'accusativo",
+                    intestazioni = listOf("", "Maschile", "Femminile", "Neutro", "Plurale"),
+                    righe = listOf(
+                        listOf("Nominativo", "kein", "keine", "kein", "keine"),
+                        listOf("Accusativo", "keinen", "keine", "kein", "keine")
+                    ),
+                    nota = "kein segue ein: cambia solo il maschile singolare (kein -> keinen)."
                 ),
                 TabellaGrammatica(
                     titolo = "Pronomi personali",
@@ -458,7 +483,7 @@ object GrammaticaSyllabus {
                     spiegazione = "Il pronome er diventa ihn all'accusativo."
                 )
             ),
-            merksatz = "Maschile all'accusativo: der -> den, ein -> einen. Femminile, neutro e plurale non cambiano."
+            merksatz = "Maschile all'accusativo: der -> den, ein -> einen, mein -> meinen, kein -> keinen. Possessivi e kein seguono ein; femminile, neutro e plurale non cambiano."
         ),
         esercizi = listOf(
             EsercizioUnita(

@@ -16,7 +16,8 @@ internal fun unitaA2Dativo(): UnitaGrammatica = unitaGrammatica(
     regola = listOf(
         "Il dativo è il caso del complemento di termine: risponde a Wem? (a chi?).",
         "Gli articoli cambiano: der -> dem, die -> der, das -> dem; al plurale den + -n sul sostantivo.",
-        "Gli articoli indeterminativi e i possessivi diventano einem/einer/einem; al plurale keinen + -n.",
+        "Gli articoli indeterminativi e i possessivi prendono le desinenze del dativo: einem/einer/einem, meinem/meiner/meinem, deinem/deiner/deinem, seinem/seiner/seinem.",
+        "Al plurale il dativo è den + -n sul sostantivo (den Kindern); anche kein diventa keinen (keinen Kindern).",
         "I pronomi al dativo sono mir, dir, ihm, ihr, ihm, uns, euch, ihnen.",
         "Molti verbi reggono il dativo: helfen, danken, gefallen, gehören, passen, schmecken, antworten, folgen. Anche le preposizioni aus, bei, mit, nach, seit, von, zu reggono il dativo."
     ),
@@ -30,6 +31,20 @@ internal fun unitaA2Dativo(): UnitaGrammatica = unitaGrammatica(
                 listOf("Dativo", "dem", "der", "dem", "den + -n")
             ),
             nota = "Al dativo plurale il sostantivo aggiunge spesso -n: den Kindern."
+        ),
+        tabellaUnita(
+            titolo = "Possessivi al dativo",
+            intestazioni = listOf("Persona", "Maschile", "Femminile", "Neutro", "Plurale"),
+            righe = listOf(
+                listOf("ich", "meinem", "meiner", "meinem", "meinen"),
+                listOf("du", "deinem", "deiner", "deinem", "deinen"),
+                listOf("er / es", "seinem", "seiner", "seinem", "seinen"),
+                listOf("sie (lei)", "ihrem", "ihrer", "ihrem", "ihren"),
+                listOf("wir", "unserem", "unserer", "unserem", "unseren"),
+                listOf("ihr", "eurem", "eurer", "eurem", "euren"),
+                listOf("sie / Sie", "ihrem / Ihrem", "ihrer / Ihrer", "ihrem / Ihrem", "ihren / Ihren")
+            ),
+            nota = "Al dativo cambiano tutti i generi: maschile e neutro -em, femminile -er, plurale -en."
         ),
         tabellaUnita(
             titolo = "Pronomi personali al dativo",
@@ -83,7 +98,7 @@ internal fun unitaA2Dativo(): UnitaGrammatica = unitaGrammatica(
             "Auto è neutro; al dativo l'articolo è dem: mit dem Auto."
         )
     ),
-    merksatz = "Dativo: dem, der, dem, den + -n. Pronomi: mir, dir, ihm, ihr, ihm, uns, euch, ihnen.",
+    merksatz = "Dativo: dem, der, dem, den + -n. Possessivi: meinem, meiner, meinem, meinen. Pronomi: mir, dir, ihm, ihr, ihm, uns, euch, ihnen.",
     esercizi = listOf(
         sceltaUnita(
             "dat-01",

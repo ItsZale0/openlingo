@@ -1,7 +1,7 @@
 {
-  "versionCode": 240,
-  "versionName": "1.48.7",
-  "changelog": "Audit completo degli esercizi e della difficolta'. Corretti gli esercizi sbagliati o incoerenti: la frase dell'accusativo con la glossa «il pallone» ora dice «un pallone», l'esercizio di ortografia non chiede piu' una frase da A1 dentro l'unita' dell'alfabeto, e la unita' sugli articoli A0 non chiede piu' di produrre una frase intera. Eliminate le domande duplicate tra unita' diverse, cosi' ripassando non si ritrova la stessa frase con un altro titolo. La teoria aggiunge un promemoria piu' utile: restano fuori solo le clausole che contengono la risposta corretta, non piu' ogni frase che nomina una parola della domanda. Novita' sulla difficolta': ogni esercizio ha un punteggio da 1 a 6 calcolato su tipo, lunghezza della consegna, forma della risposta e numero di opzioni; la sessione va dal facile al difficile, la prima sessione non contiene produzioni e le sessioni successive ne hanno al massimo una, con al massimo un altro esercizio molto impegnativo. Controlli permanenti in build: niente domande ripetute, niente opzioni duplicate, glosse coerenti con la risposta, risposte valide e spiegazioni presenti per ogni esercizio. Nessun cambiamento a vocabolario, ripassi, guida, piano, grammatica, notifiche e progressi.",
+  "versionCode": 241,
+  "versionName": "1.48.8",
+  "changelog": "Teoria completa: possessivi e kein spiegati all'accusativo e al dativo; nuovo test che blocca esercizi senza teoria",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.7/Tedesco-v1.48.7.apk"
+  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.8/Tedesco-v1.48.8.apk"
 }

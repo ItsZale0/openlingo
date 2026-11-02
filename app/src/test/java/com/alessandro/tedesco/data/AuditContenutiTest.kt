@@ -27,6 +27,36 @@ class AuditContenutiTest {
         "kein", "keine", "keinen", "keinem", "keines"
     )
 
+    /**
+     * Forme grammaticali chiuse che gli esercizi non devono mai chiedere
+     * senza spiegazione: possessivi e kein. Gli articoli e i pronomi sono
+     * spesso già forniti nella consegna o appartengono a unità precedenti,
+     * quindi qui non vengono controllati.
+     */
+    private val formeChiuse = setOf(
+        "kein", "keine", "keinen", "keinem", "keiner", "keines",
+        "mein", "meine", "meinen", "meinem", "meiner", "meines",
+        "dein", "deine", "deinen", "deinem", "deiner", "deines",
+        "sein", "seine", "seinen", "seinem", "seiner", "seines",
+        "ihr", "ihre", "ihren", "ihrem", "ihrer", "ihres",
+        "unser", "unsere", "unseren", "unserem", "unserer", "unseres",
+        "euer", "eure", "euren", "eurem", "eurer", "eures"
+    )
+
+    /** Tutto il testo della teoria, tabelle comprese. */
+    private fun testoTeoria(u: UnitaGrammatica): String = buildString {
+        appendLine(u.teoria.regola.joinToString(" "))
+        u.teoria.tabelle.forEach { t ->
+            appendLine(t.titolo)
+            appendLine(t.intestazioni.joinToString(" "))
+            t.righe.forEach { appendLine(it.joinToString(" ")) }
+            appendLine(t.nota)
+        }
+        u.teoria.esempi.forEach { appendLine("${it.tedesco} ${it.italiano}") }
+        u.teoria.erroriTipici.forEach { appendLine("${it.sbagliato} ${it.corretto} ${it.spiegazione}") }
+        appendLine(u.teoria.merksatz)
+    }
+
     private fun primaParola(testo: String): String =
         testo.trim().split(Regex("\\s+")).firstOrNull()?.lowercase().orEmpty()
 
@@ -144,6 +174,39 @@ class AuditContenutiTest {
             assertTrue("${u.id}: teoria vuota", u.teoria.regola.isNotEmpty())
             assertTrue("${u.id}: merksatz vuoto", u.teoria.merksatz.isNotBlank())
         }
+    }
+
+    /**
+     * Se un esercizio chiede una forma chiusa (articolo, possessivo, kein,
+     * pronome, dimostrativo) che lo studente deve scrivere, quella forma deve
+     * comparire nella teoria dell'unità: altrimenti l'esercizio chiede una
+     * cosa che non è mai stata spiegata. Le forme già fornite nella consegna
+     * non contano, perché non sono oggetto dell'esercizio.
+     */
+    @Test
+    fun `la teoria nomina le forme chiuse richieste dagli esercizi`() {
+        val problemi = mutableListOf<String>()
+        unita.forEach { u ->
+            val teoria = testoTeoria(u).lowercase()
+            val paroleTeoria = Regex("[a-zäöüß]+").findAll(teoria).map { it.value }.toSet()
+            u.esercizi.forEach { e ->
+                val risposta = DifficoltaEsercizi.risposta(e)
+                val consegna = e.domanda.lowercase()
+                val mancanti = Regex("[a-zäöüß]+").findAll(risposta.lowercase())
+                    .map { it.value }
+                    .filter { it in formeChiuse }
+                    .filter { it !in paroleTeoria }
+                    .filter { parola ->
+                        !Regex("\\b${Regex.escape(parola)}\\b").containsMatchIn(consegna)
+                    }
+                    .distinct()
+                    .toList()
+                if (mancanti.isNotEmpty()) {
+                    problemi += "${u.id}/${e.id}: $mancanti → «$risposta»"
+                }
+            }
+        }
+        assertTrue("Forme non spiegate nella teoria: $problemi", problemi.isEmpty())
     }
 
     /** Nessun esercizio del percorso deve superare il massimo della scala. */
