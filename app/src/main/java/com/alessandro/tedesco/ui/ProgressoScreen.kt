@@ -2,6 +2,7 @@ package com.alessandro.tedesco.ui
 
 import android.content.Context
 import android.content.Intent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Box
@@ -12,11 +13,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.Canvas
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -25,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -379,100 +385,118 @@ private fun BarraCompetenza(nome: String, valore: Float) {
 
 @Composable
 private fun CardProduzione(pr: CalcoloProgresso.ProgressoReale) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
     ) {
-        Column(Modifier.fillMaxWidth().padding(12.dp)) {
-            Text(
-                "Produzione scritta",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
-            )
-            Text(
-                "Testi liberi valutati sui 4 criteri ufficiali Goethe (Erfüllung, Kohärenz, Wortschatz, Strukturen)",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(Modifier.height(12.dp))
-
-            if (pr.produzioniScritte == 0) {
-                Text(
-                    "Nessuna produzione scritta valutata. Scrivi un testo in Produzione Scritta " +
-                        "e premi Verifica: il tutor lo valuta e il punteggio entra qui.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            } else {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Kpi("Testi", "${pr.produzioniScritte}", "valutati",
-                        MaterialTheme.colorScheme.primary, Modifier.weight(1f))
-                    Kpi(
-                        "Media",
-                        "${pr.mediaProduzione.toInt()}%",
-                        if (pr.mediaProduzione >= 60f) "soglia superata" else "soglia 60%",
-                        if (pr.mediaProduzione >= 60f) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.error,
-                        Modifier.weight(1f)
-                    )
-                }
-
-                Spacer(Modifier.height(10.dp))
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("Trend", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    val trend = pr.trendProduzione
-                    val (testo, colore) = when {
-                        trend > 0.5f -> "↑ migliorando" to MaterialTheme.colorScheme.primary
-                        trend < -0.5f -> "↓ peggiorando" to MaterialTheme.colorScheme.error
-                        else -> "→ stabile" to MaterialTheme.colorScheme.onSurfaceVariant
-                    }
+        Column(Modifier.fillMaxWidth().padding(12.dp).animateContentSize()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { expanded = !expanded },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(Modifier.weight(1f)) {
                     Text(
-                        testo,
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Bold,
-                        color = colore
+                        "Produzione scritta",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        "Testi valutati sui 4 criteri Goethe: tocca per i dettagli",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+                Icon(
+                    imageVector = Icons.Filled.ArrowDropDown,
+                    contentDescription = if (expanded) "Chiudi" else "Apri",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(28.dp)
+                )
+            }
+            if (expanded) {
+                Spacer(Modifier.height(12.dp))
 
-                if (pr.criterioDeboleProduzione != "N/A") {
-                    Spacer(Modifier.height(6.dp))
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Criterio più debole", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text(
-                            "${pr.criterioDeboleProduzione} (${pr.criterioDeboleValore.toInt()}%)",
-                            style = MaterialTheme.typography.bodySmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.error
+                if (pr.produzioniScritte == 0) {
+                    Text(
+                        "Nessuna produzione scritta valutata. Scrivi un testo in Produzione Scritta " +
+                            "e premi Verifica: il tutor lo valuta e il punteggio entra qui.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                } else {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Kpi("Testi", "${pr.produzioniScritte}", "valutati",
+                            MaterialTheme.colorScheme.primary, Modifier.weight(1f))
+                        Kpi(
+                            "Media",
+                            "${pr.mediaProduzione.toInt()}%",
+                            if (pr.mediaProduzione >= 60f) "soglia superata" else "soglia 60%",
+                            if (pr.mediaProduzione >= 60f) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.error,
+                            Modifier.weight(1f)
                         )
                     }
-                }
 
-                if (pr.storicoProduzione.size >= 2) {
-                    Spacer(Modifier.height(12.dp))
-                    Text("Evoluzione", style = MaterialTheme.typography.labelMedium)
-                    Spacer(Modifier.height(4.dp))
-                    GraficoEvoluzione(pr)
-                }
-
-                if (pr.ultimoPraedikatProduzione.isNotBlank()) {
                     Spacer(Modifier.height(10.dp))
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Ultimo risultato", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("Trend", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        val trend = pr.trendProduzione
+                        val (testo, colore) = when {
+                            trend > 0.5f -> "↑ migliorando" to MaterialTheme.colorScheme.primary
+                            trend < -0.5f -> "↓ peggiorando" to MaterialTheme.colorScheme.error
+                            else -> "→ stabile" to MaterialTheme.colorScheme.onSurfaceVariant
+                        }
                         Text(
-                            pr.ultimoPraedikatProduzione,
+                            testo,
                             style = MaterialTheme.typography.bodySmall,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
+                            color = colore
                         )
                     }
+
+                    if (pr.criterioDeboleProduzione != "N/A") {
+                        Spacer(Modifier.height(6.dp))
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text("Criterio più debole", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(
+                                "${pr.criterioDeboleProduzione} (${pr.criterioDeboleValore.toInt()}%)",
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+
+                    if (pr.storicoProduzione.size >= 2) {
+                        Spacer(Modifier.height(12.dp))
+                        Text("Evoluzione", style = MaterialTheme.typography.labelMedium)
+                        Spacer(Modifier.height(4.dp))
+                        GraficoEvoluzione(pr)
+                    }
+
+                    if (pr.ultimoPraedikatProduzione.isNotBlank()) {
+                        Spacer(Modifier.height(10.dp))
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text("Ultimo risultato", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(
+                                pr.ultimoPraedikatProduzione,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        "Soglia ufficiale: 60% (Goethe/telc/ÖSD)",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    "Soglia ufficiale: 60% (Goethe/telc/ÖSD)",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
             }
         }
     }
@@ -573,6 +597,7 @@ private fun CardReportInsegnante(
 ) {
     val context = LocalContext.current
     var conferma by remember { mutableStateOf<String?>(null) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
     val punteggi = profilo?.stato?.progresso?.punteggiLezioni.orEmpty()
     val nome = profilo?.config?.nomeVisualizzato.orEmpty()
 
@@ -581,55 +606,71 @@ private fun CardReportInsegnante(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier.fillMaxWidth().padding(16.dp).animateContentSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(
-                "Report per l'insegnante",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
-            )
-            Text(
-                "Uno snapshot dei dati reali: competenze, lessico, punteggi delle lezioni " +
-                    "e quaderno errori. Utile per un colloquio o per il tutoraggio.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = {
-                    condividi(
-                        context = context,
-                        oggetto = "Report tedesco - ${nome.ifBlank { "studente" }}",
-                        testo = ReportInsegnante.genera(
-                            nome = nome,
-                            livelloObiettivo = pr.livelloObiettivo,
-                            pr = pr,
-                            errori = errori,
-                            punteggiLezioni = punteggi,
-                            data = data
-                        )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { expanded = !expanded },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        "Report per l'insegnante",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
                     )
-                    conferma = "Report pronto: scegli come condividerlo."
-                }) {
-                    Text("Condividi report")
-                }
-                OutlinedButton(onClick = {
-                    condividi(
-                        context = context,
-                        oggetto = "Errori tedesco - ${nome.ifBlank { "studente" }}",
-                        testo = ReportInsegnante.csvErrori(errori)
+                    Text(
+                        "Snapshot dei dati reali per un colloquio o tutoraggio",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    conferma = "CSV pronto: aprilo con Excel o Fogli."
-                }) {
-                    Text("CSV errori")
                 }
-            }
-            conferma?.let {
-                Text(
-                    it,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.primary
+                Icon(
+                    imageVector = Icons.Filled.ArrowDropDown,
+                    contentDescription = if (expanded) "Chiudi" else "Apri",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(28.dp)
                 )
+            }
+            if (expanded) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(onClick = {
+                        condividi(
+                            context = context,
+                            oggetto = "Report tedesco - ${nome.ifBlank { "studente" }}",
+                            testo = ReportInsegnante.genera(
+                                nome = nome,
+                                livelloObiettivo = pr.livelloObiettivo,
+                                pr = pr,
+                                errori = errori,
+                                punteggiLezioni = punteggi,
+                                data = data
+                            )
+                        )
+                        conferma = "Report pronto: scegli come condividerlo."
+                    }) {
+                        Text("Condividi report")
+                    }
+                    OutlinedButton(onClick = {
+                        condividi(
+                            context = context,
+                            oggetto = "Errori tedesco - ${nome.ifBlank { "studente" }}",
+                            testo = ReportInsegnante.csvErrori(errori)
+                        )
+                        conferma = "CSV pronto: aprilo con Excel o Fogli."
+                    }) {
+                        Text("CSV errori")
+                    }
+                }
+                conferma?.let {
+                    Text(
+                        it,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
         }
     }
