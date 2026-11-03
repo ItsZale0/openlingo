@@ -338,6 +338,51 @@ fun StudioVeloceScreen(
                 }
             }
 
+            // ---- Sfida del giorno ----
+            item {
+                val giorno = java.time.LocalDate.now().dayOfYear
+                val sfide = listOf(
+                    "Completa 3 esercizi di grammatica oggi",
+                    "Scrivi 2 frasi originali in tedesco",
+                    "Ascolta un episodio del podcast senza sottotitoli",
+                    "Ripassa 10 parole fragili dal vocabolario",
+                    "Completa una verifica di livello",
+                    "Produci un testo di almeno 50 parole",
+                    "Studia per almeno 20 minuti consecutivi"
+                )
+                val sfida = sfide[giorno % sfide.size]
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.medium,
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(Spaziature.md),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("⚡", style = MaterialTheme.typography.headlineSmall)
+                        Spacer(Modifier.width(Spaziature.sm))
+                        Column(Modifier.weight(1f)) {
+                            Text(
+                                "Sfida del giorno",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                            Text(
+                                sfida,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
+                            )
+                        }
+                    }
+                }
+            }
+
             // ---- Traguardo streak ----
             pr?.let { progresso ->
                 item {
