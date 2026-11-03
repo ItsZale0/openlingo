@@ -34,6 +34,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -472,19 +473,15 @@ fun ImpostazioniScreen(
                 // --- VOCABOLARIO PERSONALIZZATO (solo profili custom) ---
                 if (customWords) {
                     SettingsExpandableSection(
-                        title = "Parole personalizzate",
+                        title = "Vocabolario personalizzato",
                         description = if (googleSheets)
                             "Le tue parole sono sincronizzate da Google Sheets."
-                        else "Aggiungi parole tue da ripassare con il resto."
+                        else "Aggiungi parole tue e usa un vocabolario personalizzato."
                     ) {
                         SettingsButton(onClick = { aggiungiParola = true }) { Text("Aggiungi una parola") }
-                    }
-                    Spacer(Modifier.height(12.dp))
-
-                    SettingsExpandableSection(
-                        title = "Il tuo vocabolario",
-                        description = "Usa un vocabolario personalizzato invece del vocabolario di default."
-                    ) {
+                        Spacer(Modifier.height(12.dp))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                        Spacer(Modifier.height(12.dp))
                         OutlinedTextField(
                             value = feedUrl, onValueChange = { feedUrl = it },
                             label = { Text("URL vocabolario") },
@@ -518,7 +515,7 @@ fun ImpostazioniScreen(
                                 "2. Crea un repository pubblico\n" +
                                 "3. Carica un file vokabeln.json\n" +
                                 "4. Copia l'URL Raw e incollalo qui\n\n" +
-                                "Formato: {\"words\":[{\"id\":\"1\",\"german\":\"der Hund\",\"" +
+                                "Formato: {\"words\":[{\"id\":\"1\",\"german\":\"der Hund\",\" " +
                                 "\"italian\":\"il cane\",\"level\":\"A1\",\"lesson\":1}]}",
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.padding(12.dp)
@@ -548,7 +545,7 @@ fun ImpostazioniScreen(
                                 text = "Come usare il TUO documento Google:\n\n" +
                                 "1. Apri Google Docs e crea un documento\n" +
                                 "2. Scrivi la guida (usa i Titoli)\n" +
-                                "3. Condividi → Chiunque abbia il link → Visualizzatore\n" +
+                                "3. Condividi ��' Chiunque abbia il link ��' Visualizzatore\n" +
                                 "4. Copia l'indirizzo e incollalo qui",
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.padding(12.dp)
@@ -563,7 +560,8 @@ fun ImpostazioniScreen(
                     Spacer(Modifier.height(12.dp))
                 }
 
-                // --- TUTOR AI ---
+                
+// --- TUTOR AI ---
                 SettingsExpandableSection(
                     title = "Tutor AI",
                     description = "Il tutor AI usa Groq ed è già configurato: funziona subito, senza inserire chiavi."
@@ -783,46 +781,43 @@ fun ImpostazioniScreen(
                     Spacer(Modifier.height(12.dp))
                 }
 
-                // --- BACKUP CLOUD ---
+                // --- DATI & SINCRONIZZAZIONE (consolidato) ---
                 SettingsExpandableSection(
-                    title = "Backup cloud",
-                    description = "Salva i tuoi progressi su un repo GitHub privato e ripristinali."
+                    title = "Dati & sincronizzazione",
+                    description = "Backup cloud, vocabolario e ripasso."
                 ) {
+                    Text("Backup cloud", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                    Spacer(Modifier.height(4.dp))
                     SettingsButton(onClick = onVaiABackup) { Text("Apri backup cloud") }
-                    Spacer(Modifier.height(6.dp))
-                    GlassExpandableSection(
-                            title = "Info",
-                            description = null
-                        ) {
-                            Text(
-                                text = "Il backup contiene tutti i profili (parole, ripassi, test, progressi). " +
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Il backup contiene tutti i profili (parole, ripassi, test, progressi). " +
                             "Serve un token GitHub gratuito con permesso Contents sul repo di backup.",
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.padding(12.dp)
-                            )
-                        }
-                }
-                Spacer(Modifier.height(12.dp))
-
-                // --- VOCABOLARIO ---
-                SettingsExpandableSection(
-                    title = "Vocabolario",
-                    description = "Ultimo aggiornamento: ${TedescoViewModel.formattaData(ultimoSync?.syncedAt ?: 0L)}"
-                ) {
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    Spacer(Modifier.height(12.dp))
+                    Text("Vocabolario", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Ultimo aggiornamento: ${TedescoViewModel.formattaData(ultimoSync?.syncedAt ?: 0L)}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                     ultimoSync?.message?.takeIf { it.isNotBlank() }?.let {
+                        Spacer(Modifier.height(4.dp))
                         Text(it, style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Spacer(Modifier.height(8.dp))
                     }
+                    Spacer(Modifier.height(8.dp))
                     SettingsButton(onClick = { vm.sincronizza() }) { Text("Sincronizza adesso") }
-                }
-                Spacer(Modifier.height(12.dp))
-
-                // --- RIPASSO ---
-                SettingsExpandableSection(
-                    title = "Come funziona il ripasso",
-                    description = "Spaced repetition: gli intervalli crescono con le risposte corrette."
-                ) {
+                    Spacer(Modifier.height(12.dp))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    Spacer(Modifier.height(12.dp))
+                    Text("Ripasso", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                    Spacer(Modifier.height(4.dp))
                     Text(
                         "Quando rispondi giusto l'intervallo si allunga: 1, 3, 7, 16, 35, 75, " +
                             "150, 300 giorni. Quando sbagli torna a domani.",
@@ -834,7 +829,8 @@ fun ImpostazioniScreen(
 
                 Spacer(Modifier.height(8.dp))
 
-                // --- CANCELLA DATI ---
+                
+// --- CANCELLA DATI ---
                 SettingsExpandableSection(
                     title = "Area pericolosa",
                     description = "Cancella i dati di questo profilo (gli altri profili non sono toccati)."

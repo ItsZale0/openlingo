@@ -1,7 +1,7 @@
 {
-  "versionCode": 288,
-  "versionName": "1.48.55",
-  "changelog": "Rework home: rimozione consiglio ridondante",
+  "versionCode": 289,
+  "versionName": "1.48.56",
+  "changelog": "Rework impostazioni: sezioni consolidate",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.55/Tedesco-v1.48.55.apk"
+  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.56/Tedesco-v1.48.56.apk"
 }
