@@ -1,7 +1,7 @@
 {
-  "versionCode": 277,
-  "versionName": "1.48.44",
-  "changelog": "Rimozione etichette maiuscole tracciate rimanenti",
+  "versionCode": 278,
+  "versionName": "1.48.45",
+  "changelog": "Messaggio motivante in Esercizi",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.44/Tedesco-v1.48.44.apk"
+  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.45/Tedesco-v1.48.45.apk"
 }

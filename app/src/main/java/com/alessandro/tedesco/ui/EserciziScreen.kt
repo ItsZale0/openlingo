@@ -116,6 +116,12 @@ fun EserciziScreen(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        "Ogni esercizio ti avvicina al tuo obiettivo. Inizia ora!",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                    )
                     Spacer(Modifier.height(12.dp))
                     Button(
                         onClick = { onVaiA(consiglio.route) },
