@@ -51,7 +51,7 @@ fun TraduttoreScreen(vm: TedescoViewModel) {
                 Spacer(Modifier.height(8.dp))
 
                 Text(
-                    "Traduci parole e frasi dal tedesco all'italiano",
+                    "Traduci parole e frasi dal tedesco all'italiano. Ogni parola è un tassello!",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
