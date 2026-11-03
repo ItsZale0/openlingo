@@ -332,8 +332,13 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
                     ) {
                         Column(modifier = Modifier.padding(Spaziature.md)) {
                             Text(
-                                text = if (risultato == true) "Corretto!" else "Sbagliato",
+                                text = if (risultato == true) "Corretto! 🎉" else "Sbagliato",
                                 fontWeight = FontWeight.Bold
+                            )
+                            Spacer(Modifier.height(4.dp))
+                            Text(
+                                text = if (risultato == true) "Ottimo lavoro!" else "Riprova, puoi farcela.",
+                                style = MaterialTheme.typography.bodySmall
                             )
                             Spacer(Modifier.height(4.dp))
                             Text(text = esercizio.spiegazione)
