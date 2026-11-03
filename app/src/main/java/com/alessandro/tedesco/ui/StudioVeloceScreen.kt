@@ -1182,7 +1182,7 @@ private fun ConsiglioCard(
             Spacer(Modifier.width(Spaziature.sm))
             Column(Modifier.weight(1f)) {
                 Text(
-                    "CONSIGLIO PER TE",
+                    "Consiglio per te",
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -1476,7 +1476,7 @@ private fun SezioneLezionePercorso(
         Column(modifier = Modifier.padding(Spaziature.md)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    "ESERCIZI",
+                    "Esercizi",
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary

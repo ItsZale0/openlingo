@@ -495,7 +495,7 @@ private fun CardInEvidenza(
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 ) {
                     Text(
-                        "SCELTO PER TE",
+                        "Scelto per te",
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)

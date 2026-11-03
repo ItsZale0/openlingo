@@ -942,7 +942,7 @@ private fun RegoleCollegate(
     if (regole.isEmpty()) return
     Column(Modifier.fillMaxWidth()) {
         Text(
-            "LA GRAMMATICA DIETRO IL TESTO",
+            "La grammatica dietro il testo",
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurfaceVariant
