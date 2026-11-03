@@ -139,6 +139,16 @@ fun RipassoScreen(vm: TedescoViewModel, onIndietro: () -> Unit, onVaiANuove: () 
                             style = MaterialTheme.typography.headlineMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = when {
+                                sessionState.sbagliate.isEmpty() -> "Perfetto! Tutte le parole consolidate."
+                                sessionState.sbagliate.size <= 2 -> "Quasi perfetto. Rivedi le ${sessionState.sbagliate.size} parole segnalate."
+                                else -> "Continua a ripassare: la memoria si rafforza con la pratica."
+                            },
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                         Spacer(Modifier.height(12.dp))
                         Text(
                             text = "${sessionState.totale} parole ripassate",
