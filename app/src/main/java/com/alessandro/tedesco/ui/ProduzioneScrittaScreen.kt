@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
+import androidx.compose.animation.animateContentSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -335,7 +336,9 @@ fun ProduzioneScrittaScreen(
                 if (mostraCorrezione) {
                     Spacer(Modifier.height(Spaziature.md))
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .animateContentSize(),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.secondaryContainer
                         )
