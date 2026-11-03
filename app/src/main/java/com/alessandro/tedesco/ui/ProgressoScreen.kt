@@ -79,6 +79,22 @@ fun ProgressoScreen(vm: TedescoViewModel, onIndietro: (() -> Unit)? = null) {
             modifier = Modifier.widthIn(max = dimensioneContenuto()),
             verticalArrangement = Arrangement.spacedBy(spaziaturaSchermo())
         ) {
+            // ---- Messaggio motivante ----
+            val messaggio = when {
+                pr.streakGiorni >= 30 -> "Un mese di costanza. Sei un esempio!"
+                pr.streakGiorni >= 14 -> "Due settimane di fila. Il tedesco diventa naturale."
+                pr.streakGiorni >= 7 -> "Una settimana intera! Continua così."
+                pr.streakGiorni >= 3 -> "Ottimo inizio. La costanza paga."
+                pr.paroleImparate >= 100 -> "Hai imparato oltre 100 parole. Bravo!"
+                else -> "Ogni passo conta. Continua a studiare!"
+            }
+            Text(
+                messaggio,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.primary
+            )
+
             // ---- 1. Livello ----
             CardLivello(pr)
 
