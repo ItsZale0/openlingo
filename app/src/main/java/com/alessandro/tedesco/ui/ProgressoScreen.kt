@@ -3,6 +3,7 @@ package com.alessandro.tedesco.ui
 import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -76,7 +77,7 @@ fun ProgressoScreen(vm: TedescoViewModel, onIndietro: (() -> Unit)? = null) {
         }
 
         Column(
-            modifier = Modifier.widthIn(max = dimensioneContenuto()),
+            modifier = Modifier.widthIn(max = dimensioneContenuto()).animateContentSize(),
             verticalArrangement = Arrangement.spacedBy(spaziaturaSchermo())
         ) {
             // ---- Messaggio motivante ----

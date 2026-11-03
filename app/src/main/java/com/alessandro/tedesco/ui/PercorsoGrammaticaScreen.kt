@@ -2,6 +2,7 @@
 
 package com.alessandro.tedesco.ui
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -76,7 +77,7 @@ fun PercorsoGrammaticaScreen(
     ScreenScaffold(title = "Percorso grammaticale", onBack = onIndietro) {
         // ---- Intro: obiettivo e avanzamento ----
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().animateContentSize(),
             shape = MaterialTheme.shapes.medium,
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -90,7 +91,7 @@ fun PercorsoGrammaticaScreen(
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Text(
-                    "20 minuti al giorno. La grammatica comanda il percorso.",
+                    "20 minuti al giorno. La grammatica comanda il percorso.\nOgni unità completata è un passo verso la padronanza.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
