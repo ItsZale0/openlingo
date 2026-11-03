@@ -167,9 +167,9 @@ private fun CardLivello(pr: CalcoloProgresso.ProgressoReale) {
             Spacer(Modifier.height(8.dp))
             Text(
                 when {
-                    pr.streakGiorni >= 7 -> "🔥 ${pr.streakGiorni} giorni di fila. Sei inarrestabile!"
-                    pr.streakGiorni >= 3 -> "🔥 ${pr.streakGiorni} giorni di fila. Continua così!"
-                    pr.streakGiorni > 0 -> "🔥 ${pr.streakGiorni} giorno di fila. Ogni giorno conta."
+                    pr.streakGiorni >= 7 -> "${pr.streakGiorni} giorni di fila. Sei inarrestabile!"
+                    pr.streakGiorni >= 3 -> "${pr.streakGiorni} giorni di fila. Continua così!"
+                    pr.streakGiorni > 0 -> "${pr.streakGiorni} giorno di fila. Ogni giorno conta."
                     else -> "Inizia oggi il tuo streak: basta un esercizio."
                 },
                 style = MaterialTheme.typography.bodyMedium,
