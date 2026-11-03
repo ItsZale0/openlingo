@@ -1,6 +1,7 @@
 package com.alessandro.tedesco.ui
 
 import androidx.compose.foundation.clickable
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -79,7 +80,7 @@ fun DialoghiScreen(
                             .clickable { aperto = d },
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
                     ) {
-                        Column(Modifier.fillMaxWidth().padding(Spaziature.md)) {
+                        Column(Modifier.fillMaxWidth().padding(Spaziature.md).animateContentSize()) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     d.titolo,
