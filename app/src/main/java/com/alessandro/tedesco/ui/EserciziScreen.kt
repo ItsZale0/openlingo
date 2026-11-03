@@ -117,12 +117,6 @@ fun EserciziScreen(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        "Ogni esercizio ti avvicina al tuo obiettivo. Inizia ora!",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
-                    )
                     Spacer(Modifier.height(12.dp))
                     Button(
                         onClick = { onVaiA(consiglio.route) },
@@ -134,27 +128,29 @@ fun EserciziScreen(
                 }
             }
 
-            // ---- Selettore ----
-            Text(
-                "Oppure scegli tu",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
-            )
-            Spacer(Modifier.height(4.dp))
-            TipiEsercizio.chunked(2).forEach { riga ->
-                Row(
-                    Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    riga.forEach { tipo ->
-                        CardTipoEsercizio(
-                            tipo = tipo,
-                            stat = statPerTipo(tipo.id, pr, erroriAperti.count { !it.risolto }),
-                            onClick = { onVaiA(tipo.route) },
-                            modifier = Modifier.weight(1f)
-                        )
+            // ---- Selettore: 3 sezioni raggruppate ----
+            SezioniEsercizi.forEach { (titoloSezione, ids) ->
+                Text(
+                    titoloSezione,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(Modifier.height(4.dp))
+                ids.mapNotNull { tipoPerId(it) }.chunked(2).forEach { riga ->
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        riga.forEach { tipo ->
+                            CardTipoEsercizio(
+                                tipo = tipo,
+                                stat = statPerTipo(tipo.id, pr, erroriAperti.count { !it.risolto }),
+                                onClick = { onVaiA(tipo.route) },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        if (riga.size == 1) Spacer(Modifier.weight(1f))
                     }
-                    if (riga.size == 1) Spacer(Modifier.weight(1f))
                 }
             }
 
@@ -214,6 +210,19 @@ private val TipiEsercizio = listOf(
     TipoEsercizio("podcast", "podcast", "Podcast & Video",
         "Ascolto autentico per livello: YouTube, Spotify, DW", Icons.Filled.Headphones)
 )
+
+/**
+ * Le 15 tipologie organizzate in 3 sezioni: cosi' la scansione visiva
+ * e' a colpo d'occhio invece di un ammasso unico di card.
+ */
+private val SezioniEsercizi = listOf(
+    "Competenze" to listOf("grammatica", "comprensione", "produzione", "espressioni", "verifica", "ascolto"),
+    "Ripasso e consolidamento" to listOf("ripasso", "produzione_attiva", "errori"),
+    "Esplora" to listOf("dialoghi", "pronuncia", "sprechuebungen", "wortliste", "sudtirol", "podcast")
+)
+
+private fun tipoPerId(id: String): TipoEsercizio? =
+    TipiEsercizio.firstOrNull { it.id == id }
 
 private fun statPerTipo(
     id: String,
