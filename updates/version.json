@@ -1,7 +1,7 @@
 {
-  "versionCode": 243,
-  "versionName": "1.48.10",
-  "changelog": "Design home: saluto ingrandito, streak, messaggio motivante, rimozione etichette maiuscole tracciate",
+  "versionCode": 244,
+  "versionName": "1.48.11",
+  "changelog": "Progresso: streak e messaggio motivante in evidenza",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.10/Tedesco-v1.48.10.apk"
+  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.11/Tedesco-v1.48.11.apk"
 }
