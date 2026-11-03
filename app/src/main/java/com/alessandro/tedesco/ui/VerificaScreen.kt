@@ -247,11 +247,16 @@ fun VerificaScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
                             ) {
                                 Column(Modifier.fillMaxWidth().padding(14.dp)) {
                                     Text(
-                                        if (scelta == d.corretta) "Corretto" else "Sbagliato",
+                                        if (scelta == d.corretta) "Corretto 🎉" else "Sbagliato",
                                         style = MaterialTheme.typography.titleSmall,
                                         fontWeight = FontWeight.Bold,
                                         color = if (scelta == d.corretta) MaterialTheme.colorScheme.primary
                                                 else MaterialTheme.colorScheme.error
+                                    )
+                                    Spacer(Modifier.height(2.dp))
+                                    Text(
+                                        if (scelta == d.corretta) "Ottimo!" else "Riprova.",
+                                        style = MaterialTheme.typography.bodySmall
                                     )
                                     if (d.parola.example.isNotBlank()) {
                                         Spacer(Modifier.height(4.dp))
