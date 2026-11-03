@@ -1,5 +1,6 @@
 package com.alessandro.tedesco.ui
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -197,7 +198,7 @@ fun RoleplayScreen(vm: TedescoViewModel) {
                                 containerColor = MaterialTheme.colorScheme.surfaceContainer
                             )
                         ) {
-                            Column(modifier = Modifier.padding(12.dp)) {
+                            Column(modifier = Modifier.padding(12.dp).animateContentSize()) {
                                 Text(
                                     s.titolo,
                                     style = MaterialTheme.typography.titleMedium,

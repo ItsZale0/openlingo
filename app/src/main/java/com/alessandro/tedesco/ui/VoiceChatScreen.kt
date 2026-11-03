@@ -1,6 +1,7 @@
 package com.alessandro.tedesco.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -121,7 +122,7 @@ fun VoiceChatScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
                         containerColor = MaterialTheme.colorScheme.tertiaryContainer
                     )
                 ) {
-                    Column(Modifier.padding(12.dp)) {
+                    Column(Modifier.padding(12.dp).animateContentSize()) {
                         Text(
                             "Correzione",
                             style = MaterialTheme.typography.titleSmall,

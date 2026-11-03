@@ -1,5 +1,6 @@
 package com.alessandro.tedesco.ui
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.imePadding
@@ -384,7 +385,7 @@ private fun MessaggioBubble(
                     else -> MaterialTheme.colorScheme.surfaceContainer
                 }
             ),
-            modifier = Modifier.widthIn(max = 300.dp)
+            modifier = Modifier.widthIn(max = 300.dp).animateContentSize()
         ) {
             val colore = when {
                 isUser -> MaterialTheme.colorScheme.onPrimary
