@@ -38,6 +38,34 @@ private data class ChatChoice(val message: ChatMessage? = null)
 @Serializable
 private data class ChatResponse(val choices: List<ChatChoice> = emptyList())
 
+@Serializable
+private data class GeminiPart(val text: String)
+
+@Serializable
+private data class GeminiContent(val role: String? = null, val parts: List<GeminiPart>)
+
+@Serializable
+private data class GeminiSystemInstruction(val parts: List<GeminiPart>)
+
+@Serializable
+private data class GeminiGenerationConfig(
+    @SerialName("maxOutputTokens") val maxOutputTokens: Int = 2048,
+    val temperature: Double = 0.7
+)
+
+@Serializable
+private data class GeminiRequest(
+    val contents: List<GeminiContent>,
+    @SerialName("system_instruction") val systemInstruction: GeminiSystemInstruction? = null,
+    @SerialName("generationConfig") val generationConfig: GeminiGenerationConfig = GeminiGenerationConfig()
+)
+
+@Serializable
+private data class GeminiCandidate(val content: GeminiContent? = null)
+
+@Serializable
+private data class GeminiResponse(val candidates: List<GeminiCandidate> = emptyList())
+
 /**
  * Client per il tutor AI via Groq.
  *
@@ -67,7 +95,8 @@ class TutorService {
         cronologia: List<Pair<String, String>>,
         livello: String,
         lezione: Int,
-        modello: String? = null
+        modello: String? = null,
+        geminiApiKey: String = ""
     ): String = withContext(Dispatchers.IO) {
         // Free mode (no API key): uses Gemini endpoint automatically
 
@@ -93,6 +122,21 @@ class TutorService {
             cronologia.takeLast(8).forEach { (ruolo, testo) ->
                 add(ChatMessage(if (ruolo == "utente") "user" else "assistant", testo))
             }
+        }
+
+        // Provider Gemini (chiave separata): se presente, usa Gemini
+        if (geminiApiKey.isNotBlank()) {
+            var ultimoErroreG: String? = null
+            for (tentativo in 1..2) {
+                try {
+                    return@withContext chiamaGemini(geminiApiKey, systemPrompt, messaggi)
+                } catch (e: IOException) {
+                    ultimoErroreG = e.message
+                    if (e.message?.contains("non valida") == true) throw e
+                    if (tentativo < 2) delay(4000)
+                }
+            }
+            throw IOException(ultimoErroreG ?: "Nessun modello Gemini disponibile al momento")
         }
 
         // Se l'utente ha scelto un modello, usa quello; altrimenti prova i free in cascata
@@ -142,7 +186,8 @@ class TutorService {
         testoStudente: String,
         livello: String,
         lezione: Int,
-        modello: String? = null
+        modello: String? = null,
+        geminiApiKey: String = ""
     ): String = withContext(Dispatchers.IO) {
         val systemPrompt = """
             Sei un valutatore di tedesco scritto per uno studente italiano di livello $livello.
@@ -170,6 +215,20 @@ class TutorService {
             ChatMessage("system", systemPrompt),
             ChatMessage("user", testoStudente)
         )
+        if (geminiApiKey.isNotBlank()) {
+            var ultimoErroreG: String? = null
+            for (tentativo in 1..2) {
+                try {
+                    return@withContext chiamaGemini(geminiApiKey, systemPrompt, messaggi)
+                } catch (e: IOException) {
+                    ultimoErroreG = e.message
+                    if (e.message?.contains("non valida") == true) throw e
+                    if (tentativo < 2) delay(4000)
+                }
+            }
+            throw IOException(ultimoErroreG ?: "Nessun modello Gemini disponibile al momento")
+        }
+
         val modelli = if (!modello.isNullOrBlank()) listOf(modello)
             else if (apiKey.isBlank()) MODELLI_NO_KEY else MODELLI_FREE
 
@@ -190,7 +249,8 @@ class TutorService {
         testoStudente: String,
         livello: String,
         lezione: Int,
-        modello: String? = null
+        modello: String? = null,
+        geminiApiKey: String = ""
     ): String = withContext(Dispatchers.IO) {
         // Free mode (no API key): uses Gemini endpoint automatically
 
@@ -210,6 +270,20 @@ class TutorService {
             ChatMessage("system", systemPrompt),
             ChatMessage("user", testoStudente)
         )
+
+        if (geminiApiKey.isNotBlank()) {
+            var ultimoErroreG: String? = null
+            for (tentativo in 1..2) {
+                try {
+                    return@withContext chiamaGemini(geminiApiKey, systemPrompt, messaggi)
+                } catch (e: IOException) {
+                    ultimoErroreG = e.message
+                    if (e.message?.contains("non valida") == true) throw e
+                    if (tentativo < 2) delay(4000)
+                }
+            }
+            throw IOException(ultimoErroreG ?: "Nessun modello Gemini disponibile al momento")
+        }
 
         val modelli = if (!modello.isNullOrBlank()) listOf(modello)
             else if (apiKey.isBlank()) MODELLI_NO_KEY else MODELLI_FREE
@@ -255,7 +329,8 @@ class TutorService {
         cronologia: List<Pair<String, String>>,
         livello: String,
         lezione: Int,
-        modello: String? = null
+        modello: String? = null,
+        geminiApiKey: String = ""
     ): String = withContext(Dispatchers.IO) {
         // Free mode (no API key): uses Gemini endpoint automatically
 
@@ -284,6 +359,20 @@ class TutorService {
             cronologia.takeLast(8).forEach { (ruolo, testo) ->
                 add(ChatMessage(if (ruolo == "utente") "user" else "assistant", testo))
             }
+        }
+
+        if (geminiApiKey.isNotBlank()) {
+            var ultimoErroreG: String? = null
+            for (tentativo in 1..2) {
+                try {
+                    return@withContext chiamaGemini(geminiApiKey, systemPrompt, messaggi)
+                } catch (e: IOException) {
+                    ultimoErroreG = e.message
+                    if (e.message?.contains("non valida") == true) throw e
+                    if (tentativo < 2) delay(4000)
+                }
+            }
+            throw IOException(ultimoErroreG ?: "Nessun modello Gemini disponibile al momento")
         }
 
         val modelli = if (!modello.isNullOrBlank()) listOf(modello)
@@ -356,6 +445,55 @@ class TutorService {
             val parsed = json.decodeFromString(ChatResponse.serializer(), testo)
             val contenuto = parsed.choices.firstOrNull()?.message?.content
                 ?: throw IOException("Risposta vuota dal tutor")
+            return pulisciRagionamento(contenuto)
+        }
+    }
+
+    private fun chiamaGemini(
+        apiKey: String,
+        systemPrompt: String,
+        messaggi: List<ChatMessage>
+    ): String {
+        val url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$apiKey"
+        val contents = messaggi.filter { it.role != "system" }.map { m ->
+            GeminiContent(
+                role = if (m.role == "assistant") "model" else "user",
+                parts = listOf(GeminiPart(m.content))
+            )
+        }
+        val reqBody = json.encodeToString(
+            GeminiRequest.serializer(),
+            GeminiRequest(
+                contents = contents,
+                systemInstruction = GeminiSystemInstruction(listOf(GeminiPart(systemPrompt))),
+                generationConfig = GeminiGenerationConfig()
+            )
+        )
+        val request = Request.Builder()
+            .url(url)
+            .header("Content-Type", "application/json")
+            .post(reqBody.toRequestBody("application/json".toMediaType()))
+            .build()
+        client.newCall(request).execute().use { response ->
+            val testo = response.body?.string().orEmpty()
+            if (!response.isSuccessful) {
+                val errore = runCatching {
+                    json.parseToJsonElement(testo).toString()
+                        .substringAfter("\"message\":\"", "")
+                        .substringBefore("\"")
+                }.getOrNull()
+                throw IOException(
+                    when {
+                        response.code == 400 || response.code == 401 || response.code == 403 -> "Chiave Gemini non valida."
+                        response.code == 429 -> "Troppe richieste. Riprova tra poco."
+                        errore.isNullOrBlank() -> "Errore del server Gemini (${response.code})"
+                        else -> errore
+                    }
+                )
+            }
+            val parsed = json.decodeFromString(GeminiResponse.serializer(), testo)
+            val contenuto = parsed.candidates.firstOrNull()?.content?.parts?.firstOrNull()?.text
+                ?: throw IOException("Risposta vuota da Gemini")
             return pulisciRagionamento(contenuto)
         }
     }

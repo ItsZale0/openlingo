@@ -1,7 +1,7 @@
 {
-  "versionCode": 282,
-  "versionName": "1.48.49",
-  "changelog": "Feedback animato in Dialoghi, Esercizi",
+  "versionCode": 283,
+  "versionName": "1.48.50",
+  "changelog": "Wiring chiave Gemini in TutorService",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.49/Tedesco-v1.48.49.apk"
+  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.50/Tedesco-v1.48.50.apk"
 }

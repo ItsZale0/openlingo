@@ -38,6 +38,7 @@ fun VoiceChatScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
     val livello = profilo?.stato?.progresso?.livelloCorrente?.label?.substringBefore(" ") ?: "A0"
     val lezioneCorrente by vm.lezioneCorrente.collectAsStateWithLifecycle(1)
     val apiKey by vm.tutorApiKey.collectAsStateWithLifecycle("")
+    val geminiApiKey by vm.geminiApiKey.collectAsStateWithLifecycle("")
     val modelloTutor by vm.modelloTutor.collectAsStateWithLifecycle(null)
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
@@ -153,7 +154,8 @@ fun VoiceChatScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
                                 },
                                 livello = livello,
                                 lezione = lezioneCorrente,
-                                modello = modelloTutor
+                                modello = modelloTutor,
+                                geminiApiKey = geminiApiKey
                             )
                             messaggi = messaggi + MessaggioVoiceChat(risposta, daUtente = false)
                             ttsHelper.speak(risposta)

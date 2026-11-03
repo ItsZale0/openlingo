@@ -1234,8 +1234,9 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
         lezione: Int
     ): Result<String> {
         val chiave = tutorApiKey.value
+        val gemini = geminiApiKey.value
         return runCatching {
-            app.tutorServiceInstance.rispondi(chiave, cronologia, livello, lezione, _modelloTutor.value)
+            app.tutorServiceInstance.rispondi(chiave, cronologia, livello, lezione, _modelloTutor.value, gemini)
         }
     }
 
@@ -1263,10 +1264,11 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
         lezione: Int
     ): Result<String> {
         val chiave = tutorApiKey.value
+        val gemini = geminiApiKey.value
         val scenario = _roleplayScenario.value
             ?: return Result.failure(IllegalStateException("Nessuno scenario selezionato"))
         return runCatching {
-            app.tutorServiceInstance.roleplay(chiave, scenario, cronologia, livello, lezione, _modelloTutor.value)
+            app.tutorServiceInstance.roleplay(chiave, scenario, cronologia, livello, lezione, _modelloTutor.value, gemini)
         }
     }
 
@@ -1859,7 +1861,8 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                     testoStudente = testo,
                     livello = livello,
                     lezione = lezione,
-                    modello = _modelloTutor.value
+                    modello = _modelloTutor.value,
+                    geminiApiKey = geminiApiKey.value
                 )
                 val valutazione = ParserValutazione.parse(rispostaGrezza)
                 val numParole = CalcoloProduzione.contaParole(testo)
