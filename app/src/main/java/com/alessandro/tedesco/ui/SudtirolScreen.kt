@@ -59,7 +59,7 @@ fun SudtirolScreen(
         ) {
             Text(
                 "A Bressanone e in Austria molte parole quotidiane sono diverse dallo standard. " +
-                    "Capirle è parte della competenza reale, non un vezzo.",
+                    "Capirle è parte della competenza reale, non un vezzo. Ogni variante è un arricchimento!",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
