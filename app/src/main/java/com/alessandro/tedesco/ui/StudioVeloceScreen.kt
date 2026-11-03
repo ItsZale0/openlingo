@@ -231,6 +231,7 @@ fun StudioVeloceScreen(
                     PianoOggiHero(
                         percorso = piano,
                         saluto = nomeProfilo?.let { "Ciao, $it" } ?: "Ciao",
+                        streakGiorni = pr?.streakGiorni ?: 0,
                         onApriPasso = { passo ->
                             if (passo.azione == "ripasso") {
                                 vm.caricaSessione()
@@ -495,6 +496,7 @@ fun StudioVeloceScreen(
 private fun PianoOggiHero(
     percorso: CalcoloPercorsoGiornaliero.PercorsoGiornaliero,
     saluto: String,
+    streakGiorni: Int = 0,
     onApriPasso: (CalcoloPercorsoGiornaliero.PassoPercorso) -> Unit,
     onCompletaPasso: (String) -> Unit
 ) {
@@ -512,25 +514,26 @@ private fun PianoOggiHero(
             ) {
                 Column(Modifier.weight(1f)) {
                     Text(
-                        "IL TUO PIANO DI OGGI",
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.75f)
-                    )
-                    Spacer(Modifier.height(2.dp))
-                    Text(
                         saluto,
-                        style = MaterialTheme.typography.headlineSmall,
+                        style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
-                    Spacer(Modifier.height(2.dp))
+                    Spacer(Modifier.height(4.dp))
                     Text(
-                        "20 minuti, un passo alla volta.",
+                        "20 minuti, un passo alla volta. Ogni giorno conta.",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f)
                     )
+                    if (streakGiorni > 0) {
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            "🔥 $streakGiorni giorni di fila",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
                 }
                 Spacer(Modifier.width(Spaziature.sm))
                 ProgressoOggiRing(
@@ -801,10 +804,9 @@ private fun PercorsoGrammaticaCard(
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
                     Text(
-                        "PERCORSO GRAMMATICALE",
+                        "Percorso grammaticale",
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp,
                         color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.75f)
                     )
                     Text(
@@ -984,7 +986,6 @@ private fun ConsiglioCard(
                     "CONSIGLIO PER TE",
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
@@ -1183,7 +1184,6 @@ private fun SezioneLezionePercorso(
                     "LEZIONE ${stato.lezione.numero}",
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Spacer(Modifier.weight(1f))
@@ -1280,7 +1280,6 @@ private fun SezioneLezionePercorso(
                     "ESERCIZI",
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Spacer(Modifier.weight(1f))

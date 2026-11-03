@@ -1,7 +1,7 @@
 {
-  "versionCode": 242,
-  "versionName": "1.48.9",
-  "changelog": "Audit completo: teoria senza spoiler, possessivi e kein all'accusativo/dativo, reflexivi, am, von, derselbe, dative; test permanenti di copertura e spoiler",
+  "versionCode": 243,
+  "versionName": "1.48.10",
+  "changelog": "Design home: saluto ingrandito, streak, messaggio motivante, rimozione etichette maiuscole tracciate",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.9/Tedesco-v1.48.9.apk"
+  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.10/Tedesco-v1.48.10.apk"
 }
