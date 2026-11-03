@@ -889,10 +889,17 @@ internal fun EsercizioUnitaCard(
                 ) {
                     Column(Modifier.padding(Spaziature.sm)) {
                         Text(
-                            if (corretto) "Corretto!" else "Non corretto",
+                            if (corretto) "Corretto! 🎉" else "Non corretto",
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold
                         )
+                        if (corretto) {
+                            Spacer(Modifier.height(2.dp))
+                            Text(
+                                "Ottimo lavoro!",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
                         if (!corretto) {
                             Spacer(Modifier.height(2.dp))
                             Text(

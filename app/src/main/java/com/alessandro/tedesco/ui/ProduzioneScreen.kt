@@ -250,8 +250,13 @@ fun ProduzioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                         ) {
                             Column(modifier = Modifier.padding(Spaziature.md)) {
                                 Text(
-                                    text = if (risultato == true) "✓ Corretto!" else "✗ Sbagliato",
+                                    text = if (risultato == true) "✓ Corretto! 🎉" else "✗ Sbagliato",
                                     fontWeight = FontWeight.Bold
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = if (risultato == true) "Ottimo!" else "Riprova.",
+                                    style = MaterialTheme.typography.bodySmall
                                 )
                                 Spacer(Modifier.height(4.dp))
                                 Text(text = domanda.spiegazione)
