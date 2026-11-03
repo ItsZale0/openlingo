@@ -306,7 +306,7 @@ private fun HeroPodcast() {
         )
         Column(modifier = Modifier.padding(Spaziature.md)) {
             Text(
-                "ASCOLTO AUTENTICO",
+                "Ascolto autentico",
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
@@ -321,7 +321,8 @@ private fun HeroPodcast() {
             Spacer(Modifier.height(4.dp))
             Text(
                 "Podcast, video e corsi scelti per il tuo livello. Si aprono in " +
-                    "YouTube, Spotify o nel browser: nessun download.",
+                    "YouTube, Spotify o nel browser: nessun download.\n\n" +
+                    "Ascoltare è il modo più naturale per imparare una lingua.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
