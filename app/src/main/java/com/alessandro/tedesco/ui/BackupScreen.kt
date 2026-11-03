@@ -63,6 +63,12 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Spacer(Modifier.height(4.dp))
+            Text(
+                "I tuoi progressi sono preziosi: salvali nel cloud per non perderli mai.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(4.dp))
 
             // --- Cosa viene salvato ---
             Card(
