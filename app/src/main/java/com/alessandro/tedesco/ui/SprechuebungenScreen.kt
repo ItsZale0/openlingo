@@ -1,6 +1,7 @@
 package com.alessandro.tedesco.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.animation.animateContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Check
@@ -215,13 +216,15 @@ fun SprechuebungenScreen(
                             Text("Riascolta")
                         }
                     }
-                    messaggio?.let {
-                        Spacer(Modifier.height(6.dp))
-                        Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                    if (permessoNegato) {
-                        Spacer(Modifier.height(6.dp))
-                        Text("Permesso microfono negato. Attivalo nelle impostazioni.", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.error)
+                    Column(Modifier.fillMaxWidth().animateContentSize()) {
+                        messaggio?.let {
+                            Spacer(Modifier.height(6.dp))
+                            Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        if (permessoNegato) {
+                            Spacer(Modifier.height(6.dp))
+                            Text("Permesso microfono negato. Attivalo nelle impostazioni.", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.error)
+                        }
                     }
                 }
             }

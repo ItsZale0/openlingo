@@ -3,6 +3,7 @@ package com.alessandro.tedesco.ui
 import android.content.Context
 import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -101,7 +102,7 @@ fun RipassoScreen(vm: TedescoViewModel, onIndietro: () -> Unit, onVaiANuove: () 
             } else if (carta == null) {
                 // sessione finita (o vuota)
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.animateContentSize()) {
                         if (sessionState.totale == 0) {
                             // Nulla da ripassare: guida verso le nuove parole
                             Text(

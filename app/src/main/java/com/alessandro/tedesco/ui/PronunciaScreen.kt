@@ -1,6 +1,7 @@
 package com.alessandro.tedesco.ui
 
 import android.Manifest
+import androidx.compose.animation.animateContentSize
 import android.content.Context
 import com.alessandro.tedesco.data.RotoreEsercizi
 import android.content.pm.PackageManager
@@ -227,15 +228,17 @@ fun PronunciaScreen(
                 }
             }
 
-            messaggio?.let {
-                Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
-            }
-            if (permessoNegato) {
-                Text(
-                    "Permesso microfono negato: puoi comunque ascoltare i modelli.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.error
-                )
+            Column(Modifier.fillMaxWidth().animateContentSize()) {
+                messaggio?.let {
+                    Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                }
+                if (permessoNegato) {
+                    Text(
+                        "Permesso microfono negato: puoi comunque ascoltare i modelli.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
             }
 
             when (sezione) {
