@@ -1,7 +1,7 @@
 {
-  "versionCode": 253,
-  "versionName": "1.48.20",
-  "changelog": "Feedback motivante in Verifica",
+  "versionCode": 254,
+  "versionName": "1.48.21",
+  "changelog": "Feedback animato (animateContentSize) in Ascolto",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.20/Tedesco-v1.48.20.apk"
+  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.21/Tedesco-v1.48.21.apk"
 }
