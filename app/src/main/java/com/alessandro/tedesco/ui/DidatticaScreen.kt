@@ -576,7 +576,7 @@ private fun PassoBussola(
                     )
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        "È un sistema di mattoni: se capisci il mattone, capisci la casa. Oggi costruiamo cinque mattoni nuovi, senza tradurre parola per parola.",
+                        "Un sistema di mattoni: se capisci il mattone, capisci la casa. Cinque nuovi oggi, senza tradurre parola per parola.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
                     )

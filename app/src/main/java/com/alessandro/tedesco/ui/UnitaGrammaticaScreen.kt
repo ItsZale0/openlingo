@@ -22,6 +22,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.animation.animateContentSize
 import androidx.compose.material3.Button
@@ -479,13 +481,11 @@ private fun TeoriaUnita(
 
         // Regole che gli esercizi mettono alla prova ma che la teoria non dice
         // ancora. NON contiene le risposte: sarebbe un aiuto, non una lezione.
+        // Collassabile: è una nota di contesto, non il cuore della lezione.
         val promemoria = remember(unita) { PercorsoLezioni.promemoriaEsercizi(unita) }
         if (promemoria.isNotEmpty()) {
             Spacer(Modifier.height(Spaziature.md))
-            SezioneTitolo(
-                "Promemoria",
-                "Le regole che gli esercizi mettono alla prova, senza svelare le risposte."
-            )
+            var promemoriaAperto by rememberSaveable { mutableStateOf(false) }
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
@@ -493,26 +493,54 @@ private fun TeoriaUnita(
                 ),
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
             ) {
-                Column(Modifier.padding(Spaziature.md)) {
-                    promemoria.forEach { testo ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 3.dp),
-                            verticalAlignment = Alignment.Top
-                        ) {
+                Column(Modifier.padding(Spaziature.md).animateContentSize()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { promemoriaAperto = !promemoriaAperto },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(Modifier.weight(1f)) {
                             Text(
-                                "-",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.primary,
+                                "Promemoria",
+                                style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold
                             )
-                            Spacer(Modifier.width(6.dp))
                             Text(
-                                testo,
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.weight(1f)
+                                "Le regole che gli esercizi mettono alla prova, senza svelare le risposte.",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
+                        }
+                        Icon(
+                            imageVector = if (promemoriaAperto) Icons.Filled.Close else Icons.Filled.Add,
+                            contentDescription = if (promemoriaAperto) "Chiudi" else "Apri",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                    if (promemoriaAperto) {
+                        Spacer(Modifier.height(Spaziature.sm))
+                        promemoria.forEach { testo ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 3.dp),
+                                verticalAlignment = Alignment.Top
+                            ) {
+                                Text(
+                                    "-",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Spacer(Modifier.width(6.dp))
+                                Text(
+                                    testo,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
                         }
                     }
                 }
