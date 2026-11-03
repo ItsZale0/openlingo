@@ -386,6 +386,17 @@ class ProfileManager(
         saveToDataStore()
     }
 
+    /** Segna la missione giornaliera come completata per oggi. */
+    suspend fun segnaMissioneCompletata() {
+        val repo = _repository.value
+        val id = repo.profiloAttivoId ?: return
+        val profilo = repo.profili[id] ?: return
+        val oggi = java.time.LocalDate.now().toString()
+        val aggiornato = profilo.copy(config = profilo.config.copy(missioneGiornalieraCompletata = oggi))
+        _repository.value = repo.copy(profili = repo.profili + (id to aggiornato))
+        saveToDataStore()
+    }
+
     /** Attiva/disattiva la Modalità Immersione per il profilo attivo. */
     suspend fun cambiaDidatticaImmersione(attiva: Boolean) {
         val repo = _repository.value

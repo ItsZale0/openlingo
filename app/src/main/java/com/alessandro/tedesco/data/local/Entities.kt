@@ -305,7 +305,9 @@ data class ProfiloConfig(
     val livelloIniziale: LivelloIniziale = LivelloIniziale.A0,
     val mostraContestoMedico: Boolean = false,
     /** Modalità Immersione: percorso didattico separato (input comprensibile, shadowing, ascolto passivo). */
-    val didatticaImmersione: Boolean = false
+    val didatticaImmersione: Boolean = false,
+    /** Data (YYYY-MM-DD) in cui la missione giornaliera è stata completata. Vuoto = non completata oggi. */
+    val missioneGiornalieraCompletata: String = ""
 )
 
 /** Stato persistente per profilo — dati completamente separati per utente */

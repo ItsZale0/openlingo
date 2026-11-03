@@ -1191,6 +1191,13 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    fun segnaMissioneCompletata() {
+        viewModelScope.launch {
+            profileManager.segnaMissioneCompletata()
+            _messaggio.value = "Missione del giorno completata! Bravissimo!"
+        }
+    }
+
     val palette: StateFlow<String> = profileManager.paletteFlow
 
     val tutorApiKey: StateFlow<String> = profileManager.repositoryFlow
@@ -1200,6 +1207,13 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
     val geminiApiKey: StateFlow<String> = profileManager.repositoryFlow
         .map { r -> r.profiloAttivoId?.let { r.profili[it]?.config?.geminiApiKey } ?: "" }
         .stateIn(viewModelScope, SharingStarted.Eagerly, "")
+
+    val missioneCompletataOggi: StateFlow<Boolean> = profileManager.repositoryFlow
+        .map { r ->
+            val oggi = java.time.LocalDate.now().toString()
+            r.profiloAttivoId?.let { r.profili[it]?.config?.missioneGiornalieraCompletata == oggi } ?: false
+        }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     /** Modello Groq scelto dall'utente (null = automatico tra i free). */
     private val _modelloTutor = MutableStateFlow<String?>(null)

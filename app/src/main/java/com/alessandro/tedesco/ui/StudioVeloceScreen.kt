@@ -134,6 +134,7 @@ fun StudioVeloceScreen(
     val parole by vm.parole.collectAsStateWithLifecycle(emptyList())
 
     val pr by vm.progressoReale.collectAsStateWithLifecycle(null)
+    val missioneCompletata by vm.missioneCompletataOggi.collectAsStateWithLifecycle(false)
     val consiglio = remember(pr) { ConsigliEsercizi.consiglio(pr) }
     val profilo by vm.profiloAttivo.collectAsStateWithLifecycle(null)
     val inizialeProfilo = remember(profilo) {
@@ -265,7 +266,7 @@ fun StudioVeloceScreen(
                             .padding(Spaziature.md),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("🎯", style = MaterialTheme.typography.headlineSmall)
+                        Text(if (missioneCompletata) "✅" else "🎯", style = MaterialTheme.typography.headlineSmall)
                         Spacer(Modifier.width(Spaziature.sm))
                         Column(Modifier.weight(1f)) {
                             Text(
@@ -275,10 +276,17 @@ fun StudioVeloceScreen(
                                 color = MaterialTheme.colorScheme.onSecondaryContainer
                             )
                             Text(
-                                missione,
+                                if (missioneCompletata) "Completata oggi! Ottimo lavoro." else missione,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
                             )
+                        }
+                        if (!missioneCompletata) {
+                            Spacer(Modifier.width(Spaziature.sm))
+                            Button(
+                                onClick = { vm.segnaMissioneCompletata() },
+                                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                            ) { Text("Fatto", style = MaterialTheme.typography.labelSmall) }
                         }
                     }
                 }
