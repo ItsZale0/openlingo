@@ -245,14 +245,33 @@ fun StudioVeloceScreen(
                 }
             }
 
-            // ---- Missione del giorno ----
+            // ---- Oggi: missione + sfida + traguardo streak (consolidati) ----
             item {
                 val streak = pr?.streakGiorni ?: 0
                 val missione = when {
+                    missioneCompletata -> "Completata oggi! Ottimo lavoro."
                     streak >= 7 -> "Mantieni lo streak: completa almeno un esercizio oggi."
                     streak >= 1 -> "Continua la striscia: ${streak + 1} giorni ti aspettano."
                     else -> "Inizia oggi: completa il piano di 20 minuti."
                 }
+                val giorno = java.time.LocalDate.now().dayOfYear
+                val sfide = listOf(
+                    "Completa 3 esercizi di grammatica",
+                    "Scrivi 2 frasi originali in tedesco",
+                    "Ascolta un podcast senza sottotitoli",
+                    "Ripassa 10 parole dal vocabolario",
+                    "Completa una verifica di livello",
+                    "Produci un testo di 50+ parole",
+                    "Studia 20 minuti consecutivi"
+                )
+                val sfida = sfide[giorno % sfide.size]
+                val traguardi = listOf(3, 7, 14, 30, 60, 100)
+                val prossimo = traguardi.firstOrNull { it > streak } ?: (streak + 7)
+                val precedente = traguardi.lastOrNull { it <= streak } ?: 0
+                val fracStreak = if (prossimo > precedente) {
+                    ((streak - precedente).toFloat() / (prossimo - precedente)).coerceIn(0f, 1f)
+                } else 1f
+
                 Card(
                     modifier = Modifier.fillMaxWidth().animateContentSize(),
                     shape = MaterialTheme.shapes.medium,
@@ -260,34 +279,48 @@ fun StudioVeloceScreen(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer
                     )
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(Spaziature.md),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(if (missioneCompletata) "✅" else "🎯", style = MaterialTheme.typography.headlineSmall)
-                        Spacer(Modifier.width(Spaziature.sm))
-                        Column(Modifier.weight(1f)) {
-                            Text(
-                                "Missione del giorno",
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer
-                            )
-                            Text(
-                                if (missioneCompletata) "Completata oggi! Ottimo lavoro." else missione,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
-                            )
-                        }
-                        if (!missioneCompletata) {
+                    Column(Modifier.fillMaxWidth().padding(Spaziature.md)) {
+                        // Missione
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(if (missioneCompletata) "✅" else "🎯", style = MaterialTheme.typography.headlineSmall)
                             Spacer(Modifier.width(Spaziature.sm))
-                            Button(
-                                onClick = { vm.segnaMissioneCompletata() },
-                                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp, vertical = 6.dp)
-                            ) { Text("Fatto", style = MaterialTheme.typography.labelSmall) }
+                            Column(Modifier.weight(1f)) {
+                                Text("Missione del giorno", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                                Text(missione, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f))
+                            }
+                            if (!missioneCompletata) {
+                                Spacer(Modifier.width(Spaziature.sm))
+                                Button(onClick = { vm.segnaMissioneCompletata() }, contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp, vertical = 6.dp)) {
+                                    Text("Fatto", style = MaterialTheme.typography.labelSmall)
+                                }
+                            }
                         }
+                        Spacer(Modifier.height(10.dp))
+                        // Sfida
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("⚡", style = MaterialTheme.typography.headlineSmall)
+                            Spacer(Modifier.width(Spaziature.sm))
+                            Column(Modifier.weight(1f)) {
+                                Text("Sfida del giorno", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                                Text(sfida, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f))
+                            }
+                        }
+                        Spacer(Modifier.height(10.dp))
+                        // Traguardo streak
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("🔥", style = MaterialTheme.typography.headlineSmall)
+                            Spacer(Modifier.width(Spaziature.sm))
+                            Column(Modifier.weight(1f)) {
+                                Text("Streak: $streak giorni (prossimo: $prossimo)", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f))
+                            }
+                        }
+                        Spacer(Modifier.height(6.dp))
+                        LinearProgressIndicator(
+                            progress = { fracStreak },
+                            modifier = Modifier.fillMaxWidth().height(6.dp).clip(MaterialTheme.shapes.extraSmall),
+                            color = MaterialTheme.colorScheme.primary,
+                            trackColor = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.15f)
+                        )
                     }
                 }
             }
@@ -307,144 +340,23 @@ fun StudioVeloceScreen(
                     ) {
                         Column(Modifier.fillMaxWidth().padding(Spaziature.md)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text("🎯", style = MaterialTheme.typography.headlineSmall)
+                                Text("📊", style = MaterialTheme.typography.headlineSmall)
                                 Spacer(Modifier.width(Spaziature.sm))
                                 Column(Modifier.weight(1f)) {
-                                    Text(
-                                        "Obiettivo settimanale",
-                                        style = MaterialTheme.typography.titleSmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onTertiaryContainer
-                                    )
-                                    Text(
-                                        "$fatto / $obiettivo produzioni questa settimana",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
-                                    )
+                                    Text("Obiettivo settimanale", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onTertiaryContainer)
+                                    Text("$fatto / $obiettivo produzioni questa settimana", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f))
                                 }
                             }
                             Spacer(Modifier.height(8.dp))
                             LinearProgressIndicator(
                                 progress = { frac },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(7.dp)
-                                    .clip(MaterialTheme.shapes.extraSmall),
+                                modifier = Modifier.fillMaxWidth().height(7.dp).clip(MaterialTheme.shapes.extraSmall),
                                 color = MaterialTheme.colorScheme.tertiary,
                                 trackColor = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.15f)
                             )
                             if (frac >= 1f) {
                                 Spacer(Modifier.height(6.dp))
-                                Text(
-                                    "Obiettivo raggiunto! 🎉",
-                                    style = MaterialTheme.typography.labelMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.onTertiaryContainer
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            // ---- Sfida del giorno ----
-            item {
-                val giorno = java.time.LocalDate.now().dayOfYear
-                val sfide = listOf(
-                    "Completa 3 esercizi di grammatica oggi",
-                    "Scrivi 2 frasi originali in tedesco",
-                    "Ascolta un episodio del podcast senza sottotitoli",
-                    "Ripassa 10 parole fragili dal vocabolario",
-                    "Completa una verifica di livello",
-                    "Produci un testo di almeno 50 parole",
-                    "Studia per almeno 20 minuti consecutivi"
-                )
-                val sfida = sfide[giorno % sfide.size]
-                Card(
-                    modifier = Modifier.fillMaxWidth().animateContentSize(),
-                    shape = MaterialTheme.shapes.medium,
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(Spaziature.md),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("⚡", style = MaterialTheme.typography.headlineSmall)
-                        Spacer(Modifier.width(Spaziature.sm))
-                        Column(Modifier.weight(1f)) {
-                            Text(
-                                "Sfida del giorno",
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer
-                            )
-                            Text(
-                                sfida,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
-                            )
-                        }
-                    }
-                }
-            }
-
-            // ---- Traguardo streak ----
-            pr?.let { progresso ->
-                item {
-                    val streak = progresso.streakGiorni
-                    val traguardi = listOf(3, 7, 14, 30, 60, 100)
-                    val prossimo = traguardi.firstOrNull { it > streak } ?: (streak + 7)
-                    val precedente = traguardi.lastOrNull { it <= streak } ?: 0
-                    val frac = if (prossimo > precedente) {
-                        ((streak - precedente).toFloat() / (prossimo - precedente)).coerceIn(0f, 1f)
-                    } else 1f
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = MaterialTheme.shapes.medium,
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer
-                        )
-                    ) {
-                        Column(Modifier.fillMaxWidth().padding(Spaziature.md)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text("*", style = MaterialTheme.typography.headlineSmall)
-                                Spacer(Modifier.width(Spaziature.sm))
-                                Column(Modifier.weight(1f)) {
-                                    Text(
-                                        "Traguardo streak",
-                                        style = MaterialTheme.typography.titleSmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                                    )
-                                    Text(
-                                        "$streak giorni di fila - prossimo traguardo: $prossimo",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
-                                    )
-                                }
-                            }
-                            Spacer(Modifier.height(8.dp))
-                            LinearProgressIndicator(
-                                progress = { frac },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(7.dp)
-                                    .clip(MaterialTheme.shapes.extraSmall),
-                                color = MaterialTheme.colorScheme.primary,
-                                trackColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.15f)
-                            )
-                            if (streak >= 30) {
-                                Spacer(Modifier.height(6.dp))
-                                Text(
-                                    "Sei un campione!",
-                                    style = MaterialTheme.typography.labelMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
+                                Text("Obiettivo raggiunto! 🎉", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onTertiaryContainer)
                             }
                         }
                     }
