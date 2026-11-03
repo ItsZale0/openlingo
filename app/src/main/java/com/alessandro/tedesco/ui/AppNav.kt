@@ -20,6 +20,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -76,7 +79,11 @@ fun AppNav(
     Box(modifier) {
         NavHost(
             navController = nav,
-            startDestination = "studio"
+            startDestination = "studio",
+            enterTransition = { fadeIn(animationSpec = tween(200)) },
+            exitTransition = { fadeOut(animationSpec = tween(200)) },
+            popEnterTransition = { fadeIn(animationSpec = tween(200)) },
+            popExitTransition = { fadeOut(animationSpec = tween(200)) }
         ) {
             composable("studio") {
                 StudioVeloceScreen(
