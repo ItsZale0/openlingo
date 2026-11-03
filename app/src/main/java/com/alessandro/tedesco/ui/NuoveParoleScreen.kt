@@ -121,6 +121,12 @@ fun NuoveParoleScreen(vm: TedescoViewModel, onIndietro: () -> Unit = {}) {
                     .fillMaxWidth()
                     .widthIn(max = maxLarghezza)
             ) {
+                Text(
+                    "Ogni parola nuova è un passo avanti. Cerca e impara!",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(Modifier.height(Spaziature.xs))
                 OutlinedTextField(
                     value = ricerca,
                     onValueChange = { ricerca = it },
