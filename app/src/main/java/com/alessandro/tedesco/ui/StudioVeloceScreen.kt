@@ -283,6 +283,61 @@ fun StudioVeloceScreen(
                 }
             }
 
+            // ---- Obiettivo settimanale ----
+            pr?.let { progresso ->
+                item {
+                    val fatto = progresso.produzioniSettimana
+                    val obiettivo = progresso.obiettivoSettimanaleProduzione.coerceAtLeast(1)
+                    val frac = (fatto.toFloat() / obiettivo).coerceIn(0f, 1f)
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.medium,
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                        )
+                    ) {
+                        Column(Modifier.fillMaxWidth().padding(Spaziature.md)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text("🎯", style = MaterialTheme.typography.headlineSmall)
+                                Spacer(Modifier.width(Spaziature.sm))
+                                Column(Modifier.weight(1f)) {
+                                    Text(
+                                        "Obiettivo settimanale",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                                    )
+                                    Text(
+                                        "$fatto / $obiettivo produzioni questa settimana",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
+                                    )
+                                }
+                            }
+                            Spacer(Modifier.height(8.dp))
+                            LinearProgressIndicator(
+                                progress = { frac },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(7.dp)
+                                    .clip(MaterialTheme.shapes.extraSmall),
+                                color = MaterialTheme.colorScheme.tertiary,
+                                trackColor = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.15f)
+                            )
+                            if (frac >= 1f) {
+                                Spacer(Modifier.height(6.dp))
+                                Text(
+                                    "Obiettivo raggiunto! 🎉",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onTertiaryContainer
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
             // ---- Azioni rapide
             item {
                 Row(
