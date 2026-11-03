@@ -81,6 +81,12 @@ fun WortlisteScreen(
                 singleLine = true
             )
             Spacer(Modifier.height(Spaziature.sm))
+            Text(
+                "Ogni parola imparata e un passo avanti. Cerca e ripassa!",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(Spaziature.sm))
             Row(
                 modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(Spaziature.xs)
