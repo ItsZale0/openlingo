@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material3.*
+import androidx.compose.animation.animateContentSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.runtime.rememberCoroutineScope
@@ -299,7 +300,9 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                     // Spiegazione con traduzione
                     if (risultato != null) {
                         Card(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .animateContentSize(),
                             colors = CardDefaults.cardColors(
                                 containerColor = if (risultato == true)
                                     MaterialTheme.colorScheme.primaryContainer
