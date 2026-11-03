@@ -1,7 +1,7 @@
 {
-  "versionCode": 292,
-  "versionName": "1.48.59",
-  "changelog": "Rework esercizi: sezioni raggruppate",
+  "versionCode": 293,
+  "versionName": "1.48.60",
+  "changelog": "Rework podcast: hero essenziale e guida collassabile",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.59/Tedesco-v1.48.59.apk"
+  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.60/Tedesco-v1.48.60.apk"
 }

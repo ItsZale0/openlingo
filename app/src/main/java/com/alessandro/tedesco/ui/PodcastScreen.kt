@@ -3,6 +3,7 @@ package com.alessandro.tedesco.ui
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,7 +23,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Lightbulb
@@ -320,9 +323,7 @@ private fun HeroPodcast() {
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                "Podcast, video e corsi scelti per il tuo livello. Si aprono in " +
-                    "YouTube, Spotify o nel browser: nessun download.\n\n" +
-                    "Ascoltare è il modo più naturale per imparare una lingua.",
+                "Podcast, video e corsi scelti per il tuo livello, gratis. Si aprono in YouTube, Spotify o nel browser.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -780,6 +781,7 @@ private fun StatoVuoto(onAzzera: () -> Unit) {
 
 @Composable
 private fun ComeAscoltare() {
+    var expanded by rememberSaveable { mutableStateOf(false) }
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
@@ -788,8 +790,11 @@ private fun ComeAscoltare() {
         ),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
-        Column(modifier = Modifier.padding(Spaziature.md)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+        Column(modifier = Modifier.padding(Spaziature.md).animateContentSize()) {
+            Row(
+                modifier = Modifier.fillMaxWidth().clickable { expanded = !expanded },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Icon(
                     Icons.Filled.Lightbulb,
                     contentDescription = null,
@@ -800,20 +805,29 @@ private fun ComeAscoltare() {
                 Text(
                     "Come sfruttare la sezione",
                     style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    imageVector = if (expanded) Icons.Filled.Close else Icons.Filled.Add,
+                    contentDescription = if (expanded) "Chiudi" else "Apri",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(18.dp)
                 )
             }
-            Spacer(Modifier.height(Spaziature.sm))
-            PuntoAscolto("1", "Scegli un contenuto solo e portalo a termine: la costanza vale più della quantità.")
-            PuntoAscolto("2", "Prima ascolta con il supporto scritto, poi riascolta senza: il secondo passaggio è quello che fa crescere.")
-            PuntoAscolto("3", "Chiudi con 3 parole nuove e una frase tua: l'ascolto diventa lessico attivo.")
-            Spacer(Modifier.height(Spaziature.sm))
-            Text(
-                "Serve una connessione: i link si aprono in YouTube, Spotify o nel browser. " +
-                    "Il resto dell'app resta offline.",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            if (expanded) {
+                Spacer(Modifier.height(Spaziature.sm))
+                PuntoAscolto("1", "Scegli un contenuto solo e portalo a termine: la costanza vale più della quantità.")
+                PuntoAscolto("2", "Prima ascolta con il supporto scritto, poi riascolta senza: il secondo passaggio è quello che fa crescere.")
+                PuntoAscolto("3", "Chiudi con 3 parole nuove e una frase tua: l'ascolto diventa lessico attivo.")
+                Spacer(Modifier.height(Spaziature.sm))
+                Text(
+                    "Serve una connessione: i link si aprono in YouTube, Spotify o nel browser. " +
+                        "Il resto dell'app resta offline.",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }
