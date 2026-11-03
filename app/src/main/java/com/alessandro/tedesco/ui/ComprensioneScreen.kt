@@ -350,8 +350,13 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                         ) {
                             Column(modifier = Modifier.padding(Spaziature.md)) {
                                 Text(
-                                    text = if (risultato == true) "Corretto!" else "Sbagliato",
+                                    text = if (risultato == true) "Corretto! 🎉" else "Sbagliato",
                                     fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    text = if (risultato == true) "Ottimo lavoro, continua così!" else "Non preoccuparti, riprova.",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Text(text = domanda.spiegazione)
                             }
