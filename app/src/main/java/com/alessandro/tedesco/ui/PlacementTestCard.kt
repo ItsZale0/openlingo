@@ -88,7 +88,7 @@ fun PlacementTestCard(
                 Spacer(Modifier.width(Spaziature.sm))
                 Column(Modifier.weight(1f)) {
                     Text(
-                        "TEST DI INGRESSO",
+                        "Test di ingresso",
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary

@@ -1,7 +1,7 @@
 {
-  "versionCode": 275,
-  "versionName": "1.48.42",
-  "changelog": "Messaggio motivante in Podcast",
+  "versionCode": 276,
+  "versionName": "1.48.43",
+  "changelog": "Rimozione etichetta maiuscola tracciata in PlacementTest",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.42/Tedesco-v1.48.42.apk"
+  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.43/Tedesco-v1.48.43.apk"
 }
