@@ -6,6 +6,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -123,7 +124,7 @@ private fun SettingsExpandableSection(
 ) {
     var expanded by rememberSaveable { mutableStateOf(defaultExpanded) }
     Card(
-        modifier = modifier.fillMaxWidth().clip(GlassShape),
+        modifier = modifier.fillMaxWidth().clip(GlassShape).animateContentSize(),
         shape = GlassShape,
         colors = CardDefaults.cardColors(containerColor = settingsGlassColor()),
             ) {

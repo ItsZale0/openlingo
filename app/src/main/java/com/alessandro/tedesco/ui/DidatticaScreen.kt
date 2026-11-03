@@ -1,6 +1,7 @@
 package com.alessandro.tedesco.ui
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -1229,7 +1230,7 @@ private fun PassoRaccolta(
                     }
                 )
             ) {
-                Column(Modifier.padding(16.dp)) {
+                Column(Modifier.padding(16.dp).animateContentSize()) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             "FRASE ${i + 1}",
