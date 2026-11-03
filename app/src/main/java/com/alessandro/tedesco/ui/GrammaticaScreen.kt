@@ -309,8 +309,12 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                         ) {
                             Column(modifier = Modifier.padding(Spaziature.md)) {
                                 Text(
-                                    text = if (risultato == true) "✓ Corretto!" else "✗ Sbagliato",
+                                    text = if (risultato == true) "✓ Corretto! 🎉" else "✗ Sbagliato",
                                     fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    text = if (risultato == true) "Ottimo!" else "Riprova.",
+                                    style = MaterialTheme.typography.bodySmall
                                 )
                                 Text(text = esercizio.spiegazione)
                                 Text(
