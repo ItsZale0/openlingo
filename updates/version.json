@@ -1,7 +1,7 @@
 {
-  "versionCode": 244,
-  "versionName": "1.48.11",
-  "changelog": "Progresso: streak e messaggio motivante in evidenza",
+  "versionCode": 245,
+  "versionName": "1.48.12",
+  "changelog": "Design: rimozione etichette maiuscole tracciate in Didattica e Podcast",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.11/Tedesco-v1.48.11.apk"
+  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.12/Tedesco-v1.48.12.apk"
 }

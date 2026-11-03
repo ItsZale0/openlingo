@@ -564,7 +564,6 @@ private fun PassoBussola(
                         "SERIE · ${storia.serie.uppercase()}",
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.2.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(Modifier.height(6.dp))
@@ -758,7 +757,6 @@ private fun PassoInput(
                         "EPISODIO ${storia.episodio} · ${storia.serie.uppercase()}",
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp,
                         color = MaterialTheme.colorScheme.primary
                     )
                     Spacer(Modifier.height(4.dp))
@@ -947,7 +945,6 @@ private fun RegoleCollegate(
             "LA GRAMMATICA DIETRO IL TESTO",
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
-            letterSpacing = 1.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(Modifier.height(6.dp))
@@ -1238,8 +1235,7 @@ private fun PassoRaccolta(
                             "FRASE ${i + 1}",
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(Modifier.weight(1f))
                         IconButton(onClick = { onAscolta(frase.tedesco) }) {
@@ -1480,7 +1476,6 @@ private fun PassoShadowing(
                         "FRASE ${indice + 1} DI ${frasi.size}",
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp,
                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                     )
                     Spacer(Modifier.height(10.dp))

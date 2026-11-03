@@ -309,7 +309,6 @@ private fun HeroPodcast() {
                 "ASCOLTO AUTENTICO",
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
-                letterSpacing = 1.2.sp,
                 color = MaterialTheme.colorScheme.primary
             )
             Spacer(Modifier.height(4.dp))
@@ -498,7 +497,6 @@ private fun CardInEvidenza(
                         "SCELTO PER TE",
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.6.sp,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                     )
                 }
