@@ -353,6 +353,12 @@ fun ProduzioneScrittaScreen(
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold
                                 )
+                                Spacer(Modifier.height(2.dp))
+                                Text(
+                                    text = "Ogni testo scritto è un passo avanti.",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                             }
                             Spacer(Modifier.height(Spaziature.sm))
                             when {
