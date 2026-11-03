@@ -243,7 +243,47 @@ fun StudioVeloceScreen(
                 }
             }
 
-            // ---- Azioni rapide: le sezioni principali a portata di pollice ----
+            // ---- Missione del giorno ----
+            item {
+                val streak = pr?.streakGiorni ?: 0
+                val missione = when {
+                    streak >= 7 -> "Mantieni lo streak: completa almeno un esercizio oggi."
+                    streak >= 1 -> "Continua la striscia: ${streak + 1} giorni ti aspettano."
+                    else -> "Inizia oggi: completa il piano di 20 minuti."
+                }
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.medium,
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(Spaziature.md),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("🎯", style = MaterialTheme.typography.headlineSmall)
+                        Spacer(Modifier.width(Spaziature.sm))
+                        Column(Modifier.weight(1f)) {
+                            Text(
+                                "Missione del giorno",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                            Text(
+                                missione,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
+                            )
+                        }
+                    }
+                }
+            }
+
+            // ---- Azioni rapide
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
