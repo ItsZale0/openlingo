@@ -252,9 +252,14 @@ fun ProduzioneAttivaScreen(
                             )
                             Spacer(Modifier.width(Spaziature.sm))
                             Text(
-                                if (esito == true) "Corretto!" else "Non ancora",
+                                if (esito == true) "Corretto! 🎉" else "Non ancora",
                                 fontWeight = FontWeight.Bold,
                                 style = MaterialTheme.typography.titleSmall
+                            )
+                            Spacer(Modifier.height(2.dp))
+                            Text(
+                                if (esito == true) "Ottimo!" else "Continua a provare.",
+                                style = MaterialTheme.typography.bodySmall
                             )
                         }
                         Spacer(Modifier.height(Spaziature.sm))
