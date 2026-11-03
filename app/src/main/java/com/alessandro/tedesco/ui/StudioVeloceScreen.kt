@@ -135,7 +135,6 @@ fun StudioVeloceScreen(
 
     val pr by vm.progressoReale.collectAsStateWithLifecycle(null)
     val missioneCompletata by vm.missioneCompletataOggi.collectAsStateWithLifecycle(false)
-    val consiglio = remember(pr) { ConsigliEsercizi.consiglio(pr) }
     val profilo by vm.profiloAttivo.collectAsStateWithLifecycle(null)
     val inizialeProfilo = remember(profilo) {
         (profilo?.config?.nomeVisualizzato?.trim()?.firstOrNull()?.uppercase() ?: "A")
@@ -539,14 +538,6 @@ fun StudioVeloceScreen(
                 }
             }
 
-            // ---- Consiglio dinamico ----
-            item {
-                ConsiglioCard(
-                    titolo = consiglio.titolo,
-                    motivo = consiglio.motivo,
-                    onApri = onVaiAEsercizi
-                )
-            }
         }
         }
     }
