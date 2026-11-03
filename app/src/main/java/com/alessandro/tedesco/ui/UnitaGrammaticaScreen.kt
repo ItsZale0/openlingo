@@ -920,7 +920,7 @@ internal fun EsercizioUnitaCard(
                 ) {
                     Column(Modifier.padding(Spaziature.sm)) {
                         Text(
-                            if (corretto) "Corretto! 🎉" else "Non corretto",
+                            if (corretto) "Corretto!" else "Non corretto",
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold
                         )
