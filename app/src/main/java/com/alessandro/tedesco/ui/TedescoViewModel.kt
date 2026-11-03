@@ -1184,10 +1184,21 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    fun aggiornaGeminiApiKey(nuovaChiave: String) {
+        viewModelScope.launch {
+            profileManager.aggiornaGeminiApiKey(nuovaChiave)
+            _messaggio.value = if (nuovaChiave.isBlank()) "Chiave Gemini rimossa" else "Chiave Gemini salvata"
+        }
+    }
+
     val palette: StateFlow<String> = profileManager.paletteFlow
 
     val tutorApiKey: StateFlow<String> = profileManager.repositoryFlow
         .map { r -> r.profiloAttivoId?.let { r.profili[it]?.config?.tutorApiKey } ?: "" }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, "")
+
+    val geminiApiKey: StateFlow<String> = profileManager.repositoryFlow
+        .map { r -> r.profiloAttivoId?.let { r.profili[it]?.config?.geminiApiKey } ?: "" }
         .stateIn(viewModelScope, SharingStarted.Eagerly, "")
 
     /** Modello Groq scelto dall'utente (null = automatico tra i free). */

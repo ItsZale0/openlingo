@@ -285,6 +285,7 @@ fun ImpostazioniScreen(
 }
     var guidaDocId by rememberSaveable { mutableStateOf(profilo?.config?.guidaDocId ?: "") }
     var chiaveTutor by rememberSaveable { mutableStateOf(profilo?.config?.tutorApiKey ?: "") }
+    var chiaveGemini by rememberSaveable { mutableStateOf(profilo?.config?.geminiApiKey ?: "") }
 
     // --- Sistema di notifiche (promemoria locali) ---
     var notRipassoAttivo by remember { mutableStateOf(true) }
@@ -577,6 +578,18 @@ fun ImpostazioniScreen(
                             unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
                         )
                     )
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = chiaveGemini, onValueChange = { chiaveGemini = it },
+                        label = { Text("Chiave Gemini (opzionale)") },
+                        modifier = Modifier.fillMaxWidth(), singleLine = true,
+                        placeholder = { Text("AIza...") },
+                        shape = GlassShape,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                        )
+                    )
                     GlassExpandableSection(
                             title = "Info",
                             description = null
@@ -593,7 +606,7 @@ fun ImpostazioniScreen(
                             )
                         }
                     Spacer(Modifier.height(12.dp))
-                    SettingsButton(onClick = { vm.aggiornaTutorApiKey(chiaveTutor) }) { Text("Salva chiave") }
+                    SettingsButton(onClick = { vm.aggiornaTutorApiKey(chiaveTutor); vm.aggiornaGeminiApiKey(chiaveGemini) }) { Text("Salva chiavi") }
                 }
                 Spacer(Modifier.height(12.dp))
 

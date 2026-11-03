@@ -299,6 +299,7 @@ data class ProfiloConfig(
     val feedUrl: String = "",
     val guidaDocId: String? = null,
     val tutorApiKey: String = "",
+    val geminiApiKey: String = "",
     val palette: String = "uber",
     val stileDesign: String = "pixel",
     val livelloIniziale: LivelloIniziale = LivelloIniziale.A0,
