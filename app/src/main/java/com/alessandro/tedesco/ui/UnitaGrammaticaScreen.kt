@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.animation.animateContentSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -878,7 +879,9 @@ internal fun EsercizioUnitaCard(
             if (verificato) {
                 Spacer(Modifier.height(Spaziature.sm))
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .animateContentSize(),
                     colors = CardDefaults.cardColors(
                         containerColor = if (corretto) {
                             MaterialTheme.colorScheme.primaryContainer
