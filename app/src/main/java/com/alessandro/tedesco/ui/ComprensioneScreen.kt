@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.animation.animateContentSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -340,7 +341,9 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                     // Spiegazione
                     if (risultato != null) {
                         Card(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .animateContentSize(),
                             colors = CardDefaults.cardColors(
                                 containerColor = if (risultato == true)
                                     MaterialTheme.colorScheme.primaryContainer
