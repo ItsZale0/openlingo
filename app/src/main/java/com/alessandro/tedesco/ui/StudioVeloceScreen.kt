@@ -338,6 +338,65 @@ fun StudioVeloceScreen(
                 }
             }
 
+            // ---- Traguardo streak ----
+            pr?.let { progresso ->
+                item {
+                    val streak = progresso.streakGiorni
+                    val traguardi = listOf(3, 7, 14, 30, 60, 100)
+                    val prossimo = traguardi.firstOrNull { it > streak } ?: (streak + 7)
+                    val precedente = traguardi.lastOrNull { it <= streak } ?: 0
+                    val frac = if (prossimo > precedente) {
+                        ((streak - precedente).toFloat() / (prossimo - precedente)).coerceIn(0f, 1f)
+                    } else 1f
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.medium,
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        )
+                    ) {
+                        Column(Modifier.fillMaxWidth().padding(Spaziature.md)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text("*", style = MaterialTheme.typography.headlineSmall)
+                                Spacer(Modifier.width(Spaziature.sm))
+                                Column(Modifier.weight(1f)) {
+                                    Text(
+                                        "Traguardo streak",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                                    )
+                                    Text(
+                                        "$streak giorni di fila - prossimo traguardo: $prossimo",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                                    )
+                                }
+                            }
+                            Spacer(Modifier.height(8.dp))
+                            LinearProgressIndicator(
+                                progress = { frac },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(7.dp)
+                                    .clip(MaterialTheme.shapes.extraSmall),
+                                color = MaterialTheme.colorScheme.primary,
+                                trackColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.15f)
+                            )
+                            if (streak >= 30) {
+                                Spacer(Modifier.height(6.dp))
+                                Text(
+                                    "Sei un campione!",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
             // ---- Azioni rapide
             item {
                 Row(
