@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.alessandro.tedesco.TedescoApp
 import com.alessandro.tedesco.data.BackupCloud
 import com.alessandro.tedesco.data.BackupEsecutore
+import com.alessandro.tedesco.data.BackupMerge
 import com.alessandro.tedesco.data.BackupSettings
 import com.alessandro.tedesco.sync.NotificheSettings
 import kotlinx.coroutines.Dispatchers
@@ -30,9 +31,10 @@ sealed interface BackupStato {
  * Backup cloud su GitHub: carica una fotografia di TUTTI i profili su un repo
  * privato, e la ripristina.
  *
- * Il ripristino e' distruttivo: sovrascrive i dati locali. Per questo non parte
- * mai da un tap solo — la schermata mostra il riepilogo di cosa contiene il
- * backup e chiede conferma.
+ * Il ripristino UNISCE il backup ai dati locali (BackupMerge): nessuna parola,
+ * ripasso, unità di grammatica o lezione viene sovrascritta con una versione
+ * meno avanzata. Per questo non parte mai da un tap solo: la schermata mostra
+ * il riepilogo di cosa contiene il backup e chiede conferma.
  */
 class BackupViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -172,7 +174,14 @@ class BackupViewModel(application: Application) : AndroidViewModel(application) 
         contenutoDaRipristinare = null
     }
 
-    /** Applica il ripristino: sovrascrive i dati locali e ricarica l'app. */
+    /**
+     * Applica il ripristino UNENDO il backup ai dati locali.
+     *
+     * Non è una sovrascrittura: lessico, ripassi, padronanza grammaticale e
+     * progressi delle lezioni vengono confrontati voce per voce e si tiene la
+     * versione più avanzata (BackupMerge). Ripristinare su un dispositivo non
+     * cancella più lo studio fatto su quel dispositivo dopo l'ultimo backup.
+     */
     fun confermaRipristino() {
         val json = contenutoDaRipristinare ?: return
         _stato.value = BackupStato.InCorso
@@ -180,14 +189,16 @@ class BackupViewModel(application: Application) : AndroidViewModel(application) 
             try {
                 val pacchetto = BackupCloud.deserializza(json)
                 withContext(Dispatchers.IO) {
-                    app.profileManagerInstance.sostituisciRepository(pacchetto.dati)
+                    val locale = app.profileManagerInstance.repositoryFlow.first()
+                    val unito = BackupMerge.fondi(locale, pacchetto.dati)
+                    app.profileManagerInstance.sostituisciRepository(unito)
                     pacchetto.notifiche?.let { n: BackupCloud.NotificheBackup ->
                         NotificheSettings(getApplication()).applica(n)
                     }
                 }
                 _daRipristinare.value = null
                 contenutoDaRipristinare = null
-                _stato.value = BackupStato.Ok("Ripristino completato: ${pacchetto.dati.profili.size} profili")
+                _stato.value = BackupStato.Ok("Ripristino completato: ${pacchetto.dati.profili.size} profili (progressi uniti)")
             } catch (e: Exception) {
                 _stato.value = BackupStato.Errore("Ripristino fallito: ${e.message}")
             }

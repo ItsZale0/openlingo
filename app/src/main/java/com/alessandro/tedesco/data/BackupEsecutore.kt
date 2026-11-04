@@ -49,36 +49,74 @@ object BackupEsecutore {
         val profiloAttivoId = app.profileManagerInstance.profiloAttivoId()
         val nomeFile = BackupCloud.nomeFilePerProfilo(profiloAttivoId)
 
-        val repository = app.profileManagerInstance.repositoryFlow.first()
-        if (repository.profili.isEmpty()) return Esito.NonConfigurato("Nessun profilo da salvare")
-
-        // Se NESSUN profilo ha dati reali (parole, log, guida, piano, sessioni,
-        // lastSync > 0) siamo davanti a repo fresco di ricreazione (avvio in
-        // corso o — nei casi peggiori — stato ricreato da preset). Caricarlo in
-        // automatico SOVRASCRIVE il backup buono con profili vuoti: vietato.
-        // Il pulsante manuale segue la stessa regola: un salvataggio esplicito
-        // di uno stato non ancora caricato distruggerebbe comunque i dati.
-        val datiUtili = repository.profili.values.any { p ->
-            val s = p.stato
-            s.lastSync > 0L || s.parole.isNotEmpty() || s.feedLog.isNotEmpty() ||
-                s.ripassiLog.isNotEmpty() || s.errori.isNotEmpty() ||
-                s.risposte.isNotEmpty() || s.sessioni.isNotEmpty() ||
-                s.conversazioni.isNotEmpty() || s.guida != null || s.piano != null ||
-                s.lezioniGenerate.isNotEmpty()
-        }
-        if (!datiUtili) return Esito.NonConfigurato("Stato dati non ancora caricato: backup evitato")
-
         val notifiche = NotificheSettings(app).leggi()
-        val json = BackupCloud.serializza(repository, versioneApp, System.currentTimeMillis(), notifiche)
-        val hash = sha256(json)
-
-        // Salta se identico all'ultimo backup (solo in automatico)
-        if (!forza && hash == settings.ultimoHash()) {
-            return Esito.NessunCambiamento
-        }
 
         return try {
             val client = BackupGitHubClient(token, repo, nomeFile)
+
+            // UNIONE PRIMA DEL CARICAMENTO.
+            // Lo stesso backup è condiviso con il desktop: se lì sono stati
+            // ripassati vocaboli o avanzati grammatica/lezioni, caricare solo la
+            // fotografia del telefono cancellerebbe quei progressi. Si scarica
+            // quindi l'ultima copia e si unisce (BackupMerge), poi si carica il
+            // risultato: il telefono riceve anche i progressi fatti altrove.
+            val remoto = client.scarica()
+
+            // Riletto ORA, dopo il download: durante la richiesta l'utente può
+            // aver risposto a un esercizio e quella risposta non va persa.
+            val repository = app.profileManagerInstance.repositoryFlow.first()
+            if (repository.profili.isEmpty()) return Esito.NonConfigurato("Nessun profilo da salvare")
+
+            // Se NESSUN profilo ha dati reali (parole, log, guida, piano,
+            // sessioni, lastSync > 0) siamo davanti a repo fresco di ricreazione
+            // (avvio in corso o — nei casi peggiori — stato ricreato da preset).
+            // Caricarlo in automatico SOVRASCRIVE il backup buono con profili
+            // vuoti: vietato. Il pulsante manuale segue la stessa regola.
+            val datiUtili = repository.profili.values.any { p ->
+                val s = p.stato
+                s.lastSync > 0L || s.parole.isNotEmpty() || s.feedLog.isNotEmpty() ||
+                    s.ripassiLog.isNotEmpty() || s.errori.isNotEmpty() ||
+                    s.risposte.isNotEmpty() || s.sessioni.isNotEmpty() ||
+                    s.conversazioni.isNotEmpty() || s.guida != null || s.piano != null ||
+                    s.lezioniGenerate.isNotEmpty()
+            }
+            if (!datiUtili && remoto.isNullOrBlank()) {
+                return Esito.NonConfigurato("Stato dati non ancora caricato: backup evitato")
+            }
+
+            val repositoryUnito = if (remoto.isNullOrBlank()) {
+                repository
+            } else {
+                val pacchetto = try {
+                    BackupCloud.deserializza(remoto)
+                } catch (e: BackupCloud.BackupInvalido) {
+                    return Esito.Errore(
+                        "Backup cloud non leggibile: ${e.message}. " +
+                            "Caricamento annullato per non sovrascriverlo."
+                    )
+                }
+                BackupMerge.fondi(repository, pacchetto.dati)
+            }
+
+            if (repositoryUnito != repository) {
+                // I progressi arrivati dal cloud vanno anche nello stato locale.
+                app.profileManagerInstance.sostituisciRepository(repositoryUnito)
+            }
+
+            val json = BackupCloud.serializza(
+                repositoryUnito, versioneApp, System.currentTimeMillis(), notifiche
+            )
+            // Hash sul contenuto REALE: creatoIl varia a ogni chiamata e da solo
+            // farebbe sembrare "cambiato" anche un backup identico.
+            val hash = sha256(
+                BackupCloud.serializza(repositoryUnito, versioneApp, 0L, notifiche)
+            )
+
+            // Salta se identico all'ultimo backup (solo in automatico)
+            if (!forza && hash == settings.ultimoHash()) {
+                return Esito.NessunCambiamento
+            }
+
             client.carica(json, "Backup automatico Tedesco App")
             settings.salvaHash(hash)
             settings.registraBackup(System.currentTimeMillis())

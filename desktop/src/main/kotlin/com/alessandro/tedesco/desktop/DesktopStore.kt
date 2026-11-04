@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.alessandro.tedesco.data.BackupCloud
+import com.alessandro.tedesco.data.BackupMerge
 import com.alessandro.tedesco.data.CalcoloCompetenze
 import com.alessandro.tedesco.data.CalcoloPercorsoGiornaliero
 import com.alessandro.tedesco.data.CalcoloProgresso
@@ -528,25 +529,52 @@ class DesktopStore(
         }
     }
 
-    /** Carica tutti i profili sul repo privato (stesso file dell'app Android). */
+    /**
+     * Carica tutti i profili sul repo privato (stesso file dell'app Android).
+     *
+     * Prima di caricare SCARICA il backup e lo unisce ai dati locali con
+     * [BackupMerge]: se il telefono ha ripassato parole o avanzato nella
+     * grammatica, il salvataggio dal desktop non deve cancellare quei progressi.
+     * Se il cloud esiste ma non è leggibile ci si ferma: sovrascriverlo alla
+     * cieca sarebbe una perdita di dati.
+     */
     fun salvaSulCloud(): EsitoRete {
         val token = preferenze.githubToken.trim()
         if (token.isBlank()) return EsitoRete(false, "Inserisci prima il token GitHub")
         return try {
-            val testo = BackupCloud.serializza(
-                repo = repo,
-                versioneApp = Versione.nome,
-                now = System.currentTimeMillis()
-            )
             val client = BackupGithub(
                 token = token,
                 repo = repoNormalizzato(token),
                 nomeFile = BackupCloud.nomeFilePerProfilo(repo.profiloAttivoId)
             )
+            val remoto = client.scarica()
+            val unito = if (remoto == null) {
+                repo
+            } else {
+                val pacchetto = try {
+                    BackupCloud.deserializza(remoto.json)
+                } catch (e: Exception) {
+                    return EsitoRete(
+                        false,
+                        "Backup cloud non leggibile (${e.message}). " +
+                            "Salvataggio annullato per non sovrascriverlo."
+                    )
+                }
+                BackupMerge.fondi(repo, pacchetto.dati)
+            }
+            if (unito.profili.isNotEmpty()) {
+                repo = unito
+                salva()
+            }
+            val testo = BackupCloud.serializza(
+                repo = repo,
+                versioneApp = Versione.nome,
+                now = System.currentTimeMillis()
+            )
             client.carica(testo, "Backup Tedesco (desktop)")
             preferenze = preferenze.copy(ultimoBackup = System.currentTimeMillis())
             salvaPreferenze()
-            EsitoRete(true, "Backup caricato: ${repo.profili.size} profili")
+            EsitoRete(true, "Backup caricato: ${repo.profili.size} profili (progressi uniti)")
         } catch (e: Exception) {
             EsitoRete(false, e.message ?: "Errore sconosciuto")
         }
@@ -574,24 +602,36 @@ class DesktopStore(
         }
     }
 
-    /** Applica il backup scaricato: sovrascrive i profili locali. */
+    /**
+     * Applica il backup scaricato UNENDOLO ai dati locali.
+     *
+     * Non è più una sovrascrittura: lessico, ripassi, padronanza grammaticale e
+     * progressi delle lezioni vengono confrontati voce per voce e si tiene la
+     * versione più avanzata. Così ripristinare su un dispositivo non cancella
+     * ciò che su quel dispositivo era stato fatto nel frattempo.
+     */
     fun applicaBackupCloud(contenuto: String): EsitoRete {
         return try {
             val pacchetto = BackupCloud.deserializza(contenuto)
-            val ripristinato = ProfiliPreset.riconcilia(pacchetto.dati)
-            if (ripristinato.profili.isEmpty()) {
+            val locale = ProfiliPreset.riconcilia(repo)
+            val unitoCloud = ProfiliPreset.riconcilia(pacchetto.dati)
+            if (unitoCloud.profili.isEmpty()) {
                 return EsitoRete(false, "Il backup non contiene profili")
             }
+            val unito = BackupMerge.fondi(locale, unitoCloud)
             val attivo = repo.profiloAttivoId
-                ?.takeIf { ripristinato.profili.containsKey(it) }
-                ?: ripristinato.profili.keys.first()
-            repo = ripristinato.copy(profiloAttivoId = attivo)
+                ?.takeIf { unito.profili.containsKey(it) }
+                ?: unito.profili.keys.first()
+            repo = unito.copy(profiloAttivoId = attivo)
             preferenze = preferenze.copy(profiloAttivoId = attivo)
             salva()
+            val unita = unito.profili.values.sumOf { it.stato.padronanzaGrammatica.size }
+            val lezioni = unito.profili.values.sumOf { it.stato.progressiLezioni.size }
             EsitoRete(
                 true,
-                "Ripristino completato: ${ripristinato.profili.size} profili, " +
-                    "${ripristinato.profili.values.sumOf { it.stato.parole.size }} parole"
+                "Ripristino completato: ${unito.profili.size} profili, " +
+                    "${unito.profili.values.sumOf { it.stato.parole.size }} parole, " +
+                    "$unita unità di grammatica, $lezioni lezioni (progressi uniti)"
             )
         } catch (e: Exception) {
             EsitoRete(false, e.message ?: "Errore sconosciuto")

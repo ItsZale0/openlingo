@@ -1,7 +1,7 @@
 {
-  "versionCode": 298,
-  "versionName": "1.48.65",
-  "changelog": "Versione desktop integrata con l'app: stesso vocabolario dal feed GitHub (sync automatico all'avvio e al cambio profilo), stessa Wortliste, stessi esercizi e stesso backup cloud. Nuova sezione Sincronizzazione nelle impostazioni del desktop.",
+  "versionCode": 299,
+  "versionName": "1.48.66",
+  "changelog": "Sincronizzazione completa dei progressi fra telefono e desktop: lessico, ripassi, grammatica e lezioni vengono UNITI invece di sovrascritti. Anche il caricamento del backup ora scarica e unisce prima di salvare, quindi i progressi fatti sull'altro dispositivo non si perdono. Ripristino non distruttivo, riepilogo con unita di grammatica e lezioni, hash del backup stabile.",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.65/Tedesco-v1.48.65.apk"
+  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.66/Tedesco-v1.48.66.apk"
 }

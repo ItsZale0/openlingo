@@ -255,12 +255,12 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
         }
     }
 
-    // --- Conferma ripristino (distruttivo) ---
+    // --- Conferma ripristino: unione con i dati locali ---
     val riep = daRipristinare
     if (riep != null && confermaRipristino) {
         AlertDialog(
             onDismissRequest = { confermaRipristino = false; vm.annullaRipristino() },
-            title = { Text("Sovrascrivere i dati locali?") },
+            title = { Text("Unire il backup ai dati di questo telefono?") },
             text = {
                 Column {
                     Text("Il backup contiene:")
@@ -269,15 +269,18 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                     Text("• ${riep.numParole} parole")
                     Text("• ${riep.numRipassi} ripassi registrati")
                     Text("• ${riep.numRisposte} correzioni")
+                    Text("• ${riep.numUnitaGrammatica} unità di grammatica")
+                    Text("• ${riep.numLezioni} lezioni")
                     Spacer(Modifier.height(8.dp))
                     Text("Data: " + SimpleDateFormat("d MMM yyyy, HH:mm", Locale.ITALIAN)
                         .format(Date(riep.creatoIl)))
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        "I dati attuali sul telefono verranno SOSTITUITI. " +
-                            "Se hai fatto modifiche dopo questo backup, andranno perse.",
+                        "I progressi vengono UNITI a quelli del telefono: per ogni parola, " +
+                            "unità di grammatica e lezione resta la versione più avanzata. " +
+                            "Nessuna delle due parti viene cancellata.",
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             },
@@ -285,7 +288,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                 TextButton(onClick = {
                     confermaRipristino = false
                     vm.confermaRipristino()
-                }) { Text("Sì, ripristina") }
+                }) { Text("Sì, unisci") }
             },
             dismissButton = {
                 TextButton(onClick = { confermaRipristino = false; vm.annullaRipristino() }) {
@@ -302,8 +305,10 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                     Text("• ${riep.numProfili} profili")
                     Text("• ${riep.numParole} parole")
                     Text("• ${riep.numRipassi} ripassi")
+                    Text("• ${riep.numUnitaGrammatica} unità di grammatica")
+                    Text("• ${riep.numLezioni} lezioni")
                     Spacer(Modifier.height(8.dp))
-                    Text("Vuoi ripristinarlo sul telefono?")
+                    Text("Vuoi unirlo ai dati di questo telefono?")
                 }
             },
             confirmButton = {

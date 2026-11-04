@@ -363,8 +363,10 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
             Text("Backup GitHub", style = MaterialTheme.typography.titleSmall)
             Spacer(Modifier.height(2.dp))
             Text(
-                "Carica tutti i profili (parole, ripassi, progressi) sul repository privato e " +
-                    "ripristinali su un altro dispositivo. File: ${store.nomeFileBackup}",
+                "Carica tutti i profili (parole, ripassi, grammatica e lezioni) sul repository " +
+                    "privato e ripristinali su un altro dispositivo. Il caricamento UNISCE i " +
+                    "progressi fatti altrove: niente viene sovrascritto con dati meno avanzati. " +
+                    "File: ${store.nomeFileBackup}",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -562,9 +564,11 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
                     "Backup del ${dataOra(r.creatoIl)}" +
                         (if (r.versioneApp.isBlank()) "" else " (versione ${r.versioneApp})") +
                         ":\n${r.numProfili} profili · ${r.numParole} parole · " +
-                        "${r.numRipassi} ripassi · ${r.numRisposte} risposte.\n\n" +
-                        "Sovrascriverà parole, ripassi e progressi di questo computer. " +
-                        "L'operazione non si può annullare."
+                        "${r.numRipassi} ripassi · ${r.numRisposte} risposte · " +
+                        "${r.numUnitaGrammatica} unità di grammatica · ${r.numLezioni} lezioni.\n\n" +
+                        "I progressi del backup vengono UNITI a quelli di questo computer: " +
+                        "per ogni parola, unità e lezione resta la versione più avanzata, " +
+                        "quindi niente viene perso."
                 )
             },
             confirmButton = {

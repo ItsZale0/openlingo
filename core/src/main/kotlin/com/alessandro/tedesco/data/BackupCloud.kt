@@ -116,6 +116,8 @@ object BackupCloud {
             numParole = profili.sumOf { it.stato.parole.size },
             numRipassi = profili.sumOf { it.stato.ripassiLog.size },
             numRisposte = profili.sumOf { it.stato.risposte.size },
+            numUnitaGrammatica = profili.sumOf { it.stato.padronanzaGrammatica.size },
+            numLezioni = profili.sumOf { it.stato.progressiLezioni.size },
             creatoIl = p.creatoIl,
             versioneApp = p.versioneApp
         )
@@ -127,7 +129,11 @@ object BackupCloud {
         val numRipassi: Int,
         val numRisposte: Int,
         val creatoIl: Long,
-        val versioneApp: String
+        val versioneApp: String,
+        /** Unità del percorso grammaticale con un risultato salvato. */
+        val numUnitaGrammatica: Int = 0,
+        /** Lezioni del percorso con progressi salvati. */
+        val numLezioni: Int = 0
     )
 
     class BackupInvalido(message: String) : Exception(message)

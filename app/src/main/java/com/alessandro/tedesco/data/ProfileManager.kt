@@ -248,11 +248,12 @@ class ProfileManager(
     }
 
     /**
-     * Sostituisce l'intero repository (tutti i profili) — usato dal RIPRISTINO
-     * del backup. Operazione distruttiva: sovrascrive i dati locali.
-     * Prima di applicare, salva una copia di sicurezza dei dati correnti in
-     * [ULTIMA_COPIA_PRE_RIPRISTINO] non serve: il backup e' esplicito e l'utente
-     * ha confermato. Persiste subito su DataStore.
+     * Sostituisce l'intero repository (tutti i profili).
+     *
+     * Usato dal RIPRISTINO del backup: il chiamante passa già il risultato di
+     * [BackupMerge], cioè l'unione fra dati locali e backup. Non è più una
+     * sovrascrittura cieca: nessun progresso locale viene scavalcato da una
+     * versione meno avanzata. Persiste subito su DataStore.
      */
     suspend fun sostituisciRepository(nuovo: ProfiliRepository) = withContext(io) {
         _repository.value = nuovo
