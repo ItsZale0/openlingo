@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.data.remote
 
+import com.alessandro.tedesco.data.local.WordEntity
+import com.alessandro.tedesco.data.local.WordSource
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -109,4 +111,26 @@ data class WordDto(
     val lesson: Int = 1,
     val tags: List<String> = emptyList(),
     val archived: Boolean = false
+)
+
+/**
+ * Converte una parola del feed in entita' locale.
+ *
+ * Se la parola esiste gia' si conservano `createdAt` e `source`: cosi' il
+ * confronto "cambiata si'/no" nel merge guarda solo i contenuti veri e non
+ * risulta sempre diverso per via del timestamp.
+ */
+fun WordDto.toEntity(now: Long, precedente: WordEntity? = null): WordEntity = WordEntity(
+    id = id,
+    german = german,
+    italian = italian,
+    example = example,
+    article = article,
+    pronunciation = pronunciation,
+    level = level,
+    lesson = lesson,
+    tags = tags.joinToString(","),
+    archived = archived,
+    createdAt = precedente?.createdAt ?: now,
+    source = precedente?.source ?: WordSource.SYNCED
 )

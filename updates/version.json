@@ -1,7 +1,7 @@
 {
-  "versionCode": 297,
-  "versionName": "1.48.64",
-  "changelog": "Core condiviso Kotlin/JVM: base per la versione desktop",
+  "versionCode": 298,
+  "versionName": "1.48.65",
+  "changelog": "Versione desktop integrata con l'app: stesso vocabolario dal feed GitHub (sync automatico all'avvio e al cambio profilo), stessa Wortliste, stessi esercizi e stesso backup cloud. Nuova sezione Sincronizzazione nelle impostazioni del desktop.",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.64/Tedesco-v1.48.64.apk"
+  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.65/Tedesco-v1.48.65.apk"
 }

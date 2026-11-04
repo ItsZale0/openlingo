@@ -13,7 +13,6 @@ import com.alessandro.tedesco.data.local.WordEntity
 import com.alessandro.tedesco.data.local.WordSource
 import com.alessandro.tedesco.data.remote.FeedDto
 import com.alessandro.tedesco.data.remote.FeedService
-import com.alessandro.tedesco.data.remote.WordDto
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -366,53 +365,20 @@ class WordRepository(
     }
 
     private suspend fun merge(feed: FeedDto): Pair<Int, Int> = withContext(io) {
-        var added = 0
-        var changed = 0
-        val now = System.currentTimeMillis()
-        val toUpsert = mutableListOf<WordEntity>()
-        val newWordIds = mutableSetOf<String>()
-        val currentWords = _words.value.associateBy { it.id }.toMutableMap()
-        val currentReviews = _reviews.value.toMutableMap()
-
-        for (dto in feed.words) {
-            val entity = dto.toEntity(now)
-            val esistente = currentWords[dto.id]
-
-            when {
-                esistente == null -> {
-                    toUpsert.add(entity)
-                    newWordIds.add(dto.id)
-                    added++
-                }
-                esistente != entity -> {
-                    toUpsert.add(entity)
-                    changed++
-                }
-                else -> Unit
-            }
+        // Stessa identica fusione usata dalla versione desktop (FeedMerge, nel
+        // modulo :core): una sola regola per il vocabolario del feed, cosi' i
+        // due programmi non possono divergere.
+        val esito = FeedMerge.applica(
+            parole = _words.value,
+            reviews = _reviews.value,
+            feed = feed,
+            now = System.currentTimeMillis()
+        )
+        if (esito.aggiunte > 0 || esito.aggiornate > 0) {
+            _words.value = esito.parole
         }
-
-        if (toUpsert.isNotEmpty()) {
-            toUpsert.forEach { currentWords[it.id] = it }
-            _words.value = currentWords.values.toList()
-        }
-
-        // Prima le parole, poi i ripassi (evita problemi di coerenza)
-        for (dto in feed.words) {
-            if (dto.id in newWordIds) {
-                currentReviews[dto.id] = ReviewEntity(
-                    wordId = dto.id,
-                    easeFactor = 2.5f,
-                    intervalDays = 0,
-                    repetitions = 0,
-                    lapses = 0,
-                    dueAt = now,
-                    lastReviewedAt = null
-                )
-            }
-        }
-        _reviews.value = currentReviews
-        added to changed
+        _reviews.value = esito.reviews
+        esito.aggiunte to esito.aggiornate
     }
 
     suspend fun setArchived(id: String, archived: Boolean) = withContext(io) {
@@ -607,18 +573,3 @@ class WordRepository(
         val INTERVALS = listOf(1, 3, 7, 16, 35, 75, 150, 300)
     }
 }
-
-private fun WordDto.toEntity(now: Long): WordEntity = WordEntity(
-    id = this.id,
-    german = this.german,
-    italian = this.italian,
-    example = this.example,
-    article = this.article,
-    pronunciation = this.pronunciation,
-    level = this.level,
-    lesson = this.lesson,
-    tags = this.tags.joinToString(","),
-    archived = this.archived,
-    createdAt = now,
-    source = WordSource.SYNCED
-)

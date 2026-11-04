@@ -19,3 +19,4 @@ dependencyResolutionManagement {
 rootProject.name = "Tedesco"
 include(":app")
 include(":core")
+include(":desktop")
