@@ -51,6 +51,7 @@ compose.desktop {
             packageVersion = appVersionName
             description = "Tedesco - corso di tedesco A0-B2 con ripasso spaziato"
             vendor = "Alessandro"
+            modules("java.net.http", "jdk.crypto.ec")
         }
     }
 }

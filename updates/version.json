@@ -1,7 +1,7 @@
 {
-  "versionCode": 300,
-  "versionName": "1.48.67",
-  "changelog": "Sincronizzazione automatica cloud su desktop: all avvio, al cambio profilo e ogni 5 minuti il desktop scarica, unisce e carica i progressi (grammatica e lezioni incluse). L ETag del feed non viene piu azzerato quando l unione non cambia nulla, evitando riscaricamenti inutili. Hash del backup stabile estratto in BackupCloud.impronta.",
+  "versionCode": 301,
+  "versionName": "1.48.68",
+  "changelog": "Correzione critica desktop: il runtime impacchettato non includeva java.net.http, quindi feed e backup fallivano con NoClassDefFoundError. Aggiunto il modulo. Backup e feed ora funzionano nell eseguibile.",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.67/Tedesco-v1.48.67.apk"
+  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.68/Tedesco-v1.48.68.apk"
 }
