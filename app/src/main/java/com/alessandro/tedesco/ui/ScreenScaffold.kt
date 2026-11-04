@@ -50,7 +50,7 @@ import com.alessandro.tedesco.ui.theme.spaziaturaSchermo
  * La bottom navigation vive nello Scaffold root di AppNav (gestisce il padding basso
  * del NavHost); qui aggiungiamo solo la clearance interna.
  */
-private val BottomClearance = 24.dp
+private val BottomClearance = 32.dp
 
 /** Top bar compatta coerente su tutte le schermate. */
 @Composable
@@ -63,7 +63,7 @@ fun CompactTopBar(
         // Inset reale della status bar (include notch/cutout in portrait) — applicato qui, una sola volta
         Spacer(Modifier.windowInsetsPadding(WindowInsets.statusBars))
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (onBack != null) {
@@ -83,7 +83,7 @@ fun CompactTopBar(
             )
             actions()
         }
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f))
     }
 }
 
@@ -117,7 +117,7 @@ fun ScreenScaffold(
                 modifier = Modifier
                     .widthIn(max = dimensioneContenuto())
                     .padding(horizontal = spaziaturaSchermo())
-                    .padding(top = 8.dp, bottom = BottomClearance)
+                    .padding(top = 16.dp, bottom = BottomClearance)
             ) {
                 content()
             }

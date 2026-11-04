@@ -1,7 +1,7 @@
 {
-  "versionCode": 301,
-  "versionName": "1.48.68",
-  "changelog": "Correzione critica desktop: il runtime impacchettato non includeva java.net.http, quindi feed e backup fallivano con NoClassDefFoundError. Aggiunto il modulo. Backup e feed ora funzionano nell eseguibile.",
+  "versionCode": 302,
+  "versionName": "1.48.69",
+  "changelog": "Redesign UI: home mobile e desktop più pulite, spaziature coerenti, palette teal/sabbia, piano compatto con pannello completo e lezione solo su richiesta.",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.68/Tedesco-v1.48.68.apk"
+  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.69/Tedesco-v1.48.69.apk"
 }

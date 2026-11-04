@@ -201,8 +201,8 @@ fun ColonnaContenuto(
     contenuto: @Composable ColumnScope.() -> Unit
 ) {
     Column(
-        modifier = modifier.widthIn(max = 1080.dp).fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = modifier.widthIn(max = 960.dp).fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
         content = contenuto
     )
 }
@@ -219,8 +219,8 @@ fun Pagina(contenuto: @Composable ColumnScope.() -> Unit) {
         Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 28.dp, vertical = 8.dp)
+            .padding(horizontal = 32.dp, vertical = 16.dp)
     ) {
-        Column(Modifier.fillMaxWidth().padding(bottom = 28.dp), content = contenuto)
+        Column(Modifier.fillMaxWidth().padding(bottom = 40.dp), content = contenuto)
     }
 }

@@ -27,7 +27,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Quiz
@@ -37,6 +36,7 @@ import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.CloudUpload
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.PlayArrow
@@ -147,8 +147,11 @@ fun StudioVeloceScreen(
 
     var mostraSelettore by remember { mutableStateOf(false) }
     var mostraMenu by remember { mutableStateOf(false) }
+    var mostraPiano by rememberSaveable { mutableStateOf(false) }
+    // La lezione non occupa più la home: si apre solo quando l'utente sceglie
+    // di continuare il percorso. Così la schermata iniziale resta pulita.
+    var lezioneInFocus by rememberSaveable { mutableStateOf(false) }
     val paroleCustomAbilitate by vm.enableCustomWords.collectAsStateWithLifecycle(false)
-    val immersioneAttiva by vm.didatticaImmersione.collectAsStateWithLifecycle(false)
 
     // Test di ingresso: mostrato finché non viene completato o saltato.
     val placementFatto by vm.placementFatto.collectAsStateWithLifecycle(false)
@@ -178,14 +181,14 @@ fun StudioVeloceScreen(
             CompactTopBar(
                 title = "Studio",
                 actions = {
-                    // ---- Selettore di lezione: apre il pannello per livello ----
-                    AssistChip(
-                        onClick = { mostraSelettore = true },
-                        label = { Text("Lezione $lezioneCorrente") },
-                        trailingIcon = {
-                            Icon(Icons.Filled.ArrowDropDown, contentDescription = null, modifier = Modifier.size(18.dp))
-                        }
-                    )
+                    // ---- Selettore di lezione: icona discreta, senza chip ----
+                    IconButton(onClick = { mostraSelettore = true }) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.MenuBook,
+                            contentDescription = "Scegli lezione",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                     // ---- Profilo ed extra: avatar tondo -> pannello dal basso ----
                     // Niente tre puntini: un solo tocco apre un pannello ordinato.
                     Surface(
@@ -220,169 +223,125 @@ fun StudioVeloceScreen(
                 contentPadding = PaddingValues(
                     start = spaziaturaSchermo(),
                     end = spaziaturaSchermo(),
-                    top = Spaziature.sm,
-                    bottom = 96.dp
+                    top = Spaziature.md,
+                    bottom = 112.dp
                 ),
-                verticalArrangement = Arrangement.spacedBy(Spaziature.md)
+                verticalArrangement = Arrangement.spacedBy(Spaziature.lg)
             ) {
-            // ---- Hero: piano di oggi ----
-            pianoOggi?.let { piano ->
-                item {
-                    PianoOggiHero(
-                        percorso = piano,
-                        saluto = nomeProfilo?.let { "Ciao, $it" } ?: "Ciao",
-                        streakGiorni = pr?.streakGiorni ?: 0,
-                        onApriPasso = { passo ->
-                            if (passo.azione == "ripasso") {
-                                vm.caricaSessione()
-                            }
-                            onNaviga(passo.azione)
-                        },
-                        onCompletaPasso = { vm.completaPassoGiornaliero(it) }
-                    )
-                }
-            }
-
-            // ---- Azioni rapide
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(Spaziature.sm)
-                ) {
-                    AzioneRapida(
-                        icona = Icons.Filled.Quiz,
-                        etichetta = "Esercizi",
-                        onClick = onVaiAEsercizi,
-                        modifier = Modifier.weight(1f)
-                    )
-                    AzioneRapida(
-                        icona = Icons.Filled.Refresh,
-                        etichetta = "Ripasso",
-                        onClick = {
-                            vm.caricaSessione()
-                            onNaviga("ripasso")
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
-                    AzioneRapida(
-                        icona = Icons.Filled.SmartToy,
-                        etichetta = "Tutor",
-                        onClick = onVaiATutor,
-                        modifier = Modifier.weight(1f)
-                    )
-                    AzioneRapida(
-                        icona = Icons.Filled.BarChart,
-                        etichetta = "Progresso",
-                        onClick = onVaiAProgresso,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
-            // ---- Lezione del percorso: intestazione, teoria, esercizi ----
-            lezioneAperta?.let { aperta ->
-                item {
-                    SezioneLezionePercorso(
-                        vm = vm,
-                        stato = aperta,
-                        onAscolta = { ttsHelper.speak(it) },
-                        onVaiAPercorso = onVaiAPercorsoGrammatica
-                    )
-                }
-            }
-
-            // ---- Percorso grammaticale: solo se non c'è già una lezione aperta ----
-            // Prima le due cose comparivano insieme e la home sembrava un elenco
-            // di doppioni: ora la lezione aperta è il contenuto, il percorso è
-            // il "continua da qui" quando non c'è altro.
-            if (lezioneAperta == null) {
-                item {
-                    PercorsoGrammaticaCard(
-                        prossima = prossimaGram,
-                        completate = completateGram,
-                        totale = percorsoGram.size,
-                        onApri = onVaiAPercorsoGrammatica
-                    )
-                }
-            }
-
-            // ---- Scopri: contenuti e modalita (consolidato) ----
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.medium,
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
-                ) {
-                    Column(Modifier.fillMaxWidth()) {
-                        if (immersioneAttiva) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { onVaiAImmersione() }
-                                    .padding(14.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                if (lezioneInFocus && lezioneAperta != null) {
+                    item {
+                        Column {
+                            TextButton(
+                                onClick = { lezioneInFocus = false },
+                                contentPadding = PaddingValues(horizontal = 0.dp, vertical = 4.dp)
                             ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(40.dp)
-                                        .clip(CircleShape)
-                                        .background(MaterialTheme.colorScheme.tertiaryContainer),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        Icons.Filled.Waves,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.onTertiaryContainer,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                }
-                                Spacer(Modifier.width(12.dp))
-                                Column(Modifier.weight(1f)) {
-                                    Text("Modalità Immersione", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-                                    Text("Sessione guidata di 20 minuti: storia, raccolta, voce", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                }
-                                Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(Modifier.width(6.dp))
+                                Text("Torna alla home")
                             }
-                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                            Spacer(Modifier.height(Spaziature.sm))
+                            SezioneLezionePercorso(
+                                vm = vm,
+                                stato = lezioneAperta!!,
+                                onAscolta = { ttsHelper.speak(it) },
+                                onVaiAPercorso = onVaiAPercorsoGrammatica
+                            )
                         }
+                    }
+                } else {
+                    item {
+                        IntestazioneHome(
+                            saluto = nomeProfilo?.let { "Ciao, $it" } ?: "Ciao",
+                            data = pianoOggi?.data.orEmpty(),
+                            streakGiorni = pr?.streakGiorni ?: 0
+                        )
+                    }
+
+                    pianoOggi?.let { piano ->
+                        item {
+                            PianoOggiCard(
+                                percorso = piano,
+                                onApriProssimo = { passo ->
+                                    if (passo.azione == "ripasso") vm.caricaSessione()
+                                    onNaviga(passo.azione)
+                                },
+                                onVediPiano = { mostraPiano = true },
+                                onRipassoLibero = {
+                                    vm.caricaSessione()
+                                    onNaviga("ripasso")
+                                }
+                            )
+                        }
+                    }
+
+                    item {
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onNaviga("podcast") }
-                                .padding(14.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(Spaziature.sm)
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(CircleShape)
-                                    .background(MaterialTheme.colorScheme.secondaryContainer),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(Icons.Filled.Headphones, contentDescription = null, tint = MaterialTheme.colorScheme.onSecondaryContainer, modifier = Modifier.size(20.dp))
-                            }
-                            Spacer(Modifier.width(12.dp))
-                            Column(Modifier.weight(1f)) {
-                                Text("Podcast & Video", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-                                Text("${PodcastData.episodi.size} contenuti autentici per il tuo livello", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
-                            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
+                            AzioneRapida(
+                                icona = Icons.Filled.Quiz,
+                                etichetta = "Esercizi",
+                                onClick = onVaiAEsercizi,
+                                modifier = Modifier.weight(1f)
+                            )
+                            AzioneRapida(
+                                icona = Icons.Filled.Refresh,
+                                etichetta = "Ripasso",
+                                onClick = {
+                                    vm.caricaSessione()
+                                    onNaviga("ripasso")
+                                },
+                                modifier = Modifier.weight(1f)
+                            )
+                            AzioneRapida(
+                                icona = Icons.Filled.Translate,
+                                etichetta = "Grammatica",
+                                onClick = onVaiAPercorsoGrammatica,
+                                modifier = Modifier.weight(1f)
+                            )
+                            AzioneRapida(
+                                icona = Icons.Filled.BarChart,
+                                etichetta = "Progresso",
+                                onClick = onVaiAProgresso,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+
+                    lezioneAperta?.let { aperta ->
+                        item {
+                            PercorsoLezioneCard(
+                                stato = aperta,
+                                onApri = {
+                                    vm.apriLezionePercorso(aperta.id)
+                                    lezioneInFocus = true
+                                }
+                            )
+                        }
+                    } ?: item {
+                        PercorsoGrammaticaCard(
+                            prossima = prossimaGram,
+                            completate = completateGram,
+                            totale = percorsoGram.size,
+                            onApri = onVaiAPercorsoGrammatica
+                        )
+                    }
+
+                    if (!placementFatto) {
+                        item {
+                            PlacementTestCard(
+                                onCompletato = { livello -> vm.impostaLivello(livello) },
+                                onSalta = { vm.saltaPlacement() }
+                            )
                         }
                     }
                 }
             }
-
-            
-// ---- Test di ingresso (una volta sola, finché non viene fatto) ----
-            if (!placementFatto) {
-                item {
-                    PlacementTestCard(
-                        onCompletato = { livello -> vm.impostaLivello(livello) },
-                        onSalta = { vm.saltaPlacement() }
-                    )
-                }
-            }
-
-        }
         }
     }
 
@@ -401,6 +360,9 @@ fun StudioVeloceScreen(
                 )
                 VocePannello(Icons.Filled.Quiz, "Esercizi", "Tutti i tipi, sempre nuovi") {
                     mostraMenu = false; onVaiAEsercizi()
+                }
+                VocePannello(Icons.Filled.Translate, "Percorso grammaticale", "Le unità A0-B2, una alla volta") {
+                    mostraMenu = false; onVaiAPercorsoGrammatica()
                 }
                 if (paroleCustomAbilitate) {
                     VocePannello(Icons.Filled.Add, "Aggiungi parola", "Nuove parole nel ripasso") {
@@ -437,24 +399,87 @@ fun StudioVeloceScreen(
             onSeleziona = { lezione ->
                 mostraSelettore = false
                 vm.apriLezionePercorso(lezione.id)
+                lezioneInFocus = true
             },
             onDismiss = { mostraSelettore = false }
+        )
+    }
+
+    // Piano completo: la home mostra solo il prossimo passo, il resto vive qui.
+    if (mostraPiano && pianoOggi != null) {
+        ModalBottomSheet(
+            onDismissRequest = { mostraPiano = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Spaziature.md)
+                    .padding(bottom = Spaziature.xl)
+            ) {
+                Text("Piano di oggi", style = MaterialTheme.typography.titleLarge)
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    "${pianoOggi!!.passiCompletati}/${pianoOggi!!.passiTotali} passi · " +
+                        "${pianoOggi!!.minutiTotali} minuti",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(Modifier.height(Spaziature.md))
+                pianoOggi!!.passi.forEach { passo ->
+                    PassoPianoRiga(
+                        passo = passo,
+                        onApri = {
+                            mostraPiano = false
+                            if (passo.azione == "ripasso") vm.caricaSessione()
+                            onNaviga(passo.azione)
+                        },
+                        onCompleta = { vm.completaPassoGiornaliero(passo.id) }
+                    )
+                    Spacer(Modifier.height(Spaziature.sm))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun IntestazioneHome(
+    saluto: String,
+    data: String,
+    streakGiorni: Int
+) {
+    Column(Modifier.fillMaxWidth()) {
+        Text(
+            saluto,
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        Spacer(Modifier.height(6.dp))
+        Text(
+            listOfNotNull(
+                data.takeIf { it.isNotBlank() },
+                if (streakGiorni > 0) "$streakGiorni giorni di fila" else null
+            ).joinToString(" · "),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
 
 /**
- * Hero della home: il piano di oggi con saluto, anello di avanzamento e
- * passi rapidi. Toccare una riga apre l'attività; la spunta la completa.
+ * Piano di oggi compatto: in home resta solo il prossimo passo.
+ * Il resto del piano è nel pannello "Vedi piano".
  */
 @Composable
-private fun PianoOggiHero(
+private fun PianoOggiCard(
     percorso: CalcoloPercorsoGiornaliero.PercorsoGiornaliero,
-    saluto: String,
-    streakGiorni: Int = 0,
-    onApriPasso: (CalcoloPercorsoGiornaliero.PassoPercorso) -> Unit,
-    onCompletaPasso: (String) -> Unit
+    onApriProssimo: (CalcoloPercorsoGiornaliero.PassoPercorso) -> Unit,
+    onVediPiano: () -> Unit,
+    onRipassoLibero: () -> Unit
 ) {
+    val prossimo = percorso.prossimoPasso
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
@@ -469,26 +494,24 @@ private fun PianoOggiHero(
             ) {
                 Column(Modifier.weight(1f)) {
                     Text(
-                        saluto,
-                        style = MaterialTheme.typography.headlineMedium,
+                        "PIANO DI OGGI",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.65f)
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        prossimo?.titolo ?: "Piano completato",
+                        style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "20 minuti, un passo alla volta. Ogni giorno conta.",
+                        prossimo?.descrizione ?: percorso.messaggioMotivazionale,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f)
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.82f)
                     )
-                    if (streakGiorni > 0) {
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            "$streakGiorni giorni di fila",
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
                 }
                 Spacer(Modifier.width(Spaziature.sm))
                 ProgressoOggiRing(
@@ -498,50 +521,134 @@ private fun PianoOggiHero(
                 )
             }
             Spacer(Modifier.height(Spaziature.md))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    "${percorso.passiCompletati}/${percorso.passiTotali} passi",
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-                Spacer(Modifier.weight(1f))
-                Text(
-                    "${percorso.minutiTotali} min",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.75f)
-                )
-                Spacer(Modifier.width(Spaziature.sm))
-                Text(
-                    percorso.data,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.65f)
-                )
-            }
-            Spacer(Modifier.height(6.dp))
             LinearProgressIndicator(
                 progress = { percorso.progressoGiornata },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(7.dp)
+                    .height(6.dp)
                     .clip(MaterialTheme.shapes.extraSmall),
                 color = MaterialTheme.colorScheme.primary,
-                trackColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.15f)
+                trackColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.16f)
             )
             Spacer(Modifier.height(Spaziature.sm))
-            percorso.passi.forEach { passo ->
-                PassoPianoRiga(
-                    passo = passo,
-                    onApri = { onApriPasso(passo) },
-                    onCompleta = { onCompletaPasso(passo.id) }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "${percorso.passiCompletati}/${percorso.passiTotali} passi · " +
+                        "${percorso.minutiTotali} min",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
+                    modifier = Modifier.weight(1f)
+                )
+                TextButton(onClick = onVediPiano) {
+                    Text("Vedi piano")
+                }
+                Spacer(Modifier.width(4.dp))
+                if (prossimo != null) {
+                    Button(onClick = { onApriProssimo(prossimo) }) {
+                        Text(if (percorso.passiCompletati == 0) "Inizia" else "Continua")
+                    }
+                } else {
+                    OutlinedButton(onClick = onRipassoLibero) {
+                        Text("Ripasso")
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** Card compatta della prossima lezione: la home non mostra più tutta la teoria. */
+@Composable
+private fun PercorsoLezioneCard(
+    stato: LezioneAperta,
+    onApri: () -> Unit
+) {
+    val lezione = stato.lezione
+    val progresso = if (stato.totale == 0) 0f else stato.indice.toFloat() / stato.totale
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.medium)
+            .clickable(
+                onClickLabel = "Apri ${lezione.titolo}",
+                role = Role.Button,
+                onClick = onApri
+            ),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        )
+    ) {
+        Column(Modifier.fillMaxWidth().padding(18.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    modifier = Modifier.size(44.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.MenuBook,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
+                }
+                Spacer(Modifier.width(12.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        "CONTINUA IL PERCORSO",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(Modifier.height(2.dp))
+                    Text(
+                        lezione.titolo,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        "Lezione ${lezione.numero} · ${lezione.livello} · " +
+                            "${lezione.unita.minuti} min",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+            Spacer(Modifier.height(14.dp))
+            if (progresso > 0f) {
+                LinearProgressIndicator(
+                    progress = { progresso.coerceIn(0f, 1f) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(6.dp)
+                        .clip(MaterialTheme.shapes.extraSmall),
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.outlineVariant
                 )
                 Spacer(Modifier.height(6.dp))
-            }
-            if (percorso.percorsoCompletato) {
                 Text(
-                    "Piano completato. Se vuoi, fai un ripasso libero.",
+                    if (stato.conclusa) "Lezione conclusa · ripassa quando vuoi"
+                    else "${stato.indice}/${stato.totale} esercizi completati",
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            } else {
+                Text(
+                    "Inizia da qui: teoria breve e esercizi guidati.",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -672,39 +779,38 @@ private fun AzioneRapida(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
+    Surface(
         modifier = modifier
+            .heightIn(min = 76.dp)
             .clip(MaterialTheme.shapes.medium)
             .clickable(
                 onClickLabel = "Apri $etichetta",
                 role = Role.Button,
                 onClick = onClick
-            )
-            .padding(vertical = 6.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            ),
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.surfaceContainer
     ) {
-        Surface(
-            shape = CircleShape,
-            color = MaterialTheme.colorScheme.primaryContainer,
-            modifier = Modifier.size(52.dp)
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    icona,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
+            Icon(
+                icona,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(22.dp)
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                etichetta,
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Medium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
-        Spacer(Modifier.height(6.dp))
-        Text(
-            etichetta,
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.Medium,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
     }
 }
 

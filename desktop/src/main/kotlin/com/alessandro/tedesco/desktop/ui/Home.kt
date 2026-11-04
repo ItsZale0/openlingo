@@ -6,18 +6,19 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Headphones
-import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Translate
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -29,13 +30,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.alessandro.tedesco.data.CalcoloPercorsoGiornaliero
-import com.alessandro.tedesco.data.GrammaticaSyllabus
 import com.alessandro.tedesco.desktop.DesktopStore
 import com.alessandro.tedesco.desktop.Schermata
 
@@ -45,23 +49,24 @@ fun SchermataHome(
     onVaiA: (Schermata) -> Unit,
     onApriUnita: (String) -> Unit
 ) {
-    // Legge lo stato: ogni azione (ripasso, esercizio, passo) fa ricomporre.
     store.repo
     val profilo = store.profilo
     val piano = store.pianoOggi()
     val progresso = store.progressoReale()
-    val statistiche = store.statistiche()
     val prossima = store.prossimaUnita()
 
     val nome = profilo?.config?.nomeVisualizzato?.substringBefore(" ") ?: "studente"
+    val prossimoPasso = piano.prossimoPasso
+
+    var mostraPiano by remember { mutableStateOf(false) }
 
     Pagina {
         Testata(
             titolo = "Ciao, $nome",
-            sottotitolo = "Piano di oggi: ${piano.passiTotali} passi, circa ${piano.minutiTotali} minuti. " +
-                "Tutto offline, senza AI."
+            sottotitolo = "Piano di oggi: ${piano.passiCompletati}/${piano.passiTotali} passi, circa ${piano.minutiTotali} minuti."
         )
 
+        // Hero compatto: solo il prossimo passo, il piano completo nel pannello.
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(20.dp),
@@ -72,25 +77,35 @@ fun SchermataHome(
             Column(Modifier.fillMaxWidth().padding(22.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.Top
                 ) {
-                    Column {
+                    Column(Modifier.weight(1f)) {
                         Text(
-                            "Piano di oggi",
+                            "PIANO DI OGGI",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.65f)
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            prossimoPasso?.titolo ?: "Piano completato",
                             style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
+                        Spacer(Modifier.height(4.dp))
                         Text(
-                            piano.data.replaceFirstChar { it.uppercase() },
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.75f)
+                            prossimoPasso?.descrizione ?: piano.messaggioMotivazionale,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.82f)
                         )
                     }
+                    Spacer(Modifier.width(16.dp))
                     Column(horizontalAlignment = Alignment.End) {
                         Text(
                             "${piano.passiCompletati}/${piano.passiTotali}",
                             style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Text(
@@ -100,68 +115,75 @@ fun SchermataHome(
                         )
                     }
                 }
-
                 Spacer(Modifier.height(14.dp))
                 BarraLineare(
                     valore = piano.progressoGiornata,
-                    modifier = Modifier.fillMaxWidth().height(8.dp),
+                    modifier = Modifier.fillMaxWidth().height(6.dp),
                     colore = MaterialTheme.colorScheme.primary,
-                    traccia = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.18f)
+                    traccia = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.16f)
                 )
                 Spacer(Modifier.height(6.dp))
-                Text(
-                    "${piano.minutiCompletati} di ${piano.minutiTotali} minuti · ${piano.passiTotali} passi",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.75f)
-                )
-
-                Spacer(Modifier.height(16.dp))
-                piano.passi.forEach { passo ->
-                    RigaPasso(
-                        passo = passo,
-                        onApri = { apriPasso(passo, onVaiA, onApriUnita) },
-                        onCompleta = { store.completaPasso(passo.id) }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "${piano.minutiCompletati} di ${piano.minutiTotali} minuti",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.75f),
+                        modifier = Modifier.weight(1f)
                     )
+                    TextButton(onClick = { mostraPiano = true }) {
+                        Text("Vedi piano")
+                    }
+                    Spacer(Modifier.width(4.dp))
+                    if (prossimoPasso != null) {
+                        Button(onClick = {
+                            apriPasso(prossimoPasso, onVaiA, onApriUnita)
+                        }) {
+                            Text(if (piano.passiCompletati == 0) "Inizia" else "Continua")
+                        }
+                    } else {
+                        OutlinedButton(onClick = { onVaiA(Schermata.RIPASSO) }) {
+                            Text("Ripasso")
+                        }
+                    }
                 }
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    piano.messaggioMotivazionale,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
-                )
             }
         }
 
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Kpi(
-                valore = "${statistiche.paroleTotali}",
-                etichetta = "parole in lessico",
-                dettaglio = "${statistiche.nuove} ancora da vedere",
+        // Azioni rapide essenziali.
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            AzioneRapidaDesktop(
+                icona = Icons.Filled.Refresh,
+                etichetta = "Ripasso",
+                onClick = { onVaiA(Schermata.RIPASSO) },
                 modifier = Modifier.weight(1f)
             )
-            Kpi(
-                valore = "${statistiche.mature}",
-                etichetta = "parole mature",
-                dettaglio = "riconosciute a ripetizione",
-                colore = MaterialTheme.colorScheme.tertiary,
+            AzioneRapidaDesktop(
+                icona = Icons.Filled.Translate,
+                etichetta = "Grammatica",
+                onClick = { onVaiA(Schermata.ESERCIZI) },
                 modifier = Modifier.weight(1f)
             )
-            Kpi(
-                valore = "${statistiche.daRipassare}",
-                etichetta = "da ripassare",
-                dettaglio = "in scadenza oggi",
-                colore = MaterialTheme.colorScheme.secondary,
+            AzioneRapidaDesktop(
+                icona = Icons.AutoMirrored.Filled.MenuBook,
+                etichetta = "Wortliste",
+                onClick = { onVaiA(Schermata.WORTLISTE) },
                 modifier = Modifier.weight(1f)
             )
-            Kpi(
-                valore = "${statistiche.accuratezza.toInt()}%",
-                etichetta = "accuratezza",
-                dettaglio = "${statistiche.ripassiTotali} ripassi",
-                colore = MaterialTheme.colorScheme.primary,
+            AzioneRapidaDesktop(
+                icona = Icons.Filled.BarChart,
+                etichetta = "Progresso",
+                onClick = { onVaiA(Schermata.PROGRESSO) },
                 modifier = Modifier.weight(1f)
             )
         }
 
+        // Continua il percorso: una sola card.
         val unita = prossima
         if (unita != null) {
             CardSezione(
@@ -217,44 +239,79 @@ fun SchermataHome(
             }
         }
 
-        Text("Strumenti", style = MaterialTheme.typography.titleMedium)
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Strumento(
-                icona = Icons.Filled.Refresh,
-                titolo = "Ripasso",
-                testo = "${store.paroleDaRipassare().size} carte in scadenza oggi",
-                onClick = { onVaiA(Schermata.RIPASSO) },
-                modifier = Modifier.weight(1f)
-            )
-            Strumento(
-                icona = Icons.Filled.School,
-                titolo = "Esercizi",
-                testo = "${GrammaticaSyllabus.unita.size} unità di grammatica",
-                onClick = { onVaiA(Schermata.ESERCIZI) },
-                modifier = Modifier.weight(1f)
-            )
-            Strumento(
-                icona = Icons.AutoMirrored.Filled.MenuBook,
-                titolo = "Wortliste",
-                testo = "Parole curate A1-B1 da aggiungere",
-                onClick = { onVaiA(Schermata.WORTLISTE) },
-                modifier = Modifier.weight(1f)
-            )
-            Strumento(
-                icona = Icons.Filled.Headphones,
-                titolo = "Podcast",
-                testo = "Ascolto autentico per livello",
-                onClick = { onVaiA(Schermata.PODCAST) },
-                modifier = Modifier.weight(1f)
-            )
-        }
-
+        // Accesso rapido al progresso.
         OutlinedButton(onClick = { onVaiA(Schermata.PROGRESSO) }) {
             Icon(Icons.Filled.BarChart, contentDescription = null)
             Spacer(Modifier.width(8.dp))
             Text(
                 "Livello ${progresso.livello.codiceBreve()} · " +
                     "${progresso.traguardiRaggiunti}/${progresso.traguardi.size} traguardi · vedi progresso"
+            )
+        }
+    }
+
+    if (mostraPiano) {
+        AlertDialog(
+            onDismissRequest = { mostraPiano = false },
+            confirmButton = {
+                TextButton(onClick = { mostraPiano = false }) { Text("Chiudi") }
+            },
+            title = { Text("Piano di oggi") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    piano.passi.forEach { passo ->
+                        RigaPasso(
+                            passo = passo,
+                            onApri = {
+                                mostraPiano = false
+                                apriPasso(passo, onVaiA, onApriUnita)
+                            },
+                            onCompleta = { store.completaPasso(passo.id) }
+                        )
+                    }
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        piano.messaggioMotivazionale,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun AzioneRapidaDesktop(
+    icona: ImageVector,
+    etichetta: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .heightIn(min = 84.dp)
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surfaceContainer
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 14.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                icona,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                etichetta,
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Medium,
+                maxLines = 1
             )
         }
     }
@@ -302,32 +359,6 @@ private fun RigaPasso(
                 Spacer(Modifier.width(4.dp))
                 OutlinedButton(onClick = onCompleta) { Text("Segna fatto") }
             }
-        }
-    }
-}
-
-@Composable
-private fun Strumento(
-    icona: ImageVector,
-    titolo: String,
-    testo: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.clickable(onClick = onClick),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
-    ) {
-        Column(Modifier.fillMaxWidth().padding(16.dp)) {
-            Icon(icona, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-            Spacer(Modifier.height(10.dp))
-            Text(titolo, style = MaterialTheme.typography.titleSmall)
-            Text(
-                testo,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
         }
     }
 }
