@@ -11,5 +11,5 @@ package com.alessandro.tedesco.data
 const val MAX_STORICO = 500
 
 /** Tiene solo le [max] voci piu' recenti. */
-internal fun <T> List<T>.limita(max: Int = MAX_STORICO): List<T> =
+fun <T> List<T>.limita(max: Int = MAX_STORICO): List<T> =
     if (size > max) takeLast(max) else this

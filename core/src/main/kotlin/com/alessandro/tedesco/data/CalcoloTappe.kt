@@ -68,7 +68,7 @@ object CalcoloTappe {
      * Parsa il campo lezioni (es. "1-10") in un range di interi.
      * Supporta anche singole lezioni ("5" -> 5,5).
      */
-    internal fun parseRange(lezioni: String): Pair<Int, Int>? {
+    fun parseRange(lezioni: String): Pair<Int, Int>? {
         val trimmed = lezioni.trim()
         if (trimmed.isEmpty()) return null
 

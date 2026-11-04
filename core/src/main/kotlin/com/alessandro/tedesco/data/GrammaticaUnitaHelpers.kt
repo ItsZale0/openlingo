@@ -15,7 +15,7 @@ package com.alessandro.tedesco.data
  * "core" dell'unità: più materia per ogni argomento, sempre qualcosa di nuovo
  * da affrontare.
  */
-internal val EserciziExtra: Map<String, List<EsercizioUnita>> = mapOf(
+val EserciziExtra: Map<String, List<EsercizioUnita>> = mapOf(
 
     // ============================ A0 ============================
 
@@ -571,7 +571,7 @@ internal fun erroreUnita(
     spiegazione = spiegazione
 )
 
-internal fun sceltaUnita(
+fun sceltaUnita(
     id: String,
     domanda: String,
     opzioni: List<String>,

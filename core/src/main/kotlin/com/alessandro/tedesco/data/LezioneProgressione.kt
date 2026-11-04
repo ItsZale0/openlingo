@@ -11,7 +11,7 @@ import com.alessandro.tedesco.data.local.WordEntity
  * calcola la progressione delle lezioni e va mantenuta in questo posto, lontano
  * dal ViewModel.
  */
-internal fun selezionaProssimaLezione(lezioneCorrente: Int, parole: List<WordEntity>, lezioniFeed: List<LessonEntity>): Int {
+fun selezionaProssimaLezione(lezioneCorrente: Int, parole: List<WordEntity>, lezioniFeed: List<LessonEntity>): Int {
     val reali = (parole.map { it.lesson }.distinct() + lezioniFeed.map { it.numero })
         .distinct()
         .sorted()

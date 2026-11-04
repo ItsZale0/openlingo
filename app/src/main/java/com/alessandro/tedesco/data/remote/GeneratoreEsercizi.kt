@@ -73,13 +73,6 @@ data class EsercizioGenerato(
     val glossario: List<VoceGlossario> = emptyList()
 )
 
-/** Una parola nuova del testo di lettura con la sua traduzione italiana. */
-@Serializable
-data class VoceGlossario(
-    val tedesco: String,
-    val italiano: String
-)
-
 /**
  * Generatore di esercizi infiniti via Groq (solo modelli free).
  *

@@ -1,7 +1,7 @@
 {
-  "versionCode": 296,
-  "versionName": "1.48.63",
-  "changelog": "Feedback Material senza emoji in unita",
+  "versionCode": 297,
+  "versionName": "1.48.64",
+  "changelog": "Core condiviso Kotlin/JVM: base per la versione desktop",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.63/Tedesco-v1.48.63.apk"
+  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.64/Tedesco-v1.48.64.apk"
 }
