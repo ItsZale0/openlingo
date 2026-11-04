@@ -108,9 +108,7 @@ object BackupEsecutore {
             )
             // Hash sul contenuto REALE: creatoIl varia a ogni chiamata e da solo
             // farebbe sembrare "cambiato" anche un backup identico.
-            val hash = sha256(
-                BackupCloud.serializza(repositoryUnito, versioneApp, 0L, notifiche)
-            )
+            val hash = BackupCloud.impronta(repositoryUnito, versioneApp, notifiche)
 
             // Salta se identico all'ultimo backup (solo in automatico)
             if (!forza && hash == settings.ultimoHash()) {

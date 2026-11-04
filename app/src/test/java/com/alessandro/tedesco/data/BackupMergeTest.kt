@@ -377,6 +377,13 @@ class BackupMergeTest {
     }
 
     @Test
+    fun `l'etag resta valido quando l'unione non cambia nulla`() {
+        val stato = ProfiloStato(etag = "\"abc\"", lastSync = NOW, parole = listOf(WordEntity("a", "Haus", "casa")))
+        val remoto = ProfiloStato(etag = "\"abc\"", lastSync = NOW, parole = listOf(WordEntity("a", "Haus", "casa")))
+        val unito = BackupMerge.fondi(repo(stato), repo(remoto)).profili["ale"]!!.stato
+        assertEquals("\"abc\"", unito.etag)
+    }
+    @Test
     fun `l'etag viene azzerato per forzare un nuovo sync del feed`() {
         val locale = repo(ProfiloStato(etag = "\"abc\"", lastSync = NOW))
         val remoto = repo(ProfiloStato(etag = "\"def\"", lastSync = NOW - GIORNO, parole = listOf(WordEntity("b", "Baum", "albero"))))

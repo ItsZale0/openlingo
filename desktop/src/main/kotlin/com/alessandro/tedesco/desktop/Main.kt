@@ -61,6 +61,7 @@ import com.alessandro.tedesco.desktop.ui.SchermataUnita
 import com.alessandro.tedesco.desktop.ui.SchermataWortliste
 import com.alessandro.tedesco.desktop.ui.TemaTedesco
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 enum class Schermata(val titolo: String, val icona: ImageVector) {
@@ -96,6 +97,19 @@ fun main() = application {
         LaunchedEffect(store.repo.profiloAttivoId) {
             if (store.feedUrl.isNotBlank()) {
                 withContext(Dispatchers.IO) { store.sincronizzaFeed() }
+            }
+            // Sincronizzazione automatica del cloud (grammatica e lezioni
+            // incluse): scarica, unisce e carica solo se qualcosa e' cambiato.
+            // Offline o senza token non succede nulla, senza errori visibili.
+            withContext(Dispatchers.IO) { store.sincronizzaCloudAutomatica() }
+        }
+
+        // Sincronizzazione periodica: ogni 5 minuti, in sottofondo, per tenere
+        // telefono e desktop allineati senza intervento dell'utente.
+        LaunchedEffect(Unit) {
+            while (true) {
+                delay(5 * 60 * 1000L)
+                withContext(Dispatchers.IO) { store.sincronizzaCloudAutomatica() }
             }
         }
 

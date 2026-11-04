@@ -453,6 +453,19 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
+                "Ultima sincronizzazione automatica: ${dataOra(store.ultimaSincronizzazioneCloud)} " +
+                    "(ogni 5 minuti, se il token e' inserito)",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            if (store.sincronizzazioneCloudInCorso) {
+                Text(
+                    "Sincronizzazione in corso...",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            Text(
                 "Il token resta solo su questo computer, in preferenze.json. " +
                     "Usa un token fine-grained limitato al repo di backup.",
                 style = MaterialTheme.typography.labelSmall,

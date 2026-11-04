@@ -61,7 +61,9 @@ data class Preferenze(
      */
     val githubToken: String = "",
     val githubRepo: String = "",
-    val ultimoBackup: Long = 0L
+    val ultimoBackup: Long = 0L,
+    val ultimoHashCloud: String = "",
+    val ultimaSincronizzazioneCloud: Long = 0L
 )
 
 /**
@@ -376,6 +378,11 @@ class DesktopStore(
 
     val ultimoBackupCloud: Long get() = preferenze.ultimoBackup
 
+    val ultimaSincronizzazioneCloud: Long get() = preferenze.ultimaSincronizzazioneCloud
+
+    var sincronizzazioneCloudInCorso by mutableStateOf(false)
+        private set
+
     /** Stesso nome file usato dall'app Android per il profilo attivo. */
     val nomeFileBackup: String get() = BackupCloud.nomeFilePerProfilo(repo.profiloAttivoId)
 
@@ -538,9 +545,11 @@ class DesktopStore(
      * Se il cloud esiste ma non è leggibile ci si ferma: sovrascriverlo alla
      * cieca sarebbe una perdita di dati.
      */
-    fun salvaSulCloud(): EsitoRete {
+    fun sincronizzaCloud(forza: Boolean = true): EsitoRete {
         val token = preferenze.githubToken.trim()
         if (token.isBlank()) return EsitoRete(false, "Inserisci prima il token GitHub")
+        if (sincronizzazioneCloudInCorso) return EsitoRete(false, "Sincronizzazione gia' in corso")
+        sincronizzazioneCloudInCorso = true
         return try {
             val client = BackupGithub(
                 token = token,
@@ -557,14 +566,20 @@ class DesktopStore(
                     return EsitoRete(
                         false,
                         "Backup cloud non leggibile (${e.message}). " +
-                            "Salvataggio annullato per non sovrascriverlo."
+                            "Sincronizzazione annullata per non sovrascriverlo."
                     )
                 }
                 BackupMerge.fondi(repo, pacchetto.dati)
             }
-            if (unito.profili.isNotEmpty()) {
+            if (unito != repo) {
                 repo = unito
                 salva()
+            }
+            val hash = BackupCloud.impronta(repo, Versione.nome)
+            if (!forza && hash == preferenze.ultimoHashCloud) {
+                preferenze = preferenze.copy(ultimaSincronizzazioneCloud = System.currentTimeMillis())
+                salvaPreferenze()
+                return EsitoRete(true, "Gia' sincronizzato")
             }
             val testo = BackupCloud.serializza(
                 repo = repo,
@@ -572,13 +587,34 @@ class DesktopStore(
                 now = System.currentTimeMillis()
             )
             client.carica(testo, "Backup Tedesco (desktop)")
-            preferenze = preferenze.copy(ultimoBackup = System.currentTimeMillis())
+            preferenze = preferenze.copy(
+                ultimoBackup = System.currentTimeMillis(),
+                ultimaSincronizzazioneCloud = System.currentTimeMillis(),
+                ultimoHashCloud = hash
+            )
             salvaPreferenze()
-            EsitoRete(true, "Backup caricato: ${repo.profili.size} profili (progressi uniti)")
+            EsitoRete(true, "Sincronizzato: ${repo.profili.size} profili")
         } catch (e: Exception) {
             EsitoRete(false, e.message ?: "Errore sconosciuto")
+        } finally {
+            sincronizzazioneCloudInCorso = false
         }
     }
+
+    /** Pulsante manuale: forza la sincronizzazione completa. */
+    fun salvaSulCloud(): EsitoRete = sincronizzaCloud(forza = true)
+
+    /**
+     * Sincronizzazione automatica, silenziosa: pensata per il timer di avvio
+     * e per quello periodico. Non mostra errori: se il token manca o la rete
+     * non c'e', non succede nulla.
+     */
+    fun sincronizzaCloudAutomatica(): Boolean {
+        if (preferenze.githubToken.isBlank()) return false
+        return sincronizzaCloud(forza = false).ok
+    }
+
+    val cloudConfigurato: Boolean get() = preferenze.githubToken.isNotBlank()
 
     /**
      * Scarica il backup e ne restituisce il riepilogo: NON tocca i dati finche'

@@ -108,6 +108,21 @@ object BackupCloud {
         return p
     }
 
+    /**
+     * Impronta stabile del contenuto: identica a parità di dati (creatoIl
+     * escluso). Usata per saltare i caricamenti inutili.
+     */
+    fun impronta(
+        repo: ProfiliRepository,
+        versioneApp: String,
+        notifiche: NotificheBackup? = null
+    ): String {
+        val testo = serializza(repo, versioneApp, 0L, notifiche)
+        val digest = java.security.MessageDigest.getInstance("SHA-256")
+            .digest(testo.toByteArray(Charsets.UTF_8))
+        return digest.joinToString("") { "%02x".format(it) }
+    }
+
     /** Riepilogo leggibile del contenuto, per far vedere cosa si sta ripristinando. */
     fun riepilogo(p: Pacchetto): Riepilogo {
         val profili = p.dati.profili.values

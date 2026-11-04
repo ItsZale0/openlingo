@@ -1,7 +1,7 @@
 {
-  "versionCode": 299,
-  "versionName": "1.48.66",
-  "changelog": "Sincronizzazione completa dei progressi fra telefono e desktop: lessico, ripassi, grammatica e lezioni vengono UNITI invece di sovrascritti. Anche il caricamento del backup ora scarica e unisce prima di salvare, quindi i progressi fatti sull'altro dispositivo non si perdono. Ripristino non distruttivo, riepilogo con unita di grammatica e lezioni, hash del backup stabile.",
+  "versionCode": 300,
+  "versionName": "1.48.67",
+  "changelog": "Sincronizzazione automatica cloud su desktop: all avvio, al cambio profilo e ogni 5 minuti il desktop scarica, unisce e carica i progressi (grammatica e lezioni incluse). L ETag del feed non viene piu azzerato quando l unione non cambia nulla, evitando riscaricamenti inutili. Hash del backup stabile estratto in BackupCloud.impronta.",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.66/Tedesco-v1.48.66.apk"
+  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.67/Tedesco-v1.48.67.apk"
 }

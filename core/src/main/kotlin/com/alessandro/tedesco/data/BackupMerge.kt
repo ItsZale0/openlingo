@@ -105,7 +105,7 @@ object BackupMerge {
             else -> remoto.passiGiornoIds
         }
 
-        return ProfiloStato(
+        val unito = ProfiloStato(
             parole = fondiParole(locale.parole, remoto.parole),
             reviews = fondiReviews(locale.reviews, remoto.reviews),
             feedLog = (locale.feedLog + remoto.feedLog)
@@ -118,8 +118,11 @@ object BackupMerge {
             lezioniGenerate = unisciMappe(locale.lezioniGenerate, remoto.lezioniGenerate),
             // L'ETag del dispositivo locale non descrive il contenuto unito:
             // azzerarlo costringe il prossimo sync a riscaricare tutto il feed
-            // (nessun dato perso, solo una richiesta in più).
-            etag = "",
+            // (nessun dato perso, solo una richiesta in più). Lo si azzera
+            // SOLO se l'unione ha cambiato qualcosa: se il cloud non portava
+            // nulla di nuovo, l'ETag resta quello locale e il feed non viene
+            // riscaricato inutilmente ad ogni sincronizzazione automatica.
+            etag = locale.etag,
             lastSync = max(locale.lastSync, remoto.lastSync),
             risposte = fondiRisposte(locale.risposte, remoto.risposte),
             piano = fondiPiano(locale.piano, remoto.piano),
@@ -171,9 +174,12 @@ object BackupMerge {
             rotazioniEsercizi = remoto.rotazioniEsercizi + locale.rotazioniEsercizi,
             eserciziUnitaAi = fondiMappeListe(locale.eserciziUnitaAi, remoto.eserciziUnitaAi)
         )
+        // Se l'unione non ha cambiato nulla, l'ETag locale resta valido e il
+        // feed non viene riscaricato inutilmente ad ogni sync automatico.
+        return if (unito == locale) unito else unito.copy(etag = "")
     }
 
-    // ------------------------------------------------------------- progresso
+    // ------------------------------------------------------------- progresso----------------------------------------- progresso
 
     /** Unisce i progressi complessivi (livello, test, punteggi). */
     fun fondi(locale: ProgressoUtente, remoto: ProgressoUtente): ProgressoUtente =
