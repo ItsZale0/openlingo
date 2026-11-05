@@ -113,7 +113,7 @@ fun main() = application {
             }
         }
 
-        TemaTedesco(scuro = store.temaScuro()) {
+        TemaTedesco(scuro = store.temaScuro(), temaColore = store.temaColore()) {
             Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                 Row(Modifier.fillMaxSize()) {
                     BarraNavigazione(

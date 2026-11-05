@@ -248,6 +248,22 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
             }
         }
 
+        // ------------------------------------------------------------- colore
+        CardSezione(titolo = "Colore tema", sottotitolo = "Colore principale dell'app") {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf(
+                    "teal" to "Teal", "navy" to "Blu navy", "indigo" to "Indaco",
+                    "forest" to "Verde", "rose" to "Rosa", "amber" to "Ambra"
+                ).forEach { (id, label) ->
+                    FilterChip(
+                        selected = store.temaColore() == id,
+                        onClick = { store.setTemaColore(id) },
+                        label = { Text(label) }
+                    )
+                }
+            }
+        }
+
         // ------------------------------------------------------------ lessico
         CardSezione(
             titolo = "Lessico",

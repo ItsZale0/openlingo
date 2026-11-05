@@ -34,8 +34,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Card
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -85,9 +88,11 @@ import com.alessandro.tedesco.data.remote.UpdaterViewModel
 import com.alessandro.tedesco.sync.ReminderWorker
 import com.alessandro.tedesco.sync.ImmersioneSeraleWorker
 import com.alessandro.tedesco.sync.NotificheSettings
+import com.alessandro.tedesco.sync.TemaSettings
 import com.alessandro.tedesco.TedescoApp
 import com.alessandro.tedesco.ui.theme.dimensioneContenuto
 import com.alessandro.tedesco.ui.theme.spaziaturaSchermo
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 private const val GUIDA_DOC_DEFAULT = "12yKY4Bpp6IqX7q8tgNYkFXIoAQsZR8yVd4mZhcD5I7g"
@@ -279,6 +284,10 @@ fun ImpostazioniScreen(
     var confermaReset by remember { mutableStateOf(false) }
     var aggiungiParola by remember { mutableStateOf(false) }
 
+    val temaSettings = remember(contestoUpdate) { TemaSettings(contestoUpdate) }
+    var temaColore by remember { mutableStateOf("teal") }
+    LaunchedEffect(Unit) { temaColore = temaSettings.colore.first() }
+
     var feedUrl by rememberSaveable {
     mutableStateOf(
         profilo?.config?.feedUrl?.takeIf { it.isNotBlank() }
@@ -336,6 +345,32 @@ fun ImpostazioniScreen(
                 SettingsButton(onClick = { cambiaProfilo = true }) { Text("Cambia profilo") }
                 Spacer(Modifier.height(8.dp))
                 SettingsButton(onClick = { esciSelezione = true }) { Text("Torna alla scelta del profilo") }
+                Spacer(Modifier.height(12.dp))
+
+                // --- COLORE TEMA ---
+                GlassCard {
+                    Column {
+                        Text("Colore tema", style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Spacer(Modifier.height(6.dp))
+                        Text("Scegli il colore principale dell'app.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Spacer(Modifier.height(10.dp))
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            TemaSettings.OPZIONI.forEach { (id, label) ->
+                                FilterChip(
+                                    selected = temaColore == id,
+                                    onClick = {
+                                        temaColore = id
+                                        scopeUpdate.launch { temaSettings.setColore(id) }
+                                    },
+                                    label = { Text(label) }
+                                )
+                            }
+                        }
+                    }
+                }
                 Spacer(Modifier.height(12.dp))
 
                 // --- LIVELLO (menu a tendina) ---

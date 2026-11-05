@@ -1,7 +1,7 @@
 {
-  "versionCode": 302,
-  "versionName": "1.48.69",
-  "changelog": "Redesign UI: home mobile e desktop più pulite, spaziature coerenti, palette teal/sabbia, piano compatto con pannello completo e lezione solo su richiesta.",
+  "versionCode": 303,
+  "versionName": "1.48.70",
+  "changelog": "Temi colore selezionabili (teal, blu navy, indaco, verde, rosa, ambra) in Impostazioni su mobile e desktop.",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.69/Tedesco-v1.48.69.apk"
+  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.70/Tedesco-v1.48.70.apk"
 }

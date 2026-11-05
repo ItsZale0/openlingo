@@ -53,6 +53,7 @@ import kotlin.math.max
 @Serializable
 data class Preferenze(
     val temaScuro: Boolean = true,
+    val temaColore: String = "teal",
     val profiloAttivoId: String? = null,
     /**
      * Token GitHub per il backup cloud. Salvato in locale come fa l'app
@@ -341,6 +342,13 @@ class DesktopStore(
         stato.padronanzaGrammatica.values.count { it.completata }
 
     fun temaScuro(): Boolean = preferenze.temaScuro
+
+    fun temaColore(): String = preferenze.temaColore
+
+    fun setTemaColore(id: String) {
+        preferenze = preferenze.copy(temaColore = id)
+        salvaPreferenze()
+    }
 
     fun commutaTema() {
         preferenze = preferenze.copy(temaScuro = !preferenze.temaScuro)

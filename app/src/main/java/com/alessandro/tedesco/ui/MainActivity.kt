@@ -17,12 +17,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alessandro.tedesco.TedescoApp
 import com.alessandro.tedesco.data.BackupEsecutore
 import com.alessandro.tedesco.BuildConfig
 import com.alessandro.tedesco.data.BackupSettings
+import com.alessandro.tedesco.sync.TemaSettings
 import com.alessandro.tedesco.ui.theme.TedescoTheme
 
 class MainActivity : ComponentActivity() {
@@ -68,9 +70,11 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
+            val temaSettings = remember { TemaSettings(this@MainActivity) }
+            val temaColore by temaSettings.colore.collectAsStateWithLifecycle(initialValue = "teal")
             // Material 3: dynamic color su Android 12+, altrimenti schema baseline.
             // App pensata dark: per seguire il sistema basta togliere darkTheme = true.
-            TedescoTheme(darkTheme = true) {
+            TedescoTheme(darkTheme = true, temaColore = temaColore) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
