@@ -1,7 +1,7 @@
 {
-  "versionCode": 303,
-  "versionName": "1.48.70",
-  "changelog": "Temi colore selezionabili (teal, blu navy, indaco, verde, rosa, ambra) in Impostazioni su mobile e desktop.",
+  "versionCode": 304,
+  "versionName": "1.48.71",
+  "changelog": "Esercizi AI piu' chiari: seconda revisione automatica che scarta quelli ambigui, controlli su risposte uniche e prompt piu' severo.",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.70/Tedesco-v1.48.70.apk"
+  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.71/Tedesco-v1.48.71.apk"
 }

@@ -134,7 +134,9 @@ class GeneratoreEsercizi {
                 try {
                     val risposta = chiamaModello(apiKey, m, messaggi)
                     val esercizi = parseEsercizi(risposta, tipo, livello, quanti)
-                    if (esercizi.isNotEmpty()) return@withContext esercizi
+                    if (esercizi.isNotEmpty()) {
+                        return@withContext revisiona(apiKey, m, esercizi, tipo, livello)
+                    }
                     ultimoErrore = "Risposta non valida dal modello $m"
                 } catch (e: IOException) {
                     ultimoErrore = e.message
@@ -147,6 +149,62 @@ class GeneratoreEsercizi {
             if (tentativo < 2) delay(4000)
         }
         throw IOException(ultimoErrore ?: "Nessun modello disponibile al momento")
+    }
+
+    /**
+     * Secondo passaggio "revisore": chiede al modello di rileggere il batch e
+     * scartare gli esercizi ambigui, sbagliati o con più di una risposta
+     * plausibile. È best-effort: se la chiamata fallisce, o scarta tutto, si
+     * tengono gli esercizi originali. Costa una sola chiamata in più per
+     * generazione, ma evita di mostrare esercizi senza senso.
+     */
+    private fun revisiona(
+        apiKey: String,
+        modello: String,
+        esercizi: List<EsercizioGenerato>,
+        tipo: TipoEsercizio,
+        livello: String
+    ): List<EsercizioGenerato> {
+        if (esercizi.size <= 1) return esercizi
+        val elenco = esercizi.mapIndexed { i, e ->
+            buildString {
+                append("$i) DOMANDA: ${e.domanda}")
+                if (e.fraseTedesca != null) append(" | FRASE: ${e.fraseTedesca}")
+                append(" | OPZIONI: ${e.opzioni.joinToString(" / ")}")
+                append(" | RISPOSTA CORRETTA: ${e.opzioni[e.rispostaCorretta]}")
+                append(" | SPIEGAZIONE: ${e.spiegazione}")
+            }
+        }.joinToString("\n")
+        val prompt = """
+            Sei un revisore severo di esercizi di tedesco per studenti italiani (livello $livello).
+            Rileggi questi esercizi (${tipo.etichetta}) e individua SOLO quelli PROBLEMATICI:
+            - più di una risposta plausibile o corretta (ambiguo);
+            - risposta corretta sbagliata per la regola indicata;
+            - frase tedesca innaturale o senza senso;
+            - domanda che non si capisce cosa chiede;
+            - distrattori che rendono la risposta ovvia;
+            - spiegazione che non giustifica la risposta.
+            NON scartare esercizi solo perché difficili o perché non ti piacciono.
+            Rispondi SOLO con JSON: {"scarta":[indici 0-based]}.
+            Se vanno tutti bene: {"scarta":[]}.
+
+            $elenco
+        """.trimIndent()
+        val messaggi = listOf(
+            ChatMessageCompat("system", prompt),
+            ChatMessageCompat("user", "Restituisci il JSON con gli indici da scartare.")
+        )
+        return try {
+            val risposta = chiamaModello(apiKey, modello, messaggi)
+            val jsonPulito = estraiJson(risposta) ?: return esercizi
+            val revisione = json.decodeFromString(RevisioneAi.serializer(), jsonPulito)
+            val scarta = revisione.scarta.toSet()
+            val filtrati = esercizi.filterIndexed { i, _ -> i !in scarta }
+            // Se il revisore scarta tutto, meglio tenere l'originale che nulla.
+            if (filtrati.isEmpty()) esercizi else filtrati
+        } catch (_: Exception) {
+            esercizi
+        }
     }
 
     private fun costruisciPrompt(
@@ -316,7 +374,21 @@ class GeneratoreEsercizi {
               non riconoscimento di parole elementari.
             - VARIETÀ: alterna schemi diversi (completare una frase, scegliere l'articolo/caso, coniugare un verbo, tradurre una frase utile, comprensione di una breve frase). Non proporre sempre lo stesso tipo.
             - I sostantivi tedeschi vanno sempre con l'articolo (der/die/das).
-            - Non inventare esercizi con meno di 4 opzioni o senza rispostaCorretta.$evitaTesto
+            - Non inventare esercizi con meno di 4 opzioni o senza rispostaCorretta.
+            - UNICITÀ (REGOLA FONDAMENTALE): la risposta corretta deve essere L'UNICA
+              accettabile. Prima di scrivere, prova a inserire OGNI opzione nella frase:
+              se due opzioni producono frasi tedesche corrette, l'esercizio è ambiguo:
+              cambia la frase o le opzioni. Una sola opzione deve essere grammaticalmente
+              corretta E coerente col senso della frase.
+            - CHIAREZZA: la domanda deve dire in modo esplicito cosa scegliere (articolo,
+              caso, tempo verbale, traduzione). Vietato lasciare il criterio implicito o
+              basarsi su sfumature di significato, opinioni o preferenze personali.
+            - Esercizi di sola traduzione: una sola traduzione deve essere fedele; le altre
+              devono avere un errore oggettivo (parola sbagliata, tempo sbagliato, senso
+              invertito), non una variante stilistica anch'essa corretta.
+            - Non usare opzioni che differiscono solo per punteggiatura o maiuscole.
+            - AUTOCONTROLLO FINALE: rileggi ogni esercizio come se fossi lo studente.
+              Se non sai con certezza quale sia la risposta, RISCRIVILO o NON generarlo.$evitaTesto
         """.trimIndent()
     }
 
@@ -425,6 +497,19 @@ class GeneratoreEsercizi {
             if (domanda.isEmpty() || opzioni.size != 4) return@mapIndexedNotNull null
             if (rispostaCorretta !in 0..3) return@mapIndexedNotNull null
             if (opzioni.toSet().size != opzioni.size) return@mapIndexedNotNull null // opzioni duplicate
+            // Ambiguità strutturali: un solo buco e nessuna opzione che sia un buco.
+            if (domanda.count { it == '_' } > 3) return@mapIndexedNotNull null
+            if (opzioni.any { it.contains("___") }) return@mapIndexedNotNull null
+            if (opzioni[rispostaCorretta].isBlank()) return@mapIndexedNotNull null
+            // Se la domanda è un "riempi il buco", la risposta corretta non può
+            // essere identica (ignorando maiuscole/spazi) a un'altra opzione già
+            // inserita: sarebbe la stessa frase e quindi due risposte giuste.
+            if (domanda.contains("___")) {
+                val frasi = opzioni.map { op -> domanda.replace("___", op).trim().lowercase() }
+                if (frasi.toSet().size != frasi.size) return@mapIndexedNotNull null
+            }
+            // Un'opzione non può coincidere con l'intera domanda.
+            if (opzioni.any { it.trim().equals(domanda.trim(), ignoreCase = true) }) return@mapIndexedNotNull null
             // Scarta esercizi in lingua sbagliata (spagnolo/inglese) nelle domande o opzioni
             if (contieneSpagnolo(domanda) || opzioni.any { contieneSpagnolo(it) }) return@mapIndexedNotNull null
             if (contieneNonLatino(domanda) || opzioni.any { contieneNonLatino(it) }) return@mapIndexedNotNull null
@@ -500,6 +585,9 @@ class GeneratoreEsercizi {
 }
 
 // ── Modelli di compatibilità per il generatore (evitano di toccare TutorService) ──
+
+@Serializable
+private data class RevisioneAi(val scarta: List<Int> = emptyList())
 
 @Serializable
 private data class ChatMessageCompat(val role: String, val content: String)
