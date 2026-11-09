@@ -12,8 +12,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
@@ -125,7 +130,11 @@ fun SceltaProfiloScreen(vm: TedescoViewModel) {
             Spacer(Modifier.height(16.dp))
 
             profili.forEach { profilo ->
-                CardProfilo(profilo = profilo, onEntra = { vm.selezionaProfilo(profilo.id) })
+                CardProfilo(
+                    profilo = profilo,
+                    onEntra = { vm.selezionaProfilo(profilo.id) },
+                    onElimina = { vm.eliminaProfilo(profilo.id) }
+                )
                 Spacer(Modifier.height(8.dp))
             }
 
@@ -155,7 +164,13 @@ fun SceltaProfiloScreen(vm: TedescoViewModel) {
 }
 
 @Composable
-private fun CardProfilo(profilo: ProfiloUtente, onEntra: () -> Unit) {
+private fun CardProfilo(
+    profilo: ProfiloUtente,
+    onEntra: () -> Unit,
+    onElimina: () -> Unit
+) {
+    var conferma by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
@@ -178,8 +193,37 @@ private fun CardProfilo(profilo: ProfiloUtente, onEntra: () -> Unit) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+            IconButton(onClick = { conferma = true }) {
+                Icon(
+                    imageVector = Icons.Filled.Delete,
+                    contentDescription = "Elimina profilo",
+                    tint = MaterialTheme.colorScheme.error
+                )
+            }
             Button(onClick = onEntra) { Text("Entra") }
         }
+    }
+
+    if (conferma) {
+        AlertDialog(
+            onDismissRequest = { conferma = false },
+            title = { Text("Eliminare il profilo?") },
+            text = {
+                Text(
+                    "Verranno eliminati tutti i dati di \"${profilo.config.nomeVisualizzato}\": " +
+                        "parole, ripassi, lezioni, grammatica e conversazioni. " +
+                        "L'operazione non è reversibile."
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { conferma = false; onElimina() }) {
+                    Text("Elimina", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { conferma = false }) { Text("Annulla") }
+            }
+        )
     }
 }
 

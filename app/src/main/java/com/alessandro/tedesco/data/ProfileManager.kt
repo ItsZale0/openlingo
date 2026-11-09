@@ -264,6 +264,30 @@ class ProfileManager(
         return id
     }
 
+    /**
+     * Elimina un profilo e tutti i suoi dati (parole, ripassi, lezioni,
+     * grammatica, conversazioni). Se era il profilo attivo, viene attivato
+     * il primo profilo rimanente (oppure nessuno).
+     *
+     * Non si può eliminare l'ultimo profilo? In realtà sì: l'app torna
+     * allo stato "nessun profilo" e mostra la schermata di benvenuto.
+     */
+    suspend fun eliminaProfilo(profiloId: String) {
+        val repo = _repository.value
+        if (!repo.profili.containsKey(profiloId)) return
+        val rimanenti = repo.profili - profiloId
+        val nuovoAttivo = if (repo.profiloAttivoId == profiloId) {
+            rimanenti.keys.firstOrNull()
+        } else {
+            repo.profiloAttivoId
+        }
+        _repository.value = repo.copy(
+            profili = rimanenti,
+            profiloAttivoId = nuovoAttivo
+        )
+        scriviSubito()
+    }
+
     /** Torna alla schermata di selezione profilo. */
     suspend fun esciDalProfilo() {
         _repository.value = _repository.value.copy(profiloAttivoId = null)

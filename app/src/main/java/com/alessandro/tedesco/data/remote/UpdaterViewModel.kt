@@ -75,7 +75,13 @@ class UpdaterViewModel(application: Application) : AndroidViewModel(application)
 
     val versioneCorrenteCode: Int = runCatching {
         val pm = getApplication<Application>().packageManager
-        pm.getPackageInfo(getApplication<Application>().packageName, 0).longVersionCode.toInt()
+        val info = pm.getPackageInfo(getApplication<Application>().packageName, 0)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            info.longVersionCode.toInt()
+        } else {
+            @Suppress("DEPRECATION")
+            info.versionCode
+        }
     }.getOrDefault(0)
 
     /** Timestamp dell'ultimo controllo automatico (0 = mai). */

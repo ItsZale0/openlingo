@@ -65,7 +65,13 @@ class UpdateWorker(
 
     private fun versioneInstallata(): Int = runCatching {
         val pm = applicationContext.packageManager
-        pm.getPackageInfo(applicationContext.packageName, 0).longVersionCode.toInt()
+        val info = pm.getPackageInfo(applicationContext.packageName, 0)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            info.longVersionCode.toInt()
+        } else {
+            @Suppress("DEPRECATION")
+            info.versionCode
+        }
     }.getOrDefault(0)
 
     private fun leggiVersione(): VersionInfo {

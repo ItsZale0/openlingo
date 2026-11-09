@@ -641,6 +641,16 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    /** Elimina un profilo e tutti i suoi dati. */
+    fun eliminaProfilo(profiloId: String) {
+        viewModelScope.launch {
+            profileManager.eliminaProfilo(profiloId)
+            resetStatoProfilo()
+            _messaggio.value = "Profilo eliminato"
+            sincronizza(mostraMessaggio = false)
+        }
+    }
+
     /** Aggiorna il contesto personale del profilo attivo (usato dall'AI). */
     fun aggiornaContestoUtente(contesto: String) {
         viewModelScope.launch {
