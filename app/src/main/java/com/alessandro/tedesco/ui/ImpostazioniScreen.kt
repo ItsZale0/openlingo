@@ -398,7 +398,10 @@ fun ImpostazioniScreen(
                             selected = lingua,
                             onSelect = { id ->
                                 lingua = id
-                                scopeUpdate.launch { linguaSettings.setLingua(id) }
+                                scopeUpdate.launch {
+                                    linguaSettings.setLingua(id)
+                                    (contestoUpdate as? android.app.Activity)?.recreate()
+                                }
                             }
                         )
                     }

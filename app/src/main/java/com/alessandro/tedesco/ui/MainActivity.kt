@@ -24,7 +24,11 @@ import com.alessandro.tedesco.TedescoApp
 import com.alessandro.tedesco.data.BackupEsecutore
 import com.alessandro.tedesco.BuildConfig
 import com.alessandro.tedesco.data.BackupSettings
+import com.alessandro.tedesco.sync.LinguaSettings
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import com.alessandro.tedesco.sync.TemaSettings
+import java.util.Locale
 import com.alessandro.tedesco.ui.theme.TedescoTheme
 
 class MainActivity : ComponentActivity() {
@@ -58,6 +62,17 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        // Applica la lingua scelta dall'utente (IT/EN) alle risorse.
+        val lingua = runCatching {
+            kotlinx.coroutines.runBlocking { LinguaSettings(this@MainActivity).lingua.first() }
+        }.getOrDefault("it")
+        val locale = Locale(lingua)
+        Locale.setDefault(locale)
+        val config = resources.configuration
+        config.setLocale(locale)
+        config.setLayoutDirection(locale)
+        @Suppress("DEPRECATION")
+        resources.updateConfiguration(config, resources.displayMetrics)
         val app = application as TedescoApp
 
         // Android 13+: senza questo permesso le notifiche del worker di
