@@ -102,7 +102,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
         ) {
             Spacer(Modifier.height(4.dp))
             Text(
-                "I tuoi progressi sono preziosi: salvali nel cloud per non perderli mai.",
+                "Salvataggio cloud dei progressi su GitHub.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -202,8 +202,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "Scrivi utente/nome-repo (es. ItsZale0/tedesco-backup). " +
-                            "Se scrivi solo il nome, aggiungo io il tuo utente.",
+                        "Formato: utente/nome-repo (es. ItsZale0/tedesco-backup).",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
