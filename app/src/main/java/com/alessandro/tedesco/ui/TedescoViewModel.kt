@@ -484,6 +484,14 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
+    /** Contesto personale del profilo attivo (professione, obiettivi, interessi). */
+    val contestoUtente: StateFlow<String> = profileManager.repositoryFlow
+        .map { r ->
+            val id = r.profiloAttivoId
+            id?.let { r.profili[it]?.config?.contestoUtente }.orEmpty()
+        }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, "")
+
     val feedUrl: StateFlow<String> = profileManager.repositoryFlow
         .map { r ->
             val p = r.profiloAttivoId?.let { r.profili[it] }
@@ -591,11 +599,31 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
         repo.resetContenutiProfilo()
     }
 
-    /** Crea un nuovo profilo personalizzato. */
-    fun creaProfilo(nome: String) {
+    /**
+     * Crea un nuovo profilo e lo attiva.
+     *
+     * @param contesto professione/obiettivi/interessi: guida l'AI
+     * @param mostraContestoMedico true = lessico sanitario
+     */
+    fun creaProfilo(
+        nome: String,
+        livello: LivelloIniziale = LivelloIniziale.A0,
+        contesto: String = "",
+        mostraContestoMedico: Boolean = false
+    ) {
         viewModelScope.launch {
-            profileManager.creaProfilo(nome)
+            profileManager.creaProfilo(nome, livello, contesto, mostraContestoMedico)
+            resetStatoProfilo()
             _messaggio.value = "Profilo creato"
+            sincronizza(mostraMessaggio = false)
+        }
+    }
+
+    /** Aggiorna il contesto personale del profilo attivo (usato dall'AI). */
+    fun aggiornaContestoUtente(contesto: String) {
+        viewModelScope.launch {
+            profileManager.aggiornaContestoUtente(contesto)
+            _messaggio.value = "Contesto salvato"
         }
     }
 
@@ -1139,7 +1167,9 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                     numero = n,
                     livello = livello,
                     argomento = argomentoLezione(n, titoloFeed),
-                    paroleNote = paroleNote
+                    paroleNote = paroleNote,
+                    contesto = profilo.config.contestoUtente,
+                    contestoMedico = profilo.config.mostraContestoMedico
                 )
                 repo.salvaLezioneGenerata(n, lezione.contenuto)
                 val aggiunte = repo.aggiungiParoleLezione(lezione.parole, n, livello)
@@ -1253,7 +1283,10 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
         val chiave = tutorApiKey.value
         val gemini = geminiApiKey.value
         return runCatching {
-            app.tutorServiceInstance.rispondi(chiave, cronologia, livello, lezione, _modelloTutor.value, gemini)
+            app.tutorServiceInstance.rispondi(
+                chiave, cronologia, livello, lezione, _modelloTutor.value, gemini,
+                contestoUtente = contestoUtente.value
+            )
         }
     }
 
@@ -1380,7 +1413,9 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
         val evitaChiavi = esistenti.map(::chiaveEntita)
         val risultato = app.generatoreEserciziInstance.genera(
             apiKey = chiave, tipo = tipo, livello = livello,
-            quanti = quanti, contestoMedico = medico, evita = evita, modello = modello
+            quanti = quanti, contestoMedico = medico,
+            contestoUtente = profiloAttivo.value?.config?.contestoUtente.orEmpty(),
+            evita = evita, modello = modello
         )
         // converte in entità e persisti
         // SOGLIA DI LIVELLO: un esercizio piu' alto del profilo non viene mai
@@ -1586,6 +1621,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                     livello = unita.livello,
                     quanti = quanti,
                     contestoMedico = profilo.config.mostraContestoMedico,
+                    contestoUtente = profilo.config.contestoUtente,
                     evita = evita,
                     tema = tema
                 )

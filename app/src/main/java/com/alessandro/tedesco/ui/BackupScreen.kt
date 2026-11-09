@@ -24,18 +24,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.alessandro.tedesco.BuildConfig
 import com.alessandro.tedesco.data.BackupCloud
+import com.alessandro.tedesco.data.BackupEsecutore
 import com.alessandro.tedesco.data.remote.BackupStato
 import com.alessandro.tedesco.data.remote.BackupViewModel
 import com.alessandro.tedesco.ui.theme.dimensioneContenuto
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 
@@ -56,6 +67,32 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
     var tokenInput by remember(token) { mutableStateOf(token) }
     var repoInput by remember(repo) { mutableStateOf(repo) }
     var confermaRipristino by remember { mutableStateOf(false) }
+
+    val contesto = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var messaggioExport by remember { mutableStateOf("") }
+    val esporta = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("application/json")
+    ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            messaggioExport = "Esportazione in corso…"
+            runCatching {
+                val testo = withContext(Dispatchers.IO) {
+                    BackupEsecutore.esportaTutto(contesto, BuildConfig.VERSION_NAME)
+                }
+                withContext(Dispatchers.IO) {
+                    contesto.contentResolver.openOutputStream(uri)?.use {
+                        it.write(testo.toByteArray(Charsets.UTF_8))
+                    } ?: error("Impossibile scrivere il file")
+                }
+            }.onSuccess {
+                messaggioExport = "Esportazione completata."
+            }.onFailure {
+                messaggioExport = "Esportazione non riuscita: ${it.message}"
+            }
+        }
+    }
 
     ScreenScaffold("Backup cloud", onBack = onIndietro) {
         Column(
@@ -94,6 +131,51 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                                 .format(Date(ultimo)),
                             style = MaterialTheme.typography.bodySmall,
                             fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
+            }
+
+            // --- Esportazione completa su file ---
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium,
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer)
+            ) {
+                Column(Modifier.fillMaxWidth().padding(12.dp)) {
+                    Text("Esporta tutti i dati", style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold)
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Salva un file JSON con tutti i profili (parole, ripassi, " +
+                            "lezioni, grammatica, conversazioni), le notifiche e il tema. " +
+                            "Puoi conservarlo o importarlo su un altro dispositivo.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Attenzione: il file contiene anche le chiavi API dei profili. " +
+                            "Trattalo come un documento riservato. Il token GitHub non è incluso.",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(Modifier.height(10.dp))
+                    OutlinedButton(
+                        onClick = {
+                            val marca = LocalDateTime.now()
+                                .format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmm"))
+                            esporta.launch("tedesco-dati-$marca.json")
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) { Text("Esporta su file") }
+                    if (messaggioExport.isNotBlank()) {
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            messaggioExport,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 }

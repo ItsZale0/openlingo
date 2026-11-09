@@ -2,7 +2,7 @@
 <resources>
     <!-- Material 3: il tema base senza barra d'azione, Compose fa il resto.
          I colori reali vengono dai colori dinamici del sistema (Android 12+). -->
-    <style name="Theme.Tedesco" parent="android:Theme.Material.Light.NoActionBar">
+    <style name="Theme.Deutsch" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>

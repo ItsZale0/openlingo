@@ -37,13 +37,20 @@ android {
 
     signingConfigs {
         getByName("debug") {
-            // Keystore STABILE dentro il progetto: l'auto-update funziona solo se
-            // ogni build e' firmata con la stessa chiave. Prima puntava a
-            // C:/Users/zampe/.android/debug.keystore (path personale, non portabile).
-            storeFile = file("keystore/tedesco-debug.jks")
-            storePassword = "android"
-            keyAlias = "androiddebugkey"
-            keyPassword = "android"
+            // Firma di sviluppo.
+            //
+            // Il keystore NON è più versionato: un keystore pubblico permette a
+            // chiunque di firmare un APK che l'app accetterebbe come aggiornamento.
+            // Per build riproducibili (CI o release) si fornisce un keystore
+            // privato tramite variabili d'ambiente; altrimenti Gradle usa il
+            // debug keystore locale generato automaticamente.
+            val percorsoKeystore = System.getenv("TEDESCO_KEYSTORE_FILE")
+            if (!percorsoKeystore.isNullOrBlank()) {
+                storeFile = file(percorsoKeystore)
+                storePassword = System.getenv("TEDESCO_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("TEDESCO_KEY_ALIAS")
+                keyPassword = System.getenv("TEDESCO_KEY_PASSWORD")
+            }
             enableV1Signing = true
             enableV2Signing = true
             enableV3Signing = true
@@ -156,7 +163,7 @@ tasks.register("bumpVersion") {
             .replace("\n", "\\n")
             .replace("\r", "\\r")
             .replace("\t", "\\t")
-        val apkUrl = "https://github.com/ItsZale0/tedesco-app/releases/download/v$newName/Tedesco-v$newName.apk"
+        val apkUrl = "https://github.com/ItsZale0/tedesco-app/releases/download/v$newName/Deutsch-v$newName.apk"
         val json = """
             {
               "versionCode": $newCode,
@@ -185,7 +192,7 @@ tasks.register("generateVersionJson") {
         if (f.exists()) f.inputStream().use { props.load(it) }
         val vc = props.getProperty("VERSION_CODE", "0").toIntOrNull() ?: 0
         val vn = props.getProperty("VERSION_NAME", "0.0.0")
-        val apkUrl = "https://github.com/ItsZale0/tedesco-app/releases/download/v$vn/Tedesco-v$vn.apk"
+        val apkUrl = "https://github.com/ItsZale0/tedesco-app/releases/download/v$vn/Deutsch-v$vn.apk"
         val json = """
             {
               "versionCode": $vc,

@@ -86,6 +86,37 @@ class VersionInfoTest {
     }
 
     @Test
+    fun `deserializza apkSha256 quando presente`() {
+        val conHash = """
+            {
+                "versionCode": 306,
+                "versionName": "1.48.73",
+                "apkUrl": "https://example.com/Deutsch-v1.48.73.apk",
+                "apkSha256": "ABCDEF0123456789"
+            }
+        """.trimIndent()
+
+        val info = json.decodeFromString<VersionInfo>(conHash)
+
+        assertEquals("ABCDEF0123456789", info.apkSha256)
+    }
+
+    @Test
+    fun `sha256 di un file corrisponde al digest atteso`() {
+        val file = java.io.File.createTempFile("verifica-apk", ".bin")
+        try {
+            file.writeBytes(byteArrayOf(0x50, 0x4B, 0x03, 0x04, 0x00, 0x7F, 0x22))
+            val atteso = java.security.MessageDigest.getInstance("SHA-256")
+                .digest(file.readBytes())
+                .joinToString("") { "%02x".format(it) }
+
+            assertEquals(atteso, VerificaApk.sha256(file))
+        } finally {
+            file.delete()
+        }
+    }
+
+    @Test
     fun `version json minimale senza changelog ne minVersionCode`() {
         // Regressione: il version.json pubblicato conteneva solo 3 campi,
         // la deserializzazione falliva e l'auto-updater non vedeva mai l'update.

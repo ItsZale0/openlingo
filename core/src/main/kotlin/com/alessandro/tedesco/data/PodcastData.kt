@@ -79,7 +79,7 @@ object PodcastData {
         ),
         Livello(
             codice = "B2",
-            titolo = "Tedesco autentico",
+            titolo = "Deutsch autentico",
             obiettivo = "Talk show, approfondimenti, velocità naturale e registro colloquiale.",
             consiglio = "Ascolta senza testo, poi riassumi in 5 frasi. Se ci riesci, " +
                 "hai capito davvero: è la prova che serve per il B2."

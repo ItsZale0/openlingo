@@ -1,7 +1,8 @@
 {
-  "versionCode": 305,
-  "versionName": "1.48.72",
-  "changelog": "Lessico A1-B2 ampliato: 3.108 parole curate (670 nuove A1, 708 A2, 1.125 B1, 605 B2) con copertura cumulativa verso i traguardi 650/1.300/2.400/3.000. Aggiungi un livello al ripasso con un tocco e allenati con sei tipi di esercizio (significato, parola tedesca, articolo, frase da completare, scrittura, ascolto).",
+  "versionCode": 306,
+  "versionName": "1.48.73",
+  "changelog": "Rinomina dell'app in Deutsch, verifica integrita' APK con SHA-256, backup dati sicuri, nessun profilo predefinito, esportazione completa dei dati, documentazione e report di sicurezza aggiornati. Build e test verdi.",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.72/Tedesco-v1.48.72.apk"
+  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.73/Deutsch-v1.48.73.apk",
+  "apkSha256": "1369db60ae27c04f0cf91c5e3c4aad156fbd55dfaea18cf94e1e0be6ea8bd45d"
 }

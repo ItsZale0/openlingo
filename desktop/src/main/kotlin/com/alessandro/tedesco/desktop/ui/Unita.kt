@@ -176,7 +176,7 @@ private fun TeoriaUnita(unita: UnitaGrammatica, onVaiEsercizi: () -> Unit) {
     }
 
     if (teoria.esempi.isNotEmpty()) {
-        CardSezione(titolo = "Esempi", sottotitolo = "Tedesco e italiano, a confronto") {
+        CardSezione(titolo = "Esempi", sottotitolo = "Deutsch e italiano, a confronto") {
             teoria.esempi.forEach { esempio ->
                 EsempioCard(esempio)
                 Spacer(Modifier.height(8.dp))

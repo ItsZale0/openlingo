@@ -1,5 +1,5 @@
 #!/bin/bash
-# Wrapper Gradle per il progetto Tedesco
+# Wrapper Gradle per il progetto Deutsch
 # Uso: ./gradlew assembleDebug
 
 export JAVA_HOME=/opt/data/toolchain/jdk-17.0.20.1+1

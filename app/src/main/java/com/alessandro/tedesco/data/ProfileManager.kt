@@ -117,7 +117,22 @@ class ProfileManager(
         } else {
             runCatching {
                 json.decodeFromString(ProfiliRepository.serializer(), jsonStr)
-            }.getOrElse { ProfiliRepository() }
+            }.getOrElse {
+                // Non perdere nulla: prima di ripartire da zero conserviamo il
+                // JSON illeggibile in files/recupero/, così l'utente (o chi lo
+                // assiste) può recuperarlo o allegarlo a una segnalazione.
+                salvaCopiaRecupero(jsonStr)
+                ProfiliRepository()
+            }
+        }
+    }
+
+    private fun salvaCopiaRecupero(jsonStr: String) {
+        runCatching {
+            val cartella = java.io.File(context.filesDir, "recupero")
+            cartella.mkdirs()
+            val nome = "profili_data_corrotto_${System.currentTimeMillis()}.json"
+            java.io.File(cartella, nome).writeText(jsonStr)
         }
     }
 
@@ -182,13 +197,9 @@ class ProfileManager(
         scriviSuDataStore(_repository.value)
     }
 
-    /** Tutti i profili disponibili, nell'ordine dei preset. */
-    fun profiliDisponibili(): List<ProfiloUtente> {
-        val ordine = ProfiliPreset.ID_PRESET
-        return _repository.value.profili.values.sortedBy { p ->
-            ordine.indexOf(p.config.tipo.id).let { if (it < 0) Int.MAX_VALUE else it }
-        }
-    }
+    /** Tutti i profili disponibili, dal più vecchio al più recente. */
+    fun profiliDisponibili(): List<ProfiloUtente> =
+        _repository.value.profili.values.sortedBy { it.creatoIl }
 
     fun profiloAttivoId(): String? = _repository.value.profiloAttivoId
 
@@ -210,35 +221,36 @@ class ProfileManager(
         scriviSubito()
     }
 
-    /** Crea un nuovo profilo personalizzato. */
-    suspend fun creaProfilo(nome: String, tipo: TipoProfilo = TipoProfilo.PERSONALIZZATO) {
+    /**
+     * Crea un nuovo profilo e lo attiva subito.
+     *
+     * @param nome nome mostrato
+     * @param livello livello CEFR di partenza
+     * @param contesto contesto personale per l'AI (professione, obiettivi)
+     * @param mostraContestoMedico true = contenuti con lessico sanitario
+     * @return l'id del profilo creato
+     */
+    suspend fun creaProfilo(
+        nome: String,
+        livello: LivelloIniziale = LivelloIniziale.A0,
+        contesto: String = "",
+        mostraContestoMedico: Boolean = false
+    ): String {
         val repo = _repository.value
         val id = "profilo_${System.currentTimeMillis()}"
-        val config = ProfiloConfig(
-            tipo = tipo,
-            nomeVisualizzato = nome,
-            enableCustomWords = true,
-            enableGoogleSheets = false,
-            googleSheetId = null,
-            feedUrl = ProfiliPreset.FEED_URL,
-            guidaDocId = null,
-            tutorApiKey = ProfiliPreset.DEFAULT_TUTOR_API_KEY,
-            livelloIniziale = LivelloIniziale.A0,
-            mostraContestoMedico = false
-        )
-        val nuovo = ProfiloUtente(
+        val nuovo = ProfiliPreset.nuovo(
             id = id,
-            config = config,
-            stato = ProfiloStato(
-                progresso = ProgressoUtente(
-                    livelloCorrente = config.livelloIniziale.toLivelloCEFR()
-                )
-            ),
-            creatoIl = System.currentTimeMillis(),
-            ultimoAccesso = System.currentTimeMillis()
+            nome = nome.trim().ifBlank { "Profilo" },
+            livello = livello,
+            contesto = contesto,
+            mostraContestoMedico = mostraContestoMedico
         )
-        _repository.value = repo.copy(profili = repo.profili + (id to nuovo))
+        _repository.value = repo.copy(
+            profili = repo.profili + (id to nuovo),
+            profiloAttivoId = id
+        )
         scriviSubito()
+        return id
     }
 
     /** Torna alla schermata di selezione profilo. */
@@ -292,9 +304,8 @@ class ProfileManager(
     /**
      * Feed del profilo attivo.
      *
-     * Se il profilo salvato non ha un URL (installazioni vecchie, campi
-     * ripristinati vuoti) si torna al default DEL TIPO: Emma non deve mai
-     * trovarsi, per assenza di URL, il vocabolario di Alessandro.
+     * Il feed è facoltativo: se il profilo non ha un URL si usa il lessico
+     * incluso nell'app. Nessun feed personale è incorporato.
      */
     fun getFeedUrl(): String {
         val profilo = profiloAttivo()
@@ -311,8 +322,23 @@ class ProfileManager(
 
     fun nomeProfiloAttivo(): String = profiloAttivo()?.config?.nomeVisualizzato ?: ""
 
-    /** Ordine dei preset, esposto per l'UI. */
-    fun ordinePreset(): List<String> = ProfiliPreset.ID_PRESET
+    /** Contesto personale del profilo attivo (professione, obiettivi, interessi). */
+    fun contestoUtente(): String = profiloAttivo()?.config?.contestoUtente.orEmpty()
+
+    /** Ordine dei profili, esposto per l'UI. */
+    fun ordinePreset(): List<String> = profiliDisponibili().map { it.id }
+
+    /** Aggiorna il contesto personale usato dall'AI per il profilo attivo. */
+    suspend fun aggiornaContestoUtente(contesto: String) {
+        val repo = _repository.value
+        val id = repo.profiloAttivoId ?: return
+        val profilo = repo.profili[id] ?: return
+        val aggiornato = profilo.copy(
+            config = profilo.config.copy(contestoUtente = contesto.trim())
+        )
+        _repository.value = repo.copy(profili = repo.profili + (id to aggiornato))
+        saveToDataStore()
+    }
 
     /** Aggiorna il feed URL del profilo attivo. */
     suspend fun aggiornaFeedUrl(nuovoUrl: String) {
@@ -335,12 +361,13 @@ class ProfileManager(
     }
 
     /**
-     * Canale ntfy su cui pubblicare le parole nuove.
-     * Solo per i profili con le parole personalizzate abilitate (Emma e
-     * Alessandro): gli altri non hanno un vocabolario su GitHub da aggiornare.
+     * Canale di pubblicazione delle parole nuove.
+     *
+     * Le parole restano locali: nessun canale ntfy condiviso è più incorporato.
+     * La pubblicazione su un servizio esterno richiede una configurazione
+     * esplicita dell'utente (funzione non attiva di default).
      */
-    fun topicPubblicazione(): String =
-        if (isCustomWordsEnabled()) ProfiliPreset.NTFY_TOPIC_EMMA else ""
+    fun topicPubblicazione(): String = ""
 
     /** Flusso della palette colore scelta per il profilo attivo. */
     val paletteFlow: StateFlow<String> = repositoryFlow

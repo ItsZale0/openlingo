@@ -23,8 +23,9 @@ import org.robolectric.annotation.Config
  * Test d'integrazione del [ProfileManager] con un Context Android reale
  * (Robolectric) e il vero DataStore su disco temporaneo.
  *
- * Riproduce il bug segnalato: "esce la selezione profilo ma non posso
- * selezionare nulla" — cioè la lista profili restava vuota.
+ * Verifica il comportamento attuale: al primo avvio il repository e' VUOTO
+ * (nessun profilo predefinito), l'utente crea il proprio profilo in onboarding,
+ * e i dati creati non vengono persi.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [33])
@@ -46,12 +47,13 @@ class ProfileManagerIntegrationTest {
     }
 
     @Test
-    fun `dopo inizializza la lista profili non e' vuota`() = runBlocking {
+    fun `dopo inizializza la lista profili e' vuota`() = runBlocking {
         val manager = nuovoManager()
         manager.inizializza()
 
-        val profili = manager.profiliDisponibili()
-        assertEquals("La selezione deve mostrare 2 profili", 2, profili.size)
+        assertTrue(manager.prontoFlow.firstValue())
+        assertTrue(manager.repositoryFlow.firstValue().profili.isEmpty())
+        assertEquals(0, manager.profiliDisponibili().size)
     }
 
     @Test
@@ -59,7 +61,7 @@ class ProfileManagerIntegrationTest {
         val manager = nuovoManager()
         manager.inizializza()
 
-        // Requisito: si sceglie il profilo PRIMA di entrare
+        // Requisito: la selezione avviene prima di entrare
         assertNull(manager.profiloAttivoId())
         assertNull(manager.profiloAttivo())
     }
@@ -70,17 +72,37 @@ class ProfileManagerIntegrationTest {
         manager.inizializza()
 
         assertTrue(manager.prontoFlow.firstValue())
-        assertEquals(2, manager.repositoryFlow.firstValue().profili.size)
+        assertEquals(0, manager.repositoryFlow.firstValue().profili.size)
     }
 
     @Test
     fun `inizializzazioni concorrenti non svuotano la lista`() = runBlocking {
-        // Il bug originale: lettura e creazione preset in parallelo
+        // Il bug originale: lettura e creazione preset in parallelo si
+        // sovrascrivevano, lasciando la lista profili vuota.
         val manager = nuovoManager()
         val esiti = (1..8).map { async(Dispatchers.IO) { manager.inizializza() } }.awaitAll()
 
         assertEquals(8, esiti.size)
-        assertEquals(2, manager.profiliDisponibili().size)
+        assertTrue(manager.prontoFlow.firstValue())
+        assertTrue(manager.repositoryFlow.firstValue().profili.isEmpty())
+    }
+
+    @Test
+    fun `creaProfilo crea e attiva un profilo con i valori di default`() = runBlocking {
+        val manager = nuovoManager()
+        manager.inizializza()
+
+        val id = manager.creaProfilo("Test Custom")
+
+        val profili = manager.profiliDisponibili()
+        assertEquals(1, profili.size)
+        assertEquals(id, manager.profiloAttivoId())
+        val profilo = profili[0]
+        assertEquals("Test Custom", profilo.config.nomeVisualizzato)
+        assertTrue(profilo.config.enableCustomWords)
+        assertFalse(profilo.config.enableGoogleSheets)
+        assertEquals("", manager.getFeedUrl())
+        assertTrue(profilo.config.tutorApiKey.isEmpty())
     }
 
     @Test
@@ -88,46 +110,49 @@ class ProfileManagerIntegrationTest {
         val manager = nuovoManager()
         manager.inizializza()
 
-        manager.selezionaProfilo(TipoProfilo.EMMA.id)
-        assertEquals(TipoProfilo.EMMA.id, manager.profiloAttivoId())
-        assertEquals("Emma", manager.nomeProfiloAttivo())
-        assertTrue(manager.isCustomWordsEnabled())
+        val mario = manager.creaProfilo("Mario")
+        val luigi = manager.creaProfilo("Luigi")
+
+        manager.selezionaProfilo(luigi)
+        assertEquals(luigi, manager.profiloAttivoId())
+        assertEquals("Luigi", manager.nomeProfiloAttivo())
 
         // Un nuovo manager sullo stesso DataStore deve ritrovare la scelta
         val manager2 = nuovoManager()
         manager2.inizializza()
-        assertEquals(TipoProfilo.EMMA.id, manager2.profiloAttivoId())
+        assertEquals(luigi, manager2.profiloAttivoId())
     }
 
     @Test
     fun `uscire dal profilo riporta alla selezione senza perdere i dati`() = runBlocking {
         val manager = nuovoManager()
         manager.inizializza()
-        manager.selezionaProfilo(TipoProfilo.EMMA.id)
-        manager.aggiornaStatoAttivo(
-            manager.statoAttivo().copy(etag = "MIO-ETAG")
-        )
+
+        val id = manager.creaProfilo("Mario")
+        manager.selezionaProfilo(id)
+        manager.aggiornaStatoAttivo(manager.statoAttivo().copy(etag = "MIO-ETAG"), immediato = true)
 
         manager.esciDalProfilo()
         assertNull(manager.profiloAttivoId())
         // I profili restano disponibili per una nuova scelta
-        assertEquals(2, manager.profiliDisponibili().size)
+        assertEquals(1, manager.profiliDisponibili().size)
 
         // Rientrando, i dati sono ancora li'
-        manager.selezionaProfilo(TipoProfilo.EMMA.id)
+        manager.selezionaProfilo(id)
         assertEquals("MIO-ETAG", manager.statoAttivo().etag)
     }
 
     @Test
-    fun `il profilo standard abilita le parole personalizzate ma non i fogli`() = runBlocking {
+    fun `il profilo creato abilita le parole personalizzate ma non i fogli`() = runBlocking {
         val manager = nuovoManager()
         manager.inizializza()
-        manager.selezionaProfilo(TipoProfilo.ALESSANDRO.id)
 
-        // Da 1.43.3 anche Alessandro può aggiungere parole al ripasso.
+        manager.creaProfilo("Mario")
+
+        // Da 1.43.3 anche i profili personalizzati possono aggiungere parole al ripasso.
         assertTrue(manager.isCustomWordsEnabled())
         assertFalse(manager.isGoogleSheetsEnabled())
-        assertNotNull(manager.getFeedUrl())
+        assertEquals("", manager.getFeedUrl())
     }
 
     @Test
@@ -135,63 +160,29 @@ class ProfileManagerIntegrationTest {
         val manager = nuovoManager()
         manager.inizializza()
 
-        manager.selezionaProfilo(TipoProfilo.ALESSANDRO.id)
-        manager.aggiornaStatoAttivo(manager.statoAttivo().copy(etag = "SOLO-ALESSANDRO"))
+        val mario = manager.creaProfilo("Mario")
+        manager.selezionaProfilo(mario)
+        manager.aggiornaStatoAttivo(manager.statoAttivo().copy(etag = "SOLO-MARIO"), immediato = true)
 
-        manager.selezionaProfilo(TipoProfilo.EMMA.id)
+        manager.esciDalProfilo()
+        val luigi = manager.creaProfilo("Luigi")
+        manager.selezionaProfilo(luigi)
         assertTrue(
-            "Emma non deve vedere i dati di Alessandro",
+            "Luigi non deve vedere i dati di Mario",
             manager.statoAttivo().etag.isEmpty()
         )
     }
 
     @Test
-    fun `un DataStore con repo vuoto viene riparato con i preset`() = runBlocking {
+    fun `un DataStore con repo vuoto resta vuoto`() = runBlocking {
         val ctx = ApplicationProvider.getApplicationContext<android.content.Context>()
-        // Simula lo stato lasciato dalla versione buggata: repo senza profili
+        // Simula lo stato di un primo avvio pulito: nessun profilo salvato
         ctx.scriviProfiliJson("""{"profili":{},"profiloAttivoId":null}""")
 
         val manager = nuovoManager()
         manager.inizializza()
 
-        assertEquals(2, manager.profiliDisponibili().size)
-    }
-
-    @Test
-    fun `il profilo attivo ha la chiave OpenRouter di default`() = runBlocking {
-        val manager = nuovoManager()
-        manager.inizializza()
-        manager.selezionaProfilo(TipoProfilo.ALESSANDRO.id)
-
-        val profilo = manager.profiloAttivo()
-        assertNotNull(profilo)
-        assertTrue(
-            "Il profilo attivo deve avere la chiave API di default",
-            profilo!!.config.tutorApiKey.isNotBlank()
-        )
-        assertEquals(
-            ProfiliPreset.DEFAULT_TUTOR_API_KEY,
-            profilo.config.tutorApiKey
-        )
-    }
-
-    @Test
-    fun `creaProfilo imposta la chiave OpenRouter di default`() = runBlocking {
-        val manager = nuovoManager()
-        manager.inizializza()
-        manager.creaProfilo("Test Custom")
-
-        // Trova il profilo creato nella lista dei profili disponibili
-        val profilo = manager.profiliDisponibili().find { it.config.nomeVisualizzato == "Test Custom" }
-        assertNotNull("Il profilo creato deve essere nella lista", profilo)
-        assertTrue(
-            "Il profilo personalizzato deve avere la chiave API di default",
-            profilo!!.config.tutorApiKey.isNotBlank()
-        )
-        assertEquals(
-            ProfiliPreset.DEFAULT_TUTOR_API_KEY,
-            profilo.config.tutorApiKey
-        )
+        assertEquals(0, manager.profiliDisponibili().size)
     }
 
     @Test
@@ -201,17 +192,18 @@ class ProfileManagerIntegrationTest {
         // repository VUOTO di memoria sul DataStore, cancellando i dati reali.
         val manager = nuovoManager()
         manager.inizializza()
-        manager.selezionaProfilo(TipoProfilo.EMMA.id)
+        val id = manager.creaProfilo("Mario")
+        manager.selezionaProfilo(id)
         manager.aggiornaStatoAttivo(manager.statoAttivo().copy(etag = "DATI-VETRI"), immediato = true)
         manager.flush() // persiste subito: il DataStore ora contiene "DATI-VETRI"
 
-        // Nuovo processo: il flush parte PRIMA del caricamento (es. onStop)
+        // Nuovo manager che NON inizializza subito: simula onStop
         val manager2 = nuovoManager()
         manager2.flush() // senza guardia sovrascriverebbe con il repo vuoto
 
         val manager3 = nuovoManager()
         manager3.inizializza()
-        assertEquals(TipoProfilo.EMMA.id, manager3.profiloAttivoId())
+        assertEquals(id, manager3.profiloAttivoId())
         assertEquals("I dati salvati devono sopravvivere", "DATI-VETRI", manager3.statoAttivo().etag)
     }
 
@@ -219,12 +211,12 @@ class ProfileManagerIntegrationTest {
     fun `il writer coalescente non cancella i dati durante il caricamento`() = runBlocking {
         // Il bug di produzione: a ~400 ms dall'avvio la coroutine del writer
         // emetteva il valore iniziale (0) e scriveva _repository.value, che
-        // prima di inizializza() e' il repository VUOTO: ogni avvio con
-        // dati grossi (>400 ms di lettura) ripartiva da zero.
-        // Dati "grandi": mettiamo una parola sul profilo Emma nel DataStore
+        // prima di inizializza() e' il repository VUOTO: ogni avvio con dati
+        // grossi (>400 ms di lettura) ripartiva da zero.
         val manager0 = nuovoManager()
         manager0.inizializza()
-        manager0.selezionaProfilo(TipoProfilo.EMMA.id)
+        val id0 = manager0.creaProfilo("Mario")
+        manager0.selezionaProfilo(id0)
         manager0.aggiornaStatoAttivo(manager0.statoAttivo().copy(etag = "LUNGA-LETTURA"), immediato = true)
         manager0.flush()
 

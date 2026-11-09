@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Backup di sistema disattivato: i dati contengono progressi, cronologia e
+    chiavi API dei profili. L'esportazione avviene solo su richiesta esplicita
+    dell'utente dalla schermata Backup.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" path="." />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root" path="." />
+    </device-transfer>
+</data-extraction-rules>

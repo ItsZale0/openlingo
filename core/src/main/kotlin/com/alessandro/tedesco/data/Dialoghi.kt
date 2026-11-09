@@ -140,16 +140,16 @@ object Dialoghi {
             traduzione = "Due partecipanti al corso di tedesco si conoscono presentandosi.",
             battute = listOf(
                 BattutaDialogo("A", "Hallo! Sind Sie auch hier im Deutschkurs?", "Ciao! È anche lei qui nel corso di tedesco?"),
-                BattutaDialogo("B", "Ja, ich bin hier neu. Ich heiße Emma. Und du?", "Sì, sono nuovo qui. Mi chiamo Emma. E tu?"),
-                BattutaDialogo("A", "Ich bin Alessandro, sehr schön. Woher kommst du?", "Sono Alessandro, molto piacere. Da dove vieni?"),
+                BattutaDialogo("B", "Ja, ich bin hier neu. Ich heiße Sophie. Und du?", "Sì, sono nuovo qui. Mi chiamo Sophie. E tu?"),
+                BattutaDialogo("A", "Ich bin Thomas, sehr schön. Woher kommst du?", "Sono Thomas, molto piacere. Da dove vieni?"),
                 BattutaDialogo("B", "Ich komme aus Brixen. Und du?", "Vengo da Bressanone. E tu?"),
                 BattutaDialogo("A", "Auch aus Brixen! Warum lernst du Deutsch?", "Anche io da Bressanone! Perché studi tedesco?"),
                 BattutaDialogo("B", "Für die Arbeit und die Prüfung. Und du?", "Per il lavoro e per l'esame. E tu?"),
                 BattutaDialogo("A", "Für meine Arbeit im Krankenhaus. Der Kurs ist jeden Dienstag.", "Per il mio lavoro in ospedale. Il corso è ogni martedì.")
             ),
             domande = listOf(
-                DomandaDialogo("Da dove viene Emma?", listOf("Da Bolzano", "Da Bressanone", "Da Merano", "Da Trento"), 1),
-                DomandaDialogo("Perché studia Alessandro?", listOf("Per esame", "Per il lavoro all'ospedale", "Per hobby", "Per un trasloco"), 1),
+                DomandaDialogo("Da dove viene Sophie?", listOf("Da Bolzano", "Da Bressanone", "Da Merano", "Da Trento"), 1),
+                DomandaDialogo("Perché studia Thomas?", listOf("Per esame", "Per il lavoro all'ospedale", "Per hobby", "Per un trasloco"), 1),
                 DomandaDialogo("Quando è il corso?", listOf("Lunedì", "Mercoledì", "Martedì", "Giovedì"), 2)
             )
         ),
@@ -239,7 +239,7 @@ object Dialoghi {
             livello = "B1",
             traduzione = "Un nuovo collega viene presentato in un ambulatorio di fisioterapia.",
             battute = listOf(
-                BattutaDialogo("A", "Frau Rossi, das ist Alessandro, unser neuer Kollege.", "Signora Rossi, questo è Alessandro, il nostro nuovo collega."),
+                BattutaDialogo("A", "Frau Rossi, das ist Thomas, unser neuer Kollege.", "Signora Rossi, questo è Thomas, il nostro nuovo collega."),
                 BattutaDialogo("B", "Schön, dich kennenzulernen! Wo hast du vorher gearbeitet?", "Piacere di conoscerti! Dove hai lavorato prima?"),
                 BattutaDialogo("C", "In einem Rehabilitationszentrum in Bozen. Zwei Jahre lang.", "In un centro di riabilitazione a Bolzano. Per due anni."),
                 BattutaDialogo("B", "Und welche Bereiche kennst du gut?", "E quali settori conosci bene?"),
@@ -249,9 +249,9 @@ object Dialoghi {
                 BattutaDialogo("C", "Kein Problem. Wo finde ich die Unterlagen?", "Nessun problema. Dove trovo i documenti?")
             ),
             domande = listOf(
-                DomandaDialogo("Dove ha lavorato prima Alessandro?", listOf("In un ospedale a Merano", "In un centro di riabilitazione a Bolzano", "In una palestra", "In un ambulatorio lombardo"), 1),
+                DomandaDialogo("Dove ha lavorato prima Thomas?", listOf("In un ospedale a Merano", "In un centro di riabilitazione a Bolzano", "In una palestra", "In un ambulatorio lombardo"), 1),
                 DomandaDialogo("Quali pazienti sono più frequenti?", listOf("Con mal di schiena", "Con problemi cardiaci", "Bambini", "Post-operatori del ginocchio"), 0),
-                DomandaDialogo("Quando arriva la prima paziente per Alessandro?", listOf("Giovedì alle 9", "Lunedì alle 9", "Mercoledì alle 11", "Sabato alle 8"), 1)
+                DomandaDialogo("Quando arriva la prima paziente per Thomas?", listOf("Giovedì alle 9", "Lunedì alle 9", "Mercoledì alle 11", "Sabato alle 8"), 1)
             )
         ),
         DialogoAscolto(

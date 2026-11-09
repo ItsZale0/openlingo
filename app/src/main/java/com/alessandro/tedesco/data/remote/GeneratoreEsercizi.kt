@@ -110,6 +110,7 @@ class GeneratoreEsercizi {
         livello: String,
         quanti: Int = 5,
         contestoMedico: Boolean = false,
+        contestoUtente: String = "",
         evita: List<String> = emptyList(),
         modello: String? = null,
         tema: String? = null
@@ -117,7 +118,9 @@ class GeneratoreEsercizi {
         // Free mode (no API key): uses Gemini endpoint automatically
         if (quanti <= 0) return@withContext emptyList()
 
-        val systemPrompt = costruisciPrompt(tipo, livello, quanti, contestoMedico, evita, tema)
+        val systemPrompt = costruisciPrompt(
+            tipo, livello, quanti, contestoMedico, contestoUtente, evita, tema
+        )
         val messaggi = listOf(
             ChatMessageCompat("system", systemPrompt),
             ChatMessageCompat("user", "Genera gli esercizi in JSON.")
@@ -212,13 +215,28 @@ class GeneratoreEsercizi {
         livello: String,
         quanti: Int,
         contestoMedico: Boolean,
+        contestoUtente: String = "",
         evita: List<String>,
         tema: String? = null
     ): String {
-        val contesto = if (contestoMedico) {
-            "\n- Contesto professionale: lo studente è un fisioterapista che lavorerà a Bolzano. " +
-                "Dove ha senso, usa vocabolario medico/ospedaliero (Krankenhaus, Schmerzen, Behandlung, Patient…)."
-        } else ""
+        val contesto = buildString {
+            if (contestoMedico) {
+                append(
+                    "\n- Contesto professionale: lo studente lavora in ambito sanitario. " +
+                        "Dove ha senso, usa vocabolario medico/ospedaliero " +
+                        "(Krankenhaus, Schmerzen, Behandlung, Patient…)."
+                )
+            }
+            val personale = contestoUtente.trim()
+            if (personale.isNotEmpty()) {
+                append(
+                    "\n- Contesto dichiarato dallo studente (professione, interessi, obiettivi): " +
+                        "\"${personale.take(400)}\". " +
+                        "Adatta esempi, situazioni e vocabolario a questo contesto, " +
+                        "senza tradire il livello $livello."
+                )
+            }
+        }
 
         val istruzioniTipo = when (tipo) {
             TipoEsercizio.ASCOLTO -> """
@@ -412,7 +430,7 @@ class GeneratoreEsercizi {
 
         if (!isFreeMode) {
             builder.header("HTTP-Referer", "https://github.com/ItsZale0/tedesco-app")
-            builder.header("X-Title", "Tedesco App")
+            builder.header("X-Title", "Deutsch")
         }
 
         val request = builder.post(body.toRequestBody("application/json".toMediaType())).build()

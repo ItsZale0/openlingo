@@ -47,10 +47,10 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Dmg)
-            packageName = "Tedesco"
+            packageName = "Deutsch"
             packageVersion = appVersionName
-            description = "Tedesco - corso di tedesco A0-B2 con ripasso spaziato"
-            vendor = "Alessandro"
+            description = "Deutsch - corso di tedesco A0-B2 con ripasso spaziato"
+            vendor = "Deutsch"
             modules("java.net.http", "jdk.crypto.ec")
         }
     }

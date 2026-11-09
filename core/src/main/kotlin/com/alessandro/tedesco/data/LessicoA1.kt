@@ -594,7 +594,7 @@ object LessicoA1 {
         gleich|subito|Ich komme gleich.|Tempo
         lange|a lungo|Ich warte lange.|Tempo
         kurz|breve|Die Pause ist kurz.|Aggettivi
-        heißen|chiamarsi|Ich heiße Alessandro.|Verbi
+        heißen|chiamarsi|Ich heiße Thomas.|Verbi
         buchstabieren|compitare|Buchstabieren Sie Ihren Namen.|Verbi
         probieren|provare|Probieren Sie den Kuchen.|Verbi
         schmecken|avere sapore|Die Suppe schmeckt gut.|Verbi

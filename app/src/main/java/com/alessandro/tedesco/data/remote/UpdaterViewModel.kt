@@ -161,8 +161,8 @@ class UpdaterViewModel(application: Application) : AndroidViewModel(application)
 
     fun apkGiaScaricato(version: VersionInfo): Boolean {
         val dir = File(getApplication<Application>().cacheDir, "updates")
-        val apk = File(dir, "Tedesco-v${version.versionName}.apk")
-        return apk.exists() && VerificaApk.isApkValido(apk)
+        val apk = File(dir, "Deutsch-v${version.versionName}.apk")
+        return apk.exists() && VerificaApk.isApkValido(apk, version.apkSha256)
     }
 
     fun downloadUpdate(version: VersionInfo) {
@@ -171,7 +171,7 @@ class UpdaterViewModel(application: Application) : AndroidViewModel(application)
         // Se l'APK è già scaricato e valido, salta il download
         if (apkGiaScaricato(version)) {
             val dir = File(getApplication<Application>().cacheDir, "updates")
-            val apk = File(dir, "Tedesco-v${version.versionName}.apk")
+            val apk = File(dir, "Deutsch-v${version.versionName}.apk")
             android.util.Log.d("Updater", "APK già scaricato: ${apk.length()} byte")
             _state.value = UpdateState.ReadyToInstall(apk)
             return
@@ -193,17 +193,17 @@ class UpdaterViewModel(application: Application) : AndroidViewModel(application)
                         }
                     }
 
-                    val apk = File(dir, "Tedesco-v${version.versionName}.apk")
+                    val apk = File(dir, "Deutsch-v${version.versionName}.apk")
 
                     // Prova l'URL dichiarato, poi una variante con nome file minuscolo:
                     // l'asset su GitHub e' case-sensitive e il task può divergere.
-                    val urlAlternative = version.apkUrl.replace("Tedesco-v", "tedesco-v")
+                    val urlAlternative = version.apkUrl.replace("Deutsch-v", "deutsch-v")
                     val fonti = listOf(version.apkUrl, urlAlternative).distinct()
-                    val riuscita = fonti.any { url -> scaricaApk(url, apk) }
+                    val riuscita = fonti.any { url -> scaricaApk(url, apk, version.apkSha256) }
                     if (!riuscita) throw IOException("Download fallito da tutte le fonti")
 
-                    // Verifica integrità APK
-                    if (!VerificaApk.isApkValido(apk)) {
+                    // Verifica integrità APK (struttura + SHA-256 del manifest)
+                    if (!VerificaApk.isApkValido(apk, version.apkSha256)) {
                         apk.delete()
                         throw IOException("APK scaricato non valido o corrotto")
                     }
@@ -224,7 +224,7 @@ class UpdaterViewModel(application: Application) : AndroidViewModel(application)
      * Scarica l'APK in `apk` dall'URL dato. Ritorna true se riuscito (e l'APK e'
      * valido), false in caso di errore di rete — cosi' si puo' provare un'altra fonte.
      */
-    private suspend fun scaricaApk(url: String, apk: File): Boolean = withContext(Dispatchers.IO) {
+    private suspend fun scaricaApk(url: String, apk: File, shaAtteso: String = ""): Boolean = withContext(Dispatchers.IO) {
         runCatching {
             val request = Request.Builder().url(url).build()
             client.newCall(request).execute().use { response ->
@@ -246,7 +246,7 @@ class UpdaterViewModel(application: Application) : AndroidViewModel(application)
                     }
                 }
             }
-            VerificaApk.isApkValido(apk)
+            VerificaApk.isApkValido(apk, shaAtteso)
         }.getOrDefault(false)
     }
 

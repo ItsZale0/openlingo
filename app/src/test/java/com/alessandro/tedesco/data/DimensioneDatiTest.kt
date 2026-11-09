@@ -3,12 +3,13 @@ package com.alessandro.tedesco.data
 import com.alessandro.tedesco.data.local.ConversazioneEntry
 import com.alessandro.tedesco.data.local.EsercizioGenEntity
 import com.alessandro.tedesco.data.local.LivelloCEFR
+import com.alessandro.tedesco.data.local.LivelloIniziale
 import com.alessandro.tedesco.data.local.ProfiloStato
 import com.alessandro.tedesco.data.local.ProgressoUtente
-import com.alessandro.tedesco.data.local.ProfiloConfig
 import com.alessandro.tedesco.data.local.ProfiloUtente
 import com.alessandro.tedesco.data.local.ProfiliRepository
 import com.alessandro.tedesco.data.local.RipassoLogEntity
+import com.alessandro.tedesco.data.local.TipoProfilo
 import com.alessandro.tedesco.data.local.TestGrammatica
 import com.alessandro.tedesco.data.local.WordEntity
 import com.alessandro.tedesco.data.remote.VoceGlossario
@@ -48,6 +49,15 @@ class DimensioneDatiTest {
         glossario = listOf(VoceGlossario("das Wort", "la parola"), VoceGlossario("der Satz", "la frase"))
     )
 
+    private fun profiloBase(): ProfiloUtente = ProfiliPreset.nuovo(
+        id = TipoProfilo.ALESSANDRO.id,
+        nome = "Sanitario",
+        livello = LivelloIniziale.A0,
+        mostraContestoMedico = true,
+        tipo = TipoProfilo.ALESSANDRO,
+        now = 1_700_000_000_000L
+    )
+
     private fun repoCon(parole: Int, log: Int, esercizi: Int, conversazioni: Int): ProfiliRepository {
         val stato = ProfiloStato(
             parole = (1..parole).map { parola(it) },
@@ -77,11 +87,9 @@ class DimensioneDatiTest {
             )
         )
         // uso un profilo reale del preset: cosi' la config e' quella vera
-        val base = ProfiliPreset.crea(now = 1_700_000_000_000L)
-            .getValue(com.alessandro.tedesco.data.local.TipoProfilo.ALESSANDRO.id)
         return ProfiliRepository(
-            profili = mapOf("alessandro" to base.copy(stato = stato)),
-            profiloAttivoId = "alessandro"
+            profili = mapOf(TipoProfilo.ALESSANDRO.id to profiloBase().copy(stato = stato)),
+            profiloAttivoId = TipoProfilo.ALESSANDRO.id
         )
     }
 

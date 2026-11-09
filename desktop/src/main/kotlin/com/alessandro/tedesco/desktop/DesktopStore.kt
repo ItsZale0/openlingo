@@ -9,6 +9,7 @@ import com.alessandro.tedesco.data.CalcoloCompetenze
 import com.alessandro.tedesco.data.CalcoloPercorsoGiornaliero
 import com.alessandro.tedesco.data.CalcoloProgresso
 import com.alessandro.tedesco.data.CalcoloStatistiche
+import com.alessandro.tedesco.data.EsportaDati
 import com.alessandro.tedesco.data.FeedMerge
 import com.alessandro.tedesco.data.GrammaticaSyllabus
 import com.alessandro.tedesco.data.LessicoLivelli
@@ -102,6 +103,32 @@ class DesktopStore(
 
     val percorsoDati: String get() = cartella.absolutePath
 
+    /**
+     * Esporta TUTTI i dati in un unico file JSON leggibile:
+     * profili (parole, ripassi, lezioni, grammatica…), tema e metadati.
+     *
+     * Il token GitHub non viene incluso: è una credenziale e va reinserita a
+     * mano. Il file viene scritto nella cartella Download (se esiste) e il
+     * percorso viene restituito per mostrarlo all'utente.
+     */
+    fun esportaDatiCompleti(): File {
+        val testo = EsportaDati.serializza(
+            repository = repo,
+            versioneApp = Versione.conBuild,
+            now = System.currentTimeMillis(),
+            temaColore = preferenze.temaColore
+        )
+        val download = File(System.getProperty("user.home"), "Downloads")
+            .takeIf { it.isDirectory }
+            ?: cartella
+        download.mkdirs()
+        val marca = java.time.LocalDateTime.now()
+            .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmm"))
+        val destinazione = File(download, "tedesco-dati-$marca.json")
+        destinazione.writeText(testo)
+        return destinazione
+    }
+
     // ---------------------------------------------------------------- profilo
 
     val profilo: ProfiloUtente?
@@ -132,6 +159,48 @@ class DesktopStore(
         val pulito = nome.trim()
         if (pulito.isEmpty()) return
         aggiornaProfilo { it.copy(config = it.config.copy(nomeVisualizzato = pulito)) }
+    }
+
+    /**
+     * Crea e attiva un nuovo profilo.
+     *
+     * Come sull'app Android: nessun profilo viene creato automaticamente, e il
+     * lessico di partenza dipende dal livello scelto.
+     *
+     * @param contesto professione, interessi e obiettivi per l'AI
+     * @param mostraContestoMedico true = lessico sanitario
+     */
+    fun creaProfilo(
+        nome: String,
+        livello: LivelloIniziale = LivelloIniziale.A0,
+        contesto: String = "",
+        mostraContestoMedico: Boolean = false
+    ): String {
+        val id = "profilo_${System.currentTimeMillis()}"
+        val nuovo = ProfiliPreset.nuovo(
+            id = id,
+            nome = nome.trim().ifBlank { "Profilo" },
+            livello = livello,
+            contesto = contesto,
+            mostraContestoMedico = mostraContestoMedico
+        )
+        val conParole = nuovo.copy(
+            stato = nuovo.stato.copy(parole = paroleIniziali(nuovo))
+        )
+        repo = repo.copy(
+            profili = repo.profili + (id to conParole),
+            profiloAttivoId = id
+        )
+        preferenze = preferenze.copy(profiloAttivoId = id)
+        salva()
+        return id
+    }
+
+    /** Aggiorna il contesto personale usato dall'AI per il profilo attivo. */
+    fun impostaContestoUtente(contesto: String) {
+        aggiornaProfilo {
+            it.copy(config = it.config.copy(contestoUtente = contesto.trim()))
+        }
     }
 
     fun impostaLivelloEObiettivo(iniziale: LivelloIniziale, obiettivo: LivelloCEFR) {
@@ -653,7 +722,7 @@ class DesktopStore(
                 versioneApp = Versione.nome,
                 now = System.currentTimeMillis()
             )
-            client.carica(testo, "Backup Tedesco (desktop)")
+            client.carica(testo, "Backup Deutsch (desktop)")
             preferenze = preferenze.copy(
                 ultimoBackup = System.currentTimeMillis(),
                 ultimaSincronizzazioneCloud = System.currentTimeMillis(),
@@ -805,11 +874,14 @@ class DesktopStore(
             }
         }.getOrNull()
 
-        val base = letto?.let { ProfiliPreset.riconcilia(it) } ?: ProfiliPreset.riconcilia(
-            ProfiliRepository(profili = ProfiliPreset.crea())
-        )
+        // Nessun profilo creato d'ufficio: al primo avvio l'utente compila il
+        // modulo di benvenuto. I profili già esistenti restano intatti.
+        val base = letto?.let { ProfiliPreset.riconcilia(it) } ?: ProfiliRepository()
         val conAttivo = if (base.profiloAttivoId == null) {
-            base.copy(profiloAttivoId = preferenzeCaricate().profiloAttivoId ?: base.profili.keys.firstOrNull())
+            val salvato = preferenzeCaricate().profiloAttivoId
+            base.copy(
+                profiloAttivoId = salvato?.takeIf { it in base.profili }
+            )
         } else base
 
         // Primo avvio: lessico iniziale dalla Wortliste, cosi' il ripasso e le

@@ -4,6 +4,7 @@ import android.content.Context
 import com.alessandro.tedesco.TedescoApp
 import com.alessandro.tedesco.data.remote.BackupGitHubClient
 import com.alessandro.tedesco.sync.NotificheSettings
+import com.alessandro.tedesco.sync.TemaSettings
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -115,7 +116,7 @@ object BackupEsecutore {
                 return Esito.NessunCambiamento
             }
 
-            client.carica(json, "Backup automatico Tedesco App")
+            client.carica(json, "Backup automatico Deutsch")
             settings.salvaHash(hash)
             settings.registraBackup(System.currentTimeMillis())
             if (!forza) settings.registraAuto(System.currentTimeMillis())
@@ -128,5 +129,24 @@ object BackupEsecutore {
     private fun sha256(testo: String): String {
         val digest = MessageDigest.getInstance("SHA-256")
         return digest.digest(testo.toByteArray()).joinToString("") { "%02x".format(it) }
+    }
+
+    /**
+     * Costruisce il contenuto dell'esportazione COMPLETA (tutti i profili,
+     * notifiche, tema). Nessuna scrittura su disco: il chiamante decide dove
+     * salvare il testo (Storage Access Framework, condivisione, ecc.).
+     */
+    suspend fun esportaTutto(context: Context, versioneApp: String): String {
+        val app = context.applicationContext as TedescoApp
+        val repository = app.profileManagerInstance.repositoryFlow.first()
+        val notifiche = NotificheSettings(app).leggi()
+        val tema = TemaSettings(app).colore.first()
+        return EsportaDati.serializza(
+            repository = repository,
+            versioneApp = versioneApp,
+            now = System.currentTimeMillis(),
+            notifiche = notifiche,
+            temaColore = tema
+        )
     }
 }

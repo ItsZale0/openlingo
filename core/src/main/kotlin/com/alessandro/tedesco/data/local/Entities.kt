@@ -252,10 +252,17 @@ enum class TipoProfilo(
     val livelloIniziale: LivelloIniziale = LivelloIniziale.A0,
     val mostraContestoMedico: Boolean = false
 ) {
+    /**
+     * Profilo "professionalizzante": percorso con contesto sanitario.
+     *
+     * L'id resta "alessandro" per compatibilità con i dati e i backup già
+     * esistenti (l'enum è serializzato per nome). Il nome mostrato è neutro:
+     * chiunque lavora in ambito sanitario può usarlo.
+     */
     ALESSANDRO(
         id = "alessandro",
-        nome = "Alessandro",
-        descrizione = "Percorso A0→B2 per lavoro in sanità a Bressanone, con contesto medico",
+        nome = "Sanitario",
+        descrizione = "Percorso con contesto medico e sanitario",
         enableCustomWords = true,
         enableGoogleSheets = false,
         livelloIniziale = LivelloIniziale.A0,
@@ -264,19 +271,20 @@ enum class TipoProfilo(
     PERSONALIZZATO(
         id = "personalizzato",
         nome = "Personalizzato",
-        descrizione = "Profilo personalizzato creato dall'utente",
+        descrizione = "Profilo creato dall'utente, senza contesto predefinito",
         enableCustomWords = true,
         enableGoogleSheets = false,
         livelloIniziale = LivelloIniziale.A0,
         mostraContestoMedico = false
     ),
+    /** Profilo "standard" con parole personalizzate. Id storico mantenuto. */
     EMMA(
         id = "emma",
-        nome = "Emma",
-        descrizione = "Percorso B1→B2 con parole custom e Google Sheets, niente contesto medico",
+        nome = "Standard",
+        descrizione = "Percorso standard con parole personalizzate",
         enableCustomWords = true,
         enableGoogleSheets = true,
-        livelloIniziale = LivelloIniziale.B1,
+        livelloIniziale = LivelloIniziale.A0,
         mostraContestoMedico = false
     )
 }
@@ -304,6 +312,14 @@ data class ProfiloConfig(
     val stileDesign: String = "pixel",
     val livelloIniziale: LivelloIniziale = LivelloIniziale.A0,
     val mostraContestoMedico: Boolean = false,
+    /**
+     * Contesto personale scritto dall'utente: professione, interessi, obiettivi
+     * (es. "elettricista, vorrei parlare con i clienti del cantiere").
+     *
+     * Viene passato ai prompt AI (tutor, esercizi, lezioni) per personalizzare
+     * contenuti e vocabolario. Vuoto = nessuna personalizzazione.
+     */
+    val contestoUtente: String = "",
     /** Modalità Immersione: percorso didattico separato (input comprensibile, shadowing, ascolto passivo). */
     val didatticaImmersione: Boolean = false,
     /** Data (YYYY-MM-DD) in cui la missione giornaliera è stata completata. Vuoto = non completata oggi. */

@@ -287,23 +287,23 @@ fun getEserciziA0(profilo: ProfiloUtente?): List<EsercizioAscolto> {
         EsercizioAscolto(
             id = "a0_1",
             fraseTedesca = if (profilo?.config?.mostraContestoMedico == true)
-                "Ich heiße Alessandro."
+                "Ich heiße Stefan."
             else
-                "Ich heiße Emma.",
+                "Ich heiße Sophie.",
             traduzioneItaliana = if (profilo?.config?.mostraContestoMedico == true)
-                "Mi chiamo Alessandro."
+                "Mi chiamo Stefan."
             else
-                "Mi chiamo Emma.",
+                "Mi chiamo Sophie.",
             domanda = "Come si chiama il parlante?",
             opzioni = if (profilo?.config?.mostraContestoMedico == true)
-                listOf("Alessandro", "Marco", "Luca", "Paolo")
+                listOf("Stefan", "Marco", "Luca", "Paolo")
             else
-                listOf("Emma", "Anna", "Julia", "Sofia"),
+                listOf("Sophie", "Anna", "Julia", "Lea"),
             rispostaCorretta = 0,
             spiegazione = if (profilo?.config?.mostraContestoMedico == true)
-                "Il parlante dice 'Ich heiße Alessandro' (Mi chiamo Alessandro)"
+                "Il parlante dice 'Ich heiße Stefan' (Mi chiamo Stefan)"
             else
-                "Il parlante dice 'Ich heiße Emma' (Mi chiamo Emma)",
+                "Il parlante dice 'Ich heiße Sophie' (Mi chiamo Sophie)",
             livello = "A0"
         ),
         EsercizioAscolto(

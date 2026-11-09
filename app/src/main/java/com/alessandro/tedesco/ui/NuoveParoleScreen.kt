@@ -337,7 +337,7 @@ private fun AggiungiParolaDialog(
                 OutlinedTextField(
                     value = tedesco,
                     onValueChange = { tedesco = it },
-                    label = { Text("Tedesco *") },
+                    label = { Text("Deutsch *") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )

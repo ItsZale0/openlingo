@@ -115,8 +115,9 @@ class PianoProgressoSessioniRegressionTest {
     @Ignore("flaky: timestamp race su orizzonte piano — preesistente, non legato alle modifiche UI")
     fun `piano sopravvive a un ciclo completo di sync`() = runBlocking {
         val manager = nuovoManager()
-        manager.inizializza()
-        manager.selezionaProfilo(TipoProfilo.ALESSANDRO.id)
+        val idProfilo = manager.creaProfilo("Prova Regressione")
+        manager.selezionaProfilo(idProfilo)
+        manager.aggiornaFeedUrl("https://example.com/feed")
 
         val service = mockFeedService(feedDtoConPianoProgressoSessioni())
         val repo = WordRepository(
@@ -145,7 +146,9 @@ class PianoProgressoSessioniRegressionTest {
         // Primo ciclo: sync con piano
         val manager1 = nuovoManager()
         manager1.inizializza()
-        manager1.selezionaProfilo(TipoProfilo.ALESSANDRO.id)
+        val idProfilo1 = manager1.creaProfilo("Prova Regressione")
+        manager1.selezionaProfilo(idProfilo1)
+        manager1.aggiornaFeedUrl("https://example.com/feed")
 
         val service = mockFeedService(feedDtoConPianoProgressoSessioni())
         val repo1 = WordRepository(
@@ -160,7 +163,8 @@ class PianoProgressoSessioniRegressionTest {
         // Secondo ciclo: nuovo manager (simula riavvio dell'app)
         val manager2 = nuovoManager()
         manager2.inizializza()
-        manager2.selezionaProfilo(TipoProfilo.ALESSANDRO.id)
+        manager2.selezionaProfilo(idProfilo1)
+        manager2.aggiornaFeedUrl("https://example.com/feed")
 
         val stato = manager2.statoAttivo()
         assertNotNull("piano deve sopravvivere a un riavvio", stato.piano)
@@ -172,8 +176,9 @@ class PianoProgressoSessioniRegressionTest {
     @Test
     fun `piano con tappe e certificazioni multiple sopravvive al sync`() = runBlocking {
         val manager = nuovoManager()
-        manager.inizializza()
-        manager.selezionaProfilo(TipoProfilo.ALESSANDRO.id)
+        val idProfilo = manager.creaProfilo("Prova Regressione")
+        manager.selezionaProfilo(idProfilo)
+        manager.aggiornaFeedUrl("https://example.com/feed")
 
         val feed = feedDtoConPianoProgressoSessioni()
         val service = mockFeedService(feed)
@@ -207,8 +212,9 @@ class PianoProgressoSessioniRegressionTest {
     @Test
     fun `progressoFeed sopravvive a un ciclo completo di sync`() = runBlocking {
         val manager = nuovoManager()
-        manager.inizializza()
-        manager.selezionaProfilo(TipoProfilo.ALESSANDRO.id)
+        val idProfilo = manager.creaProfilo("Prova Regressione")
+        manager.selezionaProfilo(idProfilo)
+        manager.aggiornaFeedUrl("https://example.com/feed")
 
         val service = mockFeedService(feedDtoConPianoProgressoSessioni())
         val repo = WordRepository(
@@ -234,7 +240,9 @@ class PianoProgressoSessioniRegressionTest {
     fun `progressoFeed sopravvive a un riavvio dell app`() = runBlocking {
         val manager1 = nuovoManager()
         manager1.inizializza()
-        manager1.selezionaProfilo(TipoProfilo.ALESSANDRO.id)
+        val idProfilo1 = manager1.creaProfilo("Prova Regressione")
+        manager1.selezionaProfilo(idProfilo1)
+        manager1.aggiornaFeedUrl("https://example.com/feed")
 
         val service = mockFeedService(feedDtoConPianoProgressoSessioni())
         val repo1 = WordRepository(
@@ -248,7 +256,8 @@ class PianoProgressoSessioniRegressionTest {
 
         val manager2 = nuovoManager()
         manager2.inizializza()
-        manager2.selezionaProfilo(TipoProfilo.ALESSANDRO.id)
+        manager2.selezionaProfilo(idProfilo1)
+        manager2.aggiornaFeedUrl("https://example.com/feed")
 
         val stato = manager2.statoAttivo()
         assertNotNull("progressoFeed deve sopravvivere a un riavvio", stato.progressoFeed)
@@ -265,8 +274,9 @@ class PianoProgressoSessioniRegressionTest {
     @Test
     fun `sessioni sopravvivono a un ciclo completo di sync`() = runBlocking {
         val manager = nuovoManager()
-        manager.inizializza()
-        manager.selezionaProfilo(TipoProfilo.ALESSANDRO.id)
+        val idProfilo = manager.creaProfilo("Prova Regressione")
+        manager.selezionaProfilo(idProfilo)
+        manager.aggiornaFeedUrl("https://example.com/feed")
 
         val service = mockFeedService(feedDtoConPianoProgressoSessioni())
         val repo = WordRepository(
@@ -293,7 +303,9 @@ class PianoProgressoSessioniRegressionTest {
     fun `sessioni sopravvivono a un riavvio dell app`() = runBlocking {
         val manager1 = nuovoManager()
         manager1.inizializza()
-        manager1.selezionaProfilo(TipoProfilo.ALESSANDRO.id)
+        val idProfilo1 = manager1.creaProfilo("Prova Regressione")
+        manager1.selezionaProfilo(idProfilo1)
+        manager1.aggiornaFeedUrl("https://example.com/feed")
 
         val service = mockFeedService(feedDtoConPianoProgressoSessioni())
         val repo1 = WordRepository(
@@ -307,7 +319,8 @@ class PianoProgressoSessioniRegressionTest {
 
         val manager2 = nuovoManager()
         manager2.inizializza()
-        manager2.selezionaProfilo(TipoProfilo.ALESSANDRO.id)
+        manager2.selezionaProfilo(idProfilo1)
+        manager2.aggiornaFeedUrl("https://example.com/feed")
 
         val stato = manager2.statoAttivo()
         assertEquals(2, stato.sessioni.size)
@@ -324,8 +337,9 @@ class PianoProgressoSessioniRegressionTest {
     @Test
     fun `piano progressoFeed e sessioni sopravvivono insieme a un ciclo completo`() = runBlocking {
         val manager = nuovoManager()
-        manager.inizializza()
-        manager.selezionaProfilo(TipoProfilo.ALESSANDRO.id)
+        val idProfilo = manager.creaProfilo("Prova Regressione")
+        manager.selezionaProfilo(idProfilo)
+        manager.aggiornaFeedUrl("https://example.com/feed")
 
         val service = mockFeedService(feedDtoConPianoProgressoSessioni())
         val repo = WordRepository(
@@ -359,7 +373,9 @@ class PianoProgressoSessioniRegressionTest {
     fun `piano progressoFeed e sessioni sopravvivono insieme a un riavvio`() = runBlocking {
         val manager1 = nuovoManager()
         manager1.inizializza()
-        manager1.selezionaProfilo(TipoProfilo.ALESSANDRO.id)
+        val idProfilo1 = manager1.creaProfilo("Prova Regressione")
+        manager1.selezionaProfilo(idProfilo1)
+        manager1.aggiornaFeedUrl("https://example.com/feed")
 
         val service = mockFeedService(feedDtoConPianoProgressoSessioni())
         val repo1 = WordRepository(
@@ -373,7 +389,8 @@ class PianoProgressoSessioniRegressionTest {
 
         val manager2 = nuovoManager()
         manager2.inizializza()
-        manager2.selezionaProfilo(TipoProfilo.ALESSANDRO.id)
+        manager2.selezionaProfilo(idProfilo1)
+        manager2.aggiornaFeedUrl("https://example.com/feed")
 
         val stato = manager2.statoAttivo()
 
@@ -399,8 +416,9 @@ class PianoProgressoSessioniRegressionTest {
     fun `feed con piano null non perdere il piano esistente`() = runBlocking {
         // Primo sync con piano
         val manager = nuovoManager()
-        manager.inizializza()
-        manager.selezionaProfilo(TipoProfilo.ALESSANDRO.id)
+        val idProfilo = manager.creaProfilo("Prova Regressione")
+        manager.selezionaProfilo(idProfilo)
+        manager.aggiornaFeedUrl("https://example.com/feed")
 
         val service1 = mockFeedService(feedDtoConPianoProgressoSessioni())
         val repo1 = WordRepository(
@@ -444,8 +462,9 @@ class PianoProgressoSessioniRegressionTest {
     @Test
     fun `feed con sessioni vuote aggiorna la lista sessioni`() = runBlocking {
         val manager = nuovoManager()
-        manager.inizializza()
-        manager.selezionaProfilo(TipoProfilo.ALESSANDRO.id)
+        val idProfilo = manager.creaProfilo("Prova Regressione")
+        manager.selezionaProfilo(idProfilo)
+        manager.aggiornaFeedUrl("https://example.com/feed")
 
         // Primo sync con sessioni
         val service1 = mockFeedService(feedDtoConPianoProgressoSessioni())
@@ -487,8 +506,9 @@ class PianoProgressoSessioniRegressionTest {
     @Test
     fun `sync multipli consecutivi non perdono i campi`() = runBlocking {
         val manager = nuovoManager()
-        manager.inizializza()
-        manager.selezionaProfilo(TipoProfilo.ALESSANDRO.id)
+        val idProfilo = manager.creaProfilo("Prova Regressione")
+        manager.selezionaProfilo(idProfilo)
+        manager.aggiornaFeedUrl("https://example.com/feed")
 
         // Primo sync
         val service1 = mockFeedService(feedDtoConPianoProgressoSessioni(), etag = "etag-1")
@@ -536,9 +556,11 @@ class PianoProgressoSessioniRegressionTest {
     fun `cambio profilo non perde i campi del profilo precedente`() = runBlocking {
         val manager = nuovoManager()
         manager.inizializza()
+        val idMario = manager.creaProfilo("Mario")
+        manager.selezionaProfilo(idMario)
+        manager.aggiornaFeedUrl("https://example.com/feed")
 
-        // Sync con Alessandro
-        manager.selezionaProfilo(TipoProfilo.ALESSANDRO.id)
+        // Sync con Mario
         val service = mockFeedService(feedDtoConPianoProgressoSessioni())
         val repo = WordRepository(
             context = ApplicationProvider.getApplicationContext(),
@@ -549,11 +571,13 @@ class PianoProgressoSessioniRegressionTest {
         )
         repo.sync()
 
-        // Cambia a Emma
-        manager.selezionaProfilo(TipoProfilo.EMMA.id)
+        // Cambia a un secondo profilo
+        val idLuigi = manager.creaProfilo("Luigi")
+        manager.selezionaProfilo(idLuigi)
 
-        // Torna ad Alessandro
-        manager.selezionaProfilo(TipoProfilo.ALESSANDRO.id)
+        // Torna al primo profilo
+        manager.selezionaProfilo(idMario)
+        manager.aggiornaFeedUrl("https://example.com/feed")
 
         // I dati di Alessandro dovrebbero essere ancora li'
         val stato = manager.statoAttivo()

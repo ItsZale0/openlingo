@@ -44,9 +44,9 @@ fun getEserciziScrittura(profilo: ProfiloUtente?): List<EsercizioScrittura> {
             titolo = "Presentazione personale",
             istruzioni = "Scrivi 3-4 frasi su di te: come ti chiami, da dove vivi, cosa fai.",
             esempio = if (profilo?.config?.mostraContestoMedico == true)
-                "Ich heiße Alessandro. Ich wohne in Bozen. Ich bin Physiotherapeut. Ich lerne Deutsch."
+                "Ich heiße Thomas. Ich wohne in Bozen. Ich bin Physiotherapeut. Ich lerne Deutsch."
             else
-                "Ich heiße Emma. Ich wohne in Bozen. Ich bin Studentin. Ich lerne Deutsch.",
+                "Ich heiße Sophie. Ich wohne in Bozen. Ich bin Studentin. Ich lerne Deutsch.",
             suggerimenti = listOf("Nome", "Città", "Lavoro/Studi", "Hobby")
         ),
         EsercizioScrittura(

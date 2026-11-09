@@ -41,7 +41,7 @@ class BackupGitHubClient(
         .url(url)
         .header("Authorization", "Bearer $token")
         .header("Accept", "application/vnd.github+json")
-        .header("User-Agent", "TedescoApp-Backup")
+        .header("User-Agent", "DeutschApp-Backup")
 
     /** Scarica il backup; null se non esiste ancora (404). */
     suspend fun scarica(): String? = withContext(Dispatchers.IO) {
@@ -83,7 +83,7 @@ class BackupGitHubClient(
      * Carica (o aggiorna) il backup. Legge lo sha corrente: senza, GitHub rifiuta
      * la sovrascrittura con 409.
      */
-    suspend fun carica(contenutoJson: String, messaggio: String = "Backup Tedesco App"): String =
+    suspend fun carica(contenutoJson: String, messaggio: String = "Backup Deutsch"): String =
         withContext(Dispatchers.IO) {
             val sha = shaCorrente()
             val payload = buildJsonObject {
@@ -107,7 +107,7 @@ class BackupGitHubClient(
             .url("https://api.github.com/user")
             .header("Authorization", "Bearer $token")
             .header("Accept", "application/vnd.github+json")
-            .header("User-Agent", "TedescoApp-Backup")
+            .header("User-Agent", "DeutschApp-Backup")
             .get().build()
         try {
             client.newCall(r).execute().use { resp ->
@@ -127,7 +127,7 @@ class BackupGitHubClient(
                 .url("https://api.github.com/repos/$repo")
                 .header("Authorization", "Bearer $token")
                 .header("Accept", "application/vnd.github+json")
-                .header("User-Agent", "TedescoApp-Backup")
+                .header("User-Agent", "DeutschApp-Backup")
                 .get().build()
             client.newCall(r).execute().use { resp ->
                 when (resp.code) {

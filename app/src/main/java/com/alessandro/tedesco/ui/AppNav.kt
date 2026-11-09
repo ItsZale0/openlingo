@@ -76,7 +76,20 @@ fun AppNav(
 
     val nav = rememberNavController()
 
+    // Prima schermata: caricamento → benvenuto (nessun profilo) → scelta profilo
+    // → app. Nessun profilo viene creato automaticamente al primo avvio.
+    val pronto by vm.pronto.collectAsStateWithLifecycle(false)
+    val profili by vm.profiliDisponibili.collectAsStateWithLifecycle(emptyList())
+    val profiloAttivo by vm.profiloAttivo.collectAsStateWithLifecycle(null)
+
     Box(modifier) {
+        if (!pronto) {
+            CaricamentoIniziale()
+        } else if (profili.isEmpty()) {
+            BenvenutoScreen(vm = vm)
+        } else if (profiloAttivo == null) {
+            SceltaProfiloScreen(vm = vm)
+        } else {
         NavHost(
             navController = nav,
             startDestination = "studio",
@@ -233,5 +246,6 @@ fun AppNav(
 
         // Popup aggiornamenti: sovraimposto a tutto, non scorre con il contenuto
         UpdateOverlay(updater = updater)
+        }
     }
 }

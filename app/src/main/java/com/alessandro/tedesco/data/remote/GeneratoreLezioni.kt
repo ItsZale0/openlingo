@@ -70,11 +70,16 @@ class GeneratoreLezioni(
         numero: Int,
         livello: String,
         argomento: String,
-        paroleNote: List<String> = emptyList()
+        paroleNote: List<String> = emptyList(),
+        contesto: String = "",
+        contestoMedico: Boolean = false
     ): LezioneGenerata = withContext(Dispatchers.IO) {
         val modelli = if (apiKey.trim().isBlank()) TutorService.MODELLI_NO_KEY else TutorService.MODELLI_FREE
         val messaggi = listOf(
-            LezMsg("system", promptSistema(livello, numero, argomento, paroleNote)),
+            LezMsg(
+                "system",
+                promptSistema(livello, numero, argomento, paroleNote, contesto, contestoMedico)
+            ),
             LezMsg("user", "Genera la lezione $numero per il livello $livello.")
         )
 
@@ -99,16 +104,34 @@ class GeneratoreLezioni(
         livello: String,
         numero: Int,
         argomento: String,
-        paroleNote: List<String>
+        paroleNote: List<String>,
+        contesto: String = "",
+        contestoMedico: Boolean = false
     ): String {
         val tema = argomento.ifBlank { "scegli tu un tema utile e nuovo per questo livello" }
         val daEvitare = if (paroleNote.isEmpty()) ""
             else "\n- NON ripetere queste parole, gia' studiate: " + paroleNote.take(60).joinToString(", ")
+        val contestoTesto = buildString {
+            if (contestoMedico) {
+                append(
+                    "\n- Contesto professionale: ambito sanitario. " +
+                        "Dove ha senso, usa situazioni e lessico medico/ospedaliero."
+                )
+            }
+            val personale = contesto.trim()
+            if (personale.isNotEmpty()) {
+                append(
+                    "\n- Contesto dichiarato dallo studente: \"${personale.take(400)}\". " +
+                        "Scegli esempi, dialoghi e vocabolario pertinenti a questo contesto, " +
+                        "mantenendo la difficolta' del livello $livello."
+                )
+            }
+        }
 
         return """
             Sei un insegnante di tedesco per studenti italiani. Genera la LEZIONE $numero.
             LIVELLO DELLO STUDENTE: $livello
-            ARGOMENTO: $tema
+            ARGOMENTO: $tema$contestoTesto
 
             REGOLE DI CALIBRAZIONE (obbligatorie):
             - Usa SOLO grammatica e lessico che uno studente di livello $livello conosce davvero.
@@ -123,7 +146,7 @@ class GeneratoreLezioni(
             ## Riscaldamento (3-5 domande di ripasso a voce)
             ## Nuova lezione (spiegazione della grammatica, con tabelle)
             ## Esempi (frasi tedesche con traduzione italiana)
-            ## Vocabolario (tabella: Tedesco | Italiano)
+            ## Vocabolario (tabella: Deutsch | Italiano)
             ## Esercizi (4-6 esercizi pratici con soluzione)
 
             VOCABOLARIO (campo "parole"): esattamente 12 parole NUOVE, utili per l'argomento e per il livello $livello.

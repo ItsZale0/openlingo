@@ -56,7 +56,7 @@ class ReminderWorker(
             )
         } else if (paroleTotali > 0) {
             sendNotification(
-                title = "Tedesco — Giornata completata",
+                title = "Deutsch — Giornata completata",
                 message = "Hai finito tutti i ripassi! Torna domani per nuove parole.",
                 dueCount = 0
             )
@@ -71,7 +71,7 @@ class ReminderWorker(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "Promemoria Tedesco",
+                "Promemoria Deutsch",
                 NotificationManager.IMPORTANCE_DEFAULT
             ).apply {
                 description = "Promemoria giornalieri per il ripasso del tedesco"

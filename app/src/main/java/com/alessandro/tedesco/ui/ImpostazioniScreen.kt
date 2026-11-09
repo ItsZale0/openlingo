@@ -95,7 +95,7 @@ import com.alessandro.tedesco.ui.theme.spaziaturaSchermo
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-private const val GUIDA_DOC_DEFAULT = "12yKY4Bpp6IqX7q8tgNYkFXIoAQsZR8yVd4mZhcD5I7g"
+private const val GUIDA_DOC_DEFAULT = ""
 
 /** Forma card Material 3. */
 private val GlassShape: Shape
@@ -289,12 +289,13 @@ fun ImpostazioniScreen(
     LaunchedEffect(Unit) { temaColore = temaSettings.colore.first() }
 
     var feedUrl by rememberSaveable {
-    mutableStateOf(
-        profilo?.config?.feedUrl?.takeIf { it.isNotBlank() }
-            ?: ProfiliPreset.feedPredefinito(profilo?.config?.tipo ?: TipoProfilo.ALESSANDRO)
-    )
-}
+        mutableStateOf(
+            profilo?.config?.feedUrl?.takeIf { it.isNotBlank() }
+                ?: ProfiliPreset.feedPredefinito(profilo?.config?.tipo ?: TipoProfilo.PERSONALIZZATO)
+        )
+    }
     var guidaDocId by rememberSaveable { mutableStateOf(profilo?.config?.guidaDocId ?: "") }
+    var contestoUtente by rememberSaveable { mutableStateOf(profilo?.config?.contestoUtente ?: "") }
     var chiaveTutor by rememberSaveable { mutableStateOf(profilo?.config?.tutorApiKey ?: "") }
     var chiaveGemini by rememberSaveable { mutableStateOf(profilo?.config?.geminiApiKey ?: "") }
 
@@ -529,16 +530,8 @@ fun ImpostazioniScreen(
                             )
                         )
                         Spacer(Modifier.height(8.dp))
-                        OutlinedButton(onClick = {
-                            feedUrl = profilo?.config?.tipo?.let { ProfiliPreset.feedPredefinito(it) }
-                                ?: ProfiliPreset.FEED_URL
-                        }) {
-                            Text(
-                                if (profilo?.config?.tipo == TipoProfilo.EMMA)
-                                    "Usa il vocabolario di Emma"
-                                else
-                                    "Usa il vocabolario di Alessandro"
-                            )
+                        OutlinedButton(onClick = { feedUrl = "" }) {
+                            Text("Rimuovi feed")
                         }
                         GlassExpandableSection(
                             title = "Info",
@@ -569,9 +562,6 @@ fun ImpostazioniScreen(
                             )
                         )
                         Spacer(Modifier.height(8.dp))
-                        OutlinedButton(onClick = { guidaDocId = GUIDA_DOC_DEFAULT }) {
-                            Text("Usa la guida di Alessandro")
-                        }
                         GlassExpandableSection(
                             title = "Info",
                             description = null
@@ -596,10 +586,44 @@ fun ImpostazioniScreen(
                 }
 
                 
+                // --- CONTESTO PER L'AI ---
+                SettingsExpandableSection(
+                    title = "Contesto e obiettivi",
+                    description = "L'AI usa queste informazioni per scegliere esempi, " +
+                        "esercizi e vocabolario adatti a te."
+                ) {
+                    OutlinedTextField(
+                        value = contestoUtente,
+                        onValueChange = { contestoUtente = it },
+                        label = { Text("Professione, interessi, cosa vuoi saper fare") },
+                        placeholder = { Text("Es. elettricista: parlare con clienti e fornitori") },
+                        modifier = Modifier.fillMaxWidth(),
+                        minLines = 3,
+                        shape = GlassShape,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                        )
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Resta sul dispositivo e viene inviato solo ai provider AI " +
+                            "quando generi contenuti. Vuoto = nessuna personalizzazione.",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    SettingsButton(onClick = { vm.aggiornaContestoUtente(contestoUtente) }) {
+                        Text("Salva contesto")
+                    }
+                }
+                Spacer(Modifier.height(12.dp))
+
 // --- TUTOR AI ---
                 SettingsExpandableSection(
                     title = "Tutor AI",
-                    description = "Il tutor AI usa Groq ed è già configurato: funziona subito, senza inserire chiavi."
+                    description = "Facoltativo: inserisci la tua chiave per usare il tutor. " +
+                        "Senza chiave restano disponibili tutti i contenuti offline."
                 ) {
                     OutlinedTextField(
                         value = chiaveTutor, onValueChange = { chiaveTutor = it },
@@ -629,12 +653,12 @@ fun ImpostazioniScreen(
                             description = null
                         ) {
                             Text(
-                                text = "Il tutor è già configurato con una chiave Groq integrata: funziona subito.\n\n" +
-                            "Se vuoi usare la tua chiave personale (opzionale):\n\n" +
+                                text = "Il tutor AI è facoltativo: l'app funziona offline senza chiavi.\n\n" +
+                            "Per attivarlo:\n\n" +
                             "1. Vai su console.groq.com e accedi\n" +
                             "2. Profile → Keys → Create Key\n" +
                             "3. Copia la chiave (gsk_...) e incollala qui\n\n" +
-                            "L'app usa solo modelli gratuiti: non spenderai nulla.",
+                            "La chiave resta sul dispositivo. L'app usa solo modelli gratuiti: non spenderai nulla.",
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.padding(12.dp)
                             )
@@ -982,7 +1006,7 @@ private fun AggiungiParolaDialog(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 OutlinedTextField(value = tedesco, onValueChange = { tedesco = it },
-                    label = { Text("Tedesco *") }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Deutsch *") }, singleLine = true, modifier = Modifier.fillMaxWidth(),
                     shape = GlassShape,
                     colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary))
                 OutlinedTextField(value = italiano, onValueChange = { italiano = it },

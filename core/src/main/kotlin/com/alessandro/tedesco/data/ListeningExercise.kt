@@ -24,9 +24,9 @@ val LISTENING_EXERCISES = listOf(
     ListeningExercise(
         id = "le1",
         titolo = "Presentazioni",
-        testo = "Ich heiße Alessandro. Ich komme aus Italien. Ich bin Physiotherapeut.",
+        testo = "Ich heiße Thomas. Ich komme aus Italien. Ich bin Physiotherapeut.",
         domande = listOf(
-            DomandaAscolto("le1q1", "Come si chiama il parlante?", listOf("Alessandro", "Marco", "Luca"), 0, "Il parlante dice 'Ich heiße Alessandro'"),
+            DomandaAscolto("le1q1", "Come si chiama il parlante?", listOf("Thomas", "Marco", "Luca"), 0, "Il parlante dice 'Ich heiße Thomas'"),
             DomandaAscolto("le1q2", "Da dove viene?", listOf("Germania", "Italia", "Austria"), 1, "Il parlante dice 'Ich komme aus Italien'"),
             DomandaAscolto("le1q3", "Qual è il suo lavoro?", listOf("Medico", "Insegnante", "Fisioterapeuta"), 2, "Il parlante dice 'Ich bin Physiotherapeut'")
         ),

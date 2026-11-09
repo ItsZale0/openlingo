@@ -83,6 +83,9 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
     val scope = rememberCoroutineScope()
     var operazioneInCorso by remember { mutableStateOf("") }
     var feedTesto by remember(profilo?.id) { mutableStateOf(profilo?.config?.feedUrl.orEmpty()) }
+    var contestoTesto by remember(profilo?.id) {
+        mutableStateOf(profilo?.config?.contestoUtente.orEmpty())
+    }
     var tokenTesto by remember { mutableStateOf(store.tokenCloud) }
     var repoTesto by remember { mutableStateOf(store.repoCloud) }
     var downloadInAttesa by remember { mutableStateOf<DesktopStore.RisultatoCloud.Trovato?>(null) }
@@ -123,7 +126,7 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
         // ----------------------------------------------------------- profilo
         CardSezione(
             titolo = "Profilo attivo",
-            sottotitolo = "Emma (B1) e Alessandro (A0-B2 sanitario) hanno dati separati"
+            sottotitolo = "Ogni profilo ha dati e progressi separati dagli altri"
         ) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 store.elencoProfili.forEach { p ->
@@ -162,6 +165,38 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
                 ) {
                     Text("Salva nome")
                 }
+            }
+        }
+
+        // ---------------------------------------------------- contesto per l'AI
+        CardSezione(
+            titolo = "Contesto e obiettivi",
+            sottotitolo = "L'AI usa queste informazioni per scegliere esempi, esercizi e vocabolario"
+        ) {
+            OutlinedTextField(
+                value = contestoTesto,
+                onValueChange = { contestoTesto = it },
+                modifier = Modifier.fillMaxWidth(),
+                minLines = 3,
+                label = { Text("Professione, interessi, cosa vuoi saper fare") },
+                placeholder = { Text("Es. elettricista: parlare con clienti e fornitori") }
+            )
+            Spacer(Modifier.height(6.dp))
+            Text(
+                "Resta su questo computer e viene inviato solo ai provider AI quando " +
+                    "generi contenuti. Vuoto = nessuna personalizzazione.",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(10.dp))
+            Button(
+                onClick = {
+                    store.impostaContestoUtente(contestoTesto)
+                    messaggio = "Contesto salvato."
+                },
+                enabled = contestoTesto.trim() != profilo?.config?.contestoUtente.orEmpty()
+            ) {
+                Text("Salva contesto")
             }
         }
 
@@ -301,9 +336,9 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
             Text("Feed del vocabolario", style = MaterialTheme.typography.titleSmall)
             Spacer(Modifier.height(2.dp))
             Text(
-                "Scarica le parole pubblicate sul repository GitHub e le unisce al lessico " +
-                    "di questo profilo con le stesse regole dell'app. Emma ha il suo feed, " +
-                    "Alessandro il corso A0-B2 sanitario.",
+                "Scarica le parole pubblicate su un repository GitHub e le unisce al lessico " +
+                    "di questo profilo con le stesse regole dell'app. Il feed è facoltativo: " +
+                    "senza URL si usa il lessico incluso nell'app.",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -342,16 +377,14 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
                 OutlinedButton(
                     enabled = operazioneInCorso.isEmpty(),
                     onClick = {
-                        val tipo = profilo?.config?.tipo ?: TipoProfilo.ALESSANDRO
-                        val predefinito = ProfiliPreset.feedPredefinito(tipo)
-                        feedTesto = predefinito
-                        store.impostaFeedUrl(predefinito)
-                        messaggio = "URL del feed ripristinato."
+                        feedTesto = ""
+                        store.impostaFeedUrl("")
+                        messaggio = "Feed rimosso: resta il lessico incluso nell'app."
                     }
                 ) {
-                    Icon(Icons.Filled.Refresh, contentDescription = null)
+                    Icon(Icons.Filled.Delete, contentDescription = null)
                     Spacer(Modifier.width(6.dp))
-                    Text("Predefinito")
+                    Text("Rimuovi feed")
                 }
             }
             Spacer(Modifier.height(8.dp))
@@ -522,11 +555,23 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
                     Spacer(Modifier.width(6.dp))
                     Text("Esporta backup")
                 }
+                Button(onClick = {
+                    messaggio = runCatching {
+                        val file = store.esportaDatiCompleti()
+                        "Esportazione completa salvata in ${file.absolutePath}"
+                    }.getOrElse { "Esportazione non riuscita: ${it.message}" }
+                }) {
+                    Icon(Icons.Filled.Download, contentDescription = null)
+                    Spacer(Modifier.width(6.dp))
+                    Text("Esporta tutti i dati")
+                }
             }
             Spacer(Modifier.height(10.dp))
             Text(
-                "Il backup è una copia di profili.json nella cartella Download: " +
-                    "copiala su un altro computer e sostituiscila per ritrovare tutto.",
+                "«Esporta tutti i dati» crea un unico file JSON con tutti i profili, le " +
+                    "preferenze e il tema: è il file da conservare o importare altrove. " +
+                    "Il token GitHub non viene incluso. «Esporta backup» copia solo " +
+                    "profili.json nella cartella Download.",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -563,7 +608,7 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Tedesco desktop · ${versione}",
+                "Deutsch desktop · ${versione}",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

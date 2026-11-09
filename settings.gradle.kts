@@ -16,7 +16,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Tedesco"
+rootProject.name = "Deutsch"
 include(":app")
 include(":core")
 include(":desktop")

@@ -54,6 +54,7 @@ import androidx.compose.ui.window.rememberWindowState
 import com.alessandro.tedesco.desktop.ui.Etichetta
 import com.alessandro.tedesco.desktop.ui.SchermataEsercizi
 import com.alessandro.tedesco.desktop.ui.SchermataHome
+import com.alessandro.tedesco.desktop.ui.SchermataBenvenuto
 import com.alessandro.tedesco.desktop.ui.SchermataImpostazioni
 import com.alessandro.tedesco.desktop.ui.SchermataLessico
 import com.alessandro.tedesco.desktop.ui.SchermataPodcast
@@ -84,7 +85,7 @@ fun main() = application {
 
     Window(
         onCloseRequest = ::exitApplication,
-        title = "Tedesco — corso A0-B2",
+        title = "Deutsch — corso A0-B2",
         // La finestra parte massimizzata: su schermi piccoli (o con scala 125%)
         // una finestra fissa rischierebbe di uscire dallo schermo.
         state = rememberWindowState(
@@ -118,6 +119,9 @@ fun main() = application {
 
         TemaTedesco(scuro = store.temaScuro(), temaColore = store.temaColore()) {
             Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                if (store.elencoProfili.isEmpty() || store.profilo == null) {
+                    SchermataBenvenuto(store)
+                } else {
                 Row(Modifier.fillMaxSize()) {
                     BarraNavigazione(
                         schermata = schermata,
@@ -167,6 +171,7 @@ fun main() = application {
                             }
                         }
                     }
+                }
                 }
             }
         }

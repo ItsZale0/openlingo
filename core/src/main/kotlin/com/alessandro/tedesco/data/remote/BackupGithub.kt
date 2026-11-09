@@ -50,7 +50,7 @@ class BackupGithub(
         .header("Authorization", "Bearer $token")
         .header("Accept", "application/vnd.github+json")
         .header("X-GitHub-Api-Version", "2022-11-28")
-        .header("User-Agent", "TedescoApp-Backup")
+        .header("User-Agent", "DeutschApp-Backup")
 
     private fun invia(richiesta: HttpRequest): HttpResponse<String> =
         http.send(richiesta, HttpResponse.BodyHandlers.ofString(Charsets.UTF_8))
@@ -82,7 +82,7 @@ class BackupGithub(
      * Carica (o aggiorna) il backup. Legge lo sha corrente: senza, GitHub
      * rifiuta la sovrascrittura con 409.
      */
-    fun carica(contenutoJson: String, messaggio: String = "Backup Tedesco App"): String {
+    fun carica(contenutoJson: String, messaggio: String = "Backup Deutsch"): String {
         val sha = shaCorrente()
         val payload = buildJsonObject {
             put("message", messaggio)

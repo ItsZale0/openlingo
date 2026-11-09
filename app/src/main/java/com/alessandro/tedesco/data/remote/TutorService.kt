@@ -96,9 +96,16 @@ class TutorService {
         livello: String,
         lezione: Int,
         modello: String? = null,
-        geminiApiKey: String = ""
+        geminiApiKey: String = "",
+        contestoUtente: String = ""
     ): String = withContext(Dispatchers.IO) {
         // Free mode (no API key): uses Gemini endpoint automatically
+
+        val contesto = contestoUtente.trim().let {
+            if (it.isEmpty()) ""
+            else "\n12. Contesto dichiarato dallo studente: \"${it.take(400)}\". " +
+                "Collega gli esempi a questo contesto quando e' utile, senza cambiare il livello."
+        }
 
         val systemPrompt = """
             Sei un tutor di tedesco per uno studente italiano di livello $livello.
@@ -114,7 +121,7 @@ class TutorService {
             8. La lezione corrente è la numero $lezione.
             9. Se lo studente sbaglia, correggi spiegando brevemente il perche.
             10. Usa markdown semplice: **grassetto** per i termini chiave, - per gli elenchi, ## per i titoli.
-            11. Non usare tabelle ne HTML.
+            11. Non usare tabelle ne HTML.$contesto
         """.trimIndent()
 
         val messaggi = buildList {
@@ -420,7 +427,7 @@ class TutorService {
 
         if (!isFreeMode) {
             builder.header("HTTP-Referer", "https://github.com/ItsZale0/tedesco-app")
-            builder.header("X-Title", "Tedesco App")
+            builder.header("X-Title", "Deutsch")
         }
 
         val request = builder.post(body.toRequestBody("application/json".toMediaType())).build()

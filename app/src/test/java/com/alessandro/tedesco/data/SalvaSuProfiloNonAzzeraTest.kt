@@ -61,7 +61,8 @@ class SalvaSuProfiloNonAzzeraTest {
         val ctx = ApplicationProvider.getApplicationContext<android.content.Context>()
         val manager = ProfileManager(context = ctx, json = json, io = Dispatchers.IO)
         manager.inizializza()
-        manager.selezionaProfilo(TipoProfilo.ALESSANDRO.id)
+        val idProfilo = manager.creaProfilo("Prova Salva")
+        manager.selezionaProfilo(idProfilo)
 
         // Stato ricco: chat, correzioni, lezione generata
         val stato = manager.statoAttivo()
@@ -117,7 +118,8 @@ class SalvaSuProfiloNonAzzeraTest {
         val ctx = ApplicationProvider.getApplicationContext<android.content.Context>()
         val manager = ProfileManager(context = ctx, json = json, io = Dispatchers.IO)
         manager.inizializza()
-        manager.selezionaProfilo(TipoProfilo.ALESSANDRO.id)
+        val idProfilo = manager.creaProfilo("Prova Salva")
+        manager.selezionaProfilo(idProfilo)
 
         val repo = WordRepository(
             context = ctx,
