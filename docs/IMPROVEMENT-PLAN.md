@@ -1,36 +1,45 @@
-# Piano di miglioramento – Deutsch
+# Improvement plan - Deutsch
 
-## Obiettivo
-Portare l'app da beta personale a release pubblica robusta, migliorando test, accessibilità, architettura e osservabilità.
+## Goal
+Take the app from personal beta to a robust public release: tests, accessibility,
+architecture and observability.
 
-## Tranche 1 – Quick wins (fatto)
-- Template issue (bug/feature)
+## Tranche 1 - Quick wins (done)
+- Issue templates (bug/feature)
 - CODEOWNERS, Dependabot
 - SECURITY.md, SECURITY-AUDIT.md
-- Export/import dati documentato
+- Documented export/import of data
 
-## Tranche 2 – Testing
-- Aggiungere JaCoCo (richiede dipendenza offline o CI online)
-- Coverage report su CI
-- Test e2e/integration per profilo, backup, AI mockata
+## Tranche 2 - Testing
+- Add JaCoCo (requires offline dependency or online CI)
+- Coverage report on CI
+- e2e/integration tests for profile, backup, mocked AI
 
-## Tranche 3 – Architettura
-- Split TedescoViewModel per feature
-- Ridurre accoppiamento UI/logica
-- Estrazione di repository/use-case
+## Tranche 3 - Architecture
+- Split TedescoViewModel by feature
+- Reduce UI/logic coupling
+- Extract repositories/use-cases
 
-## Tranche 4 – Accessibilità
-- Verifica contrasto WCAG AA
-- Touch target >= 48dp
-- TalkBack labels e ordine focus
-- Riduzione motion
+## Tranche 4 - Accessibility
+- WCAG AA contrast check
+- Touch targets >= 48dp
+- TalkBack labels and focus order
+- Reduced motion
 
-## Tranche 5 – Osservabilità
-- Crash reporting esterno (Sentry/Crashlytics) opzionale
-- Analytics funnel core
-- Log strutturati
+## Tranche 5 - Observability
+- Optional external crash reporting (Sentry/Crashlytics)
+- Core funnel analytics
+- Structured logs
 
-## Tranche 6 – Distribution
+## Tranche 6 - Distribution
 - Play Store listing, Data Safety form
-- Screenshot/metadata
-- Onboarding ottimizzato
+- Screenshots/metadata
+- Optimized onboarding
+
+## Tranche 7 - Internationalization (in progress)
+- Bilingual UI: Italian and English, switchable at runtime from Settings.
+- Runtime translation layer (`Traduttore`) with exact map + interpolated patterns.
+- Default to the device language on first run.
+- Roadmap: extend to further interface languages (Spanish, French, German, ...)
+  and to German courses for non-Italian/English speakers, reusing the same
+  translation mechanism.

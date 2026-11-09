@@ -11,8 +11,8 @@ spaced repetition and an optional AI tutor in a single app, with separate
 profiles for each person who uses it.
 
 Originally a personal project, it is meant for anyone who wants to study German
-starting from Italian: no account, no ads, and no data sent to external services
-except those explicitly chosen by the user.
+starting from Italian or English: no account, no ads, and no data sent to
+external services except those explicitly chosen by the user.
 
 ## Table of contents
 
@@ -159,6 +159,27 @@ updates/   update manifest (version and APK SHA-256)
 - [Release process](docs/RELEASE.md): versioning, tags, assets and checksums.
 - [Contributing](CONTRIBUTING.md) and [Code of conduct](CODE_OF_CONDUCT.md).
 - [Security](SECURITY.md) and [audit report](SECURITY-AUDIT.md).
+
+## Roadmap
+
+The app currently teaches German to speakers of **Italian or English**; the
+teaching core is language-agnostic and the UI is fully bilingual (Italian /
+English, switchable at runtime from Settings).
+
+Planned directions:
+
+- **More interface languages**: extend the bilingual layer (today Italian and
+  English) to Spanish, French, German and other languages, reusing the same
+  runtime translation mechanism (`Traduttore`).
+- **More source languages for the course**: adapt the German course to
+  learners whose mother tongue is not Italian or English, with localized
+  explanations and glossaries.
+- **Content growth**: expand the lexicon beyond the current B2 target (3,108
+  words) and add more grammar units and listening material.
+- **OpenSSF Criticality Score**: keep improving supply-chain and security
+  signals (currently ~0.22, target >= 0.4 through real adoption).
+
+Contributions on any of these points are welcome (see Contributing).
 
 ## Contributing
 
