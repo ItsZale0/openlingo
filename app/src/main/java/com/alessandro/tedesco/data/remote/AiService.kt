@@ -38,4 +38,27 @@ class AiService(
         lezione: Int,
         contestoUtente: String = ""
     ): String = tutor.valutaProduzione(config, testoStudente, livello, lezione, contestoUtente)
+
+    suspend fun generaEsercizi(
+        config: ConfigurazioneAI,
+        tipo: TipoEsercizio,
+        livello: String,
+        quanti: Int = 5,
+        contestoMedico: Boolean = false,
+        contestoUtente: String = "",
+        evita: List<String> = emptyList(),
+        tema: String? = null
+    ): List<EsercizioGenerato> =
+        generatoreEsercizi.genera(config, tipo, livello, quanti, contestoMedico, contestoUtente, evita, tema)
+
+    suspend fun generaLezione(
+        config: ConfigurazioneAI,
+        numero: Int,
+        livello: String,
+        argomento: String,
+        paroleNote: List<String> = emptyList(),
+        contesto: String = "",
+        contestoMedico: Boolean = false
+    ): LezioneGenerata =
+        generatoreLezioni.genera(config, numero, livello, argomento, paroleNote, contesto, contestoMedico)
 }

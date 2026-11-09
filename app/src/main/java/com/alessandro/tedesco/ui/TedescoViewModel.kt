@@ -1195,7 +1195,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
             try {
                 val titoloFeed = repo.observeLessons().first().firstOrNull { it.numero == n }?.titolo
                 val paroleNote = repo.observeWords().first().map { it.german }
-                val lezione = generatoreLezioni.genera(
+                val lezione = aiService.generaLezione(
                     config = configurazioneAI(),
                     numero = n,
                     livello = livello,
@@ -1491,7 +1491,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
             else e.domanda
         }
         val evitaChiavi = esistenti.map(::chiaveEntita)
-        val risultato = app.generatoreEserciziInstance.genera(
+        val risultato = aiService.generaEsercizi(
             config = config, tipo = tipo, livello = livello,
             quanti = quanti, contestoMedico = medico,
             contestoUtente = profiloAttivo.value?.config?.contestoUtente.orEmpty(),
@@ -1695,7 +1695,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                         append(unita.teoria.regola.take(5).joinToString(" "))
                     }
                 }
-                val generati = app.generatoreEserciziInstance.genera(
+                val generati = aiService.generaEsercizi(
                     config = configurazioneAI(),
                     tipo = TipoEsercizio.GRAMMATICA,
                     livello = unita.livello,
