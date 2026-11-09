@@ -18,9 +18,10 @@ funzione di ripristino.
 ## Su Android
 
 1. Apri l'app.
-2. Vai in **Impostazioni → Backup / Dati → Esporta tutto** (o la voce equivalente).
-3. Scegli il percorso di salvataggio (documenti del dispositivo).
-4. Conserva il file in un luogo sicuro.
+2. Apri **Impostazioni** e vai alla sezione **Backup**.
+3. Tocca **Esporta tutti i dati**, poi **Esporta su file**.
+4. Scegli il percorso di salvataggio (documenti del dispositivo).
+5. Conserva il file `deutsch-dati-AAAAMMGG-HHMM.json` in un luogo sicuro.
 
 Il file esportato:
 
@@ -32,8 +33,9 @@ Il file esportato:
 ## Su desktop
 
 1. Apri le impostazioni desktop.
-2. Usa la voce **Esporta dati completi**.
-3. Salva il JSON generato.
+2. Nella sezione backup usa la voce **Esporta tutti i dati**.
+3. Il JSON viene salvato nella cartella Download come
+   `deutsch-dati-AAAAMMGG-HHMM.json`; spostalo in un luogo sicuro.
 
 ## Struttura del file
 
@@ -41,7 +43,7 @@ Il file esportato:
 {
   "formato": 1,
   "creatoIl": 0,
-  "versioneApp": "1.48.73",
+  "versioneApp": "1.48.75",
   "profili": { ... },
   "notifiche": { ... },
   "temaColore": "..."

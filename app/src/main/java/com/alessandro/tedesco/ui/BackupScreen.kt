@@ -166,7 +166,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                         onClick = {
                             val marca = LocalDateTime.now()
                                 .format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmm"))
-                            esporta.launch("tedesco-dati-$marca.json")
+                            esporta.launch("deutsch-dati-$marca.json")
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) { Text("Esporta su file") }

@@ -124,7 +124,7 @@ class DesktopStore(
         download.mkdirs()
         val marca = java.time.LocalDateTime.now()
             .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmm"))
-        val destinazione = File(download, "tedesco-dati-$marca.json")
+        val destinazione = File(download, "deutsch-dati-$marca.json")
         destinazione.writeText(testo)
         return destinazione
     }

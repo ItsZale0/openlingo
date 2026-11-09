@@ -1,8 +1,8 @@
 {
-  "versionCode": 307,
-  "versionName": "1.48.74",
-  "changelog": "Build e release piu' sicure: wrapper Gradle ufficiale verificato in CI, nessuna modifica a profili, progressi o contenuti.",
+  "versionCode": 308,
+  "versionName": "1.48.75",
+  "changelog": "Esportazione dei dati con nome file Deutsch e guida aggiornata alle voci esatte dell'app. Nessuna modifica a profili, progressi o contenuti.",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.74/Deutsch-v1.48.74.apk",
-  "apkSha256": "c2af5790d529f6650c3f70bf7c7f1bfd71eb1abed2e4961fc229c477c438b6ae"
+  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.75/Deutsch-v1.48.75.apk",
+  "apkSha256": "32b760e70f474008013c08f34b6d045736cb262a7dcee2f03734bef4f4dabe5e"
 }
