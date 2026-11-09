@@ -359,22 +359,20 @@ fun ImpostazioniScreen(
                         Text("Colore tema", style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(Modifier.height(6.dp))
-                        Text("Scegli il colore principale dell'app.",
+                        Text("Scegli il colore principale dell'app. \"Material You\" " +
+                            "usa i colori del sistema (Android 12+).",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(Modifier.height(10.dp))
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            TemaSettings.OPZIONI.forEach { (id, label) ->
-                                FilterChip(
-                                    selected = temaColore == id,
-                                    onClick = {
-                                        temaColore = id
-                                        scopeUpdate.launch { temaSettings.setColore(id) }
-                                    },
-                                    label = { Text(label) }
-                                )
+                        DropdownSelector(
+                            label = "Colore tema",
+                            options = TemaSettings.OPZIONI.map { it.first to it.second },
+                            selected = temaColore,
+                            onSelect = { id ->
+                                temaColore = id
+                                scopeUpdate.launch { temaSettings.setColore(id) }
                             }
-                        }
+                        )
                     }
                 }
                 Spacer(Modifier.height(12.dp))

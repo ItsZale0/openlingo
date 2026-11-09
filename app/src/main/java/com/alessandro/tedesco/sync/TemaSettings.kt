@@ -24,7 +24,14 @@ class TemaSettings(private val context: Context) {
             "indigo" to "Indaco",
             "forest" to "Verde",
             "rose" to "Rosa",
-            "amber" to "Ambra"
+            "amber" to "Ambra",
+            "purple" to "Viola",
+            "pink" to "Rosa acceso",
+            "orange" to "Arancione",
+            "cyan" to "Ciano",
+            "red" to "Rosso",
+            "material" to "Material 3 (base)",
+            "material_you" to "Material You (dinamico)"
         )
     }
 }

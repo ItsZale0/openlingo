@@ -72,9 +72,14 @@ class MainActivity : ComponentActivity() {
         setContent {
             val temaSettings = remember { TemaSettings(this@MainActivity) }
             val temaColore by temaSettings.colore.collectAsStateWithLifecycle(initialValue = "teal")
+            val dynamicColor = temaColore == "material_you"
             // Material 3: dynamic color su Android 12+, altrimenti schema baseline.
             // App pensata dark: per seguire il sistema basta togliere darkTheme = true.
-            TedescoTheme(darkTheme = true, temaColore = temaColore) {
+            TedescoTheme(
+                darkTheme = true,
+                dynamicColor = dynamicColor,
+                temaColore = if (dynamicColor) "teal" else temaColore
+            ) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

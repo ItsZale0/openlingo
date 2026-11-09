@@ -157,6 +157,24 @@ private fun schemaScuro(id: String): ColorScheme = when (id) {
         outlineVariant = Color(0xFF4F493D), error = Color(0xFFFFB4AB), onError = Color(0xFF690005),
         errorContainer = Color(0xFF93000A), onErrorContainer = Color(0xFFFFDAD6)
     )
+    "purple" -> darkColorScheme()
+    "pink" -> darkColorScheme(
+        primary = Color(0xFFFFB1C8), onPrimary = Color(0xFF5E1133),
+        primaryContainer = Color(0xFF7B2949), onPrimaryContainer = Color(0xFFFFD9E2)
+    )
+    "orange" -> darkColorScheme(
+        primary = Color(0xFFFFB77C), onPrimary = Color(0xFF4A2800),
+        primaryContainer = Color(0xFF6A3B00), onPrimaryContainer = Color(0xFFFFDCC3)
+    )
+    "cyan" -> darkColorScheme(
+        primary = Color(0xFF81D8E3), onPrimary = Color(0xFF00363D),
+        primaryContainer = Color(0xFF004F58), onPrimaryContainer = Color(0xFF9EF0FB)
+    )
+    "red" -> darkColorScheme(
+        primary = Color(0xFFFFB4AB), onPrimary = Color(0xFF690005),
+        primaryContainer = Color(0xFF93000A), onPrimaryContainer = Color(0xFFFFDAD6)
+    )
+    "material" -> darkColorScheme()
     else -> darkColorScheme(
         primary = Color(0xFF8FD6CD), onPrimary = Color(0xFF003733),
         primaryContainer = Color(0xFF17433F), onPrimaryContainer = Color(0xFFB8F0E8),
@@ -252,6 +270,24 @@ private fun schemaChiaro(id: String): ColorScheme = when (id) {
         surfaceContainerHighest = Color(0xFFE3DED3), outline = Color(0xFF807869),
         outlineVariant = Color(0xFFD2C9B8), error = Color(0xFFBA1A1A), onError = Color.White
     )
+    "purple" -> lightColorScheme()
+    "pink" -> lightColorScheme(
+        primary = Color(0xFF9C415E), onPrimary = Color.White,
+        primaryContainer = Color(0xFFFFD9E2), onPrimaryContainer = Color(0xFF3E001D)
+    )
+    "orange" -> lightColorScheme(
+        primary = Color(0xFF8F4C00), onPrimary = Color.White,
+        primaryContainer = Color(0xFFFFDCC3), onPrimaryContainer = Color(0xFF2E1500)
+    )
+    "cyan" -> lightColorScheme(
+        primary = Color(0xFF006874), onPrimary = Color.White,
+        primaryContainer = Color(0xFF9EF0FB), onPrimaryContainer = Color(0xFF001F24)
+    )
+    "red" -> lightColorScheme(
+        primary = Color(0xFFBA1A1A), onPrimary = Color.White,
+        primaryContainer = Color(0xFFFFDAD6), onPrimaryContainer = Color(0xFF410002)
+    )
+    "material" -> lightColorScheme()
     else -> lightColorScheme(
         primary = Color(0xFF1F5F5B), onPrimary = Color(0xFFFFFFFF),
         primaryContainer = Color(0xFFD6EFEA), onPrimaryContainer = Color(0xFF0A2522),
@@ -455,3 +491,5 @@ fun TitoloSchermata(testo: String) {
         fontWeight = FontWeight.SemiBold
     )
 }
+
+
