@@ -82,7 +82,8 @@ class TutorService(
         config: ConfigurazioneAI,
         testoStudente: String,
         livello: String,
-        lezione: Int
+        lezione: Int,
+        contestoUtente: String = ""
     ): String {
         val systemPrompt = """
             Sei un valutatore di tedesco scritto per uno studente italiano di livello $livello.
@@ -103,7 +104,7 @@ class TutorService(
               casi, preposizioni, ordine parole, maiuscole dei sostantivi).
             - Se il testo e' corretto, "errori" e' un array vuoto.
             - La lezione corrente e' la numero $lezione.
-            - Non inventare errori che non ci sono; non ometterne di evidenti.
+            - Non inventare errori che non ci sono; non ometterne di evidenti.${if (contestoUtente.isBlank()) "" else "\n            - CONTESTO DELLO STUDENTE: \"${contestoUtente.trim().take(400)}\". Considera il lessico pertinente a questo contesto nella valutazione di wortschatz."}
         """.trimIndent()
 
         return clientAI.chat(
@@ -170,8 +171,13 @@ class TutorService(
         scenario: RoleplayScenario,
         cronologia: List<Pair<String, String>>,
         livello: String,
-        lezione: Int
+        lezione: Int,
+        contestoUtente: String = ""
     ): String {
+        val contesto = contestoUtente.trim().let {
+            if (it.isEmpty()) ""
+            else "\nCONTESTO DELLO STUDENTE: \"${it.take(400)}\". Adatta il ruolo e il lessico a questo contesto quando ha senso."
+        }
         val systemPrompt = """
             Sei un ${scenario.ruoloAI} in un gioco di ruolo per uno studente italiano di tedesco di livello $livello.
 
@@ -189,7 +195,7 @@ class TutorService(
             - Mantieni la conversazione naturale e realistica.
             - Se lo studente usa l'italiano, rispondi in tedesco incoraggiandolo a continuare.
             - Usa markdown semplice: **grassetto** per i termini chiave.
-            - Non usare tabelle né HTML.
+            - Non usare tabelle né HTML.$contesto
         """.trimIndent()
 
         return clientAI.chat(

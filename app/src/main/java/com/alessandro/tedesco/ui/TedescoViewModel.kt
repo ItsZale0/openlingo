@@ -1384,7 +1384,8 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                 scenario = scenario,
                 cronologia = cronologia,
                 livello = livello,
-                lezione = lezione
+                lezione = lezione,
+                contestoUtente = contestoUtente.value
             )
         }
     }
@@ -2111,7 +2112,8 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                     config = configurazioneAI(),
                     testoStudente = testo,
                     livello = livello,
-                    lezione = lezione
+                    lezione = lezione,
+                    contestoUtente = profilo.config.contestoUtente
                 )
                 val valutazione = ParserValutazione.parse(rispostaGrezza)
                 val numParole = CalcoloProduzione.contaParole(testo)
