@@ -26,6 +26,10 @@ import com.alessandro.tedesco.data.selezionaProssimaLezione
 import com.alessandro.tedesco.data.WordRepository
 import com.alessandro.tedesco.data.local.ProfiloStato
 import com.alessandro.tedesco.data.local.LivelloIniziale
+import com.alessandro.tedesco.data.local.ConfigurazioneAI
+import com.alessandro.tedesco.data.local.ProviderAI
+import com.alessandro.tedesco.data.local.configurazioneAI
+import com.alessandro.tedesco.data.local.providerEffettivo
 import com.alessandro.tedesco.data.CalcoloCompetenze
 import com.alessandro.tedesco.data.ControlloGrammatica
 import com.alessandro.tedesco.data.EserciziLessico
@@ -551,6 +555,11 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                         // lezione, esercizi, domande e stato del profilo precedente.
                         resetStatoProfilo()
                         caricaEserciziGenerati()
+                        repo.profili[id]?.let { profilo ->
+                            _modelloTutor.value = profilo.config.modelloAI.trim().ifBlank { null }
+                            _modelliDisponibili.value = app.tutorServiceInstance
+                                .modelliDisponibili(profilo.config.configurazioneAI())
+                        }
                         // Riallinea il livello CEFR ai criteri reali: corregge eventuali
                         // livelli gonfiati salvati in precedenza (es. falso "A2").
                         verificaEPromuovi()
@@ -602,17 +611,30 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
     /**
      * Crea un nuovo profilo e lo attiva.
      *
-     * @param contesto professione/obiettivi/interessi: guida l'AI
-     * @param mostraContestoMedico true = lessico sanitario
+     * @param contesto descrizione personale: è la base con cui l'AI
+     *   personalizza tutor, esercizi e lezioni (professione, interessi,
+     *   obiettivi, lessico specialistico come quello sanitario)
+     * @param mostraContestoMedico mantenuto solo per i profili storici
      */
     fun creaProfilo(
         nome: String,
         livello: LivelloIniziale = LivelloIniziale.A0,
         contesto: String = "",
-        mostraContestoMedico: Boolean = false
+        mostraContestoMedico: Boolean = false,
+        providerAI: ProviderAI? = null,
+        chiaviAI: Map<String, String> = emptyMap(),
+        modelloAI: String = ""
     ) {
         viewModelScope.launch {
-            profileManager.creaProfilo(nome, livello, contesto, mostraContestoMedico)
+            profileManager.creaProfilo(
+                nome = nome,
+                livello = livello,
+                contesto = contesto,
+                mostraContestoMedico = mostraContestoMedico,
+                providerAI = providerAI,
+                chiaviAI = chiaviAI,
+                modelloAI = modelloAI
+            )
             resetStatoProfilo()
             _messaggio.value = "Profilo creato"
             sincronizza(mostraMessaggio = false)
@@ -1163,7 +1185,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                 val titoloFeed = repo.observeLessons().first().firstOrNull { it.numero == n }?.titolo
                 val paroleNote = repo.observeWords().first().map { it.german }
                 val lezione = generatoreLezioni.genera(
-                    apiKey = tutorApiKey.value,
+                    config = configurazioneAI(),
                     numero = n,
                     livello = livello,
                     argomento = argomentoLezione(n, titoloFeed),
@@ -1205,9 +1227,12 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    /** Imposta il modello del tutor (null = automatico). */
+    /** Imposta il modello del tutor (null = automatico) e lo salva nel profilo. */
     fun cambiaModelloTutor(modello: String?) {
         _modelloTutor.value = modello
+        viewModelScope.launch {
+            profileManager.aggiornaModelloAI(modello.orEmpty())
+        }
     }
 
     fun aggiornaTutorApiKey(nuovaChiave: String) {
@@ -1223,6 +1248,50 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
             _messaggio.value = if (nuovaChiave.isBlank()) "Chiave Gemini rimossa" else "Chiave Gemini salvata"
         }
     }
+
+    /** Cambia il provider AI del profilo attivo. */
+    fun aggiornaProviderAI(provider: ProviderAI) {
+        viewModelScope.launch {
+            profileManager.aggiornaProviderAI(provider)
+            _modelliDisponibili.value = app.tutorServiceInstance
+                .modelliDisponibili(ConfigurazioneAI(provider))
+            _modelloTutor.value = null
+            _messaggio.value = "Provider AI: ${provider.nome}"
+        }
+    }
+
+    /** Salva provider, chiavi e modello in un'unica operazione. */
+    fun salvaConfigurazioneAI(
+        provider: ProviderAI,
+        chiaviAI: Map<String, String>,
+        modelloAI: String
+    ) {
+        viewModelScope.launch {
+            profileManager.aggiornaConfigurazioneAI(provider, chiaviAI, modelloAI)
+            _modelliDisponibili.value = app.tutorServiceInstance
+                .modelliDisponibili(ConfigurazioneAI(provider))
+            _modelloTutor.value = modelloAI.trim().ifBlank { null }
+            val salvate = chiaviAI.count { it.value.isNotBlank() }
+            _messaggio.value = if (salvate == 0) {
+                "Configurazione AI salvata: nessuna chiave inserita"
+            } else {
+                "Configurazione AI salvata ($salvate chiavi)"
+            }
+        }
+    }
+
+    /** Provider AI effettivo del profilo attivo. */
+    val providerAI: StateFlow<ProviderAI> = profileManager.repositoryFlow
+        .map { r ->
+            r.profiloAttivoId
+                ?.let { r.profili[it]?.config?.providerEffettivo() }
+                ?: ProviderAI.PREDEFINITO
+        }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, ProviderAI.PREDEFINITO)
+
+    private fun configurazioneAI(): ConfigurazioneAI =
+        profiloAttivo.value?.config?.configurazioneAI()
+            ?: ConfigurazioneAI(ProviderAI.PREDEFINITO)
 
     fun segnaMissioneCompletata() {
         viewModelScope.launch {
@@ -1262,15 +1331,10 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
         _ragionamento.value = v
         app.tutorServiceInstance.reasoningEffort = v
     }
-    private var modelliCaricati = false
 
     fun caricaModelli() {
-        if (modelliCaricati) return
-        viewModelScope.launch {
-            val chiave = tutorApiKey.value
-            val lista = app.tutorServiceInstance.modelliDisponibili(chiave)
-            if (lista.size > 1) { _modelliDisponibili.value = lista; modelliCaricati = true }
-        }
+        // Elenco statico per provider: nessuna chiamata di rete.
+        _modelliDisponibili.value = app.tutorServiceInstance.modelliDisponibili(configurazioneAI())
     }
     val modelloTutor: StateFlow<String?> = _modelloTutor
 
@@ -1279,15 +1343,14 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
         cronologia: List<Pair<String, String>>,
         livello: String,
         lezione: Int
-    ): Result<String> {
-        val chiave = tutorApiKey.value
-        val gemini = geminiApiKey.value
-        return runCatching {
-            app.tutorServiceInstance.rispondi(
-                chiave, cronologia, livello, lezione, _modelloTutor.value, gemini,
-                contestoUtente = contestoUtente.value
-            )
-        }
+    ): Result<String> = runCatching {
+        app.tutorServiceInstance.rispondi(
+            config = configurazioneAI(),
+            cronologia = cronologia,
+            livello = livello,
+            lezione = lezione,
+            contestoUtente = contestoUtente.value
+        )
     }
 
     // ---- Roleplay ----
@@ -1313,12 +1376,16 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
         livello: String,
         lezione: Int
     ): Result<String> {
-        val chiave = tutorApiKey.value
-        val gemini = geminiApiKey.value
         val scenario = _roleplayScenario.value
             ?: return Result.failure(IllegalStateException("Nessuno scenario selezionato"))
         return runCatching {
-            app.tutorServiceInstance.roleplay(chiave, scenario, cronologia, livello, lezione, _modelloTutor.value, gemini)
+            app.tutorServiceInstance.roleplay(
+                config = configurazioneAI(),
+                scenario = scenario,
+                cronologia = cronologia,
+                livello = livello,
+                lezione = lezione
+            )
         }
     }
 
@@ -1382,15 +1449,14 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
     }
 
     /**
-     * Genera nuovi esercizi via AI (Groq free) e li salva nel profilo attivo.
+     * Genera nuovi esercizi via AI e li salva nel profilo attivo.
      * Ritorna la lista di esercizi generati (validi).
      */
     suspend fun generaEsercizi(
         tipo: TipoEsercizio,
-        quanti: Int = 5,
-        modello: String? = null
+        quanti: Int = 5
     ): List<EsercizioGenerato> {
-        val chiave = tutorApiKey.value
+        val config = configurazioneAI()
         val livelloUtente = profiloAttivo.value?.stato?.progresso?.livelloCorrente ?: LivelloCEFR.A0
         val livello = livelloUtente.label
         val medico = profiloAttivo.value?.config?.mostraContestoMedico == true
@@ -1412,10 +1478,10 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
         }
         val evitaChiavi = esistenti.map(::chiaveEntita)
         val risultato = app.generatoreEserciziInstance.genera(
-            apiKey = chiave, tipo = tipo, livello = livello,
+            config = config, tipo = tipo, livello = livello,
             quanti = quanti, contestoMedico = medico,
             contestoUtente = profiloAttivo.value?.config?.contestoUtente.orEmpty(),
-            evita = evita, modello = modello
+            evita = evita
         )
         // converte in entità e persisti
         // SOGLIA DI LIVELLO: un esercizio piu' alto del profilo non viene mai
@@ -1616,7 +1682,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                     }
                 }
                 val generati = app.generatoreEserciziInstance.genera(
-                    apiKey = tutorApiKey.value,
+                    config = configurazioneAI(),
                     tipo = TipoEsercizio.GRAMMATICA,
                     livello = unita.livello,
                     quanti = quanti,
@@ -2035,8 +2101,6 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
     /** Invia una risposta in tedesco e riceve la correzione dal tutor AI. */
     fun inviaRisposta(testo: String) {
         viewModelScope.launch {
-            // In free mode la chiave puo' essere vuota: TutorService usa l'endpoint free.
-            val chiave = tutorApiKey.value
             _correzioneInCorso.value = true
             try {
                 val profilo = profileManager.profiloAttivo() ?: return@launch
@@ -2044,12 +2108,10 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                 val lezione = lezioneCorrente.value
                 // Valutazione STRUTTURATA (criteri ufficiali Goethe), non solo testo.
                 val rispostaGrezza = app.tutorServiceInstance.valutaProduzione(
-                    apiKey = chiave,
+                    config = configurazioneAI(),
                     testoStudente = testo,
                     livello = livello,
-                    lezione = lezione,
-                    modello = _modelloTutor.value,
-                    geminiApiKey = geminiApiKey.value
+                    lezione = lezione
                 )
                 val valutazione = ParserValutazione.parse(rispostaGrezza)
                 val numParole = CalcoloProduzione.contaParole(testo)

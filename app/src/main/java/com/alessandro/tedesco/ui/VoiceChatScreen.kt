@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.alessandro.tedesco.data.remote.TutorService
 import com.alessandro.tedesco.ui.theme.spaziaturaSchermo
 import kotlinx.coroutines.launch
 import com.alessandro.tedesco.ui.theme.Spaziature
@@ -38,9 +37,6 @@ fun VoiceChatScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
     val profilo by vm.profiloAttivo.collectAsStateWithLifecycle(null)
     val livello = profilo?.stato?.progresso?.livelloCorrente?.label?.substringBefore(" ") ?: "A0"
     val lezioneCorrente by vm.lezioneCorrente.collectAsStateWithLifecycle(1)
-    val apiKey by vm.tutorApiKey.collectAsStateWithLifecycle("")
-    val geminiApiKey by vm.geminiApiKey.collectAsStateWithLifecycle("")
-    val modelloTutor by vm.modelloTutor.collectAsStateWithLifecycle(null)
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
 
@@ -147,17 +143,14 @@ fun VoiceChatScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
                         messaggi = messaggi + MessaggioVoiceChat(testo, daUtente = true)
                         elaborazione = true
                         try {
-                            val tutorService = TutorService()
-                            val risposta = tutorService.rispondi(
-                                apiKey = apiKey,
+                            val risultato = vm.chiediAlTutor(
                                 cronologia = messaggi.map { m ->
                                     if (m.daUtente) "user" to m.testo else "assistant" to m.testo
                                 },
                                 livello = livello,
-                                lezione = lezioneCorrente,
-                                modello = modelloTutor,
-                                geminiApiKey = geminiApiKey
+                                lezione = lezioneCorrente
                             )
+                            val risposta = risultato.getOrThrow()
                             messaggi = messaggi + MessaggioVoiceChat(risposta, daUtente = false)
                             ttsHelper.speak(risposta)
                         } catch (e: Exception) {

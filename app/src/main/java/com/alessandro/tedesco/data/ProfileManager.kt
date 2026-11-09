@@ -11,6 +11,7 @@ import com.alessandro.tedesco.data.local.ProfiloConfig
 import com.alessandro.tedesco.data.local.ProfiloStato
 import com.alessandro.tedesco.data.local.ProfiloUtente
 import com.alessandro.tedesco.data.local.ProgressoUtente
+import com.alessandro.tedesco.data.local.ProviderAI
 import com.alessandro.tedesco.data.local.TipoProfilo
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.collectLatest
@@ -226,15 +227,22 @@ class ProfileManager(
      *
      * @param nome nome mostrato
      * @param livello livello CEFR di partenza
-     * @param contesto contesto personale per l'AI (professione, obiettivi)
-     * @param mostraContestoMedico true = contenuti con lessico sanitario
+     * @param contesto descrizione personale per l'AI (professione, interessi, obiettivi):
+     *   è l'unica personalizzazione richiesta, anche per il lessico specialistico
+     * @param mostraContestoMedico mantenuto per compatibilità con i profili storici
+     * @param providerAI provider AI scelto (null = predefinito)
+     * @param chiaviAI chiavi inserite, per id di provider
+     * @param modelloAI modello scelto (vuoto = predefinito del provider)
      * @return l'id del profilo creato
      */
     suspend fun creaProfilo(
         nome: String,
         livello: LivelloIniziale = LivelloIniziale.A0,
         contesto: String = "",
-        mostraContestoMedico: Boolean = false
+        mostraContestoMedico: Boolean = false,
+        providerAI: ProviderAI? = null,
+        chiaviAI: Map<String, String> = emptyMap(),
+        modelloAI: String = ""
     ): String {
         val repo = _repository.value
         val id = "profilo_${System.currentTimeMillis()}"
@@ -243,7 +251,10 @@ class ProfileManager(
             nome = nome.trim().ifBlank { "Profilo" },
             livello = livello,
             contesto = contesto,
-            mostraContestoMedico = mostraContestoMedico
+            mostraContestoMedico = mostraContestoMedico,
+            providerAI = providerAI,
+            chiaviAI = chiaviAI,
+            modelloAI = modelloAI
         )
         _repository.value = repo.copy(
             profili = repo.profili + (id to nuovo),
@@ -385,22 +396,97 @@ class ProfileManager(
         saveToDataStore()
     }
 
-    /** Aggiorna la chiave API del tutor AI per il profilo attivo. */
+    /** Aggiorna la chiave API del tutor AI per il profilo attivo (legacy: Groq). */
     suspend fun aggiornaTutorApiKey(nuovaChiave: String) {
         val repo = _repository.value
         val id = repo.profiloAttivoId ?: return
         val profilo = repo.profili[id] ?: return
-        val aggiornato = profilo.copy(config = profilo.config.copy(tutorApiKey = nuovaChiave.trim()))
+        val chiavi = profilo.config.chiaviAI.toMutableMap().apply {
+            if (nuovaChiave.isBlank()) remove(ProviderAI.GROQ.id)
+            else put(ProviderAI.GROQ.id, nuovaChiave.trim())
+        }
+        val aggiornato = profilo.copy(
+            config = profilo.config.copy(
+                tutorApiKey = nuovaChiave.trim(),
+                chiaviAI = chiavi
+            )
+        )
         _repository.value = repo.copy(profili = repo.profili + (id to aggiornato))
         saveToDataStore()
     }
 
-    /** Aggiorna la chiave API Gemini per il profilo attivo. */
+    /** Aggiorna la chiave API Gemini per il profilo attivo (legacy). */
     suspend fun aggiornaGeminiApiKey(nuovaChiave: String) {
         val repo = _repository.value
         val id = repo.profiloAttivoId ?: return
         val profilo = repo.profili[id] ?: return
-        val aggiornato = profilo.copy(config = profilo.config.copy(geminiApiKey = nuovaChiave.trim()))
+        val chiavi = profilo.config.chiaviAI.toMutableMap().apply {
+            if (nuovaChiave.isBlank()) remove(ProviderAI.GEMINI.id)
+            else put(ProviderAI.GEMINI.id, nuovaChiave.trim())
+        }
+        val aggiornato = profilo.copy(
+            config = profilo.config.copy(
+                geminiApiKey = nuovaChiave.trim(),
+                chiaviAI = chiavi
+            )
+        )
+        _repository.value = repo.copy(profili = repo.profili + (id to aggiornato))
+        saveToDataStore()
+    }
+
+    /** Provider AI scelto per il profilo attivo. */
+    suspend fun aggiornaProviderAI(provider: ProviderAI) {
+        val repo = _repository.value
+        val id = repo.profiloAttivoId ?: return
+        val profilo = repo.profili[id] ?: return
+        val aggiornato = profilo.copy(
+            config = profilo.config.copy(providerAI = provider)
+        )
+        _repository.value = repo.copy(profili = repo.profili + (id to aggiornato))
+        saveToDataStore()
+    }
+
+    /** Modello AI scelto per il profilo attivo (vuoto = predefinito del provider). */
+    suspend fun aggiornaModelloAI(modello: String) {
+        val repo = _repository.value
+        val id = repo.profiloAttivoId ?: return
+        val profilo = repo.profili[id] ?: return
+        val aggiornato = profilo.copy(
+            config = profilo.config.copy(modelloAI = modello.trim())
+        )
+        _repository.value = repo.copy(profili = repo.profili + (id to aggiornato))
+        saveToDataStore()
+    }
+
+    /**
+     * Salva in un'unica scrittura provider, chiavi e modello del profilo attivo.
+     *
+     * Le chiavi vuote vengono rimosse: l'utente può cancellare una chiave
+     * senza lasciare stringhe vuote nel backup. Le vecchie chiavi separate
+     * restano allineate per compatibilità con le versioni precedenti.
+     */
+    suspend fun aggiornaConfigurazioneAI(
+        provider: ProviderAI,
+        chiaviAI: Map<String, String>,
+        modelloAI: String
+    ) {
+        val repo = _repository.value
+        val id = repo.profiloAttivoId ?: return
+        val profilo = repo.profili[id] ?: return
+
+        val pulite = chiaviAI
+            .mapValues { (_, chiave) -> chiave.trim() }
+            .filterValues { it.isNotEmpty() }
+
+        val aggiornato = profilo.copy(
+            config = profilo.config.copy(
+                providerAI = provider,
+                chiaviAI = pulite,
+                modelloAI = modelloAI.trim(),
+                tutorApiKey = pulite[ProviderAI.GROQ.id].orEmpty(),
+                geminiApiKey = pulite[ProviderAI.GEMINI.id].orEmpty()
+            )
+        )
         _repository.value = repo.copy(profili = repo.profili + (id to aggiornato))
         saveToDataStore()
     }

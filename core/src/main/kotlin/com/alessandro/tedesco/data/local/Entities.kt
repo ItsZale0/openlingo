@@ -308,6 +308,17 @@ data class ProfiloConfig(
     val guidaDocId: String? = null,
     val tutorApiKey: String = "",
     val geminiApiKey: String = "",
+    /**
+     * Provider AI scelto dall'utente.
+     *
+     * null = profilo creato prima del supporto multi-provider: il provider
+     * viene dedotto dalle vecchie chiavi [tutorApiKey] e [geminiApiKey].
+     */
+    val providerAI: ProviderAI? = null,
+    /** Chiavi API per provider: id del provider -> chiave. */
+    val chiaviAI: Map<String, String> = emptyMap(),
+    /** Modello scelto (vuoto = modello predefinito del provider). */
+    val modelloAI: String = "",
     val palette: String = "uber",
     val stileDesign: String = "pixel",
     val livelloIniziale: LivelloIniziale = LivelloIniziale.A0,

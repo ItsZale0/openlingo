@@ -1,19 +1,14 @@
 package com.alessandro.tedesco.data.remote
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
 import com.alessandro.tedesco.data.ControlloGrammatica
 import com.alessandro.tedesco.data.DeduplicaEsercizi
-import com.alessandro.tedesco.di.HttpCondiviso
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
+import com.alessandro.tedesco.data.local.ConfigurazioneAI
 import java.io.IOException
-import java.util.concurrent.TimeUnit
 
 /**
  * Risposta "grezza" di un singolo esercizio generato dall'AI.
@@ -84,74 +79,53 @@ data class EsercizioGenerato(
  * Usa la stessa cascata di modelli free di TutorService: se uno è in rate
  * limit si passa al successivo.
  */
-class GeneratoreEsercizi {
-
-    private val client = HttpCondiviso.client
+class GeneratoreEsercizi(
+    private val clientAI: ClientAI = ClientAI()
+) {
 
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
 
     /**
      * Genera [quanti] esercizi nuovi del tipo richiesto.
      *
-     * @param apiKey chiave Groq dell'utente
+     * @param config provider, chiave e modello scelti dal profilo
      * @param tipo quale sezione deve generare
      * @param livello livello CEFR (A0-B2)
      * @param quanti quanti esercizi (consigliato 5-10)
      * @param contestoMedico true = usa vocabolario medico/ospedaliero
      * @param evita lista di testi già mostrati, per non ripetere le domande
-     * @param modello modello opzionale (null = cascata dei free)
      * @return lista di esercizi validati, senza duplicati di contenuto e
      *         al massimo [quanti] elementi (può essere più corta se il modello
      *         produce esercizi ripetuti o scadenti)
      */
     suspend fun genera(
-        apiKey: String,
+        config: ConfigurazioneAI,
         tipo: TipoEsercizio,
         livello: String,
         quanti: Int = 5,
         contestoMedico: Boolean = false,
         contestoUtente: String = "",
         evita: List<String> = emptyList(),
-        modello: String? = null,
         tema: String? = null
     ): List<EsercizioGenerato> = withContext(Dispatchers.IO) {
-        // Free mode (no API key): uses Gemini endpoint automatically
         if (quanti <= 0) return@withContext emptyList()
 
         val systemPrompt = costruisciPrompt(
             tipo, livello, quanti, contestoMedico, contestoUtente, evita, tema
         )
-        val messaggi = listOf(
-            ChatMessageCompat("system", systemPrompt),
-            ChatMessageCompat("user", "Genera gli esercizi in JSON.")
+        val risposta = clientAI.chat(
+            config = config,
+            system = systemPrompt,
+            cronologia = listOf(MessaggioAI("user", "Genera gli esercizi in JSON.")),
+            maxTokens = 4096,
+            temperature = 0.25,
+            reasoningEffort = "low"
         )
-
-        val modelli = if (!modello.isNullOrBlank()) listOf(modello)
-            else if (apiKey.isBlank()) TutorService.MODELLI_NO_KEY else TutorService.MODELLI_FREE
-
-        var ultimoErrore: String? = null
-        var rateLimited = false
-        // 2 tentativi: se tutti i modelli danno rate limit (429), aspetta e riprova
-        for (tentativo in 1..2) {
-            for (m in modelli) {
-                try {
-                    val risposta = chiamaModello(apiKey, m, messaggi)
-                    val esercizi = parseEsercizi(risposta, tipo, livello, quanti)
-                    if (esercizi.isNotEmpty()) {
-                        return@withContext revisiona(apiKey, m, esercizi, tipo, livello)
-                    }
-                    ultimoErrore = "Risposta non valida dal modello $m"
-                } catch (e: IOException) {
-                    ultimoErrore = e.message
-                    // 401 = chiave non valida: inutile provare altri modelli
-                    if (e.message?.contains("non valida") == true) throw e
-                    if (e.message?.contains("Troppe richieste") == true) rateLimited = true
-                }
-            }
-            if (!rateLimited) break
-            if (tentativo < 2) delay(4000)
+        val esercizi = parseEsercizi(risposta, tipo, livello, quanti)
+        if (esercizi.isEmpty()) {
+            throw IOException("Risposta non valida dal generatore di esercizi.")
         }
-        throw IOException(ultimoErrore ?: "Nessun modello disponibile al momento")
+        return@withContext revisiona(config, esercizi, tipo, livello)
     }
 
     /**
@@ -161,9 +135,8 @@ class GeneratoreEsercizi {
      * tengono gli esercizi originali. Costa una sola chiamata in più per
      * generazione, ma evita di mostrare esercizi senza senso.
      */
-    private fun revisiona(
-        apiKey: String,
-        modello: String,
+    private suspend fun revisiona(
+        config: ConfigurazioneAI,
         esercizi: List<EsercizioGenerato>,
         tipo: TipoEsercizio,
         livello: String
@@ -193,12 +166,15 @@ class GeneratoreEsercizi {
 
             $elenco
         """.trimIndent()
-        val messaggi = listOf(
-            ChatMessageCompat("system", prompt),
-            ChatMessageCompat("user", "Restituisci il JSON con gli indici da scartare.")
-        )
+        val messaggi = listOf(MessaggioAI("user", "Restituisci il JSON con gli indici da scartare."))
         return try {
-            val risposta = chiamaModello(apiKey, modello, messaggi)
+            val risposta = clientAI.chat(
+                config = config,
+                system = prompt,
+                cronologia = messaggi,
+                maxTokens = 1024,
+                temperature = 0.0
+            )
             val jsonPulito = estraiJson(risposta) ?: return esercizi
             val revisione = json.decodeFromString(RevisioneAi.serializer(), jsonPulito)
             val scarta = revisione.scarta.toSet()
@@ -410,48 +386,6 @@ class GeneratoreEsercizi {
         """.trimIndent()
     }
 
-    private fun chiamaModello(
-        apiKey: String,
-        modello: String,
-        messaggi: List<ChatMessageCompat>
-    ): String {
-        val isFreeMode = apiKey.isBlank()
-        val url = if (isFreeMode) TutorService.FREE_ENDPOINT else "https://api.groq.com/openai/v1/chat/completions"
-        val effectiveKey = apiKey.trim().ifBlank { TutorService.FREE_API_KEY }
-
-        val body = json.encodeToString(
-            ChatRequestCompat.serializer(),
-            ChatRequestCompat(model = modello, messages = messaggi, reasoningEffort = if (modello.contains("oss", ignoreCase = true)) "low" else null)
-        )
-        val builder = Request.Builder()
-            .url(url)
-            .header("Authorization", "Bearer $effectiveKey")
-            .header("Content-Type", "application/json")
-
-        if (!isFreeMode) {
-            builder.header("HTTP-Referer", "https://github.com/ItsZale0/tedesco-app")
-            builder.header("X-Title", "Deutsch")
-        }
-
-        val request = builder.post(body.toRequestBody("application/json".toMediaType())).build()
-
-        client.newCall(request).execute().use { response ->
-            val testo = response.body?.string().orEmpty()
-            if (!response.isSuccessful) {
-                throw IOException(
-                    when (response.code) {
-                        401 -> "Chiave API non valida."
-                        429, 403 -> "Troppe richieste. Riprova tra poco."
-                        else -> "Errore del server (${response.code})"
-                    }
-                )
-            }
-            val parsed = json.decodeFromString(ChatResponseCompat.serializer(), testo)
-            return parsed.choices.firstOrNull()?.messageCompat?.content
-                ?: throw IOException("Risposta vuota dal generatore")
-        }
-    }
-
     /**
      * Estrae il JSON dalla risposta (il modello a volte aggiunge ```json o testo),
      * poi converte in [EsercizioGenerato] scartando gli elementi invalidi.
@@ -602,28 +536,7 @@ class GeneratoreEsercizi {
     }
 }
 
-// ── Modelli di compatibilità per il generatore (evitano di toccare TutorService) ──
+// ── Modelli interni del generatore ──
 
 @Serializable
 private data class RevisioneAi(val scarta: List<Int> = emptyList())
-
-@Serializable
-private data class ChatMessageCompat(val role: String, val content: String)
-
-@Serializable
-private data class ChatRequestCompat(
-    val model: String,
-    val messages: List<ChatMessageCompat>,
-    @SerialName("max_tokens") val maxTokens: Int = 4096,
-    val temperature: Double = 0.25,
-    @SerialName("reasoning_effort") val reasoningEffort: String? = null
-)
-
-@Serializable
-private data class ChatMessageRespCompat(val content: String)
-
-@Serializable
-private data class ChatChoiceCompat(@SerialName("message") val messageCompat: ChatMessageRespCompat? = null)
-
-@Serializable
-private data class ChatResponseCompat(val choices: List<ChatChoiceCompat> = emptyList())

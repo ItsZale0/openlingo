@@ -77,6 +77,11 @@ object BackupMerge {
                 ?: remoto.config.guidaDocId,
             tutorApiKey = locale.config.tutorApiKey.ifBlank { remoto.config.tutorApiKey },
             geminiApiKey = locale.config.geminiApiKey.ifBlank { remoto.config.geminiApiKey },
+            providerAI = locale.config.providerAI ?: remoto.config.providerAI,
+            // Ogni chiave locale vince; le chiavi presenti solo nel cloud
+            // vengono recuperate (es. provider configurato su un altro dispositivo).
+            chiaviAI = remoto.config.chiaviAI + locale.config.chiaviAI,
+            modelloAI = locale.config.modelloAI.ifBlank { remoto.config.modelloAI },
             palette = locale.config.palette.ifBlank { remoto.config.palette },
             stileDesign = locale.config.stileDesign.ifBlank { remoto.config.stileDesign }
         ),

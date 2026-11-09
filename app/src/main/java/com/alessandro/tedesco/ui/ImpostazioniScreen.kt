@@ -80,7 +80,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alessandro.tedesco.data.ProfiliPreset
 import com.alessandro.tedesco.data.local.LivelloCEFR
 import com.alessandro.tedesco.data.local.ProfiloUtente
+import com.alessandro.tedesco.data.local.ProviderAI
 import com.alessandro.tedesco.data.local.TipoProfilo
+import com.alessandro.tedesco.data.local.providerEffettivo
 import com.alessandro.tedesco.data.remote.UpdateState
 import com.alessandro.tedesco.data.remote.UpdateSettings
 import com.alessandro.tedesco.data.remote.UpdateWorker
@@ -296,8 +298,11 @@ fun ImpostazioniScreen(
     }
     var guidaDocId by rememberSaveable { mutableStateOf(profilo?.config?.guidaDocId ?: "") }
     var contestoUtente by rememberSaveable { mutableStateOf(profilo?.config?.contestoUtente ?: "") }
-    var chiaveTutor by rememberSaveable { mutableStateOf(profilo?.config?.tutorApiKey ?: "") }
-    var chiaveGemini by rememberSaveable { mutableStateOf(profilo?.config?.geminiApiKey ?: "") }
+    var providerAI by rememberSaveable {
+        mutableStateOf(profilo?.config?.providerEffettivo() ?: ProviderAI.PREDEFINITO)
+    }
+    var chiaviAI by remember { mutableStateOf(profilo?.config?.chiaviAI ?: emptyMap()) }
+    var modelloAI by rememberSaveable { mutableStateOf(profilo?.config?.modelloAI ?: "") }
 
     // --- Sistema di notifiche (promemoria locali) ---
     var notRipassoAttivo by remember { mutableStateOf(true) }
@@ -622,49 +627,34 @@ fun ImpostazioniScreen(
 // --- TUTOR AI ---
                 SettingsExpandableSection(
                     title = "Tutor AI",
-                    description = "Facoltativo: inserisci la tua chiave per usare il tutor. " +
+                    description = "Facoltativo: scegli un provider e incolla la chiave. " +
                         "Senza chiave restano disponibili tutti i contenuti offline."
                 ) {
-                    OutlinedTextField(
-                        value = chiaveTutor, onValueChange = { chiaveTutor = it },
-                        label = { Text("Chiave Groq") },
-                        modifier = Modifier.fillMaxWidth(), singleLine = true,
-                        placeholder = { Text("gsk_...") },
-                        shape = GlassShape,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
-                        )
+                    ProviderAIChips(provider = providerAI, onProvider = { providerAI = it })
+                    Spacer(Modifier.height(8.dp))
+                    ChiaveAIField(
+                        provider = providerAI,
+                        valore = chiaviAI[providerAI.id].orEmpty(),
+                        onValore = { valore ->
+                            chiaviAI = if (valore.isBlank()) {
+                                chiaviAI - providerAI.id
+                            } else {
+                                chiaviAI + (providerAI.id to valore)
+                            }
+                        }
                     )
                     Spacer(Modifier.height(8.dp))
-                    OutlinedTextField(
-                        value = chiaveGemini, onValueChange = { chiaveGemini = it },
-                        label = { Text("Chiave Gemini (opzionale)") },
-                        modifier = Modifier.fillMaxWidth(), singleLine = true,
-                        placeholder = { Text("AIza...") },
-                        shape = GlassShape,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
-                        )
+                    ModelloAIField(
+                        provider = providerAI,
+                        valore = modelloAI,
+                        onValore = { modelloAI = it }
                     )
-                    GlassExpandableSection(
-                            title = "Info",
-                            description = null
-                        ) {
-                            Text(
-                                text = "Il tutor AI è facoltativo: l'app funziona offline senza chiavi.\n\n" +
-                            "Per attivarlo:\n\n" +
-                            "1. Vai su console.groq.com e accedi\n" +
-                            "2. Profile → Keys → Create Key\n" +
-                            "3. Copia la chiave (gsk_...) e incollala qui\n\n" +
-                            "La chiave resta sul dispositivo. L'app usa solo modelli gratuiti: non spenderai nulla.",
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.padding(12.dp)
-                            )
-                        }
+                    Spacer(Modifier.height(8.dp))
+                    NotaProviderAI(providerAI)
                     Spacer(Modifier.height(12.dp))
-                    SettingsButton(onClick = { vm.aggiornaTutorApiKey(chiaveTutor); vm.aggiornaGeminiApiKey(chiaveGemini) }) { Text("Salva chiavi") }
+                    SettingsButton(onClick = {
+                        vm.salvaConfigurazioneAI(providerAI, chiaviAI, modelloAI)
+                    }) { Text("Salva configurazione AI") }
                 }
                 Spacer(Modifier.height(12.dp))
 

@@ -19,7 +19,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -34,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alessandro.tedesco.data.local.LivelloIniziale
 import com.alessandro.tedesco.data.local.ProfiloUtente
+import com.alessandro.tedesco.data.local.ProviderAI
 import com.alessandro.tedesco.ui.theme.dimensioneContenuto
 import com.alessandro.tedesco.ui.theme.spaziaturaSchermo
 
@@ -51,9 +51,10 @@ fun CaricamentoIniziale() {
 /**
  * Primo avvio: non esiste alcun profilo.
  *
- * L'utente crea il proprio profilo e sceglie il livello di partenza. Il
- * contesto scritto qui (professione, interessi, obiettivi) viene usato dall'AI
- * per personalizzare lezioni, esercizi e vocabolario.
+ * L'utente crea il proprio profilo, sceglie il livello di partenza e descrive
+ * chi è e cosa vuole imparare. Quella descrizione è la base con cui l'AI
+ * personalizza tutor, lezioni, esercizi e vocabolario: non serve più un
+ * interruttore separato per il contesto sanitario.
  */
 @Composable
 fun BenvenutoScreen(vm: TedescoViewModel) {
@@ -81,8 +82,15 @@ fun BenvenutoScreen(vm: TedescoViewModel) {
 
             FormNuovoProfilo(
                 testoBottone = "Crea profilo e inizia",
-                onCrea = { nome, livello, contesto, medico ->
-                    vm.creaProfilo(nome, livello, contesto, medico)
+                onCrea = { nome, livello, contesto, provider, chiavi, modello ->
+                    vm.creaProfilo(
+                        nome = nome,
+                        livello = livello,
+                        contesto = contesto,
+                        providerAI = provider,
+                        chiaviAI = chiavi.mapKeys { it.key.id },
+                        modelloAI = modello
+                    )
                 }
             )
         }
@@ -125,8 +133,15 @@ fun SceltaProfiloScreen(vm: TedescoViewModel) {
             if (creaNuovo) {
                 FormNuovoProfilo(
                     testoBottone = "Crea profilo",
-                    onCrea = { nome, livello, contesto, medico ->
-                        vm.creaProfilo(nome, livello, contesto, medico)
+                    onCrea = { nome, livello, contesto, provider, chiavi, modello ->
+                        vm.creaProfilo(
+                            nome = nome,
+                            livello = livello,
+                            contesto = contesto,
+                            providerAI = provider,
+                            chiaviAI = chiavi.mapKeys { it.key.id },
+                            modelloAI = modello
+                        )
                         creaNuovo = false
                     }
                 )
@@ -171,12 +186,23 @@ private fun CardProfilo(profilo: ProfiloUtente, onEntra: () -> Unit) {
 @Composable
 private fun FormNuovoProfilo(
     testoBottone: String,
-    onCrea: (nome: String, livello: LivelloIniziale, contesto: String, medico: Boolean) -> Unit
+    onCrea: (
+        nome: String,
+        livello: LivelloIniziale,
+        contesto: String,
+        provider: ProviderAI,
+        chiavi: Map<ProviderAI, String>,
+        modello: String
+    ) -> Unit
 ) {
     var nome by remember { mutableStateOf("") }
     var livello by remember { mutableStateOf(LivelloIniziale.A0) }
     var contesto by remember { mutableStateOf("") }
-    var medico by remember { mutableStateOf(false) }
+
+    var provider by remember { mutableStateOf(ProviderAI.PREDEFINITO) }
+    var chiavi by remember { mutableStateOf<Map<ProviderAI, String>>(emptyMap()) }
+    var modello by remember { mutableStateOf("") }
+    var mostraAltreChiavi by remember { mutableStateOf(false) }
 
     Column(Modifier.fillMaxWidth()) {
         OutlinedTextField(
@@ -208,39 +234,77 @@ private fun FormNuovoProfilo(
         OutlinedTextField(
             value = contesto,
             onValueChange = { contesto = it },
-            label = { Text("Contesto e obiettivi (facoltativo)") },
-            placeholder = { Text("Es. elettricista: vorrei parlare con i clienti in cantiere") },
-            minLines = 2,
+            label = { Text("Descrizione: chi sei e cosa vuoi imparare") },
+            placeholder = {
+                Text("Es. fisioterapista: voglio parlare con pazienti e colleghi in tedesco")
+            },
+            minLines = 3,
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.height(4.dp))
         Text(
-            "Serve all'AI per scegliere esempi e vocabolario adatti a te. " +
-                "Puoi cambiarlo quando vuoi nelle impostazioni.",
+            "L'AI usa questa descrizione per scegliere esempi, esercizi, lezioni e " +
+                "vocabolario adatti a te. Se lavori in ambito sanitario, scrivilo qui: " +
+                "è una personalizzazione come le altre. Puoi cambiarla quando vuoi.",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(20.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(Modifier.weight(1f)) {
-                Text("Contesto sanitario", style = MaterialTheme.typography.bodyMedium)
-                Text(
-                    "Esercizi e vocaboli con lessico medico/ospedaliero.",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+        Text(
+            "AI (facoltativa)",
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.SemiBold
+        )
+        Spacer(Modifier.height(4.dp))
+        Text(
+            "Scegli un provider e incolla la chiave. Senza chiave l'app funziona lo stesso: " +
+                "restano tutti i contenuti offline, ma niente tutor e generazione AI.",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(Modifier.height(8.dp))
+
+        ProviderAIChips(provider = provider, onProvider = { provider = it })
+        Spacer(Modifier.height(8.dp))
+        ChiaveAIField(
+            provider = provider,
+            valore = chiavi[provider].orEmpty(),
+            onValore = { chiavi = chiavi + (provider to it) }
+        )
+        Spacer(Modifier.height(8.dp))
+        ModelloAIField(
+            provider = provider,
+            valore = modello,
+            onValore = { modello = it }
+        )
+        Spacer(Modifier.height(4.dp))
+        TextButton(onClick = { mostraAltreChiavi = !mostraAltreChiavi }) {
+            Text(
+                if (mostraAltreChiavi) "Nascondi le altre chiavi"
+                else "Aggiungi chiavi per altri provider"
+            )
+        }
+        if (mostraAltreChiavi) {
+            ProviderAI.entries.filter { it != provider }.forEach { altro ->
+                Spacer(Modifier.height(8.dp))
+                ChiaveAIField(
+                    provider = altro,
+                    valore = chiavi[altro].orEmpty(),
+                    onValore = { chiavi = chiavi + (altro to it) }
                 )
             }
-            Switch(checked = medico, onCheckedChange = { medico = it })
         }
+        Spacer(Modifier.height(8.dp))
+        NotaProviderAI(provider)
         Spacer(Modifier.height(16.dp))
 
         Button(
             onClick = {
-                onCrea(nome.trim(), livello, contesto.trim(), medico)
+                val pulite = chiavi
+                    .mapValues { (_, chiave) -> chiave.trim() }
+                    .filterValues { it.isNotEmpty() }
+                onCrea(nome.trim(), livello, contesto.trim(), provider, pulite, modello.trim())
             },
             enabled = nome.isNotBlank(),
             modifier = Modifier.fillMaxWidth().height(52.dp)

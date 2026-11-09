@@ -6,6 +6,7 @@ import com.alessandro.tedesco.data.local.ProfiliRepository
 import com.alessandro.tedesco.data.local.ProgressoUtente
 import com.alessandro.tedesco.data.local.ProfiloStato
 import com.alessandro.tedesco.data.local.ProfiloUtente
+import com.alessandro.tedesco.data.local.ProviderAI
 import com.alessandro.tedesco.data.local.TipoProfilo
 import com.alessandro.tedesco.data.local.WordSource
 
@@ -57,8 +58,11 @@ object ProfiliPreset {
      * @param id identificatore stabile (non cambia mai)
      * @param nome nome mostrato all'utente
      * @param livello livello CEFR di partenza
-     * @param contesto contesto personale per l'AI (professione, obiettivi)
-     * @param mostraContestoMedico true = contenuti con lessico sanitario
+     * @param contesto descrizione personale per l'AI (professione, interessi, obiettivi)
+     * @param mostraContestoMedico mantenuto per compatibilità con i profili storici
+     * @param providerAI provider AI scelto
+     * @param chiaviAI chiavi API inserite, per id di provider
+     * @param modelloAI modello scelto (vuoto = predefinito del provider)
      */
     fun nuovo(
         id: String,
@@ -67,28 +71,45 @@ object ProfiliPreset {
         contesto: String = "",
         mostraContestoMedico: Boolean = false,
         tipo: TipoProfilo = TipoProfilo.PERSONALIZZATO,
+        providerAI: ProviderAI? = null,
+        chiaviAI: Map<String, String> = emptyMap(),
+        modelloAI: String = "",
         now: Long = System.currentTimeMillis()
-    ): ProfiloUtente = ProfiloUtente(
-        id = id,
-        config = ProfiloConfig(
-            tipo = tipo,
-            nomeVisualizzato = nome,
-            enableCustomWords = true,
-            enableGoogleSheets = false,
-            googleSheetId = null,
-            feedUrl = "",
-            guidaDocId = null,
-            tutorApiKey = DEFAULT_TUTOR_API_KEY,
-            livelloIniziale = livello,
-            mostraContestoMedico = mostraContestoMedico,
-            contestoUtente = contesto.trim()
-        ),
-        stato = ProfiloStato(
-            progresso = ProgressoUtente(livelloCorrente = livello.toLivelloCEFR())
-        ),
-        creatoIl = now,
-        ultimoAccesso = now
-    )
+    ): ProfiloUtente {
+        val chiaviPulite = chiaviAI
+            .mapValues { (_, chiave) -> chiave.trim() }
+            .filterValues { it.isNotEmpty() }
+        val provider = providerAI ?: chiaviPulite.keys
+            .asSequence()
+            .mapNotNull(ProviderAI::daId)
+            .firstOrNull()
+
+        return ProfiloUtente(
+            id = id,
+            config = ProfiloConfig(
+                tipo = tipo,
+                nomeVisualizzato = nome,
+                enableCustomWords = true,
+                enableGoogleSheets = false,
+                googleSheetId = null,
+                feedUrl = "",
+                guidaDocId = null,
+                tutorApiKey = chiaviPulite[ProviderAI.GROQ.id].orEmpty(),
+                geminiApiKey = chiaviPulite[ProviderAI.GEMINI.id].orEmpty(),
+                providerAI = provider,
+                chiaviAI = chiaviPulite,
+                modelloAI = modelloAI.trim(),
+                livelloIniziale = livello,
+                mostraContestoMedico = mostraContestoMedico,
+                contestoUtente = contesto.trim()
+            ),
+            stato = ProfiloStato(
+                progresso = ProgressoUtente(livelloCorrente = livello.toLivelloCEFR())
+            ),
+            creatoIl = now,
+            ultimoAccesso = now
+        )
+    }
 
     /**
      * Id del vecchio profilo "Alessandro Personalizzato", rimosso nell'1.43.3.

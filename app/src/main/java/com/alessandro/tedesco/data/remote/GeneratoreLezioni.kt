@@ -1,19 +1,11 @@
 package com.alessandro.tedesco.data.remote
 
-import okhttp3.OkHttpClient
-
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
-import com.alessandro.tedesco.di.HttpCondiviso
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
+import com.alessandro.tedesco.data.local.ConfigurazioneAI
 import java.io.IOException
-import java.util.concurrent.TimeUnit
 
 /**
  * Genera una lezione COMPLETA (contenuto + vocabolario) per il livello dello studente.
@@ -55,18 +47,19 @@ data class LezioneGenerata(
 )
 
 class GeneratoreLezioni(
-    private val client: OkHttpClient = HttpCondiviso.client
+    private val clientAI: ClientAI = ClientAI()
 ) {
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
 
     /**
      * Genera la lezione [numero] per il livello [livello].
      *
+     * @param config provider, chiave e modello scelti dal profilo
      * @param argomento tema della lezione (es. "Città e paese"); se vuoto lo sceglie il modello
      * @param paroleNote parole gia' presenti, da NON ripetere
      */
     suspend fun genera(
-        apiKey: String,
+        config: ConfigurazioneAI,
         numero: Int,
         livello: String,
         argomento: String,
@@ -74,28 +67,31 @@ class GeneratoreLezioni(
         contesto: String = "",
         contestoMedico: Boolean = false
     ): LezioneGenerata = withContext(Dispatchers.IO) {
-        val modelli = if (apiKey.trim().isBlank()) TutorService.MODELLI_NO_KEY else TutorService.MODELLI_FREE
         val messaggi = listOf(
-            LezMsg(
-                "system",
-                promptSistema(livello, numero, argomento, paroleNote, contesto, contestoMedico)
-            ),
-            LezMsg("user", "Genera la lezione $numero per il livello $livello.")
+            MessaggioAI(
+                "user",
+                "Genera la lezione $numero per il livello $livello."
+            )
         )
 
         var ultimoErrore: Exception? = null
         for (tentativo in 1..2) {
-            for (modello in modelli) {
-                try {
-                    val testo = chiama(apiKey, modello, messaggi)
-                    val parsed = estrai(testo)
-                    if (parsed != null && parsed.parole.isNotEmpty()) return@withContext parsed
-                } catch (e: IOException) {
-                    ultimoErrore = e
-                    if (e.message?.contains("non valida") == true) throw e
-                }
+            try {
+                val testo = clientAI.chat(
+                    config = config,
+                    system = promptSistema(livello, numero, argomento, paroleNote, contesto, contestoMedico),
+                    cronologia = messaggi,
+                    maxTokens = 4096,
+                    temperature = 0.35,
+                    reasoningEffort = "low"
+                )
+                val parsed = estrai(testo)
+                if (parsed != null && parsed.parole.isNotEmpty()) return@withContext parsed
+                ultimoErrore = IOException("Risposta non valida dal generatore di lezioni")
+            } catch (e: IOException) {
+                ultimoErrore = e
+                if (e.message?.contains("non valida", ignoreCase = true) == true) throw e
             }
-            delay(3000)
         }
         throw ultimoErrore ?: IOException("Generazione della lezione non riuscita")
     }
@@ -158,41 +154,6 @@ class GeneratoreLezioni(
         """.trimIndent()
     }
 
-    private fun chiama(apiKey: String, modello: String, messaggi: List<LezMsg>): String {
-        val isFree = apiKey.trim().isBlank()
-        val key = apiKey.trim().ifBlank { TutorService.FREE_API_KEY }
-        val body = json.encodeToString(
-            LezReq.serializer(),
-            LezReq(
-                model = modello,
-                messages = messaggi,
-                reasoningEffort = if (modello.contains("oss", ignoreCase = true)) "low" else null
-            )
-        )
-        val request = Request.Builder()
-            .url(TutorService.FREE_ENDPOINT)
-            .header("Authorization", "Bearer $key")
-            .header("Content-Type", "application/json")
-            .post(body.toRequestBody("application/json".toMediaType()))
-            .build()
-
-        client.newCall(request).execute().use { response ->
-            val testo = response.body?.string().orEmpty()
-            if (!response.isSuccessful) {
-                throw IOException(
-                    when (response.code) {
-                        401 -> "Chiave API non valida."
-                        429, 403 -> "Troppe richieste. Riprova tra poco."
-                        else -> "Errore del server (${response.code})"
-                    }
-                )
-            }
-            val parsed = json.decodeFromString(LezRes.serializer(), testo)
-            return parsed.choices.firstOrNull()?.message?.content
-                ?: throw IOException("Risposta vuota dal generatore")
-        }
-    }
-
     /** Estrae il JSON dalla risposta (il modello a volte aggiunge ```json o testo attorno). */
     private fun estrai(testo: String): LezioneGenerata? {
         val pulito = testo.replace("```json", "").replace("```", "").trim()
@@ -235,20 +196,3 @@ class GeneratoreLezioni(
         Regex("[\\u0600-\\u06FF\\u0750-\\u077F\\u0400-\\u04FF\\u4E00-\\u9FFF\\u3040-\\u30FF]")
             .containsMatchIn(t)
 }
-
-@Serializable
-private data class LezMsg(val role: String, val content: String)
-
-@Serializable
-private data class LezReq(
-    val model: String,
-    val messages: List<LezMsg>,
-    val temperature: Double = 0.35,
-    @SerialName("reasoning_effort") val reasoningEffort: String? = null
-)
-
-@Serializable
-private data class LezChoice(val message: LezMsg? = null)
-
-@Serializable
-private data class LezRes(val choices: List<LezChoice> = emptyList())
