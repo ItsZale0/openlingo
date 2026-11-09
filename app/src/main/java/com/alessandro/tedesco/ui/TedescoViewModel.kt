@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -569,7 +571,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    /** Ricarica i profili (usato dal pulsante "Riprova" nella selezione). */
+    /** Ricarica i profili (usato dal pulsante t("Riprova") nella selezione). */
     fun ricaricaProfili() {
         viewModelScope.launch { profileManager.ricarica() }
     }
@@ -582,7 +584,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
             // Subito dopo il cambio: la memoria del profilo precedente non deve
             // restare visibile (Emma non deve vedere le lezioni di Alessandro).
             resetStatoProfilo()
-            _messaggio.value = "Profilo attivato"
+            _messaggio.value = t("Profilo attivato")
             sincronizza(mostraMessaggio = false)
         }
     }
@@ -636,7 +638,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                 modelloAI = modelloAI
             )
             resetStatoProfilo()
-            _messaggio.value = "Profilo creato"
+            _messaggio.value = t("Profilo creato")
             sincronizza(mostraMessaggio = false)
         }
     }
@@ -646,7 +648,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch {
             profileManager.eliminaProfilo(profiloId)
             resetStatoProfilo()
-            _messaggio.value = "Profilo eliminato"
+            _messaggio.value = t("Profilo eliminato")
             sincronizza(mostraMessaggio = false)
         }
     }
@@ -655,7 +657,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
     fun aggiornaContestoUtente(contesto: String) {
         viewModelScope.launch {
             profileManager.aggiornaContestoUtente(contesto)
-            _messaggio.value = "Contesto salvato"
+            _messaggio.value = t("Contesto salvato")
         }
     }
 
@@ -691,7 +693,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                     }
 
                 is SyncResult.NotModified ->
-                    if (mostraMessaggio) _messaggio.value = "Già aggiornato"
+                    if (mostraMessaggio) _messaggio.value = t("Già aggiornato")
 
                 is SyncResult.Failed ->
                     if (mostraMessaggio) _messaggio.value = "Errore: ${r.message}"
@@ -709,7 +711,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
      * Prima leggeva `paroleDaRipassare.value`: un flusso pigro parte da una
      * lista VUOTA e si riempie solo mentre una schermata lo osserva — senza
      * osservatori attivi la sessione risultava sempre vuota (regressione 1.43.3:
-     * "Nessuna parola da ripassare ora" anche con scadenze in ritardo).
+     * t("Nessuna parola da ripassare ora") anche con scadenze in ritardo).
      * Ora le carte vengono calcolate subito, fuori dal main, con la stessa
      * formula di [com.alessandro.tedesco.data.VerificaLessico.paroleDaRipassare]:
      * fragili (sbagliate in verifica) + scadute (ripetizione spaziata).
@@ -732,7 +734,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
             }
             _caricamento.value = false
             _sessione.value = SessionState(cards = cards)
-            _messaggio.value = if (cards.isEmpty()) "Niente da ripassare. Torna domani."
+            _messaggio.value = if (cards.isEmpty()) t("Niente da ripassare. Torna domani.")
             else "Ripasso di ${cards.size} parole"
         }
     }
@@ -843,7 +845,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
             runCatching {
                 repo.addCustomWord(german, italian, example, article, pronunciation, lesson, tags)
             }.onSuccess {
-                _messaggio.value = "Parola aggiunta"
+                _messaggio.value = t("Parola aggiunta")
                 // Pubblica sul canale: un cron la committa nel vocabolario su GitHub.
                 val topic = profileManager.topicPubblicazione()
                 if (topic.isNotBlank()) {
@@ -866,7 +868,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
     fun eliminaParolaCustom(id: String) {
         viewModelScope.launch {
             repo.deleteCustomWord(id)
-            _messaggio.value = "Parola eliminata"
+            _messaggio.value = t("Parola eliminata")
         }
     }
 
@@ -903,14 +905,14 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                     profileManager.aggiornaStatoAttivo(nuovoStato)
                 }
             }
-            _messaggio.value = "Esercizio eliminato"
+            _messaggio.value = t("Esercizio eliminato")
         }
     }
 
     fun reset() {
         viewModelScope.launch {
             repo.resetAll()
-            _messaggio.value = "Dati del profilo cancellati"
+            _messaggio.value = t("Dati del profilo cancellati")
             sincronizza()
         }
     }
@@ -1163,12 +1165,12 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
             if (pulito.length > 2) return pulito
         }
         val temi = listOf(
-            "Presentarsi e salutare", "Numeri, eta' e date", "La famiglia",
-            "Citta' e paese", "Cibo e bevande", "La giornata e le ore",
-            "Tempo libero e hobby", "Casa e stanze", "Vestiti e colori",
-            "Salute e corpo", "Viaggi e mezzi", "Lavoro e professioni",
-            "Tempo atmosferico", "Animali", "Soldi, negozi e prezzi",
-            "Al telefono", "Al ristorante", "In farmacia"
+            t("Presentarsi e salutare"), t("Numeri, eta' e date"), t("La famiglia"),
+            t("Citta' e paese"), t("Cibo e bevande"), t("La giornata e le ore"),
+            t("Tempo libero e hobby"), t("Casa e stanze"), "Vestiti e colori",
+            t("Salute e corpo"), "Viaggi e mezzi", t("Lavoro e professioni"),
+            t("Tempo atmosferico"), t("Animali"), t("Soldi, negozi e prezzi"),
+            t("Al telefono"), t("Al ristorante"), t("In farmacia")
         )
         return temi[(numero - 1).mod(temi.size)]
     }
@@ -1206,7 +1208,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                 _lezioneStato.value = StatoLezione.Fatto(aggiunte)
                 _messaggio.value = "Lezione $n generata: $aggiunte parole nuove nel lessico"
             } catch (e: Exception) {
-                _lezioneStato.value = StatoLezione.Errore(e.message ?: "Generazione non riuscita")
+                _lezioneStato.value = StatoLezione.Errore(e.message ?: t("Generazione non riuscita"))
             }
         }
     }
@@ -1216,14 +1218,14 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
     fun aggiornaFeedUrl(nuovoUrl: String) {
         viewModelScope.launch {
             profileManager.aggiornaFeedUrl(nuovoUrl)
-            _messaggio.value = "Feed URL aggiornato"
+            _messaggio.value = t("Feed URL aggiornato")
         }
     }
 
     fun aggiornaGuidaDocId(nuovoDocId: String?) {
         viewModelScope.launch {
             profileManager.aggiornaGuidaDocId(nuovoDocId?.ifBlank { null })
-            _messaggio.value = "Documento guida aggiornato"
+            _messaggio.value = t("Documento guida aggiornato")
         }
     }
 
@@ -1231,7 +1233,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
     fun cambiaPalette(nuovaPalette: String) {
         viewModelScope.launch {
             profileManager.cambiaPalette(nuovaPalette)
-            _messaggio.value = "Colore aggiornato"
+            _messaggio.value = t("Colore aggiornato")
         }
     }
 
@@ -1246,14 +1248,14 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
     fun aggiornaTutorApiKey(nuovaChiave: String) {
         viewModelScope.launch {
             profileManager.aggiornaTutorApiKey(nuovaChiave)
-            _messaggio.value = if (nuovaChiave.isBlank()) "Chiave tutor rimossa" else "Chiave tutor salvata"
+            _messaggio.value = if (nuovaChiave.isBlank()) t("Chiave tutor rimossa") else t("Chiave tutor salvata")
         }
     }
 
     fun aggiornaGeminiApiKey(nuovaChiave: String) {
         viewModelScope.launch {
             profileManager.aggiornaGeminiApiKey(nuovaChiave)
-            _messaggio.value = if (nuovaChiave.isBlank()) "Chiave Gemini rimossa" else "Chiave Gemini salvata"
+            _messaggio.value = if (nuovaChiave.isBlank()) t("Chiave Gemini rimossa") else t("Chiave Gemini salvata")
         }
     }
 
@@ -1304,7 +1306,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
     fun segnaMissioneCompletata() {
         viewModelScope.launch {
             profileManager.segnaMissioneCompletata()
-            _messaggio.value = "Missione del giorno completata! Bravissimo!"
+            _messaggio.value = t("Missione del giorno completata! Bravissimo!")
         }
     }
 
@@ -1329,7 +1331,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
     private val _modelloTutor = MutableStateFlow<String?>(null)
 
     // Lista modelli Groq disponibili (fetchata in tempo reale)
-    private val _modelliDisponibili = MutableStateFlow<List<Pair<String?, String>>>(listOf(null to "Automatico (consigliato)"))
+    private val _modelliDisponibili = MutableStateFlow<List<Pair<String?, String>>>(listOf(null to t("Automatico (consigliato)")))
     val modelliDisponibili: StateFlow<List<Pair<String?, String>>> = _modelliDisponibili
     // Livello di ragionamento (null = default/none)
     private val _ragionamento = MutableStateFlow<String?>(null)
@@ -1387,7 +1389,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
         lezione: Int
     ): Result<String> {
         val scenario = _roleplayScenario.value
-            ?: return Result.failure(IllegalStateException("Nessuno scenario selezionato"))
+            ?: return Result.failure(IllegalStateException(t("Nessuno scenario selezionato")))
         return runCatching {
             aiService.chiediAlRoleplay(
                 config = configurazioneAI(),
@@ -1562,7 +1564,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
      * Pre-genera esercizi in background (passivo) se il buffer di NON completati
      * scende sotto la soglia. Da chiamare all'ingresso della schermata e dopo
      * aver completato un esercizio: cosi lo studente trova sempre quiz freschi
-     * senza premere "Genera altri".
+     * senza premere t("Genera altri").
      */
     fun preGeneraInBackground(tipo: TipoEsercizio, soglia: Int = 3, quanti: Int = 5) {
         if (tipo in _generazioneInCorso.value) return
@@ -2088,13 +2090,13 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
     fun avviaSessione(tipo: String) {
         when (tipo) {
             "SESSIONE" -> {
-                _messaggio.value = "Sessione avviata: inizia dal ripasso"
+                _messaggio.value = t("Sessione avviata: inizia dal ripasso")
                 nuovaSessione()
             }
-            "TEST" -> _messaggio.value = "Test: vai in Altro > Test"
-            "ROLEPLAY" -> _messaggio.value = "Roleplay: scrivi il dialogo nel tutor"
+            "TEST" -> _messaggio.value = t("Test: vai in Altro > Test")
+            "ROLEPLAY" -> _messaggio.value = t("Roleplay: scrivi il dialogo nel tutor")
             "RIPASSO" -> {
-                _messaggio.value = "Ripasso errori"
+                _messaggio.value = t("Ripasso errori")
                 ripassaErrori()
             }
             else -> _messaggio.value = "Sessione: $tipo"

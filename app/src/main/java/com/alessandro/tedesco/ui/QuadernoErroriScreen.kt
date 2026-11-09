@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
@@ -52,7 +54,7 @@ fun QuadernoErroriScreen(
     val aperti = remember(tutti) { tutti.filter { !it.risolto } }
     val risolti = remember(tutti) { tutti.count { it.risolto } }
 
-    ScreenScaffold("Quaderno errori", onBack = onIndietro) {
+    ScreenScaffold(t("Quaderno errori"), onBack = onIndietro) {
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(Spaziature.sm)
@@ -78,13 +80,13 @@ fun QuadernoErroriScreen(
                         Text(
                             if (daRipassare.isNotEmpty())
                                 "${daRipassare.size} pronti da ripassare adesso"
-                            else "Nessun ripasso in scadenza: torna più tardi.",
+                            else t("Nessun ripasso in scadenza: torna più tardi."),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
                     if (risolti > 0) {
                         TextButton(onClick = { vm.svuotaErroriRisolti() }) {
-                            Text("Pulisci ($risolti)")
+                            Text(t("Pulisci ($risolti)"))
                         }
                     }
                 }
@@ -97,7 +99,7 @@ fun QuadernoErroriScreen(
                 ) {
                     Column(Modifier.fillMaxWidth().padding(Spaziature.lg)) {
                         Text(
-                            "Nessun errore registrato",
+                            t("Nessun errore registrato"),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                             textAlign = TextAlign.Center,
@@ -106,7 +108,7 @@ fun QuadernoErroriScreen(
                         Spacer(Modifier.height(4.dp))
                         Text(
                             "Gli errori di grammatica e produzione finiscono qui automaticamente. " +
-                                "Fai esercizi per riempire il quaderno.",
+                                t("Fai esercizi per riempire il quaderno."),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center,
@@ -147,7 +149,7 @@ fun QuadernoErroriScreen(
                             IconButton(onClick = { vm.eliminaErrore(errore.id) }) {
                                 Icon(
                                     Icons.Filled.Delete,
-                                    contentDescription = "Elimina errore",
+                                    contentDescription = t("Elimina errore"),
                                     modifier = Modifier.size(18.dp),
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -178,11 +180,11 @@ fun QuadernoErroriScreen(
                                 Button(
                                     onClick = { vm.rispondiErrore(errore.id, saputo = true) },
                                     modifier = Modifier.weight(1f)
-                                ) { Text("Sapevo") }
+                                ) { Text(t("Sapevo")) }
                                 OutlinedButton(
                                     onClick = { vm.rispondiErrore(errore.id, saputo = false) },
                                     modifier = Modifier.weight(1f)
-                                ) { Text("Da rivedere") }
+                                ) { Text(t("Da rivedere")) }
                             }
                         } else {
                             OutlinedButton(
@@ -191,7 +193,7 @@ fun QuadernoErroriScreen(
                             ) {
                                 Icon(Icons.Filled.Visibility, contentDescription = null, modifier = Modifier.size(18.dp))
                                 Spacer(Modifier.width(Spaziature.sm))
-                                Text("Mostra risposta")
+                                Text(t("Mostra risposta"))
                             }
                         }
                     }

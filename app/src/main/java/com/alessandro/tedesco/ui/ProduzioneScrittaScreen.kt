@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.verticalScroll
@@ -41,44 +43,44 @@ fun getEserciziScrittura(profilo: ProfiloUtente?): List<EsercizioScrittura> {
     val base = listOf(
         EsercizioScrittura(
             id = "sc1",
-            titolo = "Presentazione personale",
-            istruzioni = "Scrivi 3-4 frasi su di te: come ti chiami, da dove vivi, cosa fai.",
+            titolo = t("Presentazione personale"),
+            istruzioni = t("Scrivi 3-4 frasi su di te: come ti chiami, da dove vivi, cosa fai."),
             esempio = if (profilo?.config?.mostraContestoMedico == true)
                 "Ich heiße Thomas. Ich wohne in Bozen. Ich bin Physiotherapeut. Ich lerne Deutsch."
             else
                 "Ich heiße Sophie. Ich wohne in Bozen. Ich bin Studentin. Ich lerne Deutsch.",
-            suggerimenti = listOf("Nome", "Città", "Lavoro/Studi", "Hobby")
+            suggerimenti = listOf(t("Nome"), t("Città"), t("Lavoro/Studi"), "Hobby")
         ),
         EsercizioScrittura(
             id = "sc2",
-            titolo = "La tua giornata",
-            istruzioni = "Descrivi la tua giornata tipica: quando ti alzi, cosa fai, quando lavori/studi.",
+            titolo = t("La tua giornata"),
+            istruzioni = t("Descrivi la tua giornata tipica: quando ti alzi, cosa fai, quando lavori/studi."),
             esempio = "Ich stehe um 7 Uhr auf. Ich frühstücke um 8 Uhr. Ich arbeite von 9 bis 17 Uhr.",
-            suggerimenti = listOf("Ore", "Attività", "Lavoro/Studio", "Tempo libero")
+            suggerimenti = listOf(t("Ore"), t("Attività"), t("Lavoro/Studio"), t("Tempo libero"))
         ),
         EsercizioScrittura(
             id = "sc3",
-            titolo = "Un messaggio al collega",
-            istruzioni = "Scrivi un messaggio breve a un collega/compagno per chiedere un favore.",
+            titolo = t("Un messaggio al collega"),
+            istruzioni = t("Scrivi un messaggio breve a un collega/compagno per chiedere un favore."),
             esempio = "Hallo Marco, kannst du mir bitte helfen? Ich habe eine Frage. Danke!",
-            suggerimenti = listOf("Saluto", "Richiesta", "Ringraziamento")
+            suggerimenti = listOf(t("Saluto"), t("Richiesta"), t("Ringraziamento"))
         ),
         EsercizioScrittura(
             id = "sc5",
-            titolo = "Email formale",
-            istruzioni = "Scrivi un'email formale per chiedere un appuntamento.",
+            titolo = t("Email formale"),
+            istruzioni = t("Scrivi un'email formale per chiedere un appuntamento."),
             esempio = "Sehr geehrte Frau Müller, ich möchte einen Termin vereinbaren. Vielen Dank.",
-            suggerimenti = listOf("Oggetto", "Saluto formale", "Richiesta", "Chiusura")
+            suggerimenti = listOf(t("Oggetto"), t("Saluto formale"), t("Richiesta"), t("Chiusura"))
         )
     )
     // Esercizio studio fisioterapia solo per profili medici
     if (profilo?.config?.mostraContestoMedico == true) {
         return base + EsercizioScrittura(
             id = "sc4",
-            titolo = "Descrivi il tuo studio",
-            istruzioni = "Descrivi il tuo studio di fisioterapia: dove è, cosa c'è dentro, come è organizzato.",
+            titolo = t("Descrivi il tuo studio"),
+            istruzioni = t("Descrivi il tuo studio di fisioterapia: dove è, cosa c'è dentro, come è organizzato."),
             esempio = "Mein Studio ist in der Stadtmitte. Es gibt ein Behandlungszimmer und ein Wartezimmer.",
-            suggerimenti = listOf("Posizione", "Stanze", "Attrezzatura", "Personale")
+            suggerimenti = listOf(t("Posizione"), t("Stanze"), t("Attrezzatura"), t("Personale"))
         )
     }
     return base
@@ -122,7 +124,7 @@ fun ProduzioneScrittaScreen(
     }.map { gen ->
         EsercizioScrittura(
             id = gen.id,
-            titolo = "Generato dall'AI",
+            titolo = t("Generato dall'AI"),
             istruzioni = gen.domanda,
             esempio = gen.spiegazione,
             suggerimenti = gen.opzioni
@@ -145,7 +147,7 @@ fun ProduzioneScrittaScreen(
             ) {
                 item {
                     Text(
-                        text = "Scegli un esercizio di scrittura",
+                        text = t("Scegli un esercizio di scrittura"),
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.padding(vertical = Spaziature.md)
                     )
@@ -160,7 +162,7 @@ fun ProduzioneScrittaScreen(
                                 }.onSuccess { generaInCorso = false }
                                   .onFailure { e ->
                                       generaInCorso = false
-                                      erroreGen = e.message ?: "Errore generazione"
+                                      erroreGen = e.message ?: t("Errore generazione")
                                   }
                             }
                         },
@@ -175,7 +177,7 @@ fun ProduzioneScrittaScreen(
                             )
                             Spacer(Modifier.width(8.dp))
                         }
-                        Text(if (generaInCorso) "Generazione..." else "Genera nuovo esercizio")
+                        Text(if (generaInCorso) t("Generazione...") else t("Genera nuovo esercizio"))
                     }
                     if (erroreGen != null) {
                         Text(
@@ -257,7 +259,7 @@ fun ProduzioneScrittaScreen(
                 ) {
                     Column(modifier = Modifier.padding(Spaziature.md)) {
                         Text(
-                            text = "Esempio:",
+                            text = t("Esempio:"),
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.Bold
                         )
@@ -276,7 +278,7 @@ fun ProduzioneScrittaScreen(
                 ) {
                     Column(modifier = Modifier.padding(Spaziature.md)) {
                         Text(
-                            text = "Suggerimenti:",
+                            text = t("Suggerimenti:"),
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.Bold
                         )
@@ -297,7 +299,7 @@ fun ProduzioneScrittaScreen(
                 OutlinedTextField(
                     value = testoUtente,
                     onValueChange = { testoUtente = it },
-                    label = { Text("Scrivi qui in tedesco...") },
+                    label = { Text(t("Scrivi qui in tedesco...")) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(150.dp),
@@ -315,7 +317,7 @@ fun ProduzioneScrittaScreen(
                         onClick = { esercizioSelezionato = null },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Indietro")
+                        Text(t("Indietro"))
                     }
                     Button(
                         onClick = {
@@ -328,7 +330,7 @@ fun ProduzioneScrittaScreen(
                         modifier = Modifier.weight(1f),
                         enabled = testoUtente.isNotBlank() && !correzioneInCorso
                     ) {
-                        Text(if (correzioneInCorso) "Correggo…" else "Verifica")
+                        Text(if (correzioneInCorso) t("Correggo…") else t("Verifica"))
                     }
                 }
 
@@ -352,13 +354,13 @@ fun ProduzioneScrittaScreen(
                                 )
                                 Spacer(Modifier.width(Spaziature.sm))
                                 Text(
-                                    text = "Correzione automatica",
+                                    text = t("Correzione automatica"),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Spacer(Modifier.height(2.dp))
                                 Text(
-                                    text = "Ogni testo scritto è un passo avanti.",
+                                    text = t("Ogni testo scritto è un passo avanti."),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -369,7 +371,7 @@ fun ProduzioneScrittaScreen(
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                                         Spacer(Modifier.width(Spaziature.sm))
-                                        Text("Il tutor sta correggendo il tuo testo…",
+                                        Text(t("Il tutor sta correggendo il tuo testo…"),
                                             style = MaterialTheme.typography.bodyMedium)
                                     }
                                 }
@@ -381,7 +383,7 @@ fun ProduzioneScrittaScreen(
                                     )
                                     Spacer(Modifier.height(Spaziature.sm))
                                     TextButton(onClick = onVaiACorrezioni) {
-                                        Text("Vedi tutte le correzioni")
+                                        Text(t("Vedi tutte le correzioni"))
                                     }
                                 }
                                 apiKey.isBlank() -> {
@@ -394,7 +396,7 @@ fun ProduzioneScrittaScreen(
                                 }
                                 else -> {
                                     Text(
-                                        text = "Correzione non disponibile al momento. Riprova.",
+                                        text = t("Correzione non disponibile al momento. Riprova."),
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.error
                                     )
@@ -402,7 +404,7 @@ fun ProduzioneScrittaScreen(
                             }
                             Spacer(Modifier.height(Spaziature.sm))
                             Text(
-                                text = "Suggerimento: rileggi il testo ad alta voce per trovare errori.",
+                                text = t("Suggerimento: rileggi il testo ad alta voce per trovare errori."),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -414,11 +416,11 @@ fun ProduzioneScrittaScreen(
     }  // chiude Scaffold
 
     // Dialogo errore chiave API per generazione esercizi infiniti
-    if (erroreGen?.contains("Chiave API") == true) {
+    if (erroreGen?.contains(t("Chiave API")) == true) {
         AlertDialog(
             onDismissRequest = { erroreGen = null },
-            title = { Text("Chiave API necessaria") },
-            text = { Text("Per generare esercizi infiniti inserisci una chiave Groq gratuita in Profilo → Tutor AI.") },
+            title = { Text(t("Chiave API necessaria")) },
+            text = { Text(t("Per generare esercizi infiniti inserisci una chiave Groq gratuita in Profilo → Tutor AI.")) },
             confirmButton = { TextButton(onClick = { erroreGen = null }) { Text("OK") } }
         )
     }

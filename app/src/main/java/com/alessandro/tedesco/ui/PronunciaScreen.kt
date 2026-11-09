@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import android.Manifest
 import androidx.compose.animation.animateContentSize
 import android.content.Context
@@ -58,8 +60,8 @@ import java.util.Locale
 
 enum class SezionePronuncia(val etichetta: String) {
     COPPIE("Coppie minime"),
-    FRASI("Frasi"),
-    CONSIGLI("Regole")
+    FRASI(t("Frasi")),
+    CONSIGLI(t("Regole"))
 }
 
 /** Registratore audio minimale: un solo file in cache, riascoltabile. */
@@ -151,7 +153,7 @@ fun PronunciaScreen(
             permessoNegato = false
             if (registratore.avvia() != null) {
                 registrando = true
-                messaggio = "Registrazione in corso: leggi la frase, poi premi Stop."
+                messaggio = t("Registrazione in corso: leggi la frase, poi premi Stop.")
             }
         } else {
             permessoNegato = true
@@ -172,16 +174,16 @@ fun PronunciaScreen(
         if (registratore.avvia() != null) {
             idAttivo = id
             registrando = true
-            messaggio = "Registrazione in corso: leggi la frase, poi premi Stop."
+            messaggio = t("Registrazione in corso: leggi la frase, poi premi Stop.")
         } else {
-            messaggio = "Microfono non disponibile su questo dispositivo."
+            messaggio = t("Microfono non disponibile su questo dispositivo.")
         }
     }
 
     fun fermaRegistrazione() {
         registratore.ferma()
         registrando = false
-        messaggio = "Registrazione pronta: riascoltala e confrontala con il modello."
+        messaggio = t("Registrazione pronta: riascoltala e confrontala con il modello.")
     }
 
     DisposableEffect(Unit) {
@@ -196,21 +198,21 @@ fun PronunciaScreen(
             if (evento == Lifecycle.Event.ON_STOP && registratore.inRegistrazione) {
                 registratore.ferma()
                 registrando = false
-                messaggio = "Registrazione interrotta: riascoltala e confrontala con il modello."
+                messaggio = t("Registrazione interrotta: riascoltala e confrontala con il modello.")
             }
         }
         lifecycleOwner.lifecycle.addObserver(osservatore)
         onDispose { lifecycleOwner.lifecycle.removeObserver(osservatore) }
     }
 
-    ScreenScaffold("Pronuncia", onBack = onIndietro) {
+    ScreenScaffold(t("Pronuncia"), onBack = onIndietro) {
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(Spaziature.sm)
         ) {
             Text(
                 "Ascolta il modello (anche a 0,7x), ripeti e registrati. " +
-                    "Il riconoscimento vocale non basta: l'orecchio va allenato sulle coppie minime.",
+                    t("Il riconoscimento vocale non basta: l'orecchio va allenato sulle coppie minime."),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -234,7 +236,7 @@ fun PronunciaScreen(
                 }
                 if (permessoNegato) {
                     Text(
-                        "Permesso microfono negato: puoi comunque ascoltare i modelli.",
+                        t("Permesso microfono negato: puoi comunque ascoltare i modelli."),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.error
                     )
@@ -324,7 +326,7 @@ fun PronunciaScreen(
                                     OutlinedButton(onClick = { tts.speak(frase, velocita = 1f) }) {
                                         Icon(Icons.Filled.PlayArrow, contentDescription = null, modifier = Modifier.size(16.dp))
                                         Spacer(Modifier.width(4.dp))
-                                        Text("Normale")
+                                        Text(t("Normale"))
                                     }
                                 }
                                 Spacer(Modifier.height(Spaziature.sm))
@@ -399,20 +401,20 @@ private fun RegistrazioneRow(
                 Spacer(Modifier.width(4.dp))
                 Text("Stop")
             }
-            Text("Registrazione in corso...", style = MaterialTheme.typography.bodySmall)
+            Text(t("Registrazione in corso..."), style = MaterialTheme.typography.bodySmall)
         }
     } else {
         Row(horizontalArrangement = Arrangement.spacedBy(Spaziature.sm)) {
             OutlinedButton(onClick = onRegistra) {
                 Icon(Icons.Filled.Mic, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(4.dp))
-                Text(if (haRegistrazione) "Riregistra" else "Registrati")
+                Text(if (haRegistrazione) t("Riregistra") else t("Registrati"))
             }
             if (haRegistrazione) {
                 OutlinedButton(onClick = onRiproduci) {
                     Icon(Icons.Filled.PlayArrow, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(4.dp))
-                    Text("Riascolta")
+                    Text(t("Riascolta"))
                 }
             }
         }

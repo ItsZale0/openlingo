@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.clickable
@@ -74,7 +76,7 @@ fun ProgressoScreen(vm: TedescoViewModel, onIndietro: (() -> Unit)? = null) {
         if (pr == null) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(
-                    "Caricamento…",
+                    t("Caricamento…"),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -88,12 +90,12 @@ fun ProgressoScreen(vm: TedescoViewModel, onIndietro: (() -> Unit)? = null) {
         ) {
             // ---- Messaggio motivante ----
             val messaggio = when {
-                pr.streakGiorni >= 30 -> "Un mese di costanza. Sei un esempio!"
-                pr.streakGiorni >= 14 -> "Due settimane di fila. Il tedesco diventa naturale."
-                pr.streakGiorni >= 7 -> "Una settimana intera! Continua così."
-                pr.streakGiorni >= 3 -> "Ottimo inizio. La costanza paga."
+                pr.streakGiorni >= 30 -> t("Un mese di costanza. Sei un esempio!")
+                pr.streakGiorni >= 14 -> t("Due settimane di fila. Il tedesco diventa naturale.")
+                pr.streakGiorni >= 7 -> t("Una settimana intera! Continua così.")
+                pr.streakGiorni >= 3 -> t("Ottimo inizio. La costanza paga.")
                 pr.paroleImparate >= 100 -> "Hai imparato oltre 100 parole. Bravo!"
-                else -> "Ogni passo conta. Continua a studiare!"
+                else -> t("Ogni passo conta. Continua a studiare!")
             }
             Text(
                 messaggio,
@@ -147,7 +149,7 @@ private fun CardLivello(pr: CalcoloProgresso.ProgressoReale) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                "Il tuo livello",
+                t("Il tuo livello"),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
@@ -170,7 +172,7 @@ private fun CardLivello(pr: CalcoloProgresso.ProgressoReale) {
                     pr.streakGiorni >= 7 -> "${pr.streakGiorni} giorni di fila. Sei inarrestabile!"
                     pr.streakGiorni >= 3 -> "${pr.streakGiorni} giorni di fila. Continua così!"
                     pr.streakGiorni > 0 -> "${pr.streakGiorni} giorno di fila. Ogni giorno conta."
-                    else -> "Inizia oggi il tuo streak: basta un esercizio."
+                    else -> t("Inizia oggi il tuo streak: basta un esercizio.")
                 },
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
@@ -204,7 +206,7 @@ private fun CardLivello(pr: CalcoloProgresso.ProgressoReale) {
                 )
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    "Serve il 60% in TUTTE le 4 competenze (soglia ufficiale Goethe/telc/ÖSD)",
+                    t("Serve il 60% in TUTTE le 4 competenze (soglia ufficiale Goethe/telc/ÖSD)"),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -229,28 +231,28 @@ private fun CardNumeriChiave(pr: CalcoloProgresso.ProgressoReale) {
     ) {
         Column(Modifier.fillMaxWidth().padding(12.dp)) {
             Text(
-                "I tuoi numeri",
+                t("I tuoi numeri"),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
             Text(
-                "Tutto dati reali: niente stime, niente fantasia.",
+                t("Tutto dati reali: niente stime, niente fantasia."),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.height(12.dp))
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Kpi("Parole", "${pr.paroleImparate}", "su ${pr.paroleDisponibili} disponibili",
+                Kpi(t("Parole"), "${pr.paroleImparate}", "su ${pr.paroleDisponibili} disponibili",
                     MaterialTheme.colorScheme.primary, Modifier.weight(1f))
-                Kpi("Verificate", "${pr.paroleImparate - pr.paroleFragili}", "dimostrate nel quiz",
+                Kpi(t("Verificate"), "${pr.paroleImparate - pr.paroleFragili}", "dimostrate nel quiz",
                     MaterialTheme.colorScheme.tertiary, Modifier.weight(1f))
             }
             Spacer(Modifier.height(10.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Kpi("Ripassi", "${pr.ripassiTotali}", "totali",
+                Kpi(t("Ripassi"), "${pr.ripassiTotali}", "totali",
                     MaterialTheme.colorScheme.secondary, Modifier.weight(1f))
-                Kpi("Accuratezza", "${(pr.accuratezza * 100).toInt()}%", "risposte giuste",
+                Kpi(t("Accuratezza"), "${(pr.accuratezza * 100).toInt()}%", "risposte giuste",
                     MaterialTheme.colorScheme.primary, Modifier.weight(1f))
             }
             Spacer(Modifier.height(10.dp))
@@ -309,7 +311,7 @@ private fun CardProssimoPasso(pr: CalcoloProgresso.ProgressoReale) {
     ) {
         Column(Modifier.fillMaxWidth().padding(12.dp)) {
             Text(
-                "Cosa fare adesso",
+                t("Cosa fare adesso"),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
@@ -338,12 +340,12 @@ private fun CardCompetenze(pr: CalcoloProgresso.ProgressoReale) {
     ) {
         Column(Modifier.fillMaxWidth().padding(12.dp)) {
             Text(
-                "Le 4 competenze",
+                t("Le 4 competenze"),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
             Text(
-                "Il livello sale solo quando TUTTE superano il 60% (la più debole comanda)",
+                t("Il livello sale solo quando TUTTE superano il 60% (la più debole comanda)"),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -400,19 +402,19 @@ private fun CardProduzione(pr: CalcoloProgresso.ProgressoReale) {
             ) {
                 Column(Modifier.weight(1f)) {
                     Text(
-                        "Produzione scritta",
+                        t("Produzione scritta"),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        "Testi valutati sui 4 criteri Goethe: tocca per i dettagli",
+                        t("Testi valutati sui 4 criteri Goethe: tocca per i dettagli"),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 Icon(
                     imageVector = Icons.Filled.ArrowDropDown,
-                    contentDescription = if (expanded) "Chiudi" else "Apri",
+                    contentDescription = if (expanded) t("Chiudi") else t("Apri"),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(28.dp)
                 )
@@ -429,7 +431,7 @@ private fun CardProduzione(pr: CalcoloProgresso.ProgressoReale) {
                     )
                 } else {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Kpi("Testi", "${pr.produzioniScritte}", "valutati",
+                        Kpi(t("Testi"), "${pr.produzioniScritte}", "valutati",
                             MaterialTheme.colorScheme.primary, Modifier.weight(1f))
                         Kpi(
                             "Media",
@@ -461,7 +463,7 @@ private fun CardProduzione(pr: CalcoloProgresso.ProgressoReale) {
                     if (pr.criterioDeboleProduzione != "N/A") {
                         Spacer(Modifier.height(6.dp))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text("Criterio più debole", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(t("Criterio più debole"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Text(
                                 "${pr.criterioDeboleProduzione} (${pr.criterioDeboleValore.toInt()}%)",
                                 style = MaterialTheme.typography.bodySmall,
@@ -473,7 +475,7 @@ private fun CardProduzione(pr: CalcoloProgresso.ProgressoReale) {
 
                     if (pr.storicoProduzione.size >= 2) {
                         Spacer(Modifier.height(12.dp))
-                        Text("Evoluzione", style = MaterialTheme.typography.labelMedium)
+                        Text(t("Evoluzione"), style = MaterialTheme.typography.labelMedium)
                         Spacer(Modifier.height(4.dp))
                         GraficoEvoluzione(pr)
                     }
@@ -481,7 +483,7 @@ private fun CardProduzione(pr: CalcoloProgresso.ProgressoReale) {
                     if (pr.ultimoPraedikatProduzione.isNotBlank()) {
                         Spacer(Modifier.height(10.dp))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text("Ultimo risultato", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(t("Ultimo risultato"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Text(
                                 pr.ultimoPraedikatProduzione,
                                 style = MaterialTheme.typography.bodySmall,
@@ -492,7 +494,7 @@ private fun CardProduzione(pr: CalcoloProgresso.ProgressoReale) {
                     }
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        "Soglia ufficiale: 60% (Goethe/telc/ÖSD)",
+                        t("Soglia ufficiale: 60% (Goethe/telc/ÖSD)"),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -545,7 +547,7 @@ private fun CardTraguardi(pr: CalcoloProgresso.ProgressoReale) {
     ) {
         Column(Modifier.fillMaxWidth().padding(12.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("Traguardi", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text(t("Traguardi"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                 Text(
                     "${pr.traguardiRaggiunti}/${pr.traguardi.size}",
                     style = MaterialTheme.typography.bodyMedium,
@@ -617,19 +619,19 @@ private fun CardReportInsegnante(
             ) {
                 Column(Modifier.weight(1f)) {
                     Text(
-                        "Report per l'insegnante",
+                        t("Report per l'insegnante"),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        "Snapshot dei dati reali per un colloquio o tutoraggio",
+                        t("Snapshot dei dati reali per un colloquio o tutoraggio"),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 Icon(
                     imageVector = Icons.Filled.ArrowDropDown,
-                    contentDescription = if (expanded) "Chiudi" else "Apri",
+                    contentDescription = if (expanded) t("Chiudi") else t("Apri"),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(28.dp)
                 )
@@ -649,9 +651,9 @@ private fun CardReportInsegnante(
                                 data = data
                             )
                         )
-                        conferma = "Report pronto: scegli come condividerlo."
+                        conferma = t("Report pronto: scegli come condividerlo.")
                     }) {
-                        Text("Condividi report")
+                        Text(t("Condividi report"))
                     }
                     OutlinedButton(onClick = {
                         condividi(
@@ -659,9 +661,9 @@ private fun CardReportInsegnante(
                             oggetto = "Errori tedesco - ${nome.ifBlank { "studente" }}",
                             testo = ReportInsegnante.csvErrori(errori)
                         )
-                        conferma = "CSV pronto: aprilo con Excel o Fogli."
+                        conferma = t("CSV pronto: aprilo con Excel o Fogli.")
                     }) {
-                        Text("CSV errori")
+                        Text(t("CSV errori"))
                     }
                 }
                 conferma?.let {

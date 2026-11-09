@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -254,7 +256,7 @@ fun MarkdownText(
                     Text(riga.testo, style = stile, color = color)
                 }
                 TipoRiga.NUMERATO -> Row(modifier = Modifier.padding(start = 4.dp, top = 3.dp)) {
-                    Text("${riga.numero}.", color = color, style = stile)
+                    Text(t("${riga.numero}."), color = color, style = stile)
                     Spacer(Modifier.width(8.dp))
                     Text(riga.testo, style = stile, color = color)
                 }

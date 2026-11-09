@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,9 +37,9 @@ import com.alessandro.tedesco.ui.theme.Spaziature
 import java.util.Locale
 
 enum class SezioneSudtirol(val etichetta: String) {
-    VARIANTI("Austriaco"),
+    VARIANTI(t("Austriaco")),
     LESSICO("Lessico"),
-    FRASI("Frasi")
+    FRASI(t("Frasi"))
 }
 
 /**
@@ -59,7 +61,7 @@ fun SudtirolScreen(
         ) {
             Text(
                 "A Bressanone e in Austria molte parole quotidiane sono diverse dallo standard. " +
-                    "Capirle è parte della competenza reale, non un vezzo. Ogni variante è un arricchimento!",
+                    t("Capirle è parte della competenza reale, non un vezzo. Ogni variante è un arricchimento!"),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -80,7 +82,7 @@ fun SudtirolScreen(
             when (sezione) {
                 SezioneSudtirol.VARIANTI -> {
                     Text(
-                        "Variante austriaca → tedesco standard",
+                        t("Variante austriaca → tedesco standard"),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -103,7 +105,7 @@ fun SudtirolScreen(
                                     Text(v.italiano, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
                                 }
                                 IconButton(onClick = { tts.speak("${v.austriaco}. ${v.standard}", velocita = 0.85f) }) {
-                                    Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = "Ascolta", modifier = Modifier.size(20.dp))
+                                    Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = t("Ascolta"), modifier = Modifier.size(20.dp))
                                 }
                             }
                         }
@@ -133,7 +135,7 @@ fun SudtirolScreen(
                                         Text(voce.italiano, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     }
                                     IconButton(onClick = { tts.speak(voce.tedesco, velocita = 0.85f) }) {
-                                        Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = "Ascolta", modifier = Modifier.size(20.dp))
+                                        Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = t("Ascolta"), modifier = Modifier.size(20.dp))
                                     }
                                 }
                             }
@@ -144,7 +146,7 @@ fun SudtirolScreen(
 
                 SezioneSudtirol.FRASI -> {
                     Text(
-                        "Frasi da ambulatorio",
+                        t("Frasi da ambulatorio"),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -161,7 +163,7 @@ fun SudtirolScreen(
                                         modifier = Modifier.weight(1f)
                                     )
                                     IconButton(onClick = { tts.speak(frase.tedesco, velocita = 0.85f) }) {
-                                        Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = "Ascolta", modifier = Modifier.size(20.dp))
+                                        Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = t("Ascolta"), modifier = Modifier.size(20.dp))
                                     }
                                 }
                                 Text(

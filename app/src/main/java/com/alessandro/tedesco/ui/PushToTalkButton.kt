@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -76,11 +78,11 @@ fun PushToTalkButton(
             }
             .semantics {
                 contentDescription = when (state) {
-                    VoiceState.LISTENING -> "In ascolto... rilascia per inviare"
+                    VoiceState.LISTENING -> t("In ascolto... rilascia per inviare")
                     VoiceState.PROCESSING -> "Elaborazione in corso..."
-                    VoiceState.SPEAKING -> "Sto parlando..."
+                    VoiceState.SPEAKING -> t("Sto parlando...")
                     VoiceState.ERROR -> "Errore: ${errorMessage ?: "sconosciuto"}"
-                    else -> "Tieni premuto per parlare"
+                    else -> t("Tieni premuto per parlare")
                 }
             },
         contentAlignment = Alignment.Center
@@ -130,7 +132,7 @@ fun VoiceInputBar(
     onResult: (String) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    hint: String = "Tieni premuto per parlare"
+    hint: String = t("Tieni premuto per parlare")
 ) {
     val state by remember { derivedStateOf { voiceHelper.state } }
 
@@ -141,10 +143,10 @@ fun VoiceInputBar(
         // Indicatore di stato testuale
         val statusText = when (state) {
             VoiceState.IDLE -> hint
-            VoiceState.LISTENING -> "Ascolto in corso..."
+            VoiceState.LISTENING -> t("Ascolto in corso...")
             VoiceState.PROCESSING -> "Elaborazione..."
-            VoiceState.SPEAKING -> "Sto parlando..."
-            VoiceState.ERROR -> "Errore"
+            VoiceState.SPEAKING -> t("Sto parlando...")
+            VoiceState.ERROR -> t("Errore")
         }
 
         Text(

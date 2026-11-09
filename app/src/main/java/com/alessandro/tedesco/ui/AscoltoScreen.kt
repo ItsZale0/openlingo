@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -140,7 +142,7 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
                     completato = false
                     mostraTraduzione = false
                 } else {
-                    erroreGen = "Nessun esercizio generato. La serie locale resta disponibile."
+                    erroreGen = t("Nessun esercizio generato. La serie locale resta disponibile.")
                 }
             } catch (e: Throwable) {
                 // Throwable: un errore di rete non deve chiudere l'app.
@@ -152,7 +154,7 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
     }
 
     ScreenScaffold(
-        title = "Ascolto (Hörverstehen)",
+        title = t("Ascolto (Hörverstehen)"),
         scrollable = true
     ) {
         // Nessun verticalScroll qui: ScreenScaffold avvolge gia' il contenuto in
@@ -205,13 +207,13 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            "Scegli un altro livello oppure genera una serie nuova.",
+                            t("Scegli un altro livello oppure genera una serie nuova."),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(Modifier.height(12.dp))
                         Button(onClick = { giro++ }, modifier = Modifier.fillMaxWidth()) {
-                            Text("Ricarica esercizi")
+                            Text(t("Ricarica esercizi"))
                         }
                     }
                 }
@@ -238,7 +240,7 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Ascolta la frase in tedesco:",
+                            text = t("Ascolta la frase in tedesco:"),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
@@ -254,10 +256,10 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
                         ) {
                             Icon(
                                 Icons.AutoMirrored.Filled.VolumeUp,
-                                contentDescription = "Ascolta"
+                                contentDescription = t("Ascolta")
                             )
                             Spacer(Modifier.width(6.dp))
-                            Text("Ascolta")
+                            Text(t("Ascolta"))
                         }
                         if (mostraTraduzione) {
                             Spacer(Modifier.height(8.dp))
@@ -269,7 +271,7 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
                         } else {
                             Spacer(Modifier.height(4.dp))
                             TextButton(onClick = { mostraTraduzione = true }) {
-                                Text("Mostra traduzione", style = MaterialTheme.typography.labelSmall)
+                                Text(t("Mostra traduzione"), style = MaterialTheme.typography.labelSmall)
                             }
                         }
                     }
@@ -335,12 +337,12 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
                     ) {
                         Column(modifier = Modifier.padding(Spaziature.md)) {
                             Text(
-                                text = if (risultato == true) "Corretto! 🎉" else "Sbagliato",
+                                text = if (risultato == true) "Corretto! 🎉" else t("Sbagliato"),
                                 fontWeight = FontWeight.Bold
                             )
                             Spacer(Modifier.height(4.dp))
                             Text(
-                                text = if (risultato == true) "Ottimo lavoro!" else "Riprova, puoi farcela.",
+                                text = if (risultato == true) t("Ottimo lavoro!") else t("Riprova, puoi farcela."),
                                 style = MaterialTheme.typography.bodySmall
                             )
                             Spacer(Modifier.height(4.dp))
@@ -361,7 +363,7 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(if (indice < esercizi.lastIndex) "Prossimo" else "Vedi risultato")
+                        Text(if (indice < esercizi.lastIndex) t("Prossimo") else t("Vedi risultato"))
                     }
                 }
             } else if (completato) {
@@ -421,7 +423,7 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Nuova serie")
+                    Text(t("Nuova serie"))
                 }
                 Spacer(Modifier.height(8.dp))
                 Button(
@@ -430,7 +432,7 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
                 ) {
                     Icon(Icons.Filled.Check, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
-                    Text("Fatto")
+                    Text(t("Fatto"))
                 }
             }
 
@@ -447,14 +449,14 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
                             CircularProgressIndicator(modifier = Modifier.height(18.dp).width(18.dp))
                             Spacer(Modifier.width(8.dp))
                             Text(
-                                "Genero esercizi nuovi…",
+                                t("Genero esercizi nuovi…"),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     } else {
                         TextButton(onClick = { generaConAi() }) {
-                            Text("Genera esercizi nuovi con AI")
+                            Text(t("Genera esercizi nuovi con AI"))
                         }
                     }
                 }
@@ -467,7 +469,7 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
     if (erroreGen != null) {
         AlertDialog(
             onDismissRequest = { erroreGen = null },
-            title = { Text("AI non disponibile") },
+            title = { Text(t("AI non disponibile")) },
             text = {
                 Text(
                     "${erroreGen}\n\nGli esercizi locali funzionano comunque: " +

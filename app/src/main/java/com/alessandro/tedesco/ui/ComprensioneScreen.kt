@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -83,7 +85,7 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
     val scope = rememberCoroutineScope()
 
     // Batch SEMPRE fresco: nessun set statico riciclato. Se la generazione fallisce
-    // si riusa l'ultimo batch AI non ancora completato, altrimenti si mostra "Riprova".
+    // si riusa l'ultimo batch AI non ancora completato, altrimenti si mostra t("Riprova").
     LaunchedEffect(tentativo) {
         caricato = false
         erroreGen = null
@@ -92,7 +94,7 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
         val freschi = try {
             vm.generaEsercizi(TipoEsercizio.COMPRENSIONE, quanti = 10)
         } catch (e: Throwable) {
-            erroreGen = e.localizedMessage ?: "Errore di rete"
+            erroreGen = e.localizedMessage ?: t("Errore di rete")
             emptyList()
         }
         // Deduplica per contenuto: il modello può ripetere la stessa domanda
@@ -148,7 +150,7 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             CircularProgressIndicator()
                             Spacer(Modifier.height(12.dp))
-                            Text("Genero esercizi nuovi...")
+                            Text(t("Genero esercizi nuovi..."))
                         }
                     }
                 } else if (elenco.isEmpty() && !completato) {
@@ -157,17 +159,17 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier.padding(12.dp)
                         ) {
-                            Text("Nessun esercizio generato", style = MaterialTheme.typography.titleMedium)
+                            Text(t("Nessun esercizio generato"), style = MaterialTheme.typography.titleMedium)
                             Spacer(Modifier.height(8.dp))
                             Text(
-                                erroreGen ?: "Controlla la connessione e riprova.",
+                                erroreGen ?: t("Controlla la connessione e riprova."),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Spacer(Modifier.height(12.dp))
-                            Button(onClick = { tentativo++ }) { Text("Riprova") }
+                            Button(onClick = { tentativo++ }) { Text(t("Riprova")) }
                             Spacer(Modifier.height(8.dp))
-                            OutlinedButton(onClick = onFatto) { Text("Torna indietro") }
+                            OutlinedButton(onClick = onFatto) { Text(t("Torna indietro")) }
                         }
                     }
                 } else if (!completato && indice in elenco.indices) {
@@ -204,7 +206,7 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                     IconButton(onClick = { ttsHelper.speak(testo) }) {
                                         Icon(
                                             Icons.AutoMirrored.Filled.VolumeUp,
-                                            contentDescription = "Ascolta il testo",
+                                            contentDescription = t("Ascolta il testo"),
                                             tint = MaterialTheme.colorScheme.primary
                                         )
                                     }
@@ -220,7 +222,7 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                 if (domanda.glossario.isNotEmpty()) {
                                     Spacer(Modifier.height(12.dp))
                                     Text(
-                                        text = "Parole nuove (tocca per aggiungerle al dizionario)",
+                                        text = t("Parole nuove (tocca per aggiungerle al dizionario)"),
                                         style = MaterialTheme.typography.labelMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -256,7 +258,7 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                             ) {
                                                 Icon(
                                                     Icons.Filled.Add,
-                                                    contentDescription = "Aggiungi al dizionario",
+                                                    contentDescription = t("Aggiungi al dizionario"),
                                                     tint = MaterialTheme.colorScheme.primary
                                                 )
                                             }
@@ -286,7 +288,7 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                             IconButton(onClick = { ttsHelper.speak(domanda.domanda) }) {
                                 Icon(
                                     Icons.AutoMirrored.Filled.VolumeUp,
-                                    contentDescription = "Ascolta domanda",
+                                    contentDescription = t("Ascolta domanda"),
                                     tint = MaterialTheme.colorScheme.primary
                                 )
                             }
@@ -330,7 +332,7 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                 IconButton(onClick = { ttsHelper.speak(opzione) }) {
                                     Icon(
                                         Icons.AutoMirrored.Filled.VolumeUp,
-                                        contentDescription = "Ascolta opzione",
+                                        contentDescription = t("Ascolta opzione"),
                                         tint = MaterialTheme.colorScheme.primary
                                     )
                                 }
@@ -353,11 +355,11 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                         ) {
                             Column(modifier = Modifier.padding(Spaziature.md)) {
                                 Text(
-                                    text = if (risultato == true) "Corretto! 🎉" else "Sbagliato",
+                                    text = if (risultato == true) "Corretto! 🎉" else t("Sbagliato"),
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
-                                    text = if (risultato == true) "Ottimo lavoro, continua così!" else "Non preoccuparti, riprova.",
+                                    text = if (risultato == true) t("Ottimo lavoro, continua così!") else t("Non preoccuparti, riprova."),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -384,7 +386,7 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                             val idsCompletati = eserciziGen.filter { it.completato }.map { it.id }.toSet() + domanda.id
                             var next = indice + 1
                             while (next < elenco.size && elenco[next].id in idsCompletati) next++
-                            Text(if (next < elenco.size) "Prossimo" else "Vedi risultato")
+                            Text(if (next < elenco.size) t("Prossimo") else t("Vedi risultato"))
                         }
                     }
                 } else {
@@ -449,7 +451,7 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                     ) {
                         Icon(Icons.Filled.Check, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
-                        Text("Fatto")
+                        Text(t("Fatto"))
                     }
                 }
             }
@@ -457,11 +459,11 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
     }
 
     // Dialogo errore chiave API
-    if (erroreGen?.contains("Chiave API") == true) {
+    if (erroreGen?.contains(t("Chiave API")) == true) {
         AlertDialog(
             onDismissRequest = { erroreGen = null },
-            title = { Text("Chiave API necessaria") },
-            text = { Text("Per generare esercizi infiniti inserisci una chiave Groq gratuita in Profilo → Tutor AI.") },
+            title = { Text(t("Chiave API necessaria")) },
+            text = { Text(t("Per generare esercizi infiniti inserisci una chiave Groq gratuita in Profilo → Tutor AI.")) },
             confirmButton = {
                 TextButton(onClick = { erroreGen = null }) { Text("OK") }
             }

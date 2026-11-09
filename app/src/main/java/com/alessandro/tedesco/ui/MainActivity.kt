@@ -24,6 +24,7 @@ import com.alessandro.tedesco.TedescoApp
 import com.alessandro.tedesco.data.BackupEsecutore
 import com.alessandro.tedesco.BuildConfig
 import com.alessandro.tedesco.data.BackupSettings
+import com.alessandro.tedesco.i18n.Traduttore
 import com.alessandro.tedesco.sync.LinguaSettings
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -64,8 +65,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         // Applica la lingua scelta dall'utente (IT/EN) alle risorse.
         val lingua = runCatching {
-            kotlinx.coroutines.runBlocking { LinguaSettings(this@MainActivity).lingua.first() }
+            kotlinx.coroutines.runBlocking {
+                LinguaSettings(applicationContext).lingua.first()
+            }
         }.getOrDefault("it")
+        Traduttore.lingua = lingua
         val locale = Locale(lingua)
         Locale.setDefault(locale)
         val config = resources.configuration

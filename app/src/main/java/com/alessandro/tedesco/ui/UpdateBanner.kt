@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -84,13 +86,13 @@ fun UpdateOverlay(updater: UpdaterViewModel) {
                     Spacer(Modifier.width(Spaziature.sm))
                     Text(
                         when (st) {
-                            is UpdateState.Checking -> "Controllo aggiornamenti…"
+                            is UpdateState.Checking -> t("Controllo aggiornamenti…")
                             is UpdateState.Available -> "Aggiornamento disponibile: v${(st as UpdateState.Available).version.versionName}"
                             is UpdateState.Downloading -> "Download ${(st as UpdateState.Downloading).progress}%"
-                            is UpdateState.ReadyToInstall -> "Aggiornamento pronto all'installazione"
-                            is UpdateState.NeedPermission -> "Serve il permesso per installare app"
-                            is UpdateState.Error -> "Errore aggiornamento"
-                            else -> "Aggiornamento"
+                            is UpdateState.ReadyToInstall -> t("Aggiornamento pronto all'installazione")
+                            is UpdateState.NeedPermission -> t("Serve il permesso per installare app")
+                            is UpdateState.Error -> t("Errore aggiornamento")
+                            else -> t("Aggiornamento")
                         },
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold,
@@ -101,7 +103,7 @@ fun UpdateOverlay(updater: UpdaterViewModel) {
                         IconButton(onClick = { updater.dismiss() }) {
                             Icon(
                                 Icons.Filled.Close,
-                                contentDescription = "Ignora",
+                                contentDescription = t("Ignora"),
                                 tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
@@ -132,11 +134,11 @@ fun UpdateOverlay(updater: UpdaterViewModel) {
                                 .fillMaxWidth()
                                 .padding(top = 8.dp),
                             shape = MaterialTheme.shapes.large
-                        ) { Text("Scarica e installa") }
+                        ) { Text(t("Scarica e installa")) }
                         TextButton(
                             onClick = { updater.skipUpdate(v) },
                             modifier = Modifier.fillMaxWidth()
-                        ) { Text("Salta questo aggiornamento") }
+                        ) { Text(t("Salta questo aggiornamento")) }
                     }
                     is UpdateState.Downloading -> {
                         val p = (st as UpdateState.Downloading).progress
@@ -172,12 +174,12 @@ fun UpdateOverlay(updater: UpdaterViewModel) {
                                 .fillMaxWidth()
                                 .padding(top = 8.dp),
                             shape = MaterialTheme.shapes.large
-                        ) { Text("Installa ora") }
+                        ) { Text(t("Installa ora")) }
                     }
                     is UpdateState.NeedPermission -> {
                         Column(Modifier.padding(top = 8.dp)) {
                             TextButton(onClick = { updater.apriImpostazioniInstallazione() }) {
-                                Text("Apri impostazioni di installazione")
+                                Text(t("Apri impostazioni di installazione"))
                             }
                         }
                     }
@@ -193,8 +195,8 @@ fun UpdateOverlay(updater: UpdaterViewModel) {
                             Modifier.fillMaxWidth().padding(top = 8.dp),
                             horizontalArrangement = Arrangement.spacedBy(Spaziature.sm)
                         ) {
-                            TextButton(onClick = { updater.checkForUpdate() }) { Text("Riprova") }
-                            TextButton(onClick = { updater.dismiss() }) { Text("Ignora") }
+                            TextButton(onClick = { updater.checkForUpdate() }) { Text(t("Riprova")) }
+                            TextButton(onClick = { updater.dismiss() }) { Text(t("Ignora")) }
                         }
                     }
                     else -> {}

@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -54,7 +56,7 @@ fun ChiaveAIField(
     OutlinedTextField(
         value = valore,
         onValueChange = onValore,
-        label = { Text("Chiave ${provider.nome}") },
+        label = { Text(t("Chiave ${provider.nome}")) },
         placeholder = { Text(provider.chiaveSuggerita) },
         singleLine = true,
         visualTransformation = PasswordVisualTransformation(),
@@ -72,7 +74,7 @@ fun ModelloAIField(
     OutlinedTextField(
         value = valore,
         onValueChange = onValore,
-        label = { Text("Modello (facoltativo)") },
+        label = { Text(t("Modello (facoltativo)")) },
         placeholder = { Text(provider.modelloPredefinito) },
         singleLine = true,
         modifier = Modifier.fillMaxWidth()

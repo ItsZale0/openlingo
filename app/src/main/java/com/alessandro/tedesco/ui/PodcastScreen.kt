@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
@@ -120,7 +122,7 @@ fun PodcastScreen(
         runCatching {
             context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
         }.onFailure {
-            Toast.makeText(context, "Nessuna app disponibile per aprire il link", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, t("Nessuna app disponibile per aprire il link"), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -146,7 +148,7 @@ fun PodcastScreen(
         Spacer(Modifier.height(Spaziature.md))
 
         Text(
-            "Scegli il livello",
+            t("Scegli il livello"),
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.SemiBold
         )
@@ -167,7 +169,7 @@ fun PodcastScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Filtra",
+                t("Filtra"),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.weight(1f)
@@ -179,7 +181,7 @@ fun PodcastScreen(
                         piattaformaFiltro = null
                     }
                 ) {
-                    Text("Azzera")
+                    Text(t("Azzera"))
                 }
             }
         }
@@ -193,7 +195,7 @@ fun PodcastScreen(
             FilterChip(
                 selected = tipoFiltro == null,
                 onClick = { tipoFiltro = null },
-                label = { Text("Tutti") },
+                label = { Text(t("Tutti")) },
                 leadingIcon = if (tipoFiltro == null) {
                     { Icon(Icons.Filled.Check, contentDescription = null, modifier = Modifier.size(16.dp)) }
                 } else null
@@ -222,7 +224,7 @@ fun PodcastScreen(
             FilterChip(
                 selected = piattaformaFiltro == null,
                 onClick = { piattaformaFiltro = null },
-                label = { Text("Tutte") }
+                label = { Text(t("Tutte")) }
             )
             PodcastData.Piattaforma.entries.forEach { p ->
                 val selezionata = piattaformaFiltro == p.name
@@ -309,21 +311,21 @@ private fun HeroPodcast() {
         )
         Column(modifier = Modifier.padding(Spaziature.md)) {
             Text(
-                "Ascolto autentico",
+                t("Ascolto autentico"),
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                "Il tedesco che si parla davvero",
+                t("Il tedesco che si parla davvero"),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                "Podcast, video e corsi scelti per il tuo livello, gratis. Si aprono in YouTube, Spotify o nel browser.",
+                t("Podcast, video e corsi scelti per il tuo livello, gratis. Si aprono in YouTube, Spotify o nel browser."),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -331,7 +333,7 @@ private fun HeroPodcast() {
             Row(horizontalArrangement = Arrangement.spacedBy(Spaziature.xs)) {
                 StatPill("${PodcastData.episodi.size}", "contenuti")
                 StatPill("4", "livelli")
-                StatPill("Gratis", "sempre")
+                StatPill(t("Gratis"), "sempre")
             }
         }
     }
@@ -645,7 +647,7 @@ private fun CardEpisodio(
                 BadgePiattaforma(episodio.piattaforma)
                 Spacer(Modifier.weight(1f))
                 Text(
-                    "Apri",
+                    t("Apri"),
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary
@@ -763,18 +765,18 @@ private fun StatoVuoto(onAzzera: () -> Unit) {
             )
             Spacer(Modifier.height(Spaziature.sm))
             Text(
-                "Nessun contenuto con questi filtri",
+                t("Nessun contenuto con questi filtri"),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                "Prova un altro tipo o un'altra piattaforma.",
+                t("Prova un altro tipo o un'altra piattaforma."),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.height(Spaziature.sm))
-            TextButton(onClick = onAzzera) { Text("Mostra tutti i contenuti") }
+            TextButton(onClick = onAzzera) { Text(t("Mostra tutti i contenuti")) }
         }
     }
 }
@@ -803,14 +805,14 @@ private fun ComeAscoltare() {
                 )
                 Spacer(Modifier.width(Spaziature.sm))
                 Text(
-                    "Come sfruttare la sezione",
+                    t("Come sfruttare la sezione"),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f)
                 )
                 Icon(
                     imageVector = if (expanded) Icons.Filled.Close else Icons.Filled.Add,
-                    contentDescription = if (expanded) "Chiudi" else "Apri",
+                    contentDescription = if (expanded) t("Chiudi") else t("Apri"),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(18.dp)
                 )
@@ -823,7 +825,7 @@ private fun ComeAscoltare() {
                 Spacer(Modifier.height(Spaziature.sm))
                 Text(
                     "Serve una connessione: i link si aprono in YouTube, Spotify o nel browser. " +
-                        "Il resto dell'app resta offline.",
+                        t("Il resto dell'app resta offline."),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -885,8 +887,8 @@ private fun coloriPiattaforma(piattaforma: PodcastData.Piattaforma): Pair<Color,
 
 private fun ctaPiattaforma(piattaforma: PodcastData.Piattaforma): String =
     when (piattaforma) {
-        PodcastData.Piattaforma.YOUTUBE -> "Guarda su YouTube"
-        PodcastData.Piattaforma.SPOTIFY -> "Ascolta su Spotify"
-        PodcastData.Piattaforma.DW -> "Apri su Deutsche Welle"
-        PodcastData.Piattaforma.WEB -> "Apri sul sito"
+        PodcastData.Piattaforma.YOUTUBE -> t("Guarda su YouTube")
+        PodcastData.Piattaforma.SPOTIFY -> t("Ascolta su Spotify")
+        PodcastData.Piattaforma.DW -> t("Apri su Deutsche Welle")
+        PodcastData.Piattaforma.WEB -> t("Apri sul sito")
     }

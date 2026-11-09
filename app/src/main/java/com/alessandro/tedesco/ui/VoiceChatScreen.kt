@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -48,7 +50,7 @@ fun VoiceChatScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
         mutableStateOf(
             listOf(
                 MessaggioVoiceChat(
-                    testo = "Ciao! Sono il tuo tutor di tedesco. Parla con me in tedesco, ti risponderò e ti correggerò alla fine. Tieni premuto il microfono per parlare.",
+                    testo = t("Ciao! Sono il tuo tutor di tedesco. Parla con me in tedesco, ti risponderò e ti correggerò alla fine. Tieni premuto il microfono per parlare."),
                     daUtente = false
                 )
             )
@@ -73,12 +75,12 @@ fun VoiceChatScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
         }
     }
 
-    ScreenScaffold("Conversazione vocale", onBack = onIndietro, scrollable = false) {
+    ScreenScaffold(t("Conversazione vocale"), onBack = onIndietro, scrollable = false) {
 
             // Livello
             AssistChip(
                 onClick = {},
-                label = { Text("Livello: $livello") }
+                label = { Text(t("Livello: $livello")) }
             )
 
             Spacer(Modifier.height(8.dp))
@@ -103,7 +105,7 @@ fun VoiceChatScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
                         ) {
                             CircularProgressIndicator(modifier = Modifier.size(24.dp))
                             Spacer(Modifier.width(8.dp))
-                            Text("Sto analizzando la conversazione...")
+                            Text(t("Sto analizzando la conversazione..."))
                         }
                     }
                 }
@@ -120,7 +122,7 @@ fun VoiceChatScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
                 ) {
                     Column(Modifier.padding(12.dp).animateContentSize()) {
                         Text(
-                            "Correzione",
+                            t("Correzione"),
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold
                         )
@@ -202,7 +204,7 @@ fun MessaggioBubble(msg: MessaggioVoiceChat, ttsHelper: TtsHelper) {
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.VolumeUp,
-                            contentDescription = "Ascolta",
+                            contentDescription = t("Ascolta"),
                             modifier = Modifier.size(16.dp)
                         )
                     }

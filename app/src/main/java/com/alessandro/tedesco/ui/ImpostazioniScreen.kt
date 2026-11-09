@@ -1,6 +1,9 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+﻿@file:OptIn(ExperimentalMaterial3Api::class)
 
 package com.alessandro.tedesco.ui
+
+import com.alessandro.tedesco.i18n.Traduttore
+import com.alessandro.tedesco.i18n.t
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -162,7 +165,7 @@ private fun SettingsExpandableSection(
                 }
                 Icon(
                     imageVector = Icons.Filled.ArrowDropDown,
-                    contentDescription = if (expanded) "Chiudi" else "Apri",
+                    contentDescription = if (expanded) t("Chiudi") else t("Apri"),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(32.dp)
                 )
@@ -198,7 +201,7 @@ private fun <T : Any> DropdownSelector(
             value = currentLabel,
             onValueChange = {},
             label = { Text(label) },
-            trailingIcon = { Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "Apri menu",
+            trailingIcon = { Icon(imageVector = Icons.Filled.MoreVert, contentDescription = t("Apri menu"),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant) },
             shape = GlassShape,
             colors = OutlinedTextFieldDefaults.colors(
@@ -337,7 +340,7 @@ fun ImpostazioniScreen(
                 // --- PROFILO ATTIVO ---
                 GlassCard {
                     Column {
-                        Text("Profilo attivo", style = MaterialTheme.typography.labelMedium,
+                        Text(t("Profilo attivo"), style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(Modifier.height(6.dp))
                         Text(
@@ -353,24 +356,24 @@ fun ImpostazioniScreen(
                     }
                 }
                 Spacer(Modifier.height(12.dp))
-                SettingsButton(onClick = { cambiaProfilo = true }) { Text("Cambia profilo") }
+                SettingsButton(onClick = { cambiaProfilo = true }) { Text(t("Cambia profilo")) }
                 Spacer(Modifier.height(8.dp))
-                SettingsButton(onClick = { esciSelezione = true }) { Text("Torna alla scelta del profilo") }
+                SettingsButton(onClick = { esciSelezione = true }) { Text(t("Torna alla scelta del profilo")) }
                 Spacer(Modifier.height(12.dp))
 
                 // --- COLORE TEMA ---
                 GlassCard {
                     Column {
-                        Text("Colore tema", style = MaterialTheme.typography.labelMedium,
+                        Text(t("Colore tema"), style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(Modifier.height(6.dp))
                         Text("Scegli il colore principale dell'app. \"Material You\" " +
-                            "usa i colori del sistema (Android 12+).",
+                            t("usa i colori del sistema (Android 12+)."),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(Modifier.height(10.dp))
                         DropdownSelector(
-                            label = "Colore tema",
+                            label = t("Colore tema"),
                             options = TemaSettings.OPZIONI.map { it.first to it.second },
                             selected = temaColore,
                             onSelect = { id ->
@@ -385,19 +388,20 @@ fun ImpostazioniScreen(
                 // --- LINGUA ---
                 GlassCard {
                     Column {
-                        Text("Lingua", style = MaterialTheme.typography.labelMedium,
+                        Text(t("Lingua"), style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(Modifier.height(6.dp))
-                        Text("Lingua dell'interfaccia (richiede riavvio).",
+                        Text(t("Lingua dell'interfaccia (richiede riavvio)."),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(Modifier.height(10.dp))
                         DropdownSelector(
-                            label = "Lingua",
+                            label = t("Lingua"),
                             options = LinguaSettings.OPZIONI,
                             selected = lingua,
                             onSelect = { id ->
                                 lingua = id
+                                Traduttore.lingua = id
                                 scopeUpdate.launch {
                                     linguaSettings.setLingua(id)
                                     (contestoUpdate as? android.app.Activity)?.recreate()
@@ -410,17 +414,17 @@ fun ImpostazioniScreen(
 
                 // --- LIVELLO (menu a tendina) ---
                 SettingsExpandableSection(
-                    title = "Livello",
-                    description = "Il contenuto si adatta al tuo livello CEFR."
+                    title = t("Livello"),
+                    description = t("Il contenuto si adatta al tuo livello CEFR.")
                 ) {
                     DropdownSelector(
-                        label = "Livello CEFR",
+                        label = t("Livello CEFR"),
                         options = listOf(
-                            LivelloCEFR.A0 to "A0 – Principiante assoluto",
-                            LivelloCEFR.A1 to "A1 – Principiante",
-                            LivelloCEFR.A2 to "A2 – Elementare",
-                            LivelloCEFR.B1 to "B1 – Intermedio",
-                            LivelloCEFR.B2 to "B2 – Intermedio superiore"
+                            LivelloCEFR.A0 to t("A0 – Principiante assoluto"),
+                            LivelloCEFR.A1 to t("A1 – Principiante"),
+                            LivelloCEFR.A2 to t("A2 – Elementare"),
+                            LivelloCEFR.B1 to t("B1 – Intermedio"),
+                            LivelloCEFR.B2 to t("B2 – Intermedio superiore")
                         ),
                         selected = profilo?.stato?.progresso?.livelloCorrente,
                         onSelect = { vm.cambiaLivello(it) }
@@ -430,17 +434,17 @@ fun ImpostazioniScreen(
 
                 // --- MODALITÀ IMMERSIONE ---
                 SettingsExpandableSection(
-                    title = "Modalità Immersione",
-                    description = "Percorso didattico separato: storie comprensibili, vocabolario in frasi, shadowing e ascolto passivo."
+                    title = t("Modalità Immersione"),
+                    description = t("Percorso didattico separato: storie comprensibili, vocabolario in frasi, shadowing e ascolto passivo.")
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(Modifier.weight(1f)) {
-                            Text("Attiva la modalità", style = MaterialTheme.typography.bodyMedium)
+                            Text(t("Attiva la modalità"), style = MaterialTheme.typography.bodyMedium)
                             Text(
-                                "Cambia lo studio: niente tabelle, si impara leggendo e ascoltando",
+                                t("Cambia lo studio: niente tabelle, si impara leggendo e ascoltando"),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -455,17 +459,17 @@ fun ImpostazioniScreen(
 
                 // --- NOTIFICHE (promemoria locali) ---
                 SettingsExpandableSection(
-                    title = "Notifiche",
-                    description = "Due promemoria giornalieri, locali e senza rete. Chiedi il permesso quando li attivi."
+                    title = t("Notifiche"),
+                    description = t("Due promemoria giornalieri, locali e senza rete. Chiedi il permesso quando li attivi.")
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(Modifier.weight(1f)) {
-                            Text("Promemoria ripasso", style = MaterialTheme.typography.bodyMedium)
+                            Text(t("Promemoria ripasso"), style = MaterialTheme.typography.bodyMedium)
                             Text(
-                                "Parole da ripassare, a un'ora stabile ogni giorno",
+                                t("Parole da ripassare, a un'ora stabile ogni giorno"),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -485,7 +489,7 @@ fun ImpostazioniScreen(
                     if (notRipassoAttivo) {
                         Spacer(Modifier.height(4.dp))
                         DropdownSelector(
-                            label = "Ora del promemoria",
+                            label = t("Ora del promemoria"),
                             options = oreDisponibili,
                             selected = notRipassoOra,
                             onSelect = { ora ->
@@ -503,9 +507,9 @@ fun ImpostazioniScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(Modifier.weight(1f)) {
-                            Text("Ascolto passivo serale", style = MaterialTheme.typography.bodyMedium)
+                            Text(t("Ascolto passivo serale"), style = MaterialTheme.typography.bodyMedium)
                             Text(
-                                "Il bonus pre-sonno della Modalità Immersione (solo se attiva)",
+                                t("Il bonus pre-sonno della Modalità Immersione (solo se attiva)"),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -525,7 +529,7 @@ fun ImpostazioniScreen(
                     if (notImmAttiva) {
                         Spacer(Modifier.height(4.dp))
                         DropdownSelector(
-                            label = "Ora dell'ascolto serale",
+                            label = t("Ora dell'ascolto serale"),
                             options = oreDisponibili,
                             selected = notImmOra,
                             onSelect = { ora ->
@@ -543,18 +547,18 @@ fun ImpostazioniScreen(
                 // --- VOCABOLARIO PERSONALIZZATO (solo profili custom) ---
                 if (customWords) {
                     SettingsExpandableSection(
-                        title = "Vocabolario personalizzato",
+                        title = t("Vocabolario personalizzato"),
                         description = if (googleSheets)
-                            "Le tue parole sono sincronizzate da Google Sheets."
-                        else "Aggiungi parole tue e usa un vocabolario personalizzato."
+                            t("Le tue parole sono sincronizzate da Google Sheets.")
+                        else t("Aggiungi parole tue e usa un vocabolario personalizzato.")
                     ) {
-                        SettingsButton(onClick = { aggiungiParola = true }) { Text("Aggiungi una parola") }
+                        SettingsButton(onClick = { aggiungiParola = true }) { Text(t("Aggiungi una parola")) }
                         Spacer(Modifier.height(12.dp))
                         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                         Spacer(Modifier.height(12.dp))
                         OutlinedTextField(
                             value = feedUrl, onValueChange = { feedUrl = it },
-                            label = { Text("URL vocabolario") },
+                            label = { Text(t("URL vocabolario")) },
                             modifier = Modifier.fillMaxWidth(), singleLine = true,
                             placeholder = { Text("https://raw.githubusercontent.com/...") },
                             shape = GlassShape,
@@ -565,7 +569,7 @@ fun ImpostazioniScreen(
                         )
                         Spacer(Modifier.height(8.dp))
                         OutlinedButton(onClick = { feedUrl = "" }) {
-                            Text("Rimuovi feed")
+                            Text(t("Rimuovi feed"))
                         }
                         GlassExpandableSection(
                             title = "Info",
@@ -586,9 +590,9 @@ fun ImpostazioniScreen(
                         Spacer(Modifier.height(12.dp))
                         OutlinedTextField(
                             value = guidaDocId, onValueChange = { guidaDocId = it },
-                            label = { Text("Documento Google della guida") },
+                            label = { Text(t("Documento Google della guida")) },
                             modifier = Modifier.fillMaxWidth(), singleLine = true,
-                            placeholder = { Text("ID o URL del documento") },
+                            placeholder = { Text(t("ID o URL del documento")) },
                             shape = GlassShape,
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = MaterialTheme.colorScheme.primary,
@@ -614,7 +618,7 @@ fun ImpostazioniScreen(
                         SettingsButton(onClick = {
                             vm.aggiornaFeedUrl(feedUrl)
                             vm.aggiornaGuidaDocId(guidaDocId)
-                        }) { Text("Salva") }
+                        }) { Text(t("Salva")) }
                     }
                     Spacer(Modifier.height(12.dp))
                 }
@@ -622,15 +626,15 @@ fun ImpostazioniScreen(
                 
                 // --- CONTESTO PER L'AI ---
                 SettingsExpandableSection(
-                    title = "Contesto e obiettivi",
+                    title = t("Contesto e obiettivi"),
                     description = "L'AI usa queste informazioni per scegliere esempi, " +
                         "esercizi e vocabolario adatti a te."
                 ) {
                     OutlinedTextField(
                         value = contestoUtente,
                         onValueChange = { contestoUtente = it },
-                        label = { Text("Professione, interessi, cosa vuoi saper fare") },
-                        placeholder = { Text("Es. elettricista: parlare con clienti e fornitori") },
+                        label = { Text(t("Professione, interessi, cosa vuoi saper fare")) },
+                        placeholder = { Text(t("Es. elettricista: parlare con clienti e fornitori")) },
                         modifier = Modifier.fillMaxWidth(),
                         minLines = 3,
                         shape = GlassShape,
@@ -648,16 +652,16 @@ fun ImpostazioniScreen(
                     )
                     Spacer(Modifier.height(8.dp))
                     SettingsButton(onClick = { vm.aggiornaContestoUtente(contestoUtente) }) {
-                        Text("Salva contesto")
+                        Text(t("Salva contesto"))
                     }
                 }
                 Spacer(Modifier.height(12.dp))
 
 // --- TUTOR AI ---
                 SettingsExpandableSection(
-                    title = "Tutor AI",
+                    title = t("Tutor AI"),
                     description = "Facoltativo: scegli un provider e incolla la chiave. " +
-                        "Senza chiave restano disponibili tutti i contenuti offline."
+                        t("Senza chiave restano disponibili tutti i contenuti offline.")
                 ) {
                     ProviderAIChips(provider = providerAI, onProvider = { providerAI = it })
                     Spacer(Modifier.height(8.dp))
@@ -683,13 +687,13 @@ fun ImpostazioniScreen(
                     Spacer(Modifier.height(12.dp))
                     SettingsButton(onClick = {
                         vm.salvaConfigurazioneAI(providerAI, chiaviAI, modelloAI)
-                    }) { Text("Salva configurazione AI") }
+                    }) { Text(t("Salva configurazione AI")) }
                 }
                 Spacer(Modifier.height(12.dp))
 
                 // --- AGGIORNAMENTI ---
                 SettingsExpandableSection(
-                    title = "Aggiornamenti",
+                    title = t("Aggiornamenti"),
                     description = "L'app controlla da sola all'apertura e ti avvisa. Puoi anche forzare il controllo."
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -702,7 +706,7 @@ fun ImpostazioniScreen(
                         IconButton(onClick = { updater.checkForUpdate() }) {
                             Icon(
                                 Icons.Filled.Refresh,
-                                contentDescription = "Controlla aggiornamenti ora",
+                                contentDescription = t("Controlla aggiornamenti ora"),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }
@@ -718,9 +722,9 @@ fun ImpostazioniScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(Modifier.weight(1f)) {
-                            Text("Controllo automatico", style = MaterialTheme.typography.bodyMedium)
+                            Text(t("Controllo automatico"), style = MaterialTheme.typography.bodyMedium)
                             Text(
-                                "Ogni 24 ore, anche ad app chiusa (WorkManager)",
+                                t("Ogni 24 ore, anche ad app chiusa (WorkManager)"),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -742,9 +746,9 @@ fun ImpostazioniScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(Modifier.weight(1f)) {
-                            Text("Scarica in automatico", style = MaterialTheme.typography.bodyMedium)
+                            Text(t("Scarica in automatico"), style = MaterialTheme.typography.bodyMedium)
                             Text(
-                                "Scarica l'APK in background e avvisa quando è pronto",
+                                t("Scarica l'APK in background e avvisa quando è pronto"),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -763,7 +767,7 @@ fun ImpostazioniScreen(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
                                 Spacer(Modifier.width(8.dp))
-                                Text("Controllo in corso…", style = MaterialTheme.typography.bodySmall)
+                                Text(t("Controllo in corso…"), style = MaterialTheme.typography.bodySmall)
                             }
                         }
                         is UpdateState.Available -> {
@@ -775,7 +779,7 @@ fun ImpostazioniScreen(
                             )
                             Spacer(Modifier.height(8.dp))
                             SettingsButton(onClick = { updater.downloadUpdate(s.version) }) {
-                                Text("Scarica e installa")
+                                Text(t("Scarica e installa"))
                             }
                         }
                         is UpdateState.Downloading -> {
@@ -792,23 +796,23 @@ fun ImpostazioniScreen(
                         }
                         is UpdateState.ReadyToInstall -> {
                             Text(
-                                "Aggiornamento pronto all'installazione",
+                                t("Aggiornamento pronto all'installazione"),
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.primary
                             )
                             Spacer(Modifier.height(8.dp))
-                            SettingsButton(onClick = { updater.installUpdate(s.file) }) { Text("Installa ora") }
+                            SettingsButton(onClick = { updater.installUpdate(s.file) }) { Text(t("Installa ora")) }
                         }
                         is UpdateState.NeedPermission -> {
                             Text(
-                                "Serve il permesso per installare app sconosciute.",
+                                t("Serve il permesso per installare app sconosciute."),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.error
                             )
                             Spacer(Modifier.height(8.dp))
                             SettingsButton(onClick = { updater.apriImpostazioniInstallazione() }) {
-                                Text("Apri impostazioni")
+                                Text(t("Apri impostazioni"))
                             }
                         }
                         is UpdateState.Error -> {
@@ -818,15 +822,15 @@ fun ImpostazioniScreen(
                                 color = MaterialTheme.colorScheme.error
                             )
                             Spacer(Modifier.height(8.dp))
-                            SettingsButton(onClick = { updater.checkForUpdate() }) { Text("Riprova") }
+                            SettingsButton(onClick = { updater.checkForUpdate() }) { Text(t("Riprova")) }
                         }
                         is UpdateState.UpToDate -> Text(
-                            "Sei aggiornato all'ultima versione.",
+                            t("Sei aggiornato all'ultima versione."),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.primary
                         )
                         else -> Text(
-                            "Tocca l'icona in alto a destra per controllare.",
+                            t("Tocca l'icona in alto a destra per controllare."),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -840,7 +844,7 @@ fun ImpostazioniScreen(
                 val ctx = LocalContext.current
                 TedescoApp.ultimoCrash(ctx)?.let { trace ->
                     SettingsExpandableSection(
-                        title = "Ultimo arresto anomalo",
+                        title = t("Ultimo arresto anomalo"),
                         description = "L'app si e' interrotta. Guarda lo stack trace."
                     ) {
                         Text(
@@ -853,7 +857,7 @@ fun ImpostazioniScreen(
                         )
                         Spacer(Modifier.height(10.dp))
                         SettingsButton(onClick = { TedescoApp.cancellaUltimoCrash(ctx) }) {
-                            Text("Ho capito, cancella")
+                            Text(t("Ho capito, cancella"))
                         }
                     }
                     Spacer(Modifier.height(12.dp))
@@ -861,23 +865,23 @@ fun ImpostazioniScreen(
 
                 // --- DATI & SINCRONIZZAZIONE (consolidato) ---
                 SettingsExpandableSection(
-                    title = "Dati & sincronizzazione",
-                    description = "Backup cloud, vocabolario e ripasso."
+                    title = t("Dati & sincronizzazione"),
+                    description = t("Backup cloud, vocabolario e ripasso.")
                 ) {
-                    Text("Backup cloud", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                    Text(t("Backup cloud"), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                     Spacer(Modifier.height(4.dp))
-                    SettingsButton(onClick = onVaiABackup) { Text("Apri backup cloud") }
+                    SettingsButton(onClick = onVaiABackup) { Text(t("Apri backup cloud")) }
                     Spacer(Modifier.height(4.dp))
                     Text(
                         "Il backup contiene tutti i profili (parole, ripassi, test, progressi). " +
-                            "Serve un token GitHub gratuito con permesso Contents sul repo di backup.",
+                            t("Serve un token GitHub gratuito con permesso Contents sul repo di backup."),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(Modifier.height(12.dp))
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     Spacer(Modifier.height(12.dp))
-                    Text("Vocabolario", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                    Text(t("Vocabolario"), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                     Spacer(Modifier.height(4.dp))
                     Text(
                         "Ultimo aggiornamento: ${TedescoViewModel.formattaData(ultimoSync?.syncedAt ?: 0L)}",
@@ -890,11 +894,11 @@ fun ImpostazioniScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     Spacer(Modifier.height(8.dp))
-                    SettingsButton(onClick = { vm.sincronizza() }) { Text("Sincronizza adesso") }
+                    SettingsButton(onClick = { vm.sincronizza() }) { Text(t("Sincronizza adesso")) }
                     Spacer(Modifier.height(12.dp))
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     Spacer(Modifier.height(12.dp))
-                    Text("Ripasso", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                    Text(t("Ripasso"), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                     Spacer(Modifier.height(4.dp))
                     Text(
                         "Quando rispondi giusto l'intervallo si allunga: 1, 3, 7, 16, 35, 75, " +
@@ -910,8 +914,8 @@ fun ImpostazioniScreen(
                 
 // --- CANCELLA DATI ---
                 SettingsExpandableSection(
-                    title = "Area pericolosa",
-                    description = "Cancella i dati di questo profilo (gli altri profili non sono toccati)."
+                    title = t("Area pericolosa"),
+                    description = t("Cancella i dati di questo profilo (gli altri profili non sono toccati).")
                 ) {
                     Spacer(Modifier.height(8.dp))
                     SettingsButton(
@@ -920,7 +924,7 @@ fun ImpostazioniScreen(
                             containerColor = MaterialTheme.colorScheme.errorContainer,
                             contentColor = MaterialTheme.colorScheme.onErrorContainer
                         )
-                    ) { Text("Cancella i dati di questo profilo") }
+                    ) { Text(t("Cancella i dati di questo profilo")) }
                 }
             }
         }
@@ -938,33 +942,33 @@ fun ImpostazioniScreen(
     if (esciSelezione) {
         AlertDialog(
             onDismissRequest = { esciSelezione = false },
-            title = { Text("Tornare alla scelta del profilo?") },
+            title = { Text(t("Tornare alla scelta del profilo?")) },
             text = {
                 Text(
                     "I dati di ${profilo?.config?.nomeVisualizzato ?: "questo profilo"} " +
-                        "restano salvati. Potrai rientrare quando vuoi."
+                        t("restano salvati. Potrai rientrare quando vuoi.")
                 )
             },
             confirmButton = {
-                TextButton(onClick = { esciSelezione = false; vm.esciDalProfilo() }) { Text("Torna") }
+                TextButton(onClick = { esciSelezione = false; vm.esciDalProfilo() }) { Text(t("Torna")) }
             },
-            dismissButton = { TextButton(onClick = { esciSelezione = false }) { Text("Annulla") } }
+            dismissButton = { TextButton(onClick = { esciSelezione = false }) { Text(t("Annulla")) } }
         )
     }
     if (confermaReset) {
         AlertDialog(
             onDismissRequest = { confermaReset = false },
-            title = { Text("Cancellare i dati?") },
+            title = { Text(t("Cancellare i dati?")) },
             text = {
                 Text(
                     "Vengono rimossi vocaboli e ripetizioni solo di questo profilo. " +
-                        "Gli altri profili non vengono toccati."
+                        t("Gli altri profili non vengono toccati.")
                 )
             },
             confirmButton = {
-                TextButton(onClick = { confermaReset = false; vm.reset() }) { Text("Cancella") }
+                TextButton(onClick = { confermaReset = false; vm.reset() }) { Text(t("Cancella")) }
             },
-            dismissButton = { TextButton(onClick = { confermaReset = false }) { Text("Annulla") } }
+            dismissButton = { TextButton(onClick = { confermaReset = false }) { Text(t("Annulla")) } }
         )
     }
     if (aggiungiParola) {
@@ -987,10 +991,10 @@ private fun GlassChangeProfileDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Cambia profilo") },
+        title = { Text(t("Cambia profilo")) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Scegli con quale profilo continuare.", style = MaterialTheme.typography.bodySmall)
+                Text(t("Scegli con quale profilo continuare."), style = MaterialTheme.typography.bodySmall)
                 profili.forEach { p ->
                     SettingsButton(onClick = { onSelect(p.id) }) {
                         Text(p.config.nomeVisualizzato)
@@ -998,7 +1002,7 @@ private fun GlassChangeProfileDialog(
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text("Chiudi") } }
+        confirmButton = { TextButton(onClick = onDismiss) { Text(t("Chiudi")) } }
     )
 }
 
@@ -1018,7 +1022,7 @@ private fun AggiungiParolaDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Nuova parola") },
+        title = { Text(t("Nuova parola")) },
         text = {
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
@@ -1029,22 +1033,22 @@ private fun AggiungiParolaDialog(
                     shape = GlassShape,
                     colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary))
                 OutlinedTextField(value = italiano, onValueChange = { italiano = it },
-                    label = { Text("Italiano *") }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+                    label = { Text(t("Italiano *")) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
                     shape = GlassShape,
                     colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary))
                 OutlinedTextField(value = articolo, onValueChange = { articolo = it },
-                    label = { Text("Articolo (der/die/das)") }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+                    label = { Text(t("Articolo (der/die/das)")) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
                     shape = GlassShape,
                     colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary))
                 OutlinedTextField(value = pronuncia, onValueChange = { pronuncia = it },
-                    label = { Text("Pronuncia") }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+                    label = { Text(t("Pronuncia")) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
                     shape = GlassShape,
                     colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary))
                 OutlinedTextField(value = frase, onValueChange = { frase = it },
-                    label = { Text("Frase d'esempio") }, modifier = Modifier.fillMaxWidth(), shape = GlassShape,
+                    label = { Text(t("Frase d'esempio")) }, modifier = Modifier.fillMaxWidth(), shape = GlassShape,
                     colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary))
                 OutlinedTextField(value = lezione, onValueChange = { lezione = it.filter { c -> c.isDigit() } },
-                    label = { Text("Lezione (numero)") }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+                    label = { Text(t("Lezione (numero)")) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
                     shape = GlassShape,
                     colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary))
             }
@@ -1057,8 +1061,8 @@ private fun AggiungiParolaDialog(
                         lezione.toIntOrNull() ?: 0)
                 },
                 enabled = valido
-            ) { Text("Aggiungi") }
+            ) { Text(t("Aggiungi")) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Annulla") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(t("Annulla")) } }
     )
 }

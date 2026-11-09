@@ -2,6 +2,8 @@
 
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -74,7 +76,7 @@ fun PercorsoGrammaticaScreen(
     val progresso = if (percorso.isEmpty()) 0f else completate.toFloat() / percorso.size
     val perLivello = remember(percorso) { percorso.groupBy { it.unita.livello } }
 
-    ScreenScaffold(title = "Percorso grammaticale", onBack = onIndietro) {
+    ScreenScaffold(title = t("Percorso grammaticale"), onBack = onIndietro) {
         // ---- Intro: obiettivo e avanzamento ----
         Card(
             modifier = Modifier.fillMaxWidth().animateContentSize(),
@@ -129,12 +131,12 @@ fun PercorsoGrammaticaScreen(
             ) {
                 Column(Modifier.padding(Spaziature.md)) {
                     Text(
-                        "Percorso completato",
+                        t("Percorso completato"),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        "Hai completato tutte le unità disponibili. Continua con i ripassi.",
+                        t("Hai completato tutte le unità disponibili. Continua con i ripassi."),
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
@@ -173,15 +175,15 @@ fun PercorsoGrammaticaScreen(
         ) {
             Column(Modifier.padding(Spaziature.md)) {
                 Text(
-                    "Come funziona",
+                    t("Come funziona"),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(Modifier.height(Spaziature.xs))
-                PuntoAiuto("Studia la regola, guarda le tabelle e ascolta gli esempi.")
-                PuntoAiuto("Fai gli esercizi: scelta multipla, completamento, trasformazione e produzione.")
-                PuntoAiuto("Con almeno l'80% sblocchi le unità successive.")
-                PuntoAiuto("Il ripasso torna dopo 1, 3, 7 e 16 giorni.")
+                PuntoAiuto(t("Studia la regola, guarda le tabelle e ascolta gli esempi."))
+                PuntoAiuto(t("Fai gli esercizi: scelta multipla, completamento, trasformazione e produzione."))
+                PuntoAiuto(t("Con almeno l'80% sblocchi le unità successive."))
+                PuntoAiuto(t("Il ripasso torna dopo 1, 3, 7 e 16 giorni."))
             }
         }
 
@@ -198,25 +200,25 @@ fun PercorsoGrammaticaScreen(
             Column(Modifier.padding(Spaziature.md)) {
                 if (GrammaticaSyllabus.tappeFuture.isEmpty()) {
                     Text(
-                        "Percorso A0-B2 completo",
+                        t("Percorso A0-B2 completo"),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(Modifier.height(Spaziature.xs))
                     Text(
                         "${GrammaticaSyllabus.unita.size} unità disponibili: dalle basi A0 alle strutture B1. " +
-                            "Continua con i ripassi per non perdere la padronanza.",
+                            t("Continua con i ripassi per non perdere la padronanza."),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 } else {
                     Text(
-                        "Prossime tappe",
+                        t("Prossime tappe"),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        "Il percorso continua ad ampliarsi.",
+                        t("Il percorso continua ad ampliarsi."),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -248,7 +250,7 @@ fun PercorsoGrammaticaScreen(
                     }
                     Spacer(Modifier.height(Spaziature.xs))
                     Text(
-                        "In arrivo nelle prossime fasi.",
+                        t("In arrivo nelle prossime fasi."),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -268,10 +270,10 @@ private fun CardProssimaUnita(
 ) {
     val unita = voce.unita
     val (etichetta, azione) = when {
-        !voce.accessibile -> "Bloccata" to "Apri"
-        voce.stato == StatoUnita.DA_RIPASSARE -> "Ripasso in scadenza" to "Ripassa"
-        voce.stato == StatoUnita.COMPLETATA -> "Percorso completato" to "Ripassa"
-        else -> "Prossima unità" to "Inizia"
+        !voce.accessibile -> t("Bloccata") to t("Apri")
+        voce.stato == StatoUnita.DA_RIPASSARE -> t("Ripasso in scadenza") to t("Ripassa")
+        voce.stato == StatoUnita.COMPLETATA -> t("Percorso completato") to t("Ripassa")
+        else -> t("Prossima unità") to t("Inizia")
     }
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -329,10 +331,10 @@ private fun CardUnita(
         else -> MaterialTheme.colorScheme.surface
     }
     val (icona, descrizioneStato) = when {
-        bloccata -> Icons.Filled.Lock to "Bloccata"
-        voce.stato == StatoUnita.DA_RIPASSARE -> Icons.Filled.Refresh to "Da ripassare"
-        voce.stato == StatoUnita.COMPLETATA -> Icons.Filled.CheckCircle to "Completata"
-        else -> Icons.Filled.PlayArrow to "Da iniziare"
+        bloccata -> Icons.Filled.Lock to t("Bloccata")
+        voce.stato == StatoUnita.DA_RIPASSARE -> Icons.Filled.Refresh to t("Da ripassare")
+        voce.stato == StatoUnita.COMPLETATA -> Icons.Filled.CheckCircle to t("Completata")
+        else -> Icons.Filled.PlayArrow to t("Da iniziare")
     }
     val prerequisiti = remember(unita) {
         unita.prerequisiti.mapNotNull { id -> GrammaticaSyllabus.perId(id)?.titolo }

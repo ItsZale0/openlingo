@@ -2,6 +2,8 @@
 
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -165,7 +167,7 @@ fun GlassExpandableSection(
                 }
                 Icon(
                     imageVector = Icons.Filled.ExpandMore,
-                    contentDescription = if (expanded) "Chiudi" else "Apri",
+                    contentDescription = if (expanded) t("Chiudi") else t("Apri"),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(28.dp)
                 )

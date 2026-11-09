@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -89,8 +91,8 @@ data class StatoSessioneLessico(
  *
  * Una sezione per livello, ognuna con:
  * - il conteggio delle parole curate e quante sono già nel profilo;
- * - "Aggiungi al ripasso": importa tutto il livello, creando le carte SRS;
- * - "Esercizi": 6 tipi generati offline (significato, tedesco, articolo,
+ * - t("Aggiungi al ripasso"): importa tutto il livello, creando le carte SRS;
+ * - t("Esercizi"): 6 tipi generati offline (significato, tedesco, articolo,
  *   cloze, scrivi, ascolto), mescolati, così si allena anche il richiamo attivo.
  *
  * L'elenco sotto è consultabile e filtrabile: ogni parola mostra se è già
@@ -207,7 +209,7 @@ fun LessicoScreen(
                                 onClick = { vm.aggiungiLessico(livelloScelto) },
                                 enabled = !caricamento,
                                 modifier = Modifier.weight(1f)
-                            ) { Text("Aggiungi al ripasso") }
+                            ) { Text(t("Aggiungi al ripasso")) }
                             Button(
                                 onClick = {
                                     vm.avviaEserciziLessico(livelloScelto)
@@ -218,7 +220,7 @@ fun LessicoScreen(
                             ) {
                                 Icon(Icons.Filled.PlayArrow, contentDescription = null, modifier = Modifier.size(18.dp))
                                 Spacer(Modifier.size(6.dp))
-                                Text("Esercizi")
+                                Text(t("Esercizi"))
                             }
                         }
                     }
@@ -232,7 +234,7 @@ fun LessicoScreen(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
-                placeholder = { Text("Cerca in tedesco o in italiano") }
+                placeholder = { Text(t("Cerca in tedesco o in italiano")) }
             )
 
             Spacer(Modifier.height(8.dp))
@@ -276,7 +278,7 @@ fun LessicoScreen(
                         if (presente) {
                             Icon(
                                 Icons.Filled.CheckCircle,
-                                contentDescription = "Già nel lessico",
+                                contentDescription = t("Già nel lessico"),
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(18.dp)
                             )

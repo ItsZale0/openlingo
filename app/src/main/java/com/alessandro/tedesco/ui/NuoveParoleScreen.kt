@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
@@ -79,16 +81,16 @@ fun NuoveParoleScreen(vm: TedescoViewModel, onIndietro: () -> Unit = {}) {
 
     // Titoli descrittivi delle lezioni del vocabolario (A0 → B2)
     val lezioneTitoli = mapOf(
-        1 to "Presentarsi (ich bin, ich heiße, ich wohne)",
-        2 to "Verbi regolari (-en → ich lerne, du lernst)",
-        3 to "Articoli: der / die / das + generi",
-        4 to "Verbi irregolari (essen → isst, sprechen → sprichst)",
-        5 to "Accusativo: den, die, das + verbi transitivi",
-        6 to "Separabili: aufstehen, anrufen, einkaufen",
-        7 to "Perfetto: ich habe gelernt / ich bin gegangen",
-        8 to "Dativo: dem, der, dem + verbi (helfen, geben)",
-        9 to "Preposizioni: in, auf, unter, über + caso",
-        10 to "Modali: können, müssen, wollen, sollen, dürfen, möchten"
+        1 to t("Presentarsi (ich bin, ich heiße, ich wohne)"),
+        2 to t("Verbi regolari (-en → ich lerne, du lernst)"),
+        3 to t("Articoli: der / die / das + generi"),
+        4 to t("Verbi irregolari (essen → isst, sprechen → sprichst)"),
+        5 to t("Accusativo: den, die, das + verbi transitivi"),
+        6 to t("Separabili: aufstehen, anrufen, einkaufen"),
+        7 to t("Perfetto: ich habe gelernt / ich bin gegangen"),
+        8 to t("Dativo: dem, der, dem + verbi (helfen, geben)"),
+        9 to t("Preposizioni: in, auf, unter, über + caso"),
+        10 to t("Modali: können, müssen, wollen, sollen, dürfen, möchten")
     )
 
     val filtrate = parole.filter { w: WordEntity ->
@@ -101,14 +103,14 @@ fun NuoveParoleScreen(vm: TedescoViewModel, onIndietro: () -> Unit = {}) {
 
     val maxLarghezza = dimensioneContenuto()
 
-    ScreenScaffold("Parole", onBack = onIndietro, actions = {
+    ScreenScaffold(t("Parole"), onBack = onIndietro, actions = {
         if (customWordsAbilitate) {
             IconButton(onClick = { mostraAggiungiParola = true }) {
-                Icon(Icons.Filled.Add, contentDescription = "Aggiungi parola")
+                Icon(Icons.Filled.Add, contentDescription = t("Aggiungi parola"))
             }
         }
         IconButton(onClick = { vm.sincronizza() }, enabled = !caricamento) {
-            Icon(Icons.Filled.Refresh, contentDescription = "Aggiorna ora")
+            Icon(Icons.Filled.Refresh, contentDescription = t("Aggiorna ora"))
         }
     }, scrollable = false) {
         Column(
@@ -122,7 +124,7 @@ fun NuoveParoleScreen(vm: TedescoViewModel, onIndietro: () -> Unit = {}) {
                     .widthIn(max = maxLarghezza)
             ) {
                 Text(
-                    "Ogni parola nuova è un passo avanti. Cerca e impara!",
+                    t("Ogni parola nuova è un passo avanti. Cerca e impara!"),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -130,7 +132,7 @@ fun NuoveParoleScreen(vm: TedescoViewModel, onIndietro: () -> Unit = {}) {
                 OutlinedTextField(
                     value = ricerca,
                     onValueChange = { ricerca = it },
-                    label = { Text("Cerca in tedesco o italiano") },
+                    label = { Text(t("Cerca in tedesco o italiano")) },
                     singleLine = true,
                     shape = MaterialTheme.shapes.medium,
                     modifier = Modifier
@@ -146,14 +148,14 @@ fun NuoveParoleScreen(vm: TedescoViewModel, onIndietro: () -> Unit = {}) {
                         FilterChip(
                             selected = lezioneFiltrata == null,
                             onClick = { lezioneFiltrata = null },
-                            label = { Text("Tutte") }
+                            label = { Text(t("Tutte")) }
                         )
                     }
                     items(lezioni) { l: Int ->
                         FilterChip(
                             selected = lezioneFiltrata == l,
                             onClick = { lezioneFiltrata = if (lezioneFiltrata == l) null else l },
-                            label = { Text("Lezione $l") }
+                            label = { Text(t("Lezione $l")) }
                         )
                     }
                 }
@@ -211,7 +213,7 @@ fun NuoveParoleScreen(vm: TedescoViewModel, onIndietro: () -> Unit = {}) {
                                 ) {
                                     Icon(Icons.Filled.Check, contentDescription = null)
                                     Spacer(Modifier.width(8.dp))
-                                    Text("Segna come studiato")
+                                    Text(t("Segna come studiato"))
                                 }
                             }
                         }
@@ -277,7 +279,7 @@ private fun WordRow(w: WordEntity, onAscolta: () -> Unit, onAscoltaFrase: () -> 
                         ) {
                             Icon(
                                 Icons.AutoMirrored.Filled.VolumeUp,
-                                contentDescription = "Ascolta frase",
+                                contentDescription = t("Ascolta frase"),
                                 modifier = Modifier.size(16.dp),
                                 tint = MaterialTheme.colorScheme.primary
                             )
@@ -303,7 +305,7 @@ private fun WordRow(w: WordEntity, onAscolta: () -> Unit, onAscoltaFrase: () -> 
             IconButton(onClick = onAscolta) {
                 Icon(
                     Icons.AutoMirrored.Filled.VolumeUp,
-                    contentDescription = "Ascolta pronuncia",
+                    contentDescription = t("Ascolta pronuncia"),
                     modifier = Modifier.size(24.dp),
                     tint = MaterialTheme.colorScheme.primary
                 )
@@ -328,7 +330,7 @@ private fun AggiungiParolaDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Nuova parola") },
+        title = { Text(t("Nuova parola")) },
         text = {
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
@@ -344,34 +346,34 @@ private fun AggiungiParolaDialog(
                 OutlinedTextField(
                     value = italiano,
                     onValueChange = { italiano = it },
-                    label = { Text("Italiano *") },
+                    label = { Text(t("Italiano *")) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = articolo,
                     onValueChange = { articolo = it },
-                    label = { Text("Articolo (der/die/das)") },
+                    label = { Text(t("Articolo (der/die/das)")) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = pronuncia,
                     onValueChange = { pronuncia = it },
-                    label = { Text("Pronuncia") },
+                    label = { Text(t("Pronuncia")) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = frase,
                     onValueChange = { frase = it },
-                    label = { Text("Frase d'esempio") },
+                    label = { Text(t("Frase d'esempio")) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = lezione,
                     onValueChange = { lezione = it.filter { c -> c.isDigit() } },
-                    label = { Text("Lezione (numero)") },
+                    label = { Text(t("Lezione (numero)")) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -390,10 +392,10 @@ private fun AggiungiParolaDialog(
                     )
                 },
                 enabled = valido
-            ) { Text("Aggiungi") }
+            ) { Text(t("Aggiungi")) }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Annulla") }
+            TextButton(onClick = onDismiss) { Text(t("Annulla")) }
         }
     )
 }
@@ -406,10 +408,10 @@ private fun EmptyParole() {
             .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Nessuna parola", style = MaterialTheme.typography.titleMedium)
+        Text(t("Nessuna parola"), style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.height(8.dp))
         Text(
-            "Tocca l'icona di aggiornamento in alto per scaricare il vocabolario.",
+            t("Tocca l'icona di aggiornamento in alto per scaricare il vocabolario."),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center

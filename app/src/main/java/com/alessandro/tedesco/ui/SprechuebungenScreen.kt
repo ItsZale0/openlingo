@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.animation.animateContentSize
 import androidx.compose.material.icons.Icons
@@ -65,7 +67,7 @@ fun SprechuebungenScreen(
             permessoNegato = false
             if (registratore.avvia() != null) {
                 registrando = true
-                messaggio = "Registrazione in corso: parla, poi premi Stop."
+                messaggio = t("Registrazione in corso: parla, poi premi Stop.")
             }
         } else {
             permessoNegato = true
@@ -84,16 +86,16 @@ fun SprechuebungenScreen(
         }
         if (registratore.avvia() != null) {
             registrando = true
-            messaggio = "Registrazione in corso: parla, poi premi Stop."
+            messaggio = t("Registrazione in corso: parla, poi premi Stop.")
         } else {
-            messaggio = "Microfono non disponibile su questo dispositivo."
+            messaggio = t("Microfono non disponibile su questo dispositivo.")
         }
     }
 
     fun fermaRegistrazione() {
         registratore.ferma()
         registrando = false
-        messaggio = "Registrazione pronta: riascoltala e confrontala con il modello."
+        messaggio = t("Registrazione pronta: riascoltala e confrontala con il modello.")
     }
 
     DisposableEffect(Unit) {
@@ -110,7 +112,7 @@ fun SprechuebungenScreen(
             if (evento == Lifecycle.Event.ON_STOP && registratore.inRegistrazione) {
                 registratore.ferma()
                 registrando = false
-                messaggio = "Registrazione interrotta: riascoltala e confronta con il modello."
+                messaggio = t("Registrazione interrotta: riascoltala e confronta con il modello.")
             }
         }
         lifecycleOwner.lifecycle.addObserver(osservatore)
@@ -121,7 +123,7 @@ fun SprechuebungenScreen(
 
     ScreenScaffold("Sprechübungen", onBack = onIndietro) {
         if (prompt == null) {
-            Text("Nessun esercizio per questo livello.")
+            Text(t("Nessun esercizio per questo livello."))
             return@ScreenScaffold
         }
         // Nessun verticalScroll qui: ScreenScaffold avvolge gia' il contenuto
@@ -173,7 +175,7 @@ fun SprechuebungenScreen(
             // Modello
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(Spaziature.md)) {
-                    Text("Risposta modello", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                    Text(t("Risposta modello"), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                     Spacer(Modifier.height(4.dp))
                     Text(prompt.modello, style = MaterialTheme.typography.bodyMedium)
                     Spacer(Modifier.height(8.dp))
@@ -181,12 +183,12 @@ fun SprechuebungenScreen(
                         OutlinedButton(onClick = { tts.speak(prompt.modello, 0.8f) }) {
                             Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(4.dp))
-                            Text("Ascolta (lento)")
+                            Text(t("Ascolta (lento)"))
                         }
                         OutlinedButton(onClick = { tts.speak(prompt.modello, 1f) }) {
                             Icon(Icons.Filled.PlayArrow, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(4.dp))
-                            Text("Ascolta")
+                            Text(t("Ascolta"))
                         }
                     }
                 }
@@ -195,7 +197,7 @@ fun SprechuebungenScreen(
             // Registrazione
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(Spaziature.md)) {
-                    Text("La tua registrazione", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                    Text(t("La tua registrazione"), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                     Spacer(Modifier.height(8.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(Spaziature.sm)) {
                         Button(
@@ -204,7 +206,7 @@ fun SprechuebungenScreen(
                         ) {
                             Icon(if (registrando) Icons.Filled.Stop else Icons.Filled.Mic, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(4.dp))
-                            Text(if (registrando) "Stop" else "Registra")
+                            Text(if (registrando) "Stop" else t("Registra"))
                         }
                         OutlinedButton(
                             onClick = { registratore.ultimoFile?.let { registratore.riproduci(it) } },
@@ -213,7 +215,7 @@ fun SprechuebungenScreen(
                         ) {
                             Icon(Icons.Filled.PlayArrow, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(4.dp))
-                            Text("Riascolta")
+                            Text(t("Riascolta"))
                         }
                     }
                     Column(Modifier.fillMaxWidth().animateContentSize()) {
@@ -223,7 +225,7 @@ fun SprechuebungenScreen(
                         }
                         if (permessoNegato) {
                             Spacer(Modifier.height(6.dp))
-                            Text("Permesso microfono negato. Attivalo nelle impostazioni.", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.error)
+                            Text(t("Permesso microfono negato. Attivalo nelle impostazioni."), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.error)
                         }
                     }
                 }
@@ -232,9 +234,9 @@ fun SprechuebungenScreen(
             // Autovalutazione
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(Spaziature.md)) {
-                    Text("Autovalutazione", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                    Text(t("Autovalutazione"), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                     Spacer(Modifier.height(4.dp))
-                    Text("Quanto è stata fluente la tua risposta? (1 = molto difficile, 5 = fluida)", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(t("Quanto è stata fluente la tua risposta? (1 = molto difficile, 5 = fluida)"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Spacer(Modifier.height(8.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         (1..5).forEach { v ->
@@ -257,12 +259,12 @@ fun SprechuebungenScreen(
                     onClick = { if (indice > 0) indice-- },
                     enabled = indice > 0,
                     modifier = Modifier.weight(1f)
-                ) { Text("Precedente") }
+                ) { Text(t("Precedente")) }
                 Button(
                     onClick = { if (indice < prompts.size - 1) { indice++; valutazione = 0 } },
                     enabled = indice < prompts.size - 1,
                     modifier = Modifier.weight(1f)
-                ) { Text("Prossimo") }
+                ) { Text(t("Prossimo")) }
             }
         }
     }

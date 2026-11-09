@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.clickable
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
@@ -68,7 +70,7 @@ fun DialoghiScreen(
             ) {
                 Text(
                     "Ascolto a due voci: prima senza traduzione, poi con. " +
-                        "Rispondi alle domande senza rileggere.",
+                        t("Rispondi alle domande senza rileggere."),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -137,12 +139,12 @@ fun DialoghiScreen(
                 }) {
                     Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(4.dp))
-                    Text("Ascolta tutto")
+                    Text(t("Ascolta tutto"))
                 }
                 OutlinedButton(onClick = { tts.stop() }) {
                     Icon(Icons.Filled.Stop, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(4.dp))
-                    Text("Ferma")
+                    Text(t("Ferma"))
                 }
             }
 
@@ -180,7 +182,7 @@ fun DialoghiScreen(
                             }) {
                                 Icon(
                                     Icons.AutoMirrored.Filled.VolumeUp,
-                                    contentDescription = "Ascolta battuta",
+                                    contentDescription = t("Ascolta battuta"),
                                     modifier = Modifier.size(18.dp)
                                 )
                             }
@@ -190,7 +192,7 @@ fun DialoghiScreen(
                             contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 0.dp, vertical = 0.dp)
                         ) {
                             Text(
-                                if (traduzioneVisibile) battuta.traduzione else "Mostra traduzione",
+                                if (traduzioneVisibile) battuta.traduzione else t("Mostra traduzione"),
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
@@ -200,7 +202,7 @@ fun DialoghiScreen(
 
             Spacer(Modifier.height(Spaziature.sm))
             Text(
-                "Domande di comprensione",
+                t("Domande di comprensione"),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -253,7 +255,7 @@ fun DialoghiScreen(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
             )
-            TextButton(onClick = { risposte = emptyMap() }) { Text("Riprova le domande") }
+            TextButton(onClick = { risposte = emptyMap() }) { Text(t("Riprova le domande")) }
         }
     }
 }

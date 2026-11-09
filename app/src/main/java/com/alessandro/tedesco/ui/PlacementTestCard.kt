@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -46,7 +48,7 @@ import com.alessandro.tedesco.ui.theme.Spaziature
 /**
  * Test di ingresso breve (12 domande) mostrato nella home finché non viene
  * completato o saltato. Evita che un falso principiante passi settimane su
- * "Saluti e presentazioni".
+ * t("Saluti e presentazioni").
  */
 @Composable
 fun PlacementTestCard(
@@ -88,13 +90,13 @@ fun PlacementTestCard(
                 Spacer(Modifier.width(Spaziature.sm))
                 Column(Modifier.weight(1f)) {
                     Text(
-                        "Test di ingresso",
+                        t("Test di ingresso"),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        "Da dove partiamo?",
+                        t("Da dove partiamo?"),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -198,9 +200,9 @@ fun PlacementTestCard(
                             Spacer(Modifier.width(Spaziature.sm))
                             Text(opzione, Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
                             if (verificato && giusta) {
-                                Icon(Icons.Filled.Check, contentDescription = "Corretta", modifier = Modifier.size(18.dp))
+                                Icon(Icons.Filled.Check, contentDescription = t("Corretta"), modifier = Modifier.size(18.dp))
                             } else if (verificato && selezionata) {
-                                Icon(Icons.Filled.Close, contentDescription = "Sbagliata", modifier = Modifier.size(18.dp))
+                                Icon(Icons.Filled.Close, contentDescription = t("Sbagliata"), modifier = Modifier.size(18.dp))
                             }
                         }
                     }
@@ -217,7 +219,7 @@ fun PlacementTestCard(
                             .fillMaxWidth()
                             .height(AltezzaBottonePrincipale()),
                         shape = MaterialTheme.shapes.large
-                    ) { Text("Verifica") }
+                    ) { Text(t("Verifica")) }
                 } else {
                     Button(
                         onClick = {
@@ -233,7 +235,7 @@ fun PlacementTestCard(
                             .fillMaxWidth()
                             .height(AltezzaBottonePrincipale()),
                         shape = MaterialTheme.shapes.large
-                    ) { Text(if (indice < domande.size - 1) "Prossima" else "Vedi risultato") }
+                    ) { Text(if (indice < domande.size - 1) t("Prossima") else t("Vedi risultato")) }
                 }
             } else {
                 val esito = PlacementTest.valuta(corrette)
@@ -262,15 +264,15 @@ fun PlacementTestCard(
                         .fillMaxWidth()
                         .height(AltezzaBottonePrincipale()),
                     shape = MaterialTheme.shapes.large
-                ) { Text("Parti da ${esito.livello.codiceBreve()}") }
+                ) { Text(t("Parti da ${esito.livello.codiceBreve()}")) }
                 TextButton(onClick = onSalta, modifier = Modifier.fillMaxWidth()) {
-                    Text("Resta sul livello attuale")
+                    Text(t("Resta sul livello attuale"))
                 }
             }
 
             if (!finito) {
                 TextButton(onClick = onSalta, modifier = Modifier.fillMaxWidth()) {
-                    Text("Salta per ora")
+                    Text(t("Salta per ora"))
                 }
             }
         }

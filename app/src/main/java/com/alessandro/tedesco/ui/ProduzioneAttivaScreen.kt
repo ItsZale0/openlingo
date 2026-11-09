@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -79,7 +81,7 @@ fun ProduzioneAttivaScreen(
 
     val esercizio = esercizi.getOrNull(indice)
 
-    ScreenScaffold("Produzione attiva", onBack = onIndietro) {
+    ScreenScaffold(t("Produzione attiva"), onBack = onIndietro) {
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(Spaziature.sm)
@@ -108,7 +110,7 @@ fun ProduzioneAttivaScreen(
             }
 
             if (esercizio == null) {
-                Text("Nessun esercizio per questo livello.", style = MaterialTheme.typography.bodyMedium)
+                Text(t("Nessun esercizio per questo livello."), style = MaterialTheme.typography.bodyMedium)
                 return@Column
             }
 
@@ -145,7 +147,7 @@ fun ProduzioneAttivaScreen(
                         )
                         if (ascolto != null) {
                             IconButton(onClick = { tts.speak(ascolto, velocita = 0.8f) }) {
-                                Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = "Ascolta")
+                                Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = t("Ascolta"))
                             }
                         }
                     }
@@ -161,7 +163,7 @@ fun ProduzioneAttivaScreen(
                     Column(Modifier.fillMaxWidth().padding(Spaziature.sm)) {
                         if (scelte.isEmpty()) {
                             Text(
-                                "Tocca le parole qui sotto nell'ordine giusto.",
+                                t("Tocca le parole qui sotto nell'ordine giusto."),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -208,7 +210,7 @@ fun ProduzioneAttivaScreen(
                     value = input,
                     onValueChange = { if (esito == null) input = it },
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text(if (esercizio.tipo == TipoProduttivo.CLOZE) "Parola mancante" else "La tua frase in tedesco") },
+                    label = { Text(if (esercizio.tipo == TipoProduttivo.CLOZE) t("Parola mancante") else t("La tua frase in tedesco")) },
                     minLines = 2,
                     enabled = esito == null,
                     keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
@@ -235,7 +237,7 @@ fun ProduzioneAttivaScreen(
                     },
                     enabled = if (esercizio.tipo == TipoProduttivo.RIORDINO) scelte.isNotEmpty() else input.isNotBlank(),
                     modifier = Modifier.fillMaxWidth()
-                ) { Text("Controlla") }
+                ) { Text(t("Controlla")) }
             } else {
                 Card(
                     modifier = Modifier
@@ -255,13 +257,13 @@ fun ProduzioneAttivaScreen(
                             )
                             Spacer(Modifier.width(Spaziature.sm))
                             Text(
-                                if (esito == true) "Corretto! 🎉" else "Non ancora",
+                                if (esito == true) "Corretto! 🎉" else t("Non ancora"),
                                 fontWeight = FontWeight.Bold,
                                 style = MaterialTheme.typography.titleSmall
                             )
                             Spacer(Modifier.height(2.dp))
                             Text(
-                                if (esito == true) "Ottimo!" else "Continua a provare.",
+                                if (esito == true) t("Ottimo!") else t("Continua a provare."),
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
@@ -290,14 +292,14 @@ fun ProduzioneAttivaScreen(
                 ) {
                     Icon(Icons.Filled.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(Spaziature.sm))
-                    Text("Prossimo esercizio")
+                    Text(t("Prossimo esercizio"))
                 }
             }
 
             Spacer(Modifier.height(Spaziature.sm))
             Text(
                 "Suggerimento: scrivi senza guardare la soluzione. " +
-                    "Se sbagli, l'errore finisce nel Quaderno errori e torna al momento giusto.",
+                    t("Se sbagli, l'errore finisce nel Quaderno errori e torna al momento giusto."),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,

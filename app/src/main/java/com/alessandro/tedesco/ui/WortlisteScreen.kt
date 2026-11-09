@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -77,12 +79,12 @@ fun WortlisteScreen(
                 value = query,
                 onValueChange = { query = it },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Cerca in tedesco o italiano") },
+                label = { Text(t("Cerca in tedesco o italiano")) },
                 singleLine = true
             )
             Spacer(Modifier.height(Spaziature.sm))
             Text(
-                "Ogni parola imparata e un passo avanti. Cerca e ripassa!",
+                t("Ogni parola imparata e un passo avanti. Cerca e ripassa!"),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -94,7 +96,7 @@ fun WortlisteScreen(
                 FilterChip(
                     selected = livello == null,
                     onClick = { livello = null },
-                    label = { Text("Tutti i livelli") }
+                    label = { Text(t("Tutti i livelli")) }
                 )
                 livelli.forEach { l ->
                     FilterChip(
@@ -112,7 +114,7 @@ fun WortlisteScreen(
                 FilterChip(
                     selected = tema == null,
                     onClick = { tema = null },
-                    label = { Text("Tutti i temi") }
+                    label = { Text(t("Tutti i temi")) }
                 )
                 temi.forEach { t ->
                     FilterChip(
@@ -185,7 +187,7 @@ fun WortlisteScreen(
                         if (voce.tedesco in aggiunte) {
                             Icon(
                                 Icons.Filled.CheckCircle,
-                                contentDescription = "Aggiunta",
+                                contentDescription = t("Aggiunta"),
                                 modifier = Modifier.size(22.dp),
                                 tint = MaterialTheme.colorScheme.primary
                             )
@@ -196,7 +198,7 @@ fun WortlisteScreen(
                             }) {
                                 Icon(
                                     Icons.Filled.AddCircleOutline,
-                                    contentDescription = "Aggiungi al lessico",
+                                    contentDescription = t("Aggiungi al lessico"),
                                     modifier = Modifier.size(22.dp)
                                 )
                             }

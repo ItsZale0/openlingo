@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -87,7 +89,7 @@ fun BenvenutoScreen(vm: TedescoViewModel) {
             Spacer(Modifier.height(20.dp))
 
             FormNuovoProfilo(
-                testoBottone = "Crea profilo e inizia",
+                testoBottone = t("Crea profilo e inizia"),
                 onCrea = { nome, livello, contesto, provider, chiavi, modello ->
                     vm.creaProfilo(
                         nome = nome,
@@ -118,13 +120,13 @@ fun SceltaProfiloScreen(vm: TedescoViewModel) {
     ) {
         Column(modifier = Modifier.widthIn(max = dimensioneContenuto())) {
             Text(
-                "Chi sta studiando?",
+                t("Chi sta studiando?"),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                "Ogni profilo ha i suoi progressi, separati dagli altri.",
+                t("Ogni profilo ha i suoi progressi, separati dagli altri."),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -142,7 +144,7 @@ fun SceltaProfiloScreen(vm: TedescoViewModel) {
             Spacer(Modifier.height(8.dp))
             if (creaNuovo) {
                 FormNuovoProfilo(
-                    testoBottone = "Crea profilo",
+                    testoBottone = t("Crea profilo"),
                     onCrea = { nome, livello, contesto, provider, chiavi, modello ->
                         vm.creaProfilo(
                             nome = nome,
@@ -157,7 +159,7 @@ fun SceltaProfiloScreen(vm: TedescoViewModel) {
                 )
             } else {
                 TextButton(onClick = { creaNuovo = true }) {
-                    Text("Crea un nuovo profilo")
+                    Text(t("Crea un nuovo profilo"))
                 }
             }
         }
@@ -197,32 +199,32 @@ private fun CardProfilo(
             IconButton(onClick = { conferma = true }) {
                 Icon(
                     imageVector = Icons.Filled.Delete,
-                    contentDescription = "Elimina profilo",
+                    contentDescription = t("Elimina profilo"),
                     tint = MaterialTheme.colorScheme.error
                 )
             }
-            Button(onClick = onEntra) { Text("Entra") }
+            Button(onClick = onEntra) { Text(t("Entra")) }
         }
     }
 
     if (conferma) {
         AlertDialog(
             onDismissRequest = { conferma = false },
-            title = { Text("Eliminare il profilo?") },
+            title = { Text(t("Eliminare il profilo?")) },
             text = {
                 Text(
                     "Verranno eliminati tutti i dati di \"${profilo.config.nomeVisualizzato}\": " +
                         "parole, ripassi, lezioni, grammatica e conversazioni. " +
-                        "L'operazione non è reversibile."
+                        t("L'operazione non è reversibile.")
                 )
             },
             confirmButton = {
                 TextButton(onClick = { conferma = false; onElimina() }) {
-                    Text("Elimina", color = MaterialTheme.colorScheme.error)
+                    Text(t("Elimina"), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { conferma = false }) { Text("Annulla") }
+                TextButton(onClick = { conferma = false }) { Text(t("Annulla")) }
             }
         )
     }
@@ -297,14 +299,14 @@ private fun FormNuovoProfilo(
         Spacer(Modifier.height(20.dp))
 
         Text(
-            "AI (facoltativa)",
+            t("AI (facoltativa)"),
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.SemiBold
         )
         Spacer(Modifier.height(4.dp))
         Text(
             "Scegli un provider e incolla la chiave. Senza chiave l'app funziona lo stesso: " +
-                "restano tutti i contenuti offline, ma niente tutor e generazione AI.",
+                t("restano tutti i contenuti offline, ma niente tutor e generazione AI."),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -326,8 +328,8 @@ private fun FormNuovoProfilo(
         Spacer(Modifier.height(4.dp))
         TextButton(onClick = { mostraAltreChiavi = !mostraAltreChiavi }) {
             Text(
-                if (mostraAltreChiavi) "Nascondi le altre chiavi"
-                else "Aggiungi chiavi per altri provider"
+                if (mostraAltreChiavi) t("Nascondi le altre chiavi")
+                else t("Aggiungi chiavi per altri provider")
             )
         }
         if (mostraAltreChiavi) {

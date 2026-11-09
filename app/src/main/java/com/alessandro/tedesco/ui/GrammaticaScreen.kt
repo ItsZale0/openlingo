@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -43,16 +45,16 @@ import com.alessandro.tedesco.ui.theme.AltezzaBottonePrincipale
 import com.alessandro.tedesco.ui.theme.TitoloSchermata
 
 private fun etichettaCategoria(categoria: CategoriaGrammatica): String = when (categoria) {
-    CategoriaGrammatica.VERBI_TEMPI -> "Verbi e tempi"
-    CategoriaGrammatica.VERBI_MODALI -> "Verbi modali"
-    CategoriaGrammatica.PASSIV -> "Passivo"
+    CategoriaGrammatica.VERBI_TEMPI -> t("Verbi e tempi")
+    CategoriaGrammatica.VERBI_MODALI -> t("Verbi modali")
+    CategoriaGrammatica.PASSIV -> t("Passivo")
     CategoriaGrammatica.KONJUNKTIV_II -> "Konjunktiv II"
-    CategoriaGrammatica.RELATIVSATZ -> "Frasi relative"
-    CategoriaGrammatica.KONNEKTOREN -> "Congiunzioni"
-    CategoriaGrammatica.PRAEPOSITIONEN -> "Preposizioni"
-    CategoriaGrammatica.ADJEKTIVDEKLINATION -> "Declinazione aggettivi"
-    CategoriaGrammatica.ARTICOLI -> "Articoli"
-    CategoriaGrammatica.INFINITIV_ZU -> "Infinito con zu"
+    CategoriaGrammatica.RELATIVSATZ -> t("Frasi relative")
+    CategoriaGrammatica.KONNEKTOREN -> t("Congiunzioni")
+    CategoriaGrammatica.PRAEPOSITIONEN -> t("Preposizioni")
+    CategoriaGrammatica.ADJEKTIVDEKLINATION -> t("Declinazione aggettivi")
+    CategoriaGrammatica.ARTICOLI -> t("Articoli")
+    CategoriaGrammatica.INFINITIV_ZU -> t("Infinito con zu")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,7 +72,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
     var tentativo by remember { mutableIntStateOf(0) }
 
     // Batch SEMPRE fresco: nessun set statico riciclato. Se la generazione fallisce
-    // si riusa l'ultimo batch AI non ancora completato, altrimenti si mostra "Riprova".
+    // si riusa l'ultimo batch AI non ancora completato, altrimenti si mostra t("Riprova").
     LaunchedEffect(tentativo) {
         caricato = false
         erroreGen = null
@@ -79,7 +81,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
         val freschi = try {
             vm.generaEsercizi(TipoEsercizio.GRAMMATICA, quanti = 10)
         } catch (e: Throwable) {
-            erroreGen = e.localizedMessage ?: "Errore di rete"
+            erroreGen = e.localizedMessage ?: t("Errore di rete")
             emptyList()
         }
         // Deduplica per contenuto: stessa domanda ripetuta nel batch = un solo
@@ -132,7 +134,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             CircularProgressIndicator()
                             Spacer(Modifier.height(12.dp))
-                            Text("Genero esercizi nuovi...")
+                            Text(t("Genero esercizi nuovi..."))
                         }
                     }
                 } else if (esercizi.isEmpty() && !completato) {
@@ -141,17 +143,17 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier.padding(12.dp)
                         ) {
-                            Text("Nessun esercizio generato", style = MaterialTheme.typography.titleMedium)
+                            Text(t("Nessun esercizio generato"), style = MaterialTheme.typography.titleMedium)
                             Spacer(Modifier.height(8.dp))
                             Text(
-                                erroreGen ?: "Controlla la connessione e riprova.",
+                                erroreGen ?: t("Controlla la connessione e riprova."),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Spacer(Modifier.height(12.dp))
-                            Button(onClick = { tentativo++ }) { Text("Riprova") }
+                            Button(onClick = { tentativo++ }) { Text(t("Riprova")) }
                             Spacer(Modifier.height(8.dp))
-                            OutlinedButton(onClick = onFatto) { Text("Torna indietro") }
+                            OutlinedButton(onClick = onFatto) { Text(t("Torna indietro")) }
                         }
                     }
                 } else if (!completato && indice in esercizi.indices) {
@@ -182,7 +184,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                 IconButton(onClick = { ttsHelper.speak(esercizio.domanda) }) {
                                     Icon(
                                         Icons.AutoMirrored.Filled.VolumeUp,
-                                        contentDescription = "Ascolta domanda",
+                                        contentDescription = t("Ascolta domanda"),
                                         tint = MaterialTheme.colorScheme.primary
                                     )
                                 }
@@ -205,7 +207,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                 ) {
                                     Icon(
                                         Icons.Filled.Translate,
-                                        contentDescription = "Traduci",
+                                        contentDescription = t("Traduci"),
                                         tint = MaterialTheme.colorScheme.primary
                                     )
                                 }
@@ -266,7 +268,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                 IconButton(onClick = { ttsHelper.speak(opzione) }) {
                                     Icon(
                                         Icons.AutoMirrored.Filled.VolumeUp,
-                                        contentDescription = "Ascolta opzione",
+                                        contentDescription = t("Ascolta opzione"),
                                         tint = MaterialTheme.colorScheme.primary
                                     )
                                 }
@@ -289,7 +291,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                 ) {
                                     Icon(
                                         Icons.Filled.Translate,
-                                        contentDescription = "Traduci",
+                                        contentDescription = t("Traduci"),
                                         tint = MaterialTheme.colorScheme.primary
                                     )
                                 }
@@ -316,7 +318,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
-                                    text = if (risultato == true) "Ottimo!" else "Riprova.",
+                                    text = if (risultato == true) t("Ottimo!") else t("Riprova."),
                                     style = MaterialTheme.typography.bodySmall
                                 )
                                 Text(text = esercizio.spiegazione)
@@ -347,7 +349,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                     ) {
                                         Icon(Icons.Filled.Translate, contentDescription = null, modifier = Modifier.size(16.dp))
                                         Spacer(Modifier.width(4.dp))
-                                        Text("Mostra traduzione")
+                                        Text(t("Mostra traduzione"))
                                     }
                                 } else {
                                     Text(
@@ -378,7 +380,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                             val idsCompletati = eserciziGen.filter { it.completato }.map { it.id }.toSet() + esercizio.id
                             var next = indice + 1
                             while (next < esercizi.size && esercizi[next].id in idsCompletati) next++
-                            Text(if (next < esercizi.size) "Prossimo" else "Vedi risultato")
+                            Text(if (next < esercizi.size) t("Prossimo") else t("Vedi risultato"))
                         }
                     }
                 } else {
@@ -432,7 +434,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                     ) {
                         Icon(Icons.Filled.Check, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
-                        Text("Fatto")
+                        Text(t("Fatto"))
                     }
                     if (erroreGen != null) {
                         Text(
@@ -448,11 +450,11 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
     }
 
     // Dialogo errore chiave API per generazione esercizi infiniti
-    if (erroreGen?.contains("Chiave API") == true) {
+    if (erroreGen?.contains(t("Chiave API")) == true) {
         AlertDialog(
             onDismissRequest = { erroreGen = null },
-            title = { Text("Chiave API necessaria") },
-            text = { Text("Per generare esercizi infiniti inserisci una chiave Groq gratuita in Profilo → Tutor AI.") },
+            title = { Text(t("Chiave API necessaria")) },
+            text = { Text(t("Per generare esercizi infiniti inserisci una chiave Groq gratuita in Profilo → Tutor AI.")) },
             confirmButton = { TextButton(onClick = { erroreGen = null }) { Text("OK") } }
         )
     }
@@ -464,7 +466,7 @@ private fun traduci(testo: String): String {
     val risultato = java.net.URL(url).readText()
     val json = kotlinx.serialization.json.Json.parseToJsonElement(risultato).jsonObject
     val translated = json["responseData"]?.jsonObject?.get("translatedText")?.jsonPrimitive?.content
-        ?: throw IOException("Traduzione non disponibile")
+        ?: throw IOException(t("Traduzione non disponibile"))
     if (translated.startsWith("MYMEMORY WARNING") || translated.startsWith("QUERY LENGTH LIMIT")) {
         throw IOException("Limite di traduzione raggiunto, riprova più tardi")
     }

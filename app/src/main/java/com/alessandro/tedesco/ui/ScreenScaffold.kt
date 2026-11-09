@@ -2,6 +2,8 @@
 
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -68,7 +70,7 @@ fun CompactTopBar(
         ) {
             if (onBack != null) {
                 IconButton(onClick = onBack, modifier = Modifier.size(40.dp)) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = t("Indietro"))
                 }
                 Spacer(Modifier.width(8.dp))
             }

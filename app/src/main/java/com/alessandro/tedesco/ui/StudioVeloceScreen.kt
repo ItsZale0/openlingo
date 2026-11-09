@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
@@ -107,7 +109,7 @@ import androidx.compose.material.icons.filled.Headphones
 
 /**
  * V2 - schermata unica: lezione + parole + esercizi, in un flusso lineare.
- * - Selettore di lezione nella barra in alto (chip "Lezioni").
+ * - Selettore di lezione nella barra in alto (chip t("Lezioni")).
  * - Impostazioni ed extra dentro il menu nascosto (icona in alto a destra).
  * - La teoria è markdown renderizzato (MarkdownText), mai testo grezzo.
  */
@@ -186,7 +188,7 @@ fun StudioVeloceScreen(
                     IconButton(onClick = { mostraSelettore = true }) {
                         Icon(
                             Icons.AutoMirrored.Filled.MenuBook,
-                            contentDescription = "Scegli lezione",
+                            contentDescription = t("Scegli lezione"),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -242,7 +244,7 @@ fun StudioVeloceScreen(
                                     modifier = Modifier.size(18.dp)
                                 )
                                 Spacer(Modifier.width(6.dp))
-                                Text("Torna alla home")
+                                Text(t("Torna alla home"))
                             }
                             Spacer(Modifier.height(Spaziature.sm))
                             SezioneLezionePercorso(
@@ -256,7 +258,7 @@ fun StudioVeloceScreen(
                 } else {
                     item {
                         IntestazioneHome(
-                            saluto = nomeProfilo?.let { "Ciao, $it" } ?: "Ciao",
+                            saluto = nomeProfilo?.let { "Ciao, $it" } ?: t("Ciao"),
                             data = pianoOggi?.data.orEmpty(),
                             streakGiorni = pr?.streakGiorni ?: 0
                         )
@@ -286,13 +288,13 @@ fun StudioVeloceScreen(
                         ) {
                             AzioneRapida(
                                 icona = Icons.Filled.Quiz,
-                                etichetta = "Esercizi",
+                                etichetta = t("Esercizi"),
                                 onClick = onVaiAEsercizi,
                                 modifier = Modifier.weight(1f)
                             )
                             AzioneRapida(
                                 icona = Icons.Filled.Refresh,
-                                etichetta = "Ripasso",
+                                etichetta = t("Ripasso"),
                                 onClick = {
                                     vm.caricaSessione()
                                     onNaviga("ripasso")
@@ -354,15 +356,15 @@ fun StudioVeloceScreen(
         ) {
             Column(modifier = Modifier.padding(bottom = Spaziature.xl)) {
                 Text(
-                    profilo?.config?.nomeVisualizzato?.takeIf { it.isNotBlank() } ?: "Il tuo profilo",
+                    profilo?.config?.nomeVisualizzato?.takeIf { it.isNotBlank() } ?: t("Il tuo profilo"),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(horizontal = Spaziature.md, vertical = Spaziature.sm)
                 )
-                VocePannello(Icons.Filled.Quiz, "Esercizi", "Tutti i tipi, sempre nuovi") {
+                VocePannello(Icons.Filled.Quiz, t("Esercizi"), t("Tutti i tipi, sempre nuovi")) {
                     mostraMenu = false; onVaiAEsercizi()
                 }
-                VocePannello(Icons.Filled.Translate, "Percorso grammaticale", "Le unità A0-B2, una alla volta") {
+                VocePannello(Icons.Filled.Translate, t("Percorso grammaticale"), t("Le unità A0-B2, una alla volta")) {
                     mostraMenu = false; onVaiAPercorsoGrammatica()
                 }
                 VocePannello(
@@ -373,26 +375,26 @@ fun StudioVeloceScreen(
                     mostraMenu = false; onNaviga("lessico")
                 }
                 if (paroleCustomAbilitate) {
-                    VocePannello(Icons.Filled.Add, "Aggiungi parola", "Nuove parole nel ripasso") {
+                    VocePannello(Icons.Filled.Add, t("Aggiungi parola"), t("Nuove parole nel ripasso")) {
                         mostraMenu = false; onVaiANuoveParole()
                     }
                 }
-                VocePannello(Icons.Filled.Waves, "Modalità Immersione", "Storie, shadowing, ascolto") {
+                VocePannello(Icons.Filled.Waves, t("Modalità Immersione"), t("Storie, shadowing, ascolto")) {
                     mostraMenu = false; onVaiAImmersione()
                 }
-                VocePannello(Icons.Filled.Headphones, "Podcast & Video", "Ascolto autentico per livello") {
+                VocePannello(Icons.Filled.Headphones, "Podcast & Video", t("Ascolto autentico per livello")) {
                     mostraMenu = false; onNaviga("podcast")
                 }
-                VocePannello(Icons.Filled.EmojiEvents, "Progresso", "Livello, competenze, numeri") {
+                VocePannello(Icons.Filled.EmojiEvents, "Progresso", t("Livello, competenze, numeri")) {
                     mostraMenu = false; onVaiAProgresso()
                 }
-                VocePannello(Icons.Filled.SmartToy, "Tutor AI", "Chiedi, correggi, esercitati") {
+                VocePannello(Icons.Filled.SmartToy, t("Tutor AI"), t("Chiedi, correggi, esercitati")) {
                     mostraMenu = false; onVaiATutor()
                 }
-                VocePannello(Icons.Filled.CloudUpload, "Backup", "Salva e ripristina i dati") {
+                VocePannello(Icons.Filled.CloudUpload, "Backup", t("Salva e ripristina i dati")) {
                     mostraMenu = false; onVaiABackup()
                 }
-                VocePannello(Icons.Filled.Settings, "Impostazioni", "Profilo, chiave, aggiornamenti") {
+                VocePannello(Icons.Filled.Settings, "Impostazioni", t("Profilo, chiave, aggiornamenti")) {
                     mostraMenu = false; onVaiAImpostazioni()
                 }
             }
@@ -425,7 +427,7 @@ fun StudioVeloceScreen(
                     .padding(horizontal = Spaziature.md)
                     .padding(bottom = Spaziature.xl)
             ) {
-                Text("Piano di oggi", style = MaterialTheme.typography.titleLarge)
+                Text(t("Piano di oggi"), style = MaterialTheme.typography.titleLarge)
                 Spacer(Modifier.height(4.dp))
                 Text(
                     "${pianoOggi!!.passiCompletati}/${pianoOggi!!.passiTotali} passi · " +
@@ -478,7 +480,7 @@ private fun IntestazioneHome(
 
 /**
  * Piano di oggi compatto: in home resta solo il prossimo passo.
- * Il resto del piano è nel pannello "Vedi piano".
+ * Il resto del piano è nel pannello t("Vedi piano").
  */
 @Composable
 private fun PianoOggiCard(
@@ -509,7 +511,7 @@ private fun PianoOggiCard(
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        prossimo?.titolo ?: "Piano completato",
+                        prossimo?.titolo ?: t("Piano completato"),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -551,16 +553,16 @@ private fun PianoOggiCard(
                     modifier = Modifier.weight(1f)
                 )
                 TextButton(onClick = onVediPiano) {
-                    Text("Vedi piano")
+                    Text(t("Vedi piano"))
                 }
                 Spacer(Modifier.width(4.dp))
                 if (prossimo != null) {
                     Button(onClick = { onApriProssimo(prossimo) }) {
-                        Text(if (percorso.passiCompletati == 0) "Inizia" else "Continua")
+                        Text(if (percorso.passiCompletati == 0) t("Inizia") else t("Continua"))
                     }
                 } else {
                     OutlinedButton(onClick = onRipassoLibero) {
-                        Text("Ripasso")
+                        Text(t("Ripasso"))
                     }
                 }
             }
@@ -609,7 +611,7 @@ private fun PercorsoLezioneCard(
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
                     Text(
-                        "CONTINUA IL PERCORSO",
+                        t("CONTINUA IL PERCORSO"),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -647,14 +649,14 @@ private fun PercorsoLezioneCard(
                 )
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    if (stato.conclusa) "Lezione conclusa · ripassa quando vuoi"
+                    if (stato.conclusa) t("Lezione conclusa · ripassa quando vuoi")
                     else "${stato.indice}/${stato.totale} esercizi completati",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             } else {
                 Text(
-                    "Inizia da qui: teoria breve e esercizi guidati.",
+                    t("Inizia da qui: teoria breve e esercizi guidati."),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -762,7 +764,7 @@ private fun PassoPianoRiga(
             }
             if (passo.completato) {
                 Text(
-                    "Fatto",
+                    t("Fatto"),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -832,11 +834,11 @@ private fun PercorsoGrammaticaCard(
 ) {
     val progresso = if (totale == 0) 0f else completate.toFloat() / totale
     val etichetta = when (prossima?.stato) {
-        StatoUnita.DA_RIPASSARE -> "Ripasso in scadenza"
-        StatoUnita.DISPONIBILE -> "Prossimo passo"
-        StatoUnita.COMPLETATA -> "Percorso completato"
-        StatoUnita.BLOCCATA -> "Unità bloccata"
-        null -> "Percorso grammaticale"
+        StatoUnita.DA_RIPASSARE -> t("Ripasso in scadenza")
+        StatoUnita.DISPONIBILE -> t("Prossimo passo")
+        StatoUnita.COMPLETATA -> t("Percorso completato")
+        StatoUnita.BLOCCATA -> t("Unità bloccata")
+        null -> t("Percorso grammaticale")
     }
     // Card compatta: niente secondo bottone a tutta larghezza. Tutta la
     // superficie è il bottone, così la home resta corta e leggibile.
@@ -845,7 +847,7 @@ private fun PercorsoGrammaticaCard(
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
             .clickable(
-                onClickLabel = "Apri il percorso grammaticale",
+                onClickLabel = t("Apri il percorso grammaticale"),
                 role = Role.Button,
                 onClick = onApri
             ),
@@ -873,13 +875,13 @@ private fun PercorsoGrammaticaCard(
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
                     Text(
-                        "Percorso grammaticale",
+                        t("Percorso grammaticale"),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.75f)
                     )
                     Text(
-                        prossima?.unita?.titolo ?: "Tutto il percorso",
+                        prossima?.unita?.titolo ?: t("Tutto il percorso"),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -900,7 +902,7 @@ private fun PercorsoGrammaticaCard(
                     if (prossima != null) {
                         "$etichetta · ${prossima.unita.livello} · ${prossima.unita.minuti} min"
                     } else {
-                        "Teoria, esempi ed esercizi in ordine"
+                        t("Teoria, esempi ed esercizi in ordine")
                     },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f),
@@ -947,7 +949,7 @@ private fun TeoriaCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable(
-                        onClickLabel = if (aperta) "Chiudi la teoria" else "Apri la teoria",
+                        onClickLabel = if (aperta) t("Chiudi la teoria") else t("Apri la teoria"),
                         role = Role.Button
                     ) { aperta = !aperta }
                     .padding(Spaziature.md),
@@ -970,19 +972,19 @@ private fun TeoriaCard(
                 Spacer(Modifier.width(Spaziature.sm))
                 Column(Modifier.weight(1f)) {
                     Text(
-                        "Teoria",
+                        t("Teoria"),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        if (aperta) "Tocca per chiudere" else "Tocca per leggere la spiegazione",
+                        if (aperta) t("Tocca per chiudere") else t("Tocca per leggere la spiegazione"),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 Icon(
                     imageVector = if (aperta) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
-                    contentDescription = if (aperta) "Chiudi la teoria" else "Apri la teoria",
+                    contentDescription = if (aperta) t("Chiudi la teoria") else t("Apri la teoria"),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -1009,7 +1011,7 @@ private fun TeoriaCard(
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text("Ascolta")
+                        Text(t("Ascolta"))
                     }
                 }
             }
@@ -1052,7 +1054,7 @@ private fun ConsiglioCard(
             Spacer(Modifier.width(Spaziature.sm))
             Column(Modifier.weight(1f)) {
                 Text(
-                    "Consiglio per te",
+                    t("Consiglio per te"),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -1074,7 +1076,7 @@ private fun ConsiglioCard(
             }
             Spacer(Modifier.width(Spaziature.xs))
             TextButton(onClick = onApri) {
-                Text("Apri")
+                Text(t("Apri"))
             }
         }
     }
@@ -1169,7 +1171,7 @@ private fun SezioneLezionePercorso(
     val eserciziSessione = sessione.esercizi
     val totale = eserciziSessione.size
 
-    // Sessione nuova (primo avvio dopo l'aggiornamento o "Riprova"): il punto
+    // Sessione nuova (primo avvio dopo l'aggiornamento o t("Riprova")): il punto
     // salvato si riferiva ad altre domande, quindi si riparte da zero.
     val sessioneNuova = stato.rotazione.sessione != sessione.rotazione.sessione
 
@@ -1286,7 +1288,7 @@ private fun SezioneLezionePercorso(
                     label = {
                         Text(
                             when {
-                                finita -> "Lezione conclusa"
+                                finita -> t("Lezione conclusa")
                                 indice > 0 -> "Domanda ${indice + 1} di $totale"
                                 else -> "Inizia · $totale esercizi"
                             }
@@ -1294,7 +1296,7 @@ private fun SezioneLezionePercorso(
                     }
                 )
                 TextButton(onClick = onVaiAPercorso) {
-                    Text("Percorso")
+                    Text(t("Percorso"))
                 }
             }
         }
@@ -1346,7 +1348,7 @@ private fun SezioneLezionePercorso(
         Column(modifier = Modifier.padding(Spaziature.md)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    "Esercizi",
+                    t("Esercizi"),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -1397,7 +1399,7 @@ private fun SezioneLezionePercorso(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = !verificato,
                     singleLine = true,
-                    placeholder = { Text("Scrivi la risposta in tedesco") }
+                    placeholder = { Text(t("Scrivi la risposta in tedesco")) }
                 )
             }
 
@@ -1413,7 +1415,7 @@ private fun SezioneLezionePercorso(
                 ) {
                     Column(modifier = Modifier.padding(Spaziature.sm)) {
                         Text(
-                            if (rispostaGiusta) "Giusto!" else "Non ancora",
+                            if (rispostaGiusta) t("Giusto!") else t("Non ancora"),
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.Bold
                         )
@@ -1437,9 +1439,9 @@ private fun SezioneLezionePercorso(
             ) {
                 Text(
                     when {
-                        !verificato -> "Verifica"
-                        ultimaDomanda -> "Concludi lezione"
-                        else -> "Avanti"
+                        !verificato -> t("Verifica")
+                        ultimaDomanda -> t("Concludi lezione")
+                        else -> t("Avanti")
                     }
                 )
             }
@@ -1526,7 +1528,7 @@ private fun RisultatoLezione(
     ) {
         Column(modifier = Modifier.padding(Spaziature.md)) {
             Text(
-                if (promosso) "Lezione superata" else "Lezione conclusa",
+                if (promosso) t("Lezione superata") else t("Lezione conclusa"),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
@@ -1550,14 +1552,14 @@ private fun RisultatoLezione(
                     .fillMaxWidth()
                     .height(AltezzaBottonePrincipale())
             ) {
-                Text("Lezione successiva")
+                Text(t("Lezione successiva"))
             }
             Spacer(Modifier.height(Spaziature.xs))
             TextButton(
                 onClick = onRiprova,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Ripeti con esercizi nuovi")
+                Text(t("Ripeti con esercizi nuovi"))
             }
         }
     }
@@ -1591,7 +1593,7 @@ private fun SelettoreLezioniSheet(
                 .padding(horizontal = Spaziature.md)
         ) {
             Text(
-                "Lezioni",
+                t("Lezioni"),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -1666,11 +1668,11 @@ private fun RigaLezione(
     onSeleziona: () -> Unit
 ) {
     val statoTesto = when {
-        !lezione.accessibile -> "Bloccata"
-        lezione.stato == StatoUnita.DA_RIPASSARE -> "Da ripassare"
-        lezione.completata -> "Completata"
-        corrente -> "In corso"
-        else -> "Da fare"
+        !lezione.accessibile -> t("Bloccata")
+        lezione.stato == StatoUnita.DA_RIPASSARE -> t("Da ripassare")
+        lezione.completata -> t("Completata")
+        corrente -> t("In corso")
+        else -> t("Da fare")
     }
     Surface(
         onClick = onSeleziona,
@@ -1758,11 +1760,11 @@ private fun RigaLezione(
 }
 
 private fun descrizioneLivello(livello: String): String = when (livello.uppercase()) {
-    "A0" -> "Basi"
-    "A1" -> "Elementare"
+    "A0" -> t("Basi")
+    "A1" -> t("Elementare")
     "A2" -> "Base"
-    "B1" -> "Intermedio"
-    "B2" -> "Avanzato"
+    "B1" -> t("Intermedio")
+    "B2" -> t("Avanzato")
     else -> ""
 }
 

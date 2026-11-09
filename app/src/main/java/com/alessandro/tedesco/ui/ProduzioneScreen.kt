@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -74,7 +76,7 @@ fun ProduzioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
 
     // Batch SEMPRE fresco: nessun set statico riciclato. Se la generazione fallisce
     // si riusa l'ultimo batch generato dall'AI non ancora completato; se non c'e'
-    // nemmeno quello, si mostra l'errore con "Riprova".
+    // nemmeno quello, si mostra l'errore con t("Riprova").
     LaunchedEffect(tentativo) {
         caricato = false
         erroreGen = null
@@ -83,7 +85,7 @@ fun ProduzioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
         val freschi: List<EsercizioGenerato> = try {
             vm.generaEsercizi(TipoEsercizio.PRODUZIONE, quanti = 10)
         } catch (e: Throwable) {
-            erroreGen = e.localizedMessage ?: "Errore di rete"
+            erroreGen = e.localizedMessage ?: t("Errore di rete")
             emptyList()
         }
         // Deduplica per contenuto: l'AI può restituire la stessa domanda più
@@ -126,17 +128,17 @@ fun ProduzioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(12.dp)
             ) {
-                Text("Nessun esercizio generato", style = MaterialTheme.typography.titleMedium)
+                Text(t("Nessun esercizio generato"), style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    erroreGen ?: "Controlla la connessione e riprova.",
+                    erroreGen ?: t("Controlla la connessione e riprova."),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(Modifier.height(12.dp))
-                Button(onClick = { tentativo++ }) { Text("Riprova") }
+                Button(onClick = { tentativo++ }) { Text(t("Riprova")) }
                 Spacer(Modifier.height(8.dp))
-                OutlinedButton(onClick = onFatto) { Text("Torna indietro") }
+                OutlinedButton(onClick = onFatto) { Text(t("Torna indietro")) }
             }
         }
     }
@@ -175,7 +177,7 @@ fun ProduzioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             CircularProgressIndicator()
                             Spacer(Modifier.height(12.dp))
-                            Text("Genero esercizi nuovi...")
+                            Text(t("Genero esercizi nuovi..."))
                         }
                     }
                 } else if (!completato) {
@@ -258,7 +260,7 @@ fun ProduzioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                 )
                                 Spacer(Modifier.height(4.dp))
                                 Text(
-                                    text = if (risultato == true) "Ottimo!" else "Riprova.",
+                                    text = if (risultato == true) t("Ottimo!") else t("Riprova."),
                                     style = MaterialTheme.typography.bodySmall
                                 )
                                 Spacer(Modifier.height(4.dp))
@@ -280,7 +282,7 @@ fun ProduzioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                 },
                                 modifier = Modifier.weight(1f)
                             ) {
-                                Text("Elimina")
+                                Text(t("Elimina"))
                             }
                             Button(
                                 onClick = {
@@ -294,7 +296,7 @@ fun ProduzioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                 },
                                 modifier = Modifier.weight(2f)
                             ) {
-                                Text(if (puoiPassare < elenco.size) "Prossimo" else "Vedi risultato")
+                                Text(if (puoiPassare < elenco.size) t("Prossimo") else t("Vedi risultato"))
                             }
                         }
                     }
@@ -348,7 +350,7 @@ fun ProduzioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                     ) {
                         Icon(Icons.Filled.Check, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
-                        Text("Fatto")
+                        Text(t("Fatto"))
                     }
                 }
             }
@@ -356,11 +358,11 @@ fun ProduzioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
     }
 
     // Dialogo errore chiave API per generazione esercizi infiniti
-    if (erroreGen?.contains("Chiave API") == true) {
+    if (erroreGen?.contains(t("Chiave API")) == true) {
         AlertDialog(
             onDismissRequest = { erroreGen = null },
-            title = { Text("Chiave API necessaria") },
-            text = { Text("Per generare esercizi infiniti inserisci una chiave Groq gratuita in Profilo → Tutor AI.") },
+            title = { Text(t("Chiave API necessaria")) },
+            text = { Text(t("Per generare esercizi infiniti inserisci una chiave Groq gratuita in Profilo → Tutor AI.")) },
 
             confirmButton = { TextButton(onClick = { erroreGen = null }) { Text("OK") } }
         )

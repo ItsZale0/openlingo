@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.background
@@ -83,7 +85,7 @@ fun TutorChatScreen(vm: TedescoViewModel, onIndietro: (() -> Unit)? = null) {
             // Id unici per posizione: la stessa frase inviata due volte non deve collidere.
             messaggi = (if (storico.isNotEmpty()) storico else listOf(
                 MessaggioTutor(
-                    testo = "Ciao! Sono il tuo tutor di tedesco. Chiedimi quello che vuoi: grammatica, esempi, esercizi, dubbi. Rispondo in italiano.",
+                    testo = t("Ciao! Sono il tuo tutor di tedesco. Chiedimi quello che vuoi: grammatica, esempi, esercizi, dubbi. Rispondo in italiano."),
                     daUtente = false
                 )
             )).mapIndexed { i, m -> m.copy(id = i.toLong()) }
@@ -145,7 +147,7 @@ fun TutorChatScreen(vm: TedescoViewModel, onIndietro: (() -> Unit)? = null) {
                     animazioneAttiva = true
                 },
                 onFailure = { e ->
-                    messaggi = aggiungi(MessaggioTutor(e.message ?: "Errore sconosciuto", daUtente = false, errore = true))
+                    messaggi = aggiungi(MessaggioTutor(e.message ?: t("Errore sconosciuto"), daUtente = false, errore = true))
                 }
             )
             caricamento = false
@@ -183,7 +185,7 @@ fun TutorChatScreen(vm: TedescoViewModel, onIndietro: (() -> Unit)? = null) {
                 ) {
                     if (onIndietro != null) {
                         IconButton(onClick = onIndietro, modifier = Modifier.size(40.dp)) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = t("Indietro"))
                         }
                         Spacer(Modifier.width(4.dp))
                     }
@@ -196,7 +198,7 @@ fun TutorChatScreen(vm: TedescoViewModel, onIndietro: (() -> Unit)? = null) {
                     Spacer(Modifier.width(12.dp))
                     Column {
                         Text(
-                            "Tutor di tedesco",
+                            t("Tutor di tedesco"),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold
                         )
@@ -252,7 +254,7 @@ fun TutorChatScreen(vm: TedescoViewModel, onIndietro: (() -> Unit)? = null) {
                             CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                             Spacer(Modifier.width(8.dp))
                             Text(
-                                "Sto scrivendo…",
+                                t("Sto scrivendo…"),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -276,7 +278,7 @@ fun TutorChatScreen(vm: TedescoViewModel, onIndietro: (() -> Unit)? = null) {
                     OutlinedTextField(
                         value = input,
                         onValueChange = { input = it },
-                        placeholder = { Text("Chiedi qualcosa…") },
+                        placeholder = { Text(t("Chiedi qualcosa…")) },
                         modifier = Modifier.weight(1f),
                         maxLines = 3,
                         enabled = !caricamento,
@@ -287,7 +289,7 @@ fun TutorChatScreen(vm: TedescoViewModel, onIndietro: (() -> Unit)? = null) {
                         onClick = { invia(input.text); input = TextFieldValue("") },
                         enabled = input.text.isNotBlank() && !caricamento
                     ) {
-                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Invia")
+                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = t("Invia"))
                     }
                 }
             }
@@ -305,7 +307,7 @@ private fun ModelloSelector(
     var espanso by remember { mutableStateOf(false) }
     val etichetta = modelli.firstOrNull { it.first == modello }?.second
         ?: modello?.substringAfterLast('/')?.replaceFirstChar { it.uppercase() }
-        ?: "Automatico"
+        ?: t("Automatico")
 
     Box(
         modifier = Modifier
@@ -337,13 +339,13 @@ private fun ModelloSelector(
 @Composable
 private fun RagionamentoSelector(ragionamento: String?, onCambia: (String?) -> Unit) {
     val opzioni = listOf(
-        null to "Ragionamento: Auto",
-        "low" to "Ragionamento: Basso",
-        "medium" to "Ragionamento: Medio",
-        "high" to "Ragionamento: Alto"
+        null to t("Ragionamento: Auto"),
+        "low" to t("Ragionamento: Basso"),
+        "medium" to t("Ragionamento: Medio"),
+        "high" to t("Ragionamento: Alto")
     )
     var espanso by remember { mutableStateOf(false) }
-    val etichetta = opzioni.firstOrNull { it.first == ragionamento }?.second ?: "Ragionamento: Auto"
+    val etichetta = opzioni.firstOrNull { it.first == ragionamento }?.second ?: t("Ragionamento: Auto")
     Box(
         modifier = Modifier
             .fillMaxWidth()

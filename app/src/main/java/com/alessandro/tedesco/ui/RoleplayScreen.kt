@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -53,7 +55,7 @@ fun RoleplayScreen(vm: TedescoViewModel) {
                     testo = if (scenarioCorrente != null)
                         "Hai scelto: ${scenarioCorrente.titolo}. ${scenarioCorrente.situazione} Il tuo ruolo: ${scenarioCorrente.ruoloUtente}. Il mio ruolo: ${scenarioCorrente.ruoloAI}. Iniziamo!"
                     else
-                        "Scegli uno scenario per iniziare il gioco di ruolo.",
+                        t("Scegli uno scenario per iniziare il gioco di ruolo."),
                     daUtente = false
                 )
             )
@@ -86,7 +88,7 @@ fun RoleplayScreen(vm: TedescoViewModel) {
                     animazioneAttiva = true
                 },
                 onFailure = { e ->
-                    messaggi = messaggi + MessaggioRoleplay(e.message ?: "Errore sconosciuto", daUtente = false, errore = true)
+                    messaggi = messaggi + MessaggioRoleplay(e.message ?: t("Errore sconosciuto"), daUtente = false, errore = true)
                 }
             )
             caricamento = false
@@ -123,7 +125,7 @@ fun RoleplayScreen(vm: TedescoViewModel) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = { vm.terminaRoleplay() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = t("Indietro"))
                     }
                     Spacer(Modifier.width(8.dp))
                     Icon(
@@ -135,12 +137,12 @@ fun RoleplayScreen(vm: TedescoViewModel) {
                     Spacer(Modifier.width(12.dp))
                     Column {
                         Text(
-                            "Gioco di ruolo",
+                            t("Gioco di ruolo"),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold
                         )
                         Text(
-                            scenario?.titolo ?: "Scegli uno scenario",
+                            scenario?.titolo ?: t("Scegli uno scenario"),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -165,7 +167,7 @@ fun RoleplayScreen(vm: TedescoViewModel) {
                 ) {
                     Text(
                         "Per il gioco di ruolo serve una chiave API Groq. " +
-                            "Vai in Profilo → Tutor AI e inseriscila.",
+                            t("Vai in Profilo → Tutor AI e inseriscila."),
                         modifier = Modifier.padding(12.dp),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onErrorContainer
@@ -245,7 +247,7 @@ fun RoleplayScreen(vm: TedescoViewModel) {
                                 CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                                 Spacer(Modifier.width(8.dp))
                                 Text(
-                                    "Sto scrivendo…",
+                                    t("Sto scrivendo…"),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -263,7 +265,7 @@ fun RoleplayScreen(vm: TedescoViewModel) {
                         OutlinedTextField(
                             value = input,
                             onValueChange = { input = it },
-                            placeholder = { Text("Scrivi in tedesco…") },
+                            placeholder = { Text(t("Scrivi in tedesco…")) },
                             modifier = Modifier.weight(1f),
                             maxLines = 3,
                             enabled = !caricamento
@@ -273,7 +275,7 @@ fun RoleplayScreen(vm: TedescoViewModel) {
                             onClick = { invia(input) },
                             enabled = input.isNotBlank() && !caricamento
                         ) {
-                            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Invia")
+                            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = t("Invia"))
                         }
                     }
                 }
@@ -290,7 +292,7 @@ private fun ModelloSelector(
 ) {
     var espanso by remember { mutableStateOf(false) }
     val modelli = listOf(
-        null to "Automatico (sceglie il più veloce)",
+        null to t("Automatico (sceglie il più veloce)"),
         "nvidia/nemotron-3.5-lightning:free" to "Nemotron 3.5 Lightning (free)",
         "liquid/lfm-2.5-2.6b:free" to "LFM 2.5 (free)",
         "inclusionai/ling-3.0-flash-sante:free" to "Ling 3.0 Flash (free)",
@@ -298,7 +300,7 @@ private fun ModelloSelector(
         "google/gemma-4-26b-a4b-it:free" to "Gemma 4 26B (free)",
         "nvidia/nemotron-3-super-120b-a12b:free" to "Nemotron 3 Super 120B (free)"
     )
-    val etichetta = modelli.firstOrNull { it.first == modello }?.second ?: "Automatico (free)"
+    val etichetta = modelli.firstOrNull { it.first == modello }?.second ?: t("Automatico (free)")
 
     Box(
         modifier = Modifier

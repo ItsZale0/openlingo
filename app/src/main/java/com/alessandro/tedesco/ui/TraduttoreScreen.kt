@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -42,7 +44,7 @@ fun TraduttoreScreen(vm: TedescoViewModel) {
     val ttsHelperTedesco = rememberTtsHelper(context, Locale.GERMAN)
     val ttsHelperItaliano = rememberTtsHelper(context, Locale.ITALIAN)
 
-    ScreenScaffold("Traduttore") {
+    ScreenScaffold(t("Traduttore")) {
 
             Column(
                 modifier = Modifier.widthIn(max = dimensioneContenuto()),
@@ -51,7 +53,7 @@ fun TraduttoreScreen(vm: TedescoViewModel) {
                 Spacer(Modifier.height(8.dp))
 
                 Text(
-                    "Traduci parole e frasi dal tedesco all'italiano. Ogni parola è un tassello!",
+                    t("Traduci parole e frasi dal tedesco all'italiano. Ogni parola è un tassello!"),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -59,7 +61,7 @@ fun TraduttoreScreen(vm: TedescoViewModel) {
                 OutlinedTextField(
                     value = testo,
                     onValueChange = { testo = it },
-                    label = { Text("Testo in tedesco") },
+                    label = { Text(t("Testo in tedesco")) },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 3,
                     trailingIcon = {
@@ -67,7 +69,7 @@ fun TraduttoreScreen(vm: TedescoViewModel) {
                             IconButton(onClick = { ttsHelperTedesco.speak(testo) }) {
                                 Icon(
                                     Icons.AutoMirrored.Filled.VolumeUp,
-                                    contentDescription = "Ascolta testo tedesco",
+                                    contentDescription = t("Ascolta testo tedesco"),
                                     tint = MaterialTheme.colorScheme.primary
                                 )
                             }
@@ -99,7 +101,7 @@ fun TraduttoreScreen(vm: TedescoViewModel) {
                 ) {
                     Icon(Icons.Filled.Translate, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
-                    Text(if (caricamento) "Traduzione..." else "Traduci")
+                    Text(if (caricamento) t("Traduzione...") else t("Traduci"))
                 }
 
                 if (errore != null) {
@@ -124,14 +126,14 @@ fun TraduttoreScreen(vm: TedescoViewModel) {
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    "Traduzione",
+                                    t("Traduzione"),
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
                                 IconButton(onClick = { ttsHelperItaliano.speak(traduzione) }) {
                                     Icon(
                                         Icons.AutoMirrored.Filled.VolumeUp,
-                                        contentDescription = "Ascolta traduzione",
+                                        contentDescription = t("Ascolta traduzione"),
                                         tint = MaterialTheme.colorScheme.onPrimaryContainer
                                     )
                                 }
@@ -161,7 +163,7 @@ fun TraduttoreScreen(vm: TedescoViewModel) {
                     ) {
                         Icon(Icons.Filled.Add, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
-                        Text("Aggiungi al vocabolario")
+                        Text(t("Aggiungi al vocabolario"))
                     }
                 }
 
@@ -177,7 +179,7 @@ private fun traduci(testo: String): String {
     val risultato = java.net.URL(url).readText()
     val json = kotlinx.serialization.json.Json.parseToJsonElement(risultato).jsonObject
     val translated = json["responseData"]?.jsonObject?.get("translatedText")?.jsonPrimitive?.content
-        ?: throw IOException("Traduzione non disponibile")
+        ?: throw IOException(t("Traduzione non disponibile"))
     // MyMemory a volte risponde con "MYMEMORY WARNING: QUERY LENGTH LIMIT..."
     if (translated.startsWith("MYMEMORY WARNING") || translated.startsWith("QUERY LENGTH LIMIT")) {
         throw IOException("Limite di traduzione raggiunto, riprova più tardi")

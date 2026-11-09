@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -91,7 +93,7 @@ class VoiceHelper(private val context: Context) {
         // Verifica disponibilità SpeechRecognizer
         if (!SpeechRecognizer.isRecognitionAvailable(context)) {
             state = VoiceState.ERROR
-            errorMessage = "Riconoscimento vocale non disponibile su questo dispositivo"
+            errorMessage = t("Riconoscimento vocale non disponibile su questo dispositivo")
             onStateChange?.invoke(state)
             return
         }
@@ -124,15 +126,15 @@ class VoiceHelper(private val context: Context) {
                 override fun onError(error: Int) {
                     state = VoiceState.ERROR
                     errorMessage = when (error) {
-                        SpeechRecognizer.ERROR_AUDIO -> "Errore audio"
-                        SpeechRecognizer.ERROR_CLIENT -> "Errore client"
-                        SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> "Permesso microfono negato"
-                        SpeechRecognizer.ERROR_NETWORK -> "Errore di rete"
-                        SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> "Timeout di rete"
-                        SpeechRecognizer.ERROR_NO_MATCH -> "Non ho capito, riprova"
-                        SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> "Riconoscitore occupato"
-                        SpeechRecognizer.ERROR_SERVER -> "Errore del server"
-                        SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "Nessun suono rilevato"
+                        SpeechRecognizer.ERROR_AUDIO -> t("Errore audio")
+                        SpeechRecognizer.ERROR_CLIENT -> t("Errore client")
+                        SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> t("Permesso microfono negato")
+                        SpeechRecognizer.ERROR_NETWORK -> t("Errore di rete")
+                        SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> t("Timeout di rete")
+                        SpeechRecognizer.ERROR_NO_MATCH -> t("Non ho capito, riprova")
+                        SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> t("Riconoscitore occupato")
+                        SpeechRecognizer.ERROR_SERVER -> t("Errore del server")
+                        SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> t("Nessun suono rilevato")
                         else -> "Errore sconosciuto ($error)"
                     }
                     onStateChange?.invoke(state)
@@ -148,7 +150,7 @@ class VoiceHelper(private val context: Context) {
                         onResultCallback?.invoke(recognized)
                     } else {
                         state = VoiceState.ERROR
-                        errorMessage = "Non ho capito, riprova"
+                        errorMessage = t("Non ho capito, riprova")
                         onStateChange?.invoke(state)
                     }
                 }

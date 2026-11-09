@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -77,7 +79,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
     ) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
         scope.launch {
-            messaggioExport = "Esportazione in corso…"
+            messaggioExport = t("Esportazione in corso…")
             runCatching {
                 val testo = withContext(Dispatchers.IO) {
                     BackupEsecutore.esportaTutto(contesto, BuildConfig.VERSION_NAME)
@@ -85,24 +87,24 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                 withContext(Dispatchers.IO) {
                     contesto.contentResolver.openOutputStream(uri)?.use {
                         it.write(testo.toByteArray(Charsets.UTF_8))
-                    } ?: error("Impossibile scrivere il file")
+                    } ?: error(t("Impossibile scrivere il file"))
                 }
             }.onSuccess {
-                messaggioExport = "Esportazione completata."
+                messaggioExport = t("Esportazione completata.")
             }.onFailure {
                 messaggioExport = "Esportazione non riuscita: ${it.message}"
             }
         }
     }
 
-    ScreenScaffold("Backup cloud", onBack = onIndietro) {
+    ScreenScaffold(t("Backup cloud"), onBack = onIndietro) {
         Column(
             modifier = Modifier.fillMaxWidth().widthIn(max = dimensioneContenuto()),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Spacer(Modifier.height(4.dp))
             Text(
-                "Salvataggio cloud dei progressi su GitHub.",
+                t("Salvataggio cloud dei progressi su GitHub."),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -116,7 +118,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                     containerColor = MaterialTheme.colorScheme.surfaceContainer)
             ) {
                 Column(Modifier.fillMaxWidth().padding(12.dp)) {
-                    Text("Cosa viene salvato", style = MaterialTheme.typography.titleMedium,
+                    Text(t("Cosa viene salvato"), style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold)
                     Spacer(Modifier.height(4.dp))
                     Text(
@@ -145,7 +147,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                     containerColor = MaterialTheme.colorScheme.surfaceContainer)
             ) {
                 Column(Modifier.fillMaxWidth().padding(12.dp)) {
-                    Text("Esporta tutti i dati", style = MaterialTheme.typography.titleMedium,
+                    Text(t("Esporta tutti i dati"), style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold)
                     Spacer(Modifier.height(4.dp))
                     Text(
@@ -158,7 +160,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                     Spacer(Modifier.height(4.dp))
                     Text(
                         "Attenzione: il file contiene anche le chiavi API dei profili. " +
-                            "Trattalo come un documento riservato. Il token GitHub non è incluso.",
+                            t("Trattalo come un documento riservato. Il token GitHub non è incluso."),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -170,7 +172,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                             esporta.launch("deutsch-dati-$marca.json")
                         },
                         modifier = Modifier.fillMaxWidth()
-                    ) { Text("Esporta su file") }
+                    ) { Text(t("Esporta su file")) }
                     if (messaggioExport.isNotBlank()) {
                         Spacer(Modifier.height(8.dp))
                         Text(
@@ -189,13 +191,13 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Column(Modifier.fillMaxWidth().padding(12.dp)) {
-                    Text("Configurazione", style = MaterialTheme.typography.titleMedium,
+                    Text(t("Configurazione"), style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold)
                     Spacer(Modifier.height(10.dp))
                     OutlinedTextField(
                         value = repoInput,
                         onValueChange = { repoInput = it },
-                        label = { Text("Repo di backup") },
+                        label = { Text(t("Repo di backup")) },
                         placeholder = { Text("ItsZale0/tedesco-backup") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
@@ -209,7 +211,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                     Spacer(Modifier.height(4.dp))
                     Text(
                         "File di backup del profilo attivo: ${vm.nomeFileBackup.collectAsStateWithLifecycle(BackupCloud.NOME_FILE).value}. " +
-                            "Il ripristino cerca anche il backup condiviso tedesco-backup.json.",
+                            t("Il ripristino cerca anche il backup condiviso tedesco-backup.json."),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -217,7 +219,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                     OutlinedTextField(
                         value = tokenInput,
                         onValueChange = { tokenInput = it },
-                        label = { Text("Token GitHub") },
+                        label = { Text(t("Token GitHub")) },
                         placeholder = { Text("github_pat_… o ghp_…") },
                         singleLine = true,
                         visualTransformation = PasswordVisualTransformation(),
@@ -242,7 +244,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                             vm.provaConnessione()
                         },
                         modifier = Modifier.fillMaxWidth()
-                    ) { Text("Salva e prova connessione") }
+                    ) { Text(t("Salva e prova connessione")) }
                 }
             }
 
@@ -258,7 +260,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                         verticalAlignment = Alignment.CenterVertically) {
                         CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
                         Spacer(Modifier.width(12.dp))
-                        Text("Operazione in corso…")
+                        Text(t("Operazione in corso…"))
                     }
                 }
                 is BackupStato.Ok -> MessaggioStato(s.messaggio, errore = false)
@@ -271,13 +273,13 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                 onClick = { vm.eseguiBackup(com.alessandro.tedesco.BuildConfig.VERSION_NAME) },
                 modifier = Modifier.fillMaxWidth().height(52.dp),
                 enabled = token.isNotBlank() && stato !is BackupStato.InCorso
-            ) { Text("Carica backup ora") }
+            ) { Text(t("Carica backup ora")) }
 
             OutlinedButton(
                 onClick = { vm.preparaRipristino() },
                 modifier = Modifier.fillMaxWidth().height(52.dp),
                 enabled = token.isNotBlank() && stato !is BackupStato.InCorso
-            ) { Text("Ripristina dal backup") }
+            ) { Text(t("Ripristina dal backup")) }
 
             // --- Backup automatico ---
             Card(
@@ -292,13 +294,13 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(Modifier.weight(1f)) {
-                            Text("Backup automatico",
+                            Text(t("Backup automatico"),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.SemiBold)
                             Spacer(Modifier.height(2.dp))
                             Text(
-                                if (auto) "Attivo · ogni 5 minuti (15 min in background)"
-                                else "Disattivato",
+                                if (auto) t("Attivo · ogni 5 minuti (15 min in background)")
+                                else t("Disattivato"),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -320,7 +322,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                     }
                     if (!token.isNotBlank()) {
                         Spacer(Modifier.height(6.dp))
-                        Text("Inserisci il token per attivare il backup automatico",
+                        Text(t("Inserisci il token per attivare il backup automatico"),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.error)
                     }
@@ -343,17 +345,17 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
     if (riep != null && confermaRipristino) {
         AlertDialog(
             onDismissRequest = { confermaRipristino = false; vm.annullaRipristino() },
-            title = { Text("Unire il backup ai dati di questo telefono?") },
+            title = { Text(t("Unire il backup ai dati di questo telefono?")) },
             text = {
                 Column {
-                    Text("Il backup contiene:")
+                    Text(t("Il backup contiene:"))
                     Spacer(Modifier.height(8.dp))
-                    Text("• ${riep.numProfili} profili")
-                    Text("• ${riep.numParole} parole")
-                    Text("• ${riep.numRipassi} ripassi registrati")
-                    Text("• ${riep.numRisposte} correzioni")
-                    Text("• ${riep.numUnitaGrammatica} unità di grammatica")
-                    Text("• ${riep.numLezioni} lezioni")
+                    Text(t("• ${riep.numProfili} profili"))
+                    Text(t("• ${riep.numParole} parole"))
+                    Text(t("• ${riep.numRipassi} ripassi registrati"))
+                    Text(t("• ${riep.numRisposte} correzioni"))
+                    Text(t("• ${riep.numUnitaGrammatica} unità di grammatica"))
+                    Text(t("• ${riep.numLezioni} lezioni"))
                     Spacer(Modifier.height(8.dp))
                     Text("Data: " + SimpleDateFormat("d MMM yyyy, HH:mm", Locale.ITALIAN)
                         .format(Date(riep.creatoIl)))
@@ -361,7 +363,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                     Text(
                         "I progressi vengono UNITI a quelli del telefono: per ogni parola, " +
                             "unità di grammatica e lezione resta la versione più avanzata. " +
-                            "Nessuna delle due parti viene cancellata.",
+                            t("Nessuna delle due parti viene cancellata."),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -371,37 +373,37 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                 TextButton(onClick = {
                     confermaRipristino = false
                     vm.confermaRipristino()
-                }) { Text("Sì, unisci") }
+                }) { Text(t("Sì, unisci")) }
             },
             dismissButton = {
                 TextButton(onClick = { confermaRipristino = false; vm.annullaRipristino() }) {
-                    Text("Annulla")
+                    Text(t("Annulla"))
                 }
             }
         )
     } else if (riep != null) {
         AlertDialog(
             onDismissRequest = { vm.annullaRipristino() },
-            title = { Text("Backup trovato") },
+            title = { Text(t("Backup trovato")) },
             text = {
                 Column {
-                    Text("• ${riep.numProfili} profili")
-                    Text("• ${riep.numParole} parole")
-                    Text("• ${riep.numRipassi} ripassi")
-                    Text("• ${riep.numUnitaGrammatica} unità di grammatica")
-                    Text("• ${riep.numLezioni} lezioni")
+                    Text(t("• ${riep.numProfili} profili"))
+                    Text(t("• ${riep.numParole} parole"))
+                    Text(t("• ${riep.numRipassi} ripassi"))
+                    Text(t("• ${riep.numUnitaGrammatica} unità di grammatica"))
+                    Text(t("• ${riep.numLezioni} lezioni"))
                     Spacer(Modifier.height(8.dp))
-                    Text("Vuoi unirlo ai dati di questo telefono?")
+                    Text(t("Vuoi unirlo ai dati di questo telefono?"))
                 }
             },
             confirmButton = {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    TextButton(onClick = { confermaRipristino = true }) { Text("Unisci") }
-                    TextButton(onClick = { confermaSostituzione = true }) { Text("Sostituisci") }
+                    TextButton(onClick = { confermaRipristino = true }) { Text(t("Unisci")) }
+                    TextButton(onClick = { confermaSostituzione = true }) { Text(t("Sostituisci")) }
                 }
             },
             dismissButton = {
-                TextButton(onClick = { vm.annullaRipristino() }) { Text("Annulla") }
+                TextButton(onClick = { vm.annullaRipristino() }) { Text(t("Annulla")) }
             }
         )
     }
@@ -410,17 +412,17 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
     if (riep != null && confermaSostituzione) {
         AlertDialog(
             onDismissRequest = { confermaSostituzione = false; vm.annullaRipristino() },
-            title = { Text("Sostituire i dati di questo telefono col backup?") },
+            title = { Text(t("Sostituire i dati di questo telefono col backup?")) },
             text = {
                 Column {
-                    Text("Il backup contiene:")
+                    Text(t("Il backup contiene:"))
                     Spacer(Modifier.height(8.dp))
-                    Text("• ${riep.numProfili} profili")
-                    Text("• ${riep.numParole} parole")
-                    Text("• ${riep.numRipassi} ripassi registrati")
-                    Text("• ${riep.numRisposte} correzioni")
-                    Text("• ${riep.numUnitaGrammatica} unità di grammatica")
-                    Text("• ${riep.numLezioni} lezioni")
+                    Text(t("• ${riep.numProfili} profili"))
+                    Text(t("• ${riep.numParole} parole"))
+                    Text(t("• ${riep.numRipassi} ripassi registrati"))
+                    Text(t("• ${riep.numRisposte} correzioni"))
+                    Text(t("• ${riep.numUnitaGrammatica} unità di grammatica"))
+                    Text(t("• ${riep.numLezioni} lezioni"))
                     Spacer(Modifier.height(8.dp))
                     Text(
                         "ATTENZIONE: i dati attuali di questo telefono verranno " +
@@ -435,11 +437,11 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                 TextButton(onClick = {
                     confermaSostituzione = false
                     vm.confermaRipristinoSostituendo()
-                }) { Text("Sì, sostituisci") }
+                }) { Text(t("Sì, sostituisci")) }
             },
             dismissButton = {
                 TextButton(onClick = { confermaSostituzione = false; vm.annullaRipristino() }) {
-                    Text("Annulla")
+                    Text(t("Annulla"))
                 }
             }
         )
@@ -468,7 +470,7 @@ private fun MessaggioStato(messaggio: String, errore: Boolean) {
 @Composable
 private fun TutorialGrigioBackup(testo: String) {
     GlassExpandableSection(
-        title = "Come creo il token?",
+        title = t("Come creo il token?"),
         description = null
     ) {
         Text(

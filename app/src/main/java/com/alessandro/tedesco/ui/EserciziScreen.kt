@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.clickable
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
@@ -75,7 +77,7 @@ fun EserciziScreen(
     val erroriAperti by vm.errori.collectAsStateWithLifecycle(emptyList())
     val consiglio = ConsigliEsercizi.consiglio(pr)
 
-    ScreenScaffold("Esercizi", onBack = onIndietro) {
+    ScreenScaffold(t("Esercizi"), onBack = onIndietro) {
         Column(
             modifier = Modifier.widthIn(max = dimensioneContenuto()),
             verticalArrangement = Arrangement.spacedBy(spaziaturaSchermo())
@@ -99,7 +101,7 @@ fun EserciziScreen(
                         )
                         Spacer(Modifier.size(8.dp))
                         Text(
-                            "Consiglio per te",
+                            t("Consiglio per te"),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -124,7 +126,7 @@ fun EserciziScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = MaterialTheme.shapes.large
                     ) {
-                        Text("Inizia")
+                        Text(t("Inizia"))
                     }
                 }
             }
@@ -159,7 +161,7 @@ fun EserciziScreen(
             Spacer(Modifier.height(8.dp))
             Text(
                 "Soglia ufficiale Goethe/telc/ÖSD: 60% per competenza. Il livello sale solo quando " +
-                    "TUTTE le 4 superano la soglia.",
+                    t("TUTTE le 4 superano la soglia."),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -180,39 +182,39 @@ private data class TipoEsercizio(
 )
 
 private val TipiEsercizio = listOf(
-    TipoEsercizio("grammatica", "grammatica", "Grammatica", "Regole e forme, una alla volta",
+    TipoEsercizio("grammatica", "grammatica", "Grammatica", t("Regole e forme, una alla volta"),
         Icons.Filled.School),
-    TipoEsercizio("comprensione", "comprensione", "Lettura", "Un testo calibrato al tuo livello",
+    TipoEsercizio("comprensione", "comprensione", t("Lettura"), t("Un testo calibrato al tuo livello"),
         Icons.Filled.Quiz),
-    TipoEsercizio("produzione", "produzione", "Produzione scritta", "Scrivi un testo: lo corregge il tutor",
+    TipoEsercizio("produzione", "produzione", t("Produzione scritta"), t("Scrivi un testo: lo corregge il tutor"),
         Icons.Filled.Edit),
-    TipoEsercizio("espressioni", "espressioni", "Espressioni rapide", "Quiz: scegli la frase tedesca giusta",
+    TipoEsercizio("espressioni", "espressioni", t("Espressioni rapide"), t("Quiz: scegli la frase tedesca giusta"),
         Icons.AutoMirrored.Filled.Chat),
-    TipoEsercizio("verifica", "verifica", "Verifica lessico", "Dimostra di sapere le parole studiate",
+    TipoEsercizio("verifica", "verifica", t("Verifica lessico"), t("Dimostra di sapere le parole studiate"),
         Icons.Filled.Translate),
-    TipoEsercizio("ascolto", "ascolto", "Ascolto", "Audio con domande per l'orecchio",
+    TipoEsercizio("ascolto", "ascolto", "Ascolto", t("Audio con domande per l'orecchio"),
         Icons.Filled.Hearing),
-    TipoEsercizio("ripasso", "ripasso", "Ripasso", "Ripassa le parole sbagliate o fragili",
+    TipoEsercizio("ripasso", "ripasso", t("Ripasso"), t("Ripassa le parole sbagliate o fragili"),
         Icons.Filled.Refresh),
     TipoEsercizio("lessico", "lessico", "Lessico A1-B2",
         "${LessicoLivelli.tutte.size} parole per livello, 6 tipi di esercizio",
         Icons.AutoMirrored.Filled.MenuBook),
-    TipoEsercizio("produzione_attiva", "produzione_attiva", "Produzione attiva",
-        "Scrivi, completa, riordina: recupero attivo", Icons.Filled.Create),
-    TipoEsercizio("errori", "errori", "Quaderno errori",
-        "Gli errori tornano al momento giusto (SRS)", Icons.Filled.ErrorOutline),
+    TipoEsercizio("produzione_attiva", "produzione_attiva", t("Produzione attiva"),
+        t("Scrivi, completa, riordina: recupero attivo"), Icons.Filled.Create),
+    TipoEsercizio("errori", "errori", t("Quaderno errori"),
+        t("Gli errori tornano al momento giusto (SRS)"), Icons.Filled.ErrorOutline),
     TipoEsercizio("dialoghi", "dialoghi", "Dialoghi",
-        "Conversazioni a due voci con domande", Icons.Filled.Headphones),
-    TipoEsercizio("pronuncia", "pronuncia", "Pronuncia",
+        t("Conversazioni a due voci con domande"), Icons.Filled.Headphones),
+    TipoEsercizio("pronuncia", "pronuncia", t("Pronuncia"),
         "Coppie minime, registro e confronto", Icons.Filled.RecordVoiceOver),
     TipoEsercizio("sprechuebungen", "sprechuebungen", "Sprechübungen",
-        "Parla su un tema e confrontati con il modello", Icons.Filled.RecordVoiceOver),
+        t("Parla su un tema e confrontati con il modello"), Icons.Filled.RecordVoiceOver),
     TipoEsercizio("wortliste", "wortliste", "Wortliste A1-B1",
         "${WortlisteB1.tutte.size} parole curate da portare nel lessico", Icons.AutoMirrored.Filled.MenuBook),
     TipoEsercizio("sudtirol", "sudtirol", "Südtirol / Austria",
-        "Varianti locali e lessico sanitario", Icons.Filled.Place),
+        t("Varianti locali e lessico sanitario"), Icons.Filled.Place),
     TipoEsercizio("podcast", "podcast", "Podcast & Video",
-        "Ascolto autentico per livello: YouTube, Spotify, DW", Icons.Filled.Headphones)
+        t("Ascolto autentico per livello: YouTube, Spotify, DW"), Icons.Filled.Headphones)
 )
 
 /**
@@ -220,9 +222,9 @@ private val TipiEsercizio = listOf(
  * e' a colpo d'occhio invece di un ammasso unico di card.
  */
 private val SezioniEsercizi = listOf(
-    "Competenze" to listOf("grammatica", "comprensione", "produzione", "espressioni", "verifica", "ascolto"),
-    "Ripasso e consolidamento" to listOf("lessico", "ripasso", "produzione_attiva", "errori"),
-    "Esplora" to listOf("dialoghi", "pronuncia", "sprechuebungen", "wortliste", "sudtirol", "podcast")
+    t("Competenze") to listOf("grammatica", "comprensione", "produzione", "espressioni", "verifica", "ascolto"),
+    t("Ripasso e consolidamento") to listOf("lessico", "ripasso", "produzione_attiva", "errori"),
+    t("Esplora") to listOf("dialoghi", "pronuncia", "sprechuebungen", "wortliste", "sudtirol", "podcast")
 )
 
 private fun tipoPerId(id: String): TipoEsercizio? =
@@ -233,22 +235,22 @@ private fun statPerTipo(
     pr: CalcoloProgresso.ProgressoReale?,
     erroriAperti: Int = 0
 ): String {
-    if (pr == null) return "Per iniziare"
+    if (pr == null) return t("Per iniziare")
     val soglia = CertificazioniUfficiali.SOGLIA_SUPERAMENTO
     return when (id) {
         "grammatica" -> "${pr.competenze.grammatica.toInt()}% ${if (pr.competenze.grammatica >= soglia) "✓" else ""}"
         "comprensione" -> "${pr.competenze.comprensione.toInt()}% ${if (pr.competenze.comprensione >= soglia) "✓" else ""}"
         "produzione" -> if (pr.produzioniScritte > 0) "${pr.produzioniScritte} testi - ${pr.mediaProduzione.toInt()}%"
-            else "Nessun testo ancora"
-        "espressioni" -> "Quiz rapido"
+            else t("Nessun testo ancora")
+        "espressioni" -> t("Quiz rapido")
         "verifica" -> "${pr.paroleImparate}/${pr.paroleDisponibili} verificate"
         "ascolto" -> "Livello ${pr.livello.label.substringBefore(" ")}"
-        "ripasso" -> if (pr.paroleFragili > 0) "${pr.paroleFragili} da ripassare" else "Tutto a posto"
+        "ripasso" -> if (pr.paroleFragili > 0) "${pr.paroleFragili} da ripassare" else t("Tutto a posto")
         "lessico" -> "${LessicoLivelli.tutte.size} parole A1-B2"
         "produzione_attiva" -> "72 esercizi offline"
-        "errori" -> if (erroriAperti > 0) "$erroriAperti da consolidare" else "Nessun errore aperto"
+        "errori" -> if (erroriAperti > 0) "$erroriAperti da consolidare" else t("Nessun errore aperto")
         "dialoghi" -> "${Dialoghi.dialoghi.size} dialoghi"
-        "pronuncia" -> "Ascolta e registrati"
+        "pronuncia" -> t("Ascolta e registrati")
         "wortliste" -> "${WortlisteB1.tutte.size} parole A1-B1"
         "sudtirol" -> "${Sudtirol.varianti.size} varianti + lessico"
         "podcast" -> "${PodcastData.episodi.size} contenuti per livello"

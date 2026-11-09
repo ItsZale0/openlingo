@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -52,7 +54,7 @@ import com.alessandro.tedesco.ui.theme.dimensioneContenuto
 
 /**
  * Quiz di VERIFICA del lessico: scelta multipla oggettiva.
- * Sostituisce il self-report ("Lo so"/"Non lo so"): qui si DIMOSTRA di sapere
+ * Sostituisce il self-report (t("Lo so")/t("Non lo so")): qui si DIMOSTRA di sapere
  * scegliendo il significato corretto tra i distrattori.
  */
 @Composable
@@ -67,7 +69,7 @@ fun VerificaScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
 
     LaunchedEffect(Unit) { vm.avviaVerifica() }
 
-    ScreenScaffold("Verifica lessico", onBack = onIndietro, scrollable = false) {
+    ScreenScaffold(t("Verifica lessico"), onBack = onIndietro, scrollable = false) {
         Column(Modifier.fillMaxSize().widthIn(max = dimensioneContenuto())) {
             val totale = domande.size
             if (totale > 0) {
@@ -86,16 +88,16 @@ fun VerificaScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Text("Verifica completata", style = MaterialTheme.typography.headlineSmall,
+                    Text(t("Verifica completata"), style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold)
                     Spacer(Modifier.height(12.dp))
-                    Text("${e.corrette} / ${e.totale} corrette",
+                    Text(t("${e.corrette} / ${e.totale} corrette"),
                         style = MaterialTheme.typography.displaySmall,
                         fontWeight = FontWeight.Bold,
                         color = if (e.punteggio >= 60f) MaterialTheme.colorScheme.primary
                                 else MaterialTheme.colorScheme.error)
                     Spacer(Modifier.height(4.dp))
-                    Text("${e.punteggio.toInt()}%", style = MaterialTheme.typography.titleMedium,
+                    Text(t("${e.punteggio.toInt()}%"), style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Spacer(Modifier.height(12.dp))
                     Card(
@@ -105,7 +107,7 @@ fun VerificaScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
                             containerColor = MaterialTheme.colorScheme.surfaceContainer)
                     ) {
                         Column(Modifier.fillMaxWidth().padding(12.dp)) {
-                            Text("Cosa significa", style = MaterialTheme.typography.titleSmall,
+                            Text(t("Cosa significa"), style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.SemiBold)
                             Spacer(Modifier.height(6.dp))
                             Text(
@@ -128,19 +130,19 @@ fun VerificaScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
                     Button(
                         onClick = onIndietro,
                         modifier = Modifier.fillMaxWidth().height(AltezzaBottonePrincipale())
-                    ) { Text("Fatto") }
+                    ) { Text(t("Fatto")) }
                 }
             } else if (totale == 0) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Hai verificato tutto il lessico disponibile",
+                        Text(t("Hai verificato tutto il lessico disponibile"),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                             textAlign = TextAlign.Center)
                         Spacer(Modifier.height(8.dp))
                         Text(
                             "Non ci sono parole nuove da dimostrare. Le parole gia' verificate " +
-                                "tornano nel Ripasso secondo la spaced repetition.",
+                                t("tornano nel Ripasso secondo la spaced repetition."),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
@@ -148,21 +150,21 @@ fun VerificaScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
                         Spacer(Modifier.height(12.dp))
                         Button(onClick = onIndietro,
                             modifier = Modifier.fillMaxWidth().height(AltezzaBottonePrincipale())
-                        ) { Text("Fatto") }
+                        ) { Text(t("Fatto")) }
                     }
                 }
             } else {
                 val d = domande.getOrNull(indice)
                 if (d == null) {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Caricamento…")
+                        Text(t("Caricamento…"))
                     }
                 } else {
                     Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState())) {
-                        Text("${indice + 1} di $totale", style = MaterialTheme.typography.labelMedium,
+                        Text(t("${indice + 1} di $totale"), style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(Modifier.height(10.dp))
-                        Text("Cosa significa questa parola?", style = MaterialTheme.typography.titleMedium)
+                        Text(t("Cosa significa questa parola?"), style = MaterialTheme.typography.titleMedium)
                         Spacer(Modifier.height(14.dp))
 
                         // Parola tedesca
@@ -185,7 +187,7 @@ fun VerificaScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
                                 )
                                 Spacer(Modifier.size(10.dp))
                                 IconButton(onClick = { tts.speak(ParolaTedesca.conArticolo(d.parola.article, d.parola.german)) }) {
-                                    Icon(Icons.AutoMirrored.Filled.VolumeUp, "Ascolta",
+                                    Icon(Icons.AutoMirrored.Filled.VolumeUp, t("Ascolta"),
                                         modifier = Modifier.size(22.dp),
                                         tint = MaterialTheme.colorScheme.onPrimaryContainer)
                                 }
@@ -250,7 +252,7 @@ fun VerificaScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
                             ) {
                                 Column(Modifier.fillMaxWidth().padding(14.dp)) {
                                     Text(
-                                        if (scelta == d.corretta) "Corretto 🎉" else "Sbagliato",
+                                        if (scelta == d.corretta) "Corretto 🎉" else t("Sbagliato"),
                                         style = MaterialTheme.typography.titleSmall,
                                         fontWeight = FontWeight.Bold,
                                         color = if (scelta == d.corretta) MaterialTheme.colorScheme.primary
@@ -258,7 +260,7 @@ fun VerificaScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
                                     )
                                     Spacer(Modifier.height(2.dp))
                                     Text(
-                                        if (scelta == d.corretta) "Ottimo!" else "Riprova.",
+                                        if (scelta == d.corretta) t("Ottimo!") else t("Riprova."),
                                         style = MaterialTheme.typography.bodySmall
                                     )
                                     if (d.parola.example.isNotBlank()) {
@@ -272,7 +274,7 @@ fun VerificaScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
                             Button(
                                 onClick = { vm.prossimaVerifica() },
                                 modifier = Modifier.fillMaxWidth().height(AltezzaBottonePrincipale())
-                            ) { Text(if (indice + 1 >= totale) "Vedi risultato" else "Avanti") }
+                            ) { Text(if (indice + 1 >= totale) t("Vedi risultato") else t("Avanti")) }
                         }
                         Spacer(Modifier.height(12.dp))
                     }

@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -91,7 +93,7 @@ fun TutorBubble(vm: TedescoViewModel) {
         // Id unici per posizione: piu' messaggi identici devono restare distinguibili.
         messaggi = (if (storico.isNotEmpty()) storico else listOf(
             MessaggioTutor(
-                testo = "Ciao! Sono il tuo tutor di tedesco. Chiedimi grammatica, esempi o dubbi. Rispondo in italiano.",
+                testo = t("Ciao! Sono il tuo tutor di tedesco. Chiedimi grammatica, esempi o dubbi. Rispondo in italiano."),
                 daUtente = false
             )
         )).mapIndexed { i, m -> m.copy(id = i.toLong()) }
@@ -139,7 +141,7 @@ fun TutorBubble(vm: TedescoViewModel) {
             val risultato = vm.chiediAlTutor(cronologia, livello, lezioneCorrente)
             risultato.fold(
                 onSuccess = { risposta -> messaggi = aggiungi(MessaggioTutor(risposta, daUtente = false)) },
-                onFailure = { e -> messaggi = aggiungi(MessaggioTutor(e.message ?: "Errore sconosciuto", daUtente = false, errore = true)) }
+                onFailure = { e -> messaggi = aggiungi(MessaggioTutor(e.message ?: t("Errore sconosciuto"), daUtente = false, errore = true)) }
             )
             caricamento = false
         }
@@ -161,7 +163,7 @@ fun TutorBubble(vm: TedescoViewModel) {
                 ) {
                     Icon(
                         Icons.Filled.SmartToy,
-                        contentDescription = "Apri il tutor",
+                        contentDescription = t("Apri il tutor"),
                         modifier = Modifier.size(26.dp)
                     )
                 }
@@ -216,7 +218,7 @@ fun TutorBubble(vm: TedescoViewModel) {
                                 Spacer(Modifier.size(10.dp))
                                 Column(Modifier.weight(1f)) {
                                     Text(
-                                        "Tutor AI",
+                                        t("Tutor AI"),
                                         style = MaterialTheme.typography.titleSmall,
                                         fontWeight = FontWeight.SemiBold
                                     )
@@ -229,7 +231,7 @@ fun TutorBubble(vm: TedescoViewModel) {
                                 IconButton(onClick = { aperto = false }, modifier = Modifier.size(40.dp)) {
                                     Icon(
                                         Icons.Filled.Close,
-                                        contentDescription = "Chiudi",
+                                        contentDescription = t("Chiudi"),
                                         modifier = Modifier.size(20.dp)
                                     )
                                 }
@@ -284,7 +286,7 @@ fun TutorBubble(vm: TedescoViewModel) {
                                     value = input,
                                     onValueChange = { input = it },
                                     modifier = Modifier.weight(1f),
-                                    placeholder = { Text("Chiedi al tutor…") },
+                                    placeholder = { Text(t("Chiedi al tutor…")) },
                                     maxLines = 3,
                                     shape = MaterialTheme.shapes.extraLarge,
                                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
@@ -297,7 +299,7 @@ fun TutorBubble(vm: TedescoViewModel) {
                                 ) {
                                     Icon(
                                         Icons.AutoMirrored.Filled.Send,
-                                        contentDescription = "Invia",
+                                        contentDescription = t("Invia"),
                                         tint = MaterialTheme.colorScheme.primary
                                     )
                                 }

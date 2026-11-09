@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import android.content.Context
 import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.layout.Arrangement
@@ -69,7 +71,7 @@ fun RipassoScreen(vm: TedescoViewModel, onIndietro: () -> Unit, onVaiANuove: () 
     // ripassare" a schermo aperto, "2 da ripassare" a schermo chiuso.
     LaunchedEffect(Unit) { vm.caricaSessione() }
 
-    // Se la sessione è stata completata, il passo "Ripasso" del piano di oggi
+    // Se la sessione è stata completata, il passo t("Ripasso") del piano di oggi
     // si spunta da solo. La spunta manuale resta disponibile nella home.
     LaunchedEffect(sessionState.totale, sessionState.cartaCorrente) {
         if (sessionState.cartaCorrente == null && sessionState.totale > 0) {
@@ -77,7 +79,7 @@ fun RipassoScreen(vm: TedescoViewModel, onIndietro: () -> Unit, onVaiANuove: () 
         }
     }
 
-    ScreenScaffold("Ripasso", onBack = onIndietro, scrollable = false) {
+    ScreenScaffold(t("Ripasso"), onBack = onIndietro, scrollable = false) {
 
             Column(
                 modifier = Modifier
@@ -97,7 +99,7 @@ fun RipassoScreen(vm: TedescoViewModel, onIndietro: () -> Unit, onVaiANuove: () 
 
             if (caricamento) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Preparo le carte...")
+                    Text(t("Preparo le carte..."))
                 }
             } else if (carta == null) {
                 // sessione finita (o vuota)
@@ -106,14 +108,14 @@ fun RipassoScreen(vm: TedescoViewModel, onIndietro: () -> Unit, onVaiANuove: () 
                         if (sessionState.totale == 0) {
                             // Nulla da ripassare: guida verso le nuove parole
                             Text(
-                                text = "Nessuna parola da ripassare ora",
+                                text = t("Nessuna parola da ripassare ora"),
                                 style = MaterialTheme.typography.headlineSmall,
                                 color = MaterialTheme.colorScheme.primary,
                                 textAlign = TextAlign.Center
                             )
                             Spacer(Modifier.height(12.dp))
                             Text(
-                                text = "Impara nuove parole dalla sezione Lessico!",
+                                text = t("Impara nuove parole dalla sezione Lessico!"),
                                 style = MaterialTheme.typography.bodyLarge,
                                 textAlign = TextAlign.Center
                             )
@@ -123,7 +125,7 @@ fun RipassoScreen(vm: TedescoViewModel, onIndietro: () -> Unit, onVaiANuove: () 
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(AltezzaBottonePrincipale())
-                            ) { Text("Impara nuove parole") }
+                            ) { Text(t("Impara nuove parole")) }
                             Spacer(Modifier.height(12.dp))
                             OutlinedButton(
                                 onClick = {
@@ -133,19 +135,19 @@ fun RipassoScreen(vm: TedescoViewModel, onIndietro: () -> Unit, onVaiANuove: () 
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(AltezzaBottonePrincipale())
-                            ) { Text("Chiudi") }
+                            ) { Text(t("Chiudi")) }
                         } else {
                         Text(
-                            text = "Fatto!",
+                            text = t("Fatto!"),
                             style = MaterialTheme.typography.headlineMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
                             text = when {
-                                sessionState.sbagliate.isEmpty() -> "Perfetto! Tutte le parole consolidate."
+                                sessionState.sbagliate.isEmpty() -> t("Perfetto! Tutte le parole consolidate.")
                                 sessionState.sbagliate.size <= 2 -> "Quasi perfetto. Rivedi le ${sessionState.sbagliate.size} parole segnalate."
-                                else -> "Continua a ripassare: la memoria si rafforza con la pratica."
+                                else -> t("Continua a ripassare: la memoria si rafforza con la pratica.")
                             },
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -173,7 +175,7 @@ fun RipassoScreen(vm: TedescoViewModel, onIndietro: () -> Unit, onVaiANuove: () 
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(AltezzaBottonePrincipale())
-                        ) { Text("Chiudi") }
+                        ) { Text(t("Chiudi")) }
                         }
                     }
                 }
@@ -208,7 +210,7 @@ fun RipassoScreen(vm: TedescoViewModel, onIndietro: () -> Unit, onVaiANuove: () 
                             IconButton(onClick = { ttsHelper.speak(ParolaTedesca.conArticolo(carta.article, carta.german)) }) {
                                 Icon(
                                     Icons.AutoMirrored.Filled.VolumeUp,
-                                    contentDescription = "Ascolta pronuncia",
+                                    contentDescription = t("Ascolta pronuncia"),
                                     modifier = Modifier.size(24.dp),
                                     tint = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
@@ -255,7 +257,7 @@ fun RipassoScreen(vm: TedescoViewModel, onIndietro: () -> Unit, onVaiANuove: () 
                                 IconButton(onClick = { ttsHelper.speak(carta.example) }) {
                                     Icon(
                                         Icons.AutoMirrored.Filled.VolumeUp,
-                                        contentDescription = "Ascolta frase",
+                                        contentDescription = t("Ascolta frase"),
                                         modifier = Modifier.size(20.dp),
                                         tint = MaterialTheme.colorScheme.primary
                                     )
@@ -273,7 +275,7 @@ fun RipassoScreen(vm: TedescoViewModel, onIndietro: () -> Unit, onVaiANuove: () 
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp)
-                    ) { Text("Mostra la risposta") }
+                    ) { Text(t("Mostra la risposta")) }
                 } else {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -291,7 +293,7 @@ fun RipassoScreen(vm: TedescoViewModel, onIndietro: () -> Unit, onVaiANuove: () 
                                 modifier = Modifier.size(20.dp)
                             )
                             Spacer(Modifier.size(8.dp))
-                            Text("Non lo so")
+                            Text(t("Non lo so"))
                         }
                         Button(
                             onClick = { vm.rispondi(true) },
@@ -308,7 +310,7 @@ fun RipassoScreen(vm: TedescoViewModel, onIndietro: () -> Unit, onVaiANuove: () 
                                 modifier = Modifier.size(20.dp)
                             )
                             Spacer(Modifier.size(8.dp))
-                            Text("Lo so")
+                            Text(t("Lo so"))
                         }
                     }
                 }

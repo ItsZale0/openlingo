@@ -2,6 +2,8 @@
 
 package com.alessandro.tedesco.ui
 
+import com.alessandro.tedesco.i18n.t
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -84,8 +86,8 @@ fun UnitaGrammaticaScreen(
 ) {
     val unita = remember(unitaId) { GrammaticaSyllabus.perId(unitaId) }
     if (unita == null) {
-        ScreenScaffold(title = "Unità non trovata", onBack = onIndietro) {
-            Text("Questa unità non esiste o non è più disponibile.")
+        ScreenScaffold(title = t("Unità non trovata"), onBack = onIndietro) {
+            Text(t("Questa unità non esiste o non è più disponibile."))
         }
         return
     }
@@ -102,7 +104,7 @@ fun UnitaGrammaticaScreen(
     var finito by rememberSaveable(unitaId) { mutableStateOf(false) }
     var salvato by rememberSaveable(unitaId) { mutableStateOf(false) }
     // Seme della sessione: nuovo a ogni apertura della schermata e a ogni
-    // "Riprova", così le domande cambiano davvero da un tentativo all'altro.
+    // t("Riprova"), così le domande cambiano davvero da un tentativo all'altro.
     var seme by rememberSaveable(unitaId) { mutableStateOf(System.currentTimeMillis()) }
     var tentativi by rememberSaveable(unitaId) { mutableStateOf(0) }
     var errori by rememberSaveable(unitaId) { mutableStateOf(listOf<ErroreRisposta>()) }
@@ -218,7 +220,7 @@ fun UnitaGrammaticaScreen(
             FilterChip(
                 selected = scheda == 0,
                 onClick = { scheda = 0 },
-                label = { Text("Teoria") }
+                label = { Text(t("Teoria")) }
             )
             FilterChip(
                 selected = scheda == 1,
@@ -226,13 +228,13 @@ fun UnitaGrammaticaScreen(
                     if (finito) resetPratica(nuovaSessione = true)
                     scheda = 1
                 },
-                label = { Text("Esercizi") }
+                label = { Text(t("Esercizi")) }
             )
             if (unita.teoria.esempi.isNotEmpty()) {
                 FilterChip(
                     selected = scheda == 2,
                     onClick = { scheda = 2 },
-                    label = { Text("Dettato") }
+                    label = { Text(t("Dettato")) }
                 )
             }
         }
@@ -354,7 +356,7 @@ private fun TeoriaUnita(
     onVaiEsercizi: () -> Unit
 ) {
     Column {
-        SezioneTitolo("Regola", "Leggi con calma: è il cuore della unità.")
+        SezioneTitolo(t("Regola"), t("Leggi con calma: è il cuore della unità."))
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
@@ -395,7 +397,7 @@ private fun TeoriaUnita(
             Spacer(Modifier.height(Spaziature.md))
         }
 
-        SezioneTitolo("Esempi", "Tocca l'altoparlante per ascoltare.")
+        SezioneTitolo(t("Esempi"), t("Tocca l'altoparlante per ascoltare."))
         unita.teoria.esempi.forEach { esempio ->
             EsempioCard(esempio = esempio, onAscolta = { onAscolta(esempio.tedesco) })
             Spacer(Modifier.height(Spaziature.sm))
@@ -403,7 +405,7 @@ private fun TeoriaUnita(
 
         if (unita.teoria.erroriTipici.isNotEmpty()) {
             Spacer(Modifier.height(Spaziature.sm))
-            SezioneTitolo("Errori tipici", "Gli errori più frequenti di chi parla italiano.")
+            SezioneTitolo(t("Errori tipici"), t("Gli errori più frequenti di chi parla italiano."))
             unita.teoria.erroriTipici.forEach { errore ->
                 Card(
                     modifier = Modifier
@@ -464,7 +466,7 @@ private fun TeoriaUnita(
             ) {
                 Column(Modifier.padding(Spaziature.md)) {
                     Text(
-                        "Merksatz",
+                        t("Merksatz"),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onTertiaryContainer
@@ -502,19 +504,19 @@ private fun TeoriaUnita(
                     ) {
                         Column(Modifier.weight(1f)) {
                             Text(
-                                "Promemoria",
+                                t("Promemoria"),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                "Le regole che gli esercizi mettono alla prova, senza svelare le risposte.",
+                                t("Le regole che gli esercizi mettono alla prova, senza svelare le risposte."),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         Icon(
                             imageVector = if (promemoriaAperto) Icons.Filled.Close else Icons.Filled.Add,
-                            contentDescription = if (promemoriaAperto) "Chiudi" else "Apri",
+                            contentDescription = if (promemoriaAperto) t("Chiudi") else t("Apri"),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(18.dp)
                         )
@@ -554,7 +556,7 @@ private fun TeoriaUnita(
                 .fillMaxWidth()
                 .height(AltezzaBottonePrincipale())
         ) {
-            Text("Passa agli esercizi")
+            Text(t("Passa agli esercizi"))
             Spacer(Modifier.width(Spaziature.sm))
             Icon(
                 Icons.AutoMirrored.Filled.ArrowForward,
@@ -584,7 +586,7 @@ private fun TabellaCard(tabella: TabellaGrammatica) {
             Spacer(Modifier.height(4.dp))
 
             // Con 4+ colonne la tabella non entra su un telefono: meglio
-            // scorrere in orizzontale che spezzare "Nominativo" in due righe.
+            // scorrere in orizzontale che spezzare t("Nominativo") in due righe.
             val molteColonne = tabella.intestazioni.size >= 4
             if (molteColonne) {
                 val scroll = rememberScrollState()
@@ -713,7 +715,7 @@ private fun EsempioCard(
             IconButton(onClick = onAscolta) {
                 Icon(
                     Icons.AutoMirrored.Filled.VolumeUp,
-                    contentDescription = "Ascolta l'esempio",
+                    contentDescription = t("Ascolta l'esempio"),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -751,9 +753,9 @@ internal fun EsercizioUnitaCard(
         GrammaticaSyllabus.rispostaTestoCorretta(esercizio, testo)
     }
     val etichettaInput = when (esercizio.tipo) {
-        TipoEsercizioGrammatica.COMPLETAMENTO -> "Scrivi la parola mancante"
-        TipoEsercizioGrammatica.TRASFORMAZIONE -> "Scrivi la frase trasformata"
-        TipoEsercizioGrammatica.PRODUZIONE -> "Scrivi la traduzione"
+        TipoEsercizioGrammatica.COMPLETAMENTO -> t("Scrivi la parola mancante")
+        TipoEsercizioGrammatica.TRASFORMAZIONE -> t("Scrivi la frase trasformata")
+        TipoEsercizioGrammatica.PRODUZIONE -> t("Scrivi la traduzione")
         TipoEsercizioGrammatica.SCELTA_MULTIPLA -> ""
     }
 
@@ -871,7 +873,7 @@ internal fun EsercizioUnitaCard(
                             ) {
                                 Icon(
                                     Icons.AutoMirrored.Filled.VolumeUp,
-                                    contentDescription = "Ascolta l'opzione",
+                                    contentDescription = t("Ascolta l'opzione"),
                                     tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.size(18.dp)
                                 )
@@ -920,14 +922,14 @@ internal fun EsercizioUnitaCard(
                 ) {
                     Column(Modifier.padding(Spaziature.sm)) {
                         Text(
-                            if (corretto) "Corretto!" else "Non corretto",
+                            if (corretto) t("Corretto!") else t("Non corretto"),
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold
                         )
                         if (corretto) {
                             Spacer(Modifier.height(2.dp))
                             Text(
-                                "Ottimo lavoro!",
+                                t("Ottimo lavoro!"),
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
@@ -953,7 +955,7 @@ internal fun EsercizioUnitaCard(
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(Modifier.width(4.dp))
-                            Text("Ascolta la risposta")
+                            Text(t("Ascolta la risposta"))
                         }
                     }
                 }
@@ -973,7 +975,7 @@ internal fun EsercizioUnitaCard(
                         .fillMaxWidth()
                         .height(AltezzaBottonePrincipale())
                 ) {
-                    Text("Verifica risposta")
+                    Text(t("Verifica risposta"))
                 }
             } else {
                 Button(
@@ -983,8 +985,8 @@ internal fun EsercizioUnitaCard(
                         .height(AltezzaBottonePrincipale())
                 ) {
                     Text(
-                        if (indice < totale - 1) "Prossima domanda"
-                        else "Vedi risultato"
+                        if (indice < totale - 1) t("Prossima domanda")
+                        else t("Vedi risultato")
                     )
                 }
             }
@@ -1008,7 +1010,7 @@ private fun DettatoUnita(
             .ifEmpty { unita.teoria.esempi.map { it.tedesco } }
     }
     if (esempi.isEmpty()) {
-        Text("Questa unità non ha ancora esempi da dettare.")
+        Text(t("Questa unità non ha ancora esempi da dettare."))
         return
     }
 
@@ -1035,7 +1037,7 @@ private fun DettatoUnita(
             )
             Spacer(Modifier.height(Spaziature.sm))
             Text(
-                "Ascolta la frase e scrivila in tedesco.",
+                t("Ascolta la frase e scrivila in tedesco."),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
@@ -1055,14 +1057,14 @@ private fun DettatoUnita(
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(Modifier.width(Spaziature.xs))
-                Text("Ascolta la frase")
+                Text(t("Ascolta la frase"))
             }
             Spacer(Modifier.height(Spaziature.sm))
             OutlinedTextField(
                 value = testo,
                 onValueChange = { testo = it },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Scrivi ciò che senti") },
+                label = { Text(t("Scrivi ciò che senti")) },
                 enabled = !verificato,
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.None,
@@ -1086,7 +1088,7 @@ private fun DettatoUnita(
                 ) {
                     Column(Modifier.padding(Spaziature.sm)) {
                         Text(
-                            if (corretta) "Dettato corretto!" else "Riascolta e confronta",
+                            if (corretta) t("Dettato corretto!") else t("Riascolta e confronta"),
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold
                         )
@@ -1108,7 +1110,7 @@ private fun DettatoUnita(
                         .fillMaxWidth()
                         .height(AltezzaBottonePrincipale())
                 ) {
-                    Text("Verifica dettato")
+                    Text(t("Verifica dettato"))
                 }
             } else {
                 Button(
@@ -1121,7 +1123,7 @@ private fun DettatoUnita(
                         .fillMaxWidth()
                         .height(AltezzaBottonePrincipale())
                 ) {
-                    Text("Prossima frase")
+                    Text(t("Prossima frase"))
                 }
             }
         }
@@ -1154,13 +1156,13 @@ internal fun RiepilogoErrori(
     ) {
         Column(Modifier.padding(Spaziature.md)) {
             Text(
-                "Dove hai sbagliato",
+                t("Dove hai sbagliato"),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold
             )
             Spacer(Modifier.height(2.dp))
             Text(
-                "Rileggi questi punti prima di riprovare: sono quelli in cui la regola non è ancora chiara.",
+                t("Rileggi questi punti prima di riprovare: sono quelli in cui la regola non è ancora chiara."),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -1232,7 +1234,7 @@ private fun RisultatoUnita(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                if (promosso) "Unità completata" else "Ripassa ancora",
+                if (promosso) t("Unità completata") else t("Ripassa ancora"),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
@@ -1253,7 +1255,7 @@ private fun RisultatoUnita(
                 if (promosso) {
                     "Hai raggiunto la soglia dell'80%. La prossima unità è sbloccata; il ripasso tornera' tra 1, 3, 7 e 16 giorni."
                 } else {
-                    "Serve almeno l'80% per sbloccare la unità successiva. Rileggi la regola e riprova: gli errori sono la parte più utile."
+                    t("Serve almeno l'80% per sbloccare la unità successiva. Rileggi la regola e riprova: gli errori sono la parte più utile.")
                 },
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
@@ -1266,7 +1268,7 @@ private fun RisultatoUnita(
                     .fillMaxWidth()
                     .height(AltezzaBottonePrincipale())
             ) {
-                Text("Torna al percorso")
+                Text(t("Torna al percorso"))
             }
             Spacer(Modifier.height(Spaziature.sm))
             Button(
@@ -1275,10 +1277,10 @@ private fun RisultatoUnita(
                     .fillMaxWidth()
                     .height(AltezzaBottonePrincipale())
             ) {
-                Text("Riprova con esercizi nuovi")
+                Text(t("Riprova con esercizi nuovi"))
             }
             TextButton(onClick = onRivediTeoria) {
-                Text("Rivedi la teoria")
+                Text(t("Rivedi la teoria"))
             }
         }
     }
@@ -1299,7 +1301,7 @@ private fun RisultatoUnita(
     ) {
         Column(Modifier.padding(Spaziature.md)) {
             Text(
-                "Cosa porti via",
+                t("Cosa porti via"),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold
             )
@@ -1311,7 +1313,7 @@ private fun RisultatoUnita(
             )
             Spacer(Modifier.height(Spaziature.xs))
             Text(
-                "Ripasso programmato: 1, 3, 7 e 16 giorni. La unità resta accessibile anche quando è completata.",
+                t("Ripasso programmato: 1, 3, 7 e 16 giorni. La unità resta accessibile anche quando è completata."),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
