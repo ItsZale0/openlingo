@@ -258,7 +258,7 @@ private fun WordRow(w: WordEntity, onAscolta: () -> Unit, onAscoltaFrase: () -> 
                 )
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    text = w.italian,
+                    text = t(w.italian),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

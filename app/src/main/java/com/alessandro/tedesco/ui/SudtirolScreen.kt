@@ -102,7 +102,7 @@ fun SudtirolScreen(
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
-                                    Text(v.italiano, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                                    Text(t(v.italiano), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
                                 }
                                 IconButton(onClick = { tts.speak("${v.austriaco}. ${v.standard}", velocita = 0.85f) }) {
                                     Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = t("Ascolta"), modifier = Modifier.size(20.dp))
@@ -132,7 +132,7 @@ fun SudtirolScreen(
                                 ) {
                                     Column(Modifier.weight(1f)) {
                                         Text(voce.tedesco, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
-                                        Text(voce.italiano, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text(t(voce.italiano), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     }
                                     IconButton(onClick = { tts.speak(voce.tedesco, velocita = 0.85f) }) {
                                         Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = t("Ascolta"), modifier = Modifier.size(20.dp))

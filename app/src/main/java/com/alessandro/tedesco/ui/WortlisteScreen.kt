@@ -167,7 +167,7 @@ fun WortlisteScreen(
                                 )
                             }
                             Text(
-                                voce.italiano,
+                                t(voce.italiano),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )

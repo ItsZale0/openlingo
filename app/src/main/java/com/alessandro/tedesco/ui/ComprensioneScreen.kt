@@ -239,7 +239,7 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                                 modifier = Modifier.weight(1f)
                                             )
                                             Text(
-                                                text = "= ${voce.italiano}",
+                                                text = "= ${t(voce.italiano)}",
                                                 style = MaterialTheme.typography.bodyMedium,
                                                 modifier = Modifier.weight(1f)
                                             )

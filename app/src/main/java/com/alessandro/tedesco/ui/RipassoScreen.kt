@@ -236,7 +236,7 @@ fun RipassoScreen(vm: TedescoViewModel, onIndietro: () -> Unit, onVaiANuove: () 
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = carta.italian,
+                            text = t(carta.italian),
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.onSurface
                         )

@@ -119,7 +119,7 @@ fun LessicoScreen(
         val tutte = LessicoLivelli.perLivello(livelloScelto)
         val q = query.trim()
         if (q.isBlank()) tutte else tutte.filter {
-            it.tedesco.contains(q, ignoreCase = true) || it.italiano.contains(q, ignoreCase = true)
+            it.tedesco.contains(q, ignoreCase = true) || it.italiano.contains(q, ignoreCase = true) || t(it.italiano).contains(q, ignoreCase = true)
         }
     }
 
@@ -262,7 +262,7 @@ fun LessicoScreen(
                                 fontWeight = FontWeight.SemiBold
                             )
                             Text(
-                                voce.italiano,
+                                t(voce.italiano),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )

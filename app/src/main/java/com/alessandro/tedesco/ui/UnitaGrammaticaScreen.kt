@@ -700,7 +700,7 @@ private fun EsempioCard(
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    esempio.italiano,
+                    t(esempio.italiano),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
