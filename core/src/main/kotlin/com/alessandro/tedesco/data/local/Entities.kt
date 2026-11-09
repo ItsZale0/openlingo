@@ -551,7 +551,11 @@ data class ProfiloUtente(
 @Serializable
 data class ProfiliRepository(
     val profili: Map<String, ProfiloUtente> = emptyMap(),
-    val profiloAttivoId: String? = null
+    val profiloAttivoId: String? = null,
+    /** ID dei profili eliminati dall'utente: il merge li ignora, così una
+     *  cancellazione non viene "resuscitata" da un backup cloud o da un altro
+     *  dispositivo che ha ancora il profilo. */
+    val profiliEliminati: Set<String> = emptySet()
 )
 
 // Stile design dell'app

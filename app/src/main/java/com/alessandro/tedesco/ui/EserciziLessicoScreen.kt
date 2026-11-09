@@ -227,7 +227,7 @@ private fun EsercizioCorrente(
         ) {
             Column(Modifier.fillMaxWidth().padding(18.dp)) {
                 Text(
-                    esercizio.tipo.etichetta,
+                    t(esercizio.tipo.etichetta),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )

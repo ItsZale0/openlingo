@@ -285,7 +285,8 @@ class ProfileManager(
         }
         _repository.value = repo.copy(
             profili = rimanenti,
-            profiloAttivoId = nuovoAttivo
+            profiloAttivoId = nuovoAttivo,
+            profiliEliminati = repo.profiliEliminati + profiloId
         )
         scriviSubito()
     }
@@ -305,7 +306,12 @@ class ProfileManager(
      * versione meno avanzata. Persiste subito su DataStore.
      */
     suspend fun sostituisciRepository(nuovo: ProfiliRepository) = withContext(io) {
-        _repository.value = nuovo
+        // Anche in modalità "sostituisci" preserviamo i profili eliminati:
+        // un backup vecchio non deve "resuscitare" un profilo cancellato.
+        val unito = nuovo.copy(
+            profiliEliminati = _repository.value.profiliEliminati + nuovo.profiliEliminati
+        )
+        _repository.value = unito
         scriviSubito()
     }
 

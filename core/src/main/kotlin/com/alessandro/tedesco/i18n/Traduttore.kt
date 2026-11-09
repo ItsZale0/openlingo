@@ -1,4 +1,4 @@
-package com.alessandro.tedesco.i18n
+﻿package com.alessandro.tedesco.i18n
 
 /**
  * Runtime translation layer (IT -> EN).
@@ -13,6 +13,27 @@ object Traduttore {
     var lingua: String = "it"
 
     private val esatto: Map<String, String> = mapOf(
+        "Scegli il significato" to "Choose the meaning",
+        "Scegli la parola tedesca" to "Choose the German word",
+        "Scegli l'articolo" to "Choose the article",
+        "Completa la frase" to "Complete the sentence",
+        "Scrivi in tedesco" to "Write in German",
+        "Ascolta e scrivi" to "Listen and write",
+        "Comprensione" to "Comprehension",
+        "Produzione" to "Production",
+        "Ascolto" to "Listening",
+        "Grammatica" to "Grammar",
+        "Lenta" to "Slow",
+        "Media" to "Medium",
+        "Naturale" to "Natural",
+        "Traduzione" to "Translation",
+        "Completa" to "Complete",
+        "Dettato" to "Dictation",
+        "Riordina" to "Reorder",
+        "parlato rallentato e scandito" to "slowed, clearly articulated speech",
+        "parlato chiaro, quasi naturale" to "clear, almost natural speech",
+        "velocità dei madrelingua" to "native speakers' speed",
+        "Corso" to "Course",
         "Accuratezza" to "Accuracy",
         "Accusativo: den, die, das + verbi transitivi" to "Accusative: den, die, das + transitive verbs",
         "Aggiorna ora" to "Update now",
@@ -730,6 +751,7 @@ object Traduttore {
         "ID o URL del documento" to "Document ID or URL",
         "Data:" to "Date:",
         "Scegli il colore principale dell'app." to "Choose the app's main colour.",
+        "Scegli il colore principale dell'app. \"Material You\" usa i colori del sistema (Android 12+)." to "Choose the app's main colour. \"Material You\" uses the system colours (Android 12+).",
         "0,7x" to "0.7x",
         "15 min" to "15 min",
         "30 min" to "30 min",
@@ -884,4 +906,3 @@ object Traduttore {
 
 /** Short alias used at the call sites. */
 fun t(testo: String): String = Traduttore.traduci(testo)
-

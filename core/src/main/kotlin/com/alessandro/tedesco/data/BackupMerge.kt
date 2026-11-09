@@ -48,6 +48,11 @@ object BackupMerge {
         ids += locale.profili.keys
         ids += remoto.profili.keys
 
+        // I profili eliminati (tombstone) non vengono mai "resuscitati" dal
+        // merge: se uno dei due lati li ha cancellati, restano cancellati.
+        val eliminati = locale.profiliEliminati + remoto.profiliEliminati
+        ids.removeAll(eliminati)
+
         val profili = ids.associateWith { id ->
             val l = locale.profili[id]
             val r = remoto.profili[id]
@@ -58,11 +63,11 @@ object BackupMerge {
             }
         }
 
-        val attivo = locale.profiloAttivoId?.takeIf { profili.containsKey(it) }
-            ?: remoto.profiloAttivoId?.takeIf { profili.containsKey(it) }
+        val attivo = locale.profiloAttivoId?.takeIf { profili.containsKey(it) && it !in eliminati }
+            ?: remoto.profiloAttivoId?.takeIf { profili.containsKey(it) && it !in eliminati }
             ?: profili.keys.firstOrNull()
 
-        return ProfiliRepository(profili = profili, profiloAttivoId = attivo)
+        return ProfiliRepository(profili = profili, profiloAttivoId = attivo, profiliEliminati = eliminati)
     }
 
     /** Unisce due profili: configurazione locale (completata dal cloud) e stato unito. */

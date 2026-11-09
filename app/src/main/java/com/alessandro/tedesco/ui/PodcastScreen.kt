@@ -1,4 +1,4 @@
-package com.alessandro.tedesco.ui
+﻿package com.alessandro.tedesco.ui
 
 import com.alessandro.tedesco.i18n.t
 
@@ -205,7 +205,7 @@ fun PodcastScreen(
                 FilterChip(
                     selected = selezionato,
                     onClick = { tipoFiltro = if (selezionato) null else t.name },
-                    label = { Text(t.etichetta) },
+                    label = { Text(t(t.etichetta)) },
                     leadingIcon = if (selezionato) {
                         { Icon(Icons.Filled.Check, contentDescription = null, modifier = Modifier.size(16.dp)) }
                     } else null
@@ -231,7 +231,7 @@ fun PodcastScreen(
                 FilterChip(
                     selected = selezionata,
                     onClick = { piattaformaFiltro = if (selezionata) null else p.name },
-                    label = { Text(p.etichetta) },
+                    label = { Text(t(p.etichetta)) },
                     leadingIcon = {
                         Icon(
                             iconaPiattaforma(p),
@@ -550,7 +550,7 @@ private fun CardInEvidenza(
                 )
                 MetaTag(
                     icona = Icons.Filled.Speed,
-                    testo = episodio.velocita.etichetta,
+                    testo = t(episodio.velocita.etichetta),
                     modifier = Modifier.weight(1f, fill = false)
                 )
                 MetaTag(
@@ -607,7 +607,7 @@ private fun CardEpisodio(
                     )
                     Spacer(Modifier.height(2.dp))
                     Text(
-                        "${episodio.canale} · ${episodio.tipo.etichetta}",
+                        "${episodio.canale} · ${t(episodio.tipo.etichetta)}",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
@@ -633,7 +633,7 @@ private fun CardEpisodio(
                         )
                         MetaTag(
                             icona = Icons.Filled.Speed,
-                            testo = episodio.velocita.etichetta,
+                            testo = t(episodio.velocita.etichetta),
                             modifier = Modifier.weight(1f, fill = false)
                         )
                     }
@@ -702,7 +702,7 @@ private fun BadgePiattaforma(piattaforma: PodcastData.Piattaforma) {
             )
             Spacer(Modifier.width(4.dp))
             Text(
-                piattaforma.etichetta,
+                t(piattaforma.etichetta),
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.SemiBold
             )

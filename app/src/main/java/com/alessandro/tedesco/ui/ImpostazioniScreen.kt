@@ -367,8 +367,8 @@ fun ImpostazioniScreen(
                         Text(t("Colore tema"), style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(Modifier.height(6.dp))
-                        Text("Scegli il colore principale dell'app. \"Material You\" " +
-                            t("usa i colori del sistema (Android 12+)."),
+                        Text(t("Scegli il colore principale dell'app. \"Material You\" " +
+                            "usa i colori del sistema (Android 12+)."),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(Modifier.height(10.dp))

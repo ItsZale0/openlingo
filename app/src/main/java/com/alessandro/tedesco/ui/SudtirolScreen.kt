@@ -74,7 +74,7 @@ fun SudtirolScreen(
                     FilterChip(
                         selected = s == sezione,
                         onClick = { sezione = s },
-                        label = { Text(s.etichetta) }
+                        label = { Text(t(s.etichetta)) }
                     )
                 }
             }

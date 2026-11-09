@@ -104,7 +104,7 @@ fun ProduzioneAttivaScreen(
                     FilterChip(
                         selected = t == tipo,
                         onClick = { tipo = t },
-                        label = { Text(t.etichetta) }
+                        label = { Text(t(t.etichetta)) }
                     )
                 }
             }
@@ -119,7 +119,7 @@ fun ProduzioneAttivaScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    t("Livello ${esercizio.livello} - ${esercizio.tipo.etichetta}"),
+                    t("Livello ${esercizio.livello} - ${t(esercizio.tipo.etichetta)}"),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
@@ -313,7 +313,7 @@ fun ProduzioneAttivaScreen(
 @Composable
 fun RigaEsercizioProduttivo(esercizio: EsercizioProduttivo) {
     Text(
-        t("${esercizio.tipo.etichetta}: ${esercizio.prompt}"),
+        t("${t(esercizio.tipo.etichetta)}: ${esercizio.prompt}"),
         style = MaterialTheme.typography.bodyMedium
     )
 }
