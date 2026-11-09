@@ -45,6 +45,7 @@ import com.alessandro.tedesco.data.local.TestGrammatica
 import com.alessandro.tedesco.data.local.TipoProfilo
 import com.alessandro.tedesco.data.local.WordEntity
 import com.alessandro.tedesco.data.remote.GeneratoreLezioni
+import com.alessandro.tedesco.data.remote.AiService
 import com.alessandro.tedesco.data.remote.TutorService
 import com.alessandro.tedesco.data.remote.EsercizioGenerato
 import com.alessandro.tedesco.data.remote.TipoEsercizio
@@ -1348,13 +1349,15 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
     }
     val modelloTutor: StateFlow<String?> = _modelloTutor
 
+    private val aiService = AiService()
+
     /** Chiede una risposta al tutor AI. */
     suspend fun chiediAlTutor(
         cronologia: List<Pair<String, String>>,
         livello: String,
         lezione: Int
     ): Result<String> = runCatching {
-        app.tutorServiceInstance.rispondi(
+        aiService.chiediAlTutor(
             config = configurazioneAI(),
             cronologia = cronologia,
             livello = livello,
@@ -1389,7 +1392,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
         val scenario = _roleplayScenario.value
             ?: return Result.failure(IllegalStateException("Nessuno scenario selezionato"))
         return runCatching {
-            app.tutorServiceInstance.roleplay(
+            aiService.chiediAlRoleplay(
                 config = configurazioneAI(),
                 scenario = scenario,
                 cronologia = cronologia,
@@ -2118,7 +2121,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                 val livello = profilo.stato.progresso.livelloCorrente.codiceBreve()
                 val lezione = lezioneCorrente.value
                 // Valutazione STRUTTURATA (criteri ufficiali Goethe), non solo testo.
-                val rispostaGrezza = app.tutorServiceInstance.valutaProduzione(
+                val rispostaGrezza = aiService.valutaProduzione(
                     config = configurazioneAI(),
                     testoStudente = testo,
                     livello = livello,

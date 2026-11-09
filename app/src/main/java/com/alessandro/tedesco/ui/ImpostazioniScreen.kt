@@ -197,7 +197,7 @@ private fun <T : Any> DropdownSelector(
             value = currentLabel,
             onValueChange = {},
             label = { Text(label) },
-            trailingIcon = { Icon(imageVector = Icons.Filled.MoreVert, contentDescription = null,
+            trailingIcon = { Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "Apri menu",
                 tint = MaterialTheme.colorScheme.onSurfaceVariant) },
             shape = GlassShape,
             colors = OutlinedTextFieldDefaults.colors(
