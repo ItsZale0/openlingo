@@ -34,7 +34,7 @@ object VerificaApk {
      * - dimensione > 1 MB
      * - primi 2 byte = 'P' 'K' (magic ZIP/APK)
      */
-    fun isApkValido(file: File): Boolean = isApkValido(file, "")
+    fun isApkValido(file: File): Boolean = isApkValidoBase(file)
 
     /**
      * Verifica APK + hash SHA-256 atteso.
@@ -43,11 +43,24 @@ object VerificaApk {
      *   prefisso "sha256:"). Vuoto = salta il controllo dell'hash.
      */
     fun isApkValido(file: File, shaAtteso: String): Boolean {
-        if (!isApkValido(file)) return false
+        if (!isApkValidoBase(file)) return false
         val atteso = shaAtteso.trim().lowercase().removePrefix("sha256:")
         if (atteso.isEmpty()) return true
         val calcolato = sha256(file) ?: return false
         return calcolato == atteso
+    }
+
+    /** Controllo base: esistenza, dimensione > 1 MB, header PK. */
+    private fun isApkValidoBase(file: File): Boolean {
+        if (!file.exists()) return false
+        if (file.length() < DIMENSIONE_MINIMA) return false
+        val header = ByteArray(2)
+        return try {
+            file.inputStream().use { it.read(header) }
+            header[0] == 0x50.toByte() && header[1] == 0x4B.toByte()
+        } catch (e: Exception) {
+            false
+        }
     }
 
     /** SHA-256 esadecimale del file, oppure null in caso di errore di lettura. */

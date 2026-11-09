@@ -1,8 +1,8 @@
 {
-  "versionCode": 325,
-  "versionName": "1.51.2",
+  "versionCode": 326,
+  "versionName": "1.51.3",
   "changelog": "",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.51.2/Deutsch-v1.51.2.apk",
-  "apkSha256": "90793788ead6b28bc9b5f0e6247f07bbbf4daf50d5080466e6265d01b7b30c39"
+  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.51.3/Deutsch-v1.51.3.apk",
+  "apkSha256": "2535a43292ea4a02721b040f8624f86134013bc417bc8eed409a384ed3d198f2"
 }
