@@ -80,6 +80,7 @@ enum class Schermata(val titolo: String, val icona: ImageVector) {
 
 fun main() = application {
     val store = remember { DesktopStore() }
+    LaunchedEffect(Unit) { com.alessandro.tedesco.i18n.Traduttore.lingua = store.lingua() }
     var schermata by remember { mutableStateOf(Schermata.HOME) }
     var unitaId by remember { mutableStateOf<String?>(null) }
 

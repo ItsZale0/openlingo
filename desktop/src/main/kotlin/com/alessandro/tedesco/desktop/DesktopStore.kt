@@ -66,7 +66,8 @@ data class Preferenze(
     val githubRepo: String = "",
     val ultimoBackup: Long = 0L,
     val ultimoHashCloud: String = "",
-    val ultimaSincronizzazioneCloud: Long = 0L
+    val ultimaSincronizzazioneCloud: Long = 0L,
+    val lingua: String = if (java.util.Locale.getDefault().language == "en") "en" else "it"
 )
 
 /**
@@ -476,6 +477,14 @@ class DesktopStore(
     fun setTemaColore(id: String) {
         preferenze = preferenze.copy(temaColore = id)
         salvaPreferenze()
+    }
+
+    fun lingua(): String = preferenze.lingua
+
+    fun setLingua(id: String) {
+        preferenze = preferenze.copy(lingua = id)
+        salvaPreferenze()
+        com.alessandro.tedesco.i18n.Traduttore.lingua = id
     }
 
     fun commutaTema() {
