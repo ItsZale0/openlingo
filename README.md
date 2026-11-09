@@ -156,6 +156,7 @@ updates/   update manifest (version and APK SHA-256)
 - [Architecture](docs/ARCHITECTURE.md): modules, data flow, teaching engine.
 - [FAQ](docs/FAQ.md): daily use, updates, backup.
 - [Data export](docs/EXPORT-DATI.md): step-by-step guide.
+- [Translations](docs/TRANSLATIONS.md): how to contribute UI and content translations.
 - [Release process](docs/RELEASE.md): versioning, tags, assets and checksums.
 - [Contributing](CONTRIBUTING.md) and [Code of conduct](CODE_OF_CONDUCT.md).
 - [Security](SECURITY.md) and [audit report](SECURITY-AUDIT.md).
