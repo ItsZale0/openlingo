@@ -17,6 +17,10 @@ Grazie per il tuo interesse a contribuire!
 
 5. Apri una pull request con una descrizione chiara del cambiamento.
 
+Per capire l'organizzazione del codice leggi
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); per il processo di rilascio vedi
+[docs/RELEASE.md](docs/RELEASE.md).
+
 ## Linee guida
 
 - **Offline first**: il nucleo didattico non deve dipendere dalla rete.

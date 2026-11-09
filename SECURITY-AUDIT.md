@@ -1,7 +1,8 @@
 # Report di sicurezza — Deutsch
 
 Data: 2026-11-09
-Versione auditata: 1.48.73
+Versione auditata: 1.48.73 (le versioni 1.48.74 e 1.48.75 introducono solo
+modifiche a build, firma dei file di export e documentazione)
 
 ## Ambito e metodologia
 
