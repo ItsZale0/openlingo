@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Deutsch</string>
+
+    <string name="welcome_title">Welcome</string>
+    <string name="welcome_subtitle">Create your profile to get started. Your data stays on the device: the app works even offline.</string>
+    <string name="create_profile_and_start">Create profile and start</string>
+    <string name="create_profile">Create profile</string>
+    <string name="what_is_your_name">What\'s your name?</string>
+    <string name="starting_level">Starting level</string>
+    <string name="description_label">Description: who you are and what you want to learn</string>
+    <string name="description_hint">E.g. physiotherapist: I want to speak with patients and colleagues in German</string>
+    <string name="description_help">The AI uses this description to choose examples, exercises, lessons and vocabulary suited to you. If you work in healthcare, write it here: it is a personalization like any other. You can change it anytime.</string>
+    <string name="ai_optional">AI (optional)</string>
+    <string name="ai_optional_help">Choose a provider and paste the key. Without a key the app still works: all offline content remains, but no tutor or AI generation.</string>
+    <string name="add_other_keys">Add keys for other providers</string>
+    <string name="hide_other_keys">Hide other keys</string>
+    <string name="enter">Enter</string>
+    <string name="who_is_studying">Who is studying?</string>
+    <string name="profile_progress_separate">Each profile has its own progress, separate from the others.</string>
+    <string name="create_new_profile">Create a new profile</string>
+</resources>

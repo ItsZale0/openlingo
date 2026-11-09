@@ -27,6 +27,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.alessandro.tedesco.R
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -72,14 +74,13 @@ fun BenvenutoScreen(vm: TedescoViewModel) {
     ) {
         Column(modifier = Modifier.widthIn(max = dimensioneContenuto())) {
             Text(
-                "Benvenuto",
+                stringResource(R.string.welcome_title),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
             Spacer(Modifier.height(6.dp))
             Text(
-                "Crea il tuo profilo per iniziare. I dati restano sul dispositivo: " +
-                    "l'app funziona anche senza connessione.",
+                stringResource(R.string.welcome_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -252,14 +253,14 @@ private fun FormNuovoProfilo(
         OutlinedTextField(
             value = nome,
             onValueChange = { nome = it },
-            label = { Text("Come ti chiami?") },
+            label = { Text(stringResource(R.string.what_is_your_name)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.height(12.dp))
 
         Text(
-            "Livello di partenza",
+            stringResource(R.string.starting_level),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -278,9 +279,9 @@ private fun FormNuovoProfilo(
         OutlinedTextField(
             value = contesto,
             onValueChange = { contesto = it },
-            label = { Text("Descrizione: chi sei e cosa vuoi imparare") },
+            label = { Text(stringResource(R.string.description_label)) },
             placeholder = {
-                Text("Es. fisioterapista: voglio parlare con pazienti e colleghi in tedesco")
+                Text(stringResource(R.string.description_hint))
             },
             minLines = 3,
             modifier = Modifier.fillMaxWidth()
@@ -357,3 +358,4 @@ private fun FormNuovoProfilo(
         }
     }
 }
+
