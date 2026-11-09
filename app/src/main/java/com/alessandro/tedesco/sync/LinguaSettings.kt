@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.map
 private val Context.linguaStore by preferencesDataStore(name = "lingua_settings")
 
 class LinguaSettings(private val context: Context) {
-    val lingua: Flow<String> = context.linguaStore.data.map { it[LINGUA] ?: "it" }
+    val lingua: Flow<String> = context.linguaStore.data.map { it[LINGUA] ?: defaultLingua() }
 
     suspend fun setLingua(id: String) {
         context.linguaStore.edit { it[LINGUA] = id }
@@ -22,5 +22,8 @@ class LinguaSettings(private val context: Context) {
             "it" to "Italiano",
             "en" to "English"
         )
+
+        private fun defaultLingua(): String =
+            if (java.util.Locale.getDefault().language == "en") "en" else "it"
     }
 }

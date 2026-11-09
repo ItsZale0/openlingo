@@ -403,8 +403,11 @@ fun ImpostazioniScreen(
                                 lingua = id
                                 Traduttore.lingua = id
                                 scopeUpdate.launch {
-                                    linguaSettings.setLingua(id)
-                                    (contestoUpdate as? android.app.Activity)?.recreate()
+                                    try {
+                                        linguaSettings.setLingua(id)
+                                    } finally {
+                                        (contestoUpdate as? android.app.Activity)?.recreate()
+                                    }
                                 }
                             }
                         )
