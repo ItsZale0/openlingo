@@ -92,7 +92,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
             }.onSuccess {
                 messaggioExport = t("Esportazione completata.")
             }.onFailure {
-                messaggioExport = "Esportazione non riuscita: ${it.message}"
+                messaggioExport = t("Esportazione non riuscita: ${it.message}")
             }
         }
     }
@@ -210,7 +210,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "File di backup del profilo attivo: ${vm.nomeFileBackup.collectAsStateWithLifecycle(BackupCloud.NOME_FILE).value}. " +
+                        t("File di backup del profilo attivo: ${vm.nomeFileBackup.collectAsStateWithLifecycle(BackupCloud.NOME_FILE).value}. ") +
                             t("Il ripristino cerca anche il backup condiviso tedesco-backup.json."),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary

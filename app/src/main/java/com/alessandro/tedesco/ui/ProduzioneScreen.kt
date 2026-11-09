@@ -187,12 +187,12 @@ fun ProduzioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = "Domanda ${indice + 1}/${elenco.size}",
+                            text = t("Domanda ${indice + 1}/${elenco.size}"),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = "Livello ${livelloUtente.codiceBreve()}",
+                            text = t("Livello ${livelloUtente.codiceBreve()}"),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -325,7 +325,7 @@ fun ProduzioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                             )
                             Spacer(Modifier.height(8.dp))
                             Text(
-                                text = "Errori: $errori",
+                                text = t("Errori: $errori"),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.error
                             )

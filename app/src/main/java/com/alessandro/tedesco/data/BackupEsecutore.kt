@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.data
 
+import com.alessandro.tedesco.i18n.t
+
 import android.content.Context
 import com.alessandro.tedesco.TedescoApp
 import com.alessandro.tedesco.data.remote.BackupGitHubClient
@@ -44,7 +46,7 @@ object BackupEsecutore {
         val settings = BackupSettings(app)
 
         val token = settings.tokenFlow.first().trim()
-        if (token.isBlank()) return Esito.NonConfigurato("Token GitHub mancante")
+        if (token.isBlank()) return Esito.NonConfigurato(t("Token GitHub mancante"))
         val repo = settings.repoFlow.first().trim().ifBlank { BackupCloud.REPO_DEFAULT }
 
         val profiloAttivoId = app.profileManagerInstance.profiloAttivoId()
@@ -66,7 +68,7 @@ object BackupEsecutore {
             // Riletto ORA, dopo il download: durante la richiesta l'utente può
             // aver risposto a un esercizio e quella risposta non va persa.
             val repository = app.profileManagerInstance.repositoryFlow.first()
-            if (repository.profili.isEmpty()) return Esito.NonConfigurato("Nessun profilo da salvare")
+            if (repository.profili.isEmpty()) return Esito.NonConfigurato(t("Nessun profilo da salvare"))
 
             // Se NESSUN profilo ha dati reali (parole, log, guida, piano,
             // sessioni, lastSync > 0) siamo davanti a repo fresco di ricreazione
@@ -82,7 +84,7 @@ object BackupEsecutore {
                     s.lezioniGenerate.isNotEmpty()
             }
             if (!datiUtili && remoto.isNullOrBlank()) {
-                return Esito.NonConfigurato("Stato dati non ancora caricato: backup evitato")
+                return Esito.NonConfigurato(t("Stato dati non ancora caricato: backup evitato"))
             }
 
             val repositoryUnito = if (remoto.isNullOrBlank()) {
@@ -92,8 +94,8 @@ object BackupEsecutore {
                     BackupCloud.deserializza(remoto)
                 } catch (e: BackupCloud.BackupInvalido) {
                     return Esito.Errore(
-                        "Backup cloud non leggibile: ${e.message}. " +
-                            "Caricamento annullato per non sovrascriverlo."
+                        t("Backup cloud non leggibile: ${e.message}. " +
+                            "Caricamento annullato per non sovrascriverlo.")
                     )
                 }
                 BackupMerge.fondi(repository, pacchetto.dati)
@@ -116,7 +118,7 @@ object BackupEsecutore {
                 return Esito.NessunCambiamento
             }
 
-            client.carica(json, "Backup automatico Deutsch")
+            client.carica(json, t("Backup automatico Deutsch"))
             settings.salvaHash(hash)
             settings.registraBackup(System.currentTimeMillis())
             if (!forza) settings.registraAuto(System.currentTimeMillis())

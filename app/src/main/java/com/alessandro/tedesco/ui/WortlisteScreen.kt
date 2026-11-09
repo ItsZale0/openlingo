@@ -125,7 +125,7 @@ fun WortlisteScreen(
                 }
             }
             Text(
-                "${voci.size} parole - tocca + per aggiungerle al tuo lessico",
+                t("${voci.size} parole - tocca + per aggiungerle al tuo lessico"),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -179,7 +179,7 @@ fun WortlisteScreen(
                                 )
                             }
                             Text(
-                                "${voce.livello} · ${voce.tema}",
+                                t("${voce.livello} · ${voce.tema}"),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )

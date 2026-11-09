@@ -126,7 +126,7 @@ fun LessicoScreen(
     ScreenScaffold("Lessico A1-B2", onBack = onIndietro, scrollable = false) {
         Column(modifier = Modifier.fillMaxSize()) {
             Text(
-                text = "${LessicoLivelli.tutte.size} parole curate, divise in parole nuove per " +
+                text = t("${LessicoLivelli.tutte.size} parole curate, divise in parole nuove per ") +
                     "livello. I traguardi sono cumulativi (A1 650, A2 1.300, B1 2.400, B2 3.000): " +
                     "aggiungi un livello al ripasso e allenati in sei modi diversi.",
                 style = MaterialTheme.typography.bodyMedium,
@@ -147,7 +147,7 @@ fun LessicoScreen(
                         onClick = { livelloScelto = livello },
                         label = {
                             Text(
-                                if (s == null) livello else "$livello · ${s.nelProfilo}/${s.curate}"
+                                if (s == null) livello else t("$livello · ${s.nelProfilo}/${s.curate}")
                             )
                         }
                     )
@@ -165,15 +165,15 @@ fun LessicoScreen(
                 ) {
                     Column(Modifier.fillMaxWidth().padding(14.dp)) {
                         Text(
-                            "Livello ${riepilogo.livello}",
+                            t("Livello ${riepilogo.livello}"),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            "${riepilogo.curate} parole nuove di ${riepilogo.livello} · " +
-                                "${riepilogo.nelProfilo} già nel tuo lessico" +
+                            t("${riepilogo.curate} parole nuove di ${riepilogo.livello} · ") +
+                                t("${riepilogo.nelProfilo} già nel tuo lessico") +
                                 if (riepilogo.daRipassare > 0) " · ${riepilogo.daRipassare} da ripassare"
                                 else "",
                             style = MaterialTheme.typography.bodySmall,
@@ -183,7 +183,7 @@ fun LessicoScreen(
                         val obiettivo = LessicoLivelli.targetCumulativo(riepilogo.livello)
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            "Copertura fino a ${riepilogo.livello}: " +
+                            t("Copertura fino a ${riepilogo.livello}: ") +
                                 "%,d di %,d parole (obiettivo cumulativo)".format(coperte, obiettivo),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -243,7 +243,7 @@ fun LessicoScreen(
                 modifier = Modifier.weight(1f).fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                items(voci, key = { "${it.livello}|${it.tedesco}" }) { voce ->
+                items(voci, key = { t("${it.livello}|${it.tedesco}") }) { voce ->
                     val presente = LessicoLivelli.chiaveParola(voce.tedesco) in chiaviProfilo
                     Row(
                         modifier = Modifier

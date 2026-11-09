@@ -689,14 +689,14 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
             when (val r = repo.sync()) {
                 is SyncResult.Updated ->
                     if (mostraMessaggio) {
-                        _messaggio.value = "Aggiornate: ${r.newWords} nuove, ${r.updatedWords} modificate"
+                        _messaggio.value = t("Aggiornate: ${r.newWords} nuove, ${r.updatedWords} modificate")
                     }
 
                 is SyncResult.NotModified ->
                     if (mostraMessaggio) _messaggio.value = t("Già aggiornato")
 
                 is SyncResult.Failed ->
-                    if (mostraMessaggio) _messaggio.value = "Errore: ${r.message}"
+                    if (mostraMessaggio) _messaggio.value = t("Errore: ${r.message}")
             }
             _caricamento.value = false
         }
@@ -735,7 +735,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
             _caricamento.value = false
             _sessione.value = SessionState(cards = cards)
             _messaggio.value = if (cards.isEmpty()) t("Niente da ripassare. Torna domani.")
-            else "Ripasso di ${cards.size} parole"
+            else t("Ripasso di ${cards.size} parole")
         }
     }
 
@@ -860,7 +860,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                     )
                 }
             }.onFailure {
-                _messaggio.value = "Errore: ${it.message}"
+                _messaggio.value = t("Errore: ${it.message}")
             }
         }
     }
@@ -930,7 +930,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                 progresso = profilo.stato.progresso.copy(livelloCorrente = nuovoLivello)
             )
             profileManager.aggiornaStatoAttivo(nuovoStato, immediato = true)
-            _messaggio.value = "Livello aggiornato a ${nuovoLivello.label}"
+            _messaggio.value = t("Livello aggiornato a ${nuovoLivello.label}")
         }
     }
 
@@ -964,9 +964,9 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
             val nuovoStato = profilo.stato.copy(progresso = p.copy(livelloCorrente = stimato))
             profileManager.aggiornaStatoAttivo(nuovoStato, immediato = true)
             _messaggio.value = if (stimato.ordine > p.livelloCorrente.ordine)
-                "Complimenti! I tuoi progressi ti portano a ${stimato.label}!"
+                t("Complimenti! I tuoi progressi ti portano a ${stimato.label}!")
             else
-                "Livello riallineato a ${stimato.label}: completa più test per avanzare."
+                t("Livello riallineato a ${stimato.label}: completa più test per avanzare.")
         }
     }
 
@@ -989,7 +989,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                 ),
                 immediato = true
             )
-            _messaggio.value = "Lezione ${lezione.numero}: ${lezione.titolo}"
+            _messaggio.value = t("Lezione ${lezione.numero}: ${lezione.titolo}")
         }
     }
 
@@ -1113,7 +1113,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                 ),
                 immediato = true
             )
-            _messaggio.value = "Lezione ${prossima.numero}: ${prossima.titolo}"
+            _messaggio.value = t("Lezione ${prossima.numero}: ${prossima.titolo}")
         }
     }
 
@@ -1206,7 +1206,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                 repo.salvaLezioneGenerata(n, lezione.contenuto)
                 val aggiunte = repo.aggiungiParoleLezione(lezione.parole, n, livello)
                 _lezioneStato.value = StatoLezione.Fatto(aggiunte)
-                _messaggio.value = "Lezione $n generata: $aggiunte parole nuove nel lessico"
+                _messaggio.value = t("Lezione $n generata: $aggiunte parole nuove nel lessico")
             } catch (e: Exception) {
                 _lezioneStato.value = StatoLezione.Errore(e.message ?: t("Generazione non riuscita"))
             }
@@ -1486,7 +1486,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
         )
         val evita = esistenti.map { e ->
             if (tipo == TipoEsercizio.ASCOLTO && !e.fraseTedesca.isNullOrBlank())
-                "${e.domanda} [${e.fraseTedesca}]"
+                t("${e.domanda} [${e.fraseTedesca}]")
             else e.domanda
         }
         val evitaChiavi = esistenti.map(::chiaveEntita)
@@ -1907,7 +1907,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                 ),
                 immediato = true
             )
-            _messaggio.value = "Livello impostato: ${livello.label}"
+            _messaggio.value = t("Livello impostato: ${livello.label}")
         }
     }
 
@@ -1994,14 +1994,14 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
             val aggiunte = runCatching {
                 repo.aggiungiParoleCurate(LessicoLivelli.perLivello(livello))
             }.getOrElse {
-                _messaggio.value = "Errore: ${it.message}"
+                _messaggio.value = t("Errore: ${it.message}")
                 0
             }
             _caricamento.value = false
             _messaggio.value = if (aggiunte > 0) {
-                "Aggiunte $aggiunte parole $livello al ripasso"
+                t("Aggiunte $aggiunte parole $livello al ripasso")
             } else {
-                "Le parole $livello sono già nel tuo lessico"
+                t("Le parole $livello sono già nel tuo lessico")
             }
         }
     }
@@ -2024,7 +2024,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
             val esercizi = EserciziLessico.costruisci(delLivello, quante, pool)
             _caricamento.value = false
             if (esercizi.isEmpty()) {
-                _messaggio.value = "Nessuna parola $livello disponibile"
+                _messaggio.value = t("Nessuna parola $livello disponibile")
                 return@launch
             }
             _sessioneLessico.value = StatoSessioneLessico(
@@ -2175,7 +2175,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                 )
                 profileManager.aggiornaStatoAttivo(nuovoStato)
             } catch (e: Exception) {
-                _messaggio.value = "Errore durante la correzione: ${e.message}"
+                _messaggio.value = t("Errore durante la correzione: ${e.message}")
             } finally {
                 _correzioneInCorso.value = false
             }
@@ -2198,7 +2198,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
     fun ripassaErrori() {
         val errori = eserciziErrori()
         if (errori.isNotEmpty()) {
-            _messaggio.value = "Ripasso di ${errori.size} errori"
+            _messaggio.value = t("Ripasso di ${errori.size} errori")
         }
     }
 

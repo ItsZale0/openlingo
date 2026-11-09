@@ -440,13 +440,13 @@ private fun IntestazioneSessione(
             }
             Spacer(Modifier.width(8.dp))
             Text(
-                "${storia.serie} · episodio ${storia.episodio}",
+                t("${storia.serie} · episodio ${storia.episodio}"),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.weight(1f))
             Text(
-                if (tappaInfo != null) "~${tappaInfo.minuti} min" else "20 min",
+                if (tappaInfo != null) t("~${tappaInfo.minuti} min") else "20 min",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -477,7 +477,7 @@ private fun IntestazioneSessione(
         Spacer(Modifier.height(6.dp))
         Text(
             if (tappaInfo != null) {
-                "Passo ${tappa + 1} di 5 · ${tappaInfo.titolo} — ${tappaInfo.sottotitolo}"
+                t("Passo ${tappa + 1} di 5 · ${tappaInfo.titolo} — ${tappaInfo.sottotitolo}")
             } else {
                 t("Sessione completata · 5 passi su 5")
             },
@@ -564,7 +564,7 @@ private fun PassoBussola(
             ) {
                 Column(Modifier.padding(22.dp)) {
                     Text(
-                        "SERIE · ${storia.serie.uppercase()}",
+                        t("SERIE · ${storia.serie.uppercase()}"),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -584,8 +584,8 @@ private fun PassoBussola(
                     )
                     Spacer(Modifier.height(14.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        EtichettaHero("Livello $livello")
-                        EtichettaHero("${storia.copertura}% parole note")
+                        EtichettaHero(t("Livello $livello"))
+                        EtichettaHero(t("${storia.copertura}% parole note"))
                     }
                 }
             }
@@ -708,7 +708,7 @@ private fun RigaTappa(
                 )
                 Spacer(Modifier.weight(1f))
                 Text(
-                    "$minuti min",
+                    t("$minuti min"),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -757,7 +757,7 @@ private fun PassoInput(
             ) {
                 Column(Modifier.padding(18.dp)) {
                     Text(
-                        "EPISODIO ${storia.episodio} · ${storia.serie.uppercase()}",
+                        t("EPISODIO ${storia.episodio} · ${storia.serie.uppercase()}"),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -776,7 +776,7 @@ private fun PassoInput(
                     )
                     Spacer(Modifier.height(12.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        AssistenzaEtichetta("${storia.copertura}% parole note")
+                        AssistenzaEtichetta(t("${storia.copertura}% parole note"))
                         Spacer(Modifier.width(8.dp))
                         Spacer(Modifier.weight(1f))
                         FilledTonalButton(
@@ -855,7 +855,7 @@ private fun PassoInput(
                 IconButton(onClick = { onAscoltaFrase(g.parola) }) {
                     Icon(
                         Icons.AutoMirrored.Filled.VolumeUp,
-                        contentDescription = "Ascolta ${g.parola}",
+                        contentDescription = t("Ascolta ${g.parola}"),
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -980,7 +980,7 @@ private fun RegoleCollegate(
                             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                         )
                         Text(
-                            "${unita.livello} · ${unita.minuti} min · regola ed esercizi",
+                            t("${unita.livello} · ${unita.minuti} min · regola ed esercizi"),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
@@ -1093,7 +1093,7 @@ private fun SchedaDomanda(
     ) {
         Column(Modifier.padding(16.dp)) {
             Text(
-                "$numero. ${domanda.domanda}",
+                t("$numero. ${domanda.domanda}"),
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.SemiBold
             )
@@ -1235,7 +1235,7 @@ private fun PassoRaccolta(
                 Column(Modifier.padding(16.dp).animateContentSize()) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            "FRASE ${i + 1}",
+                            t("FRASE ${i + 1}"),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -1274,7 +1274,7 @@ private fun PassoRaccolta(
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            "${frase.parolaChiave} = ${frase.significatoChiave}",
+                            t("${frase.parolaChiave} = ${frase.significatoChiave}"),
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.primary
@@ -1336,7 +1336,7 @@ private fun PassoRaccolta(
                         )
                         Spacer(Modifier.width(10.dp))
                         Text(
-                            "$daRivedere da rivedere: le ritrovi nel ripasso e nell'ascolto di oggi. Nessun giudizio, solo un promemoria.",
+                            t("$daRivedere da rivedere: le ritrovi nel ripasso e nell'ascolto di oggi. Nessun giudizio, solo un promemoria."),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSecondaryContainer
                         )
@@ -1476,7 +1476,7 @@ private fun PassoShadowing(
             ) {
                 Column(Modifier.padding(20.dp)) {
                     Text(
-                        "FRASE ${indice + 1} DI ${frasi.size}",
+                        t("FRASE ${indice + 1} DI ${frasi.size}"),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
@@ -1747,7 +1747,7 @@ private fun PassoAscolto(
                     )
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        "${(indice + 1).coerceAtMost(playlist.size)} di ${playlist.size} frasi",
+                        t("${(indice + 1).coerceAtMost(playlist.size)} di ${playlist.size} frasi"),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -1897,7 +1897,7 @@ private fun PassoRiepilogo(
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "${storia.titolo} · ${storia.serie}, episodio ${storia.episodio}",
+                        t("${storia.titolo} · ${storia.serie}, episodio ${storia.episodio}"),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
                     )
@@ -1920,7 +1920,7 @@ private fun PassoRiepilogo(
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(Modifier.height(10.dp))
-                    RigaRiepilogo(t("Storia letta e ascoltata"), "${storia.frasi.size} frasi")
+                    RigaRiepilogo(t("Storia letta e ascoltata"), t("${storia.frasi.size} frasi"))
                     RigaRiepilogo(t("Parole raccolte in frasi"), "$frasiRaccolte")
                     RigaRiepilogo(t("Frasi ombreggiate"), "$frasiShadowing")
                     RigaRiepilogo(t("Frasi in playlist"), "$frasiAscolto")

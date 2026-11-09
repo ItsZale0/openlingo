@@ -111,7 +111,7 @@ fun VerificaScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
                                 fontWeight = FontWeight.SemiBold)
                             Spacer(Modifier.height(6.dp))
                             Text(
-                                "Hai DIMOSTRATO di sapere ${e.paroleVerificate.size} " +
+                                t("Hai DIMOSTRATO di sapere ${e.paroleVerificate.size} ") +
                                     (if (e.paroleVerificate.size == 1) "parola" else "parole") +
                                     ". Queste contano nel tuo lessico.",
                                 style = MaterialTheme.typography.bodyMedium
@@ -119,7 +119,7 @@ fun VerificaScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
                             if (e.paroleDaRivedere.isNotEmpty()) {
                                 Spacer(Modifier.height(6.dp))
                                 Text(
-                                    "${e.paroleDaRivedere.size} da rivedere: le ritroverai nel quiz.",
+                                    t("${e.paroleDaRivedere.size} da rivedere: le ritroverai nel quiz."),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.error
                                 )

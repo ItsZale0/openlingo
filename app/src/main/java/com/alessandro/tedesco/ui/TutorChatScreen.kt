@@ -203,7 +203,7 @@ fun TutorChatScreen(vm: TedescoViewModel, onIndietro: (() -> Unit)? = null) {
                             fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold
                         )
                         Text(
-                            "Livello $livello · lezione $lezioneCorrente",
+                            t("Livello $livello · lezione $lezioneCorrente"),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

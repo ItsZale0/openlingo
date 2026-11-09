@@ -370,7 +370,7 @@ fun StudioVeloceScreen(
                 VocePannello(
                     Icons.AutoMirrored.Filled.MenuBook,
                     "Lessico A1-B2",
-                    "${LessicoLivelli.tutte.size} parole per livello, con esercizi"
+                    t("${LessicoLivelli.tutte.size} parole per livello, con esercizi")
                 ) {
                     mostraMenu = false; onNaviga("lessico")
                 }
@@ -431,7 +431,7 @@ fun StudioVeloceScreen(
                 Spacer(Modifier.height(4.dp))
                 Text(
                     "${pianoOggi!!.passiCompletati}/${pianoOggi!!.passiTotali} passi · " +
-                        "${pianoOggi!!.minutiTotali} minuti",
+                        t("${pianoOggi!!.minutiTotali} minuti"),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -470,7 +470,7 @@ private fun IntestazioneHome(
         Text(
             listOfNotNull(
                 data.takeIf { it.isNotBlank() },
-                if (streakGiorni > 0) "$streakGiorni giorni di fila" else null
+                if (streakGiorni > 0) t("$streakGiorni giorni di fila") else null
             ).joinToString(" · "),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -583,7 +583,7 @@ private fun PercorsoLezioneCard(
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
             .clickable(
-                onClickLabel = "Apri ${lezione.titolo}",
+                onClickLabel = t("Apri ${lezione.titolo}"),
                 role = Role.Button,
                 onClick = onApri
             ),
@@ -623,8 +623,8 @@ private fun PercorsoLezioneCard(
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        "Lezione ${lezione.numero} · ${lezione.livello} · " +
-                            "${lezione.unita.minuti} min",
+                        t("Lezione ${lezione.numero} · ${lezione.livello} · ") +
+                            t("${lezione.unita.minuti} min"),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -650,7 +650,7 @@ private fun PercorsoLezioneCard(
                 Spacer(Modifier.height(6.dp))
                 Text(
                     if (stato.conclusa) t("Lezione conclusa · ripassa quando vuoi")
-                    else "${stato.indice}/${stato.totale} esercizi completati",
+                    else t("${stato.indice}/${stato.totale} esercizi completati"),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -691,7 +691,7 @@ private fun ProgressoOggiRing(
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Text(
-                "$completati/$totali",
+                t("$completati/$totali"),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
             )
@@ -772,7 +772,7 @@ private fun PassoPianoRiga(
                 IconButton(onClick = onCompleta) {
                     Icon(
                         Icons.Filled.Check,
-                        contentDescription = "Segna ${passo.titolo} come fatto",
+                        contentDescription = t("Segna ${passo.titolo} come fatto"),
                         modifier = Modifier.size(20.dp),
                         tint = MaterialTheme.colorScheme.primary
                     )
@@ -900,7 +900,7 @@ private fun PercorsoGrammaticaCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     if (prossima != null) {
-                        "$etichetta · ${prossima.unita.livello} · ${prossima.unita.minuti} min"
+                        t("$etichetta · ${prossima.unita.livello} · ${prossima.unita.minuti} min")
                     } else {
                         t("Teoria, esempi ed esercizi in ordine")
                     },
@@ -911,7 +911,7 @@ private fun PercorsoGrammaticaCard(
                     modifier = Modifier.weight(1f)
                 )
                 Text(
-                    "$completate/$totale",
+                    t("$completate/$totale"),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
@@ -1252,14 +1252,14 @@ private fun SezioneLezionePercorso(
         Column(modifier = Modifier.padding(Spaziature.md)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    "LEZIONE ${stato.lezione.numero}",
+                    t("LEZIONE ${stato.lezione.numero}"),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Spacer(Modifier.weight(1f))
                 Text(
-                    "${unita.livello} · ${unita.minuti} min",
+                    t("${unita.livello} · ${unita.minuti} min"),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                 )
@@ -1289,8 +1289,8 @@ private fun SezioneLezionePercorso(
                         Text(
                             when {
                                 finita -> t("Lezione conclusa")
-                                indice > 0 -> "Domanda ${indice + 1} di $totale"
-                                else -> "Inizia · $totale esercizi"
+                                indice > 0 -> t("Domanda ${indice + 1} di $totale")
+                                else -> t("Inizia · $totale esercizi")
                             }
                         )
                     }
@@ -1534,13 +1534,13 @@ private fun RisultatoLezione(
                 color = MaterialTheme.colorScheme.onSecondaryContainer
             )
             Text(
-                "$corrette risposte corrette su $totaleValido · $percentuale%",
+                t("$corrette risposte corrette su $totaleValido · $percentuale%"),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
             )
             if (!promosso) {
                 Text(
-                    "Ti servono almeno ${GrammaticaSyllabus.SOGLIA_PADRONANZA}% per la padronanza: ripeti la lezione quando vuoi.",
+                    t("Ti servono almeno ${GrammaticaSyllabus.SOGLIA_PADRONANZA}% per la padronanza: ripeti la lezione quando vuoi."),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
                 )
@@ -1598,7 +1598,7 @@ private fun SelettoreLezioniSheet(
                 fontWeight = FontWeight.Bold
             )
             Text(
-                "$completate di ${lezioni.size} completate · percorso A0 → B2",
+                t("$completate di ${lezioni.size} completate · percorso A0 → B2"),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -1616,7 +1616,7 @@ private fun SelettoreLezioniSheet(
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             lezioni.groupBy { it.livello }.forEach { (livello, gruppo) ->
-                item(key = "livello-$livello") {
+                item(key = t("livello-$livello")) {
                     IntestazioneLivello(livello, gruppo)
                 }
                 items(gruppo, key = { it.id }) { lezione ->

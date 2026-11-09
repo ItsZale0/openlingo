@@ -104,7 +104,7 @@ fun DialoghiScreen(
                             )
                             Spacer(Modifier.height(4.dp))
                             Text(
-                                "${d.battute.size} battute - ${d.domande.size} domande",
+                                t("${d.battute.size} battute - ${d.domande.size} domande"),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.primary
                             )

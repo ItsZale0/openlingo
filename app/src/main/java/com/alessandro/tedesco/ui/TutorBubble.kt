@@ -223,7 +223,7 @@ fun TutorBubble(vm: TedescoViewModel) {
                                         fontWeight = FontWeight.SemiBold
                                     )
                                     Text(
-                                        "Livello $livello",
+                                        t("Livello $livello"),
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )

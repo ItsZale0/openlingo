@@ -197,7 +197,7 @@ private val TipiEsercizio = listOf(
     TipoEsercizio("ripasso", "ripasso", t("Ripasso"), t("Ripassa le parole sbagliate o fragili"),
         Icons.Filled.Refresh),
     TipoEsercizio("lessico", "lessico", "Lessico A1-B2",
-        "${LessicoLivelli.tutte.size} parole per livello, 6 tipi di esercizio",
+        t("${LessicoLivelli.tutte.size} parole per livello, 6 tipi di esercizio"),
         Icons.AutoMirrored.Filled.MenuBook),
     TipoEsercizio("produzione_attiva", "produzione_attiva", t("Produzione attiva"),
         t("Scrivi, completa, riordina: recupero attivo"), Icons.Filled.Create),
@@ -210,7 +210,7 @@ private val TipiEsercizio = listOf(
     TipoEsercizio("sprechuebungen", "sprechuebungen", "Sprechübungen",
         t("Parla su un tema e confrontati con il modello"), Icons.Filled.RecordVoiceOver),
     TipoEsercizio("wortliste", "wortliste", "Wortliste A1-B1",
-        "${WortlisteB1.tutte.size} parole curate da portare nel lessico", Icons.AutoMirrored.Filled.MenuBook),
+        t("${WortlisteB1.tutte.size} parole curate da portare nel lessico"), Icons.AutoMirrored.Filled.MenuBook),
     TipoEsercizio("sudtirol", "sudtirol", "Südtirol / Austria",
         t("Varianti locali e lessico sanitario"), Icons.Filled.Place),
     TipoEsercizio("podcast", "podcast", "Podcast & Video",
@@ -240,20 +240,20 @@ private fun statPerTipo(
     return when (id) {
         "grammatica" -> "${pr.competenze.grammatica.toInt()}% ${if (pr.competenze.grammatica >= soglia) "✓" else ""}"
         "comprensione" -> "${pr.competenze.comprensione.toInt()}% ${if (pr.competenze.comprensione >= soglia) "✓" else ""}"
-        "produzione" -> if (pr.produzioniScritte > 0) "${pr.produzioniScritte} testi - ${pr.mediaProduzione.toInt()}%"
+        "produzione" -> if (pr.produzioniScritte > 0) t("${pr.produzioniScritte} testi - ${pr.mediaProduzione.toInt()}%")
             else t("Nessun testo ancora")
         "espressioni" -> t("Quiz rapido")
         "verifica" -> "${pr.paroleImparate}/${pr.paroleDisponibili} verificate"
         "ascolto" -> "Livello ${pr.livello.label.substringBefore(" ")}"
         "ripasso" -> if (pr.paroleFragili > 0) "${pr.paroleFragili} da ripassare" else t("Tutto a posto")
-        "lessico" -> "${LessicoLivelli.tutte.size} parole A1-B2"
+        "lessico" -> t("${LessicoLivelli.tutte.size} parole A1-B2")
         "produzione_attiva" -> "72 esercizi offline"
         "errori" -> if (erroriAperti > 0) "$erroriAperti da consolidare" else t("Nessun errore aperto")
         "dialoghi" -> "${Dialoghi.dialoghi.size} dialoghi"
         "pronuncia" -> t("Ascolta e registrati")
-        "wortliste" -> "${WortlisteB1.tutte.size} parole A1-B1"
+        "wortliste" -> t("${WortlisteB1.tutte.size} parole A1-B1")
         "sudtirol" -> "${Sudtirol.varianti.size} varianti + lessico"
-        "podcast" -> "${PodcastData.episodi.size} contenuti per livello"
+        "podcast" -> t("${PodcastData.episodi.size} contenuti per livello")
         else -> ""
     }
 }

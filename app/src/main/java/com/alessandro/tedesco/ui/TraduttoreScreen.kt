@@ -89,7 +89,7 @@ fun TraduttoreScreen(vm: TedescoViewModel) {
                                     }
                                     traduzione = risultato
                                 } catch (e: Exception) {
-                                    errore = "Errore: ${e.message}"
+                                    errore = t("Errore: ${e.message}")
                                 } finally {
                                     caricamento = false
                                 }

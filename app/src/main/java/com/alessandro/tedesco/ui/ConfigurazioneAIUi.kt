@@ -91,7 +91,7 @@ fun ModelloAIField(
 @Composable
 fun NotaProviderAI(provider: ProviderAI) {
     Text(
-        "La chiave si crea su ${provider.urlChiave}. Resta sul dispositivo e viene " +
+        t("La chiave si crea su ${provider.urlChiave}. Resta sul dispositivo e viene ") +
             "inviata solo al provider scelto quando usi le funzioni AI.",
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant

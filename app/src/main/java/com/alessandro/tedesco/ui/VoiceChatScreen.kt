@@ -157,7 +157,7 @@ fun VoiceChatScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
                             ttsHelper.speak(risposta)
                         } catch (e: Exception) {
                             messaggi = messaggi + MessaggioVoiceChat(
-                                "Errore: ${e.message}",
+                                t("Errore: ${e.message}"),
                                 daUtente = false
                             )
                         } finally {

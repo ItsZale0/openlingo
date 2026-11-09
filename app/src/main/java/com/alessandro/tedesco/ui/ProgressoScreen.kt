@@ -169,9 +169,9 @@ private fun CardLivello(pr: CalcoloProgresso.ProgressoReale) {
             Spacer(Modifier.height(8.dp))
             Text(
                 when {
-                    pr.streakGiorni >= 7 -> "${pr.streakGiorni} giorni di fila. Sei inarrestabile!"
-                    pr.streakGiorni >= 3 -> "${pr.streakGiorni} giorni di fila. Continua così!"
-                    pr.streakGiorni > 0 -> "${pr.streakGiorni} giorno di fila. Ogni giorno conta."
+                    pr.streakGiorni >= 7 -> t("${pr.streakGiorni} giorni di fila. Sei inarrestabile!")
+                    pr.streakGiorni >= 3 -> t("${pr.streakGiorni} giorni di fila. Continua così!")
+                    pr.streakGiorni > 0 -> t("${pr.streakGiorni} giorno di fila. Ogni giorno conta.")
                     else -> t("Inizia oggi il tuo streak: basta un esercizio.")
                 },
                 style = MaterialTheme.typography.bodyMedium,
@@ -212,7 +212,7 @@ private fun CardLivello(pr: CalcoloProgresso.ProgressoReale) {
                 )
             } else {
                 Text(
-                    "Hai raggiunto il tuo obiettivo: ${pr.livelloObiettivo.label}",
+                    t("Hai raggiunto il tuo obiettivo: ${pr.livelloObiettivo.label}"),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary
@@ -243,7 +243,7 @@ private fun CardNumeriChiave(pr: CalcoloProgresso.ProgressoReale) {
             Spacer(Modifier.height(12.dp))
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Kpi(t("Parole"), "${pr.paroleImparate}", "su ${pr.paroleDisponibili} disponibili",
+                Kpi(t("Parole"), "${pr.paroleImparate}", t("su ${pr.paroleDisponibili} disponibili"),
                     MaterialTheme.colorScheme.primary, Modifier.weight(1f))
                 Kpi(t("Verificate"), "${pr.paroleImparate - pr.paroleFragili}", "dimostrate nel quiz",
                     MaterialTheme.colorScheme.tertiary, Modifier.weight(1f))

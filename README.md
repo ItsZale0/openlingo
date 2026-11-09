@@ -45,9 +45,10 @@ except those explicitly chosen by the user.
 | **Backup** | Full export/import and optional GitHub backup |
 | **Desktop** | The same teaching core in a Compose Desktop app |
 
-The interface is in Italian and uses Material 3, with selectable colour themes
-(teal, navy, indigo, green, rose, amber) on mobile and desktop. English UI is a
-work in progress.
+The interface uses Material 3, with selectable colour themes (teal, navy, indigo,
+green, rose, amber) on mobile and desktop. The UI is bilingual: Settings →
+Language switches the whole interface between Italian and English at runtime,
+and the choice is stored on the device.
 
 ## Platforms and requirements
 

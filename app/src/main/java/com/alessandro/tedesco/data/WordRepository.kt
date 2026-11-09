@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.data
 
+import com.alessandro.tedesco.i18n.t
+
 import android.content.Context
 import com.alessandro.tedesco.data.local.FeedLogEntity
 import com.alessandro.tedesco.data.local.GuidaEntity
@@ -309,7 +311,7 @@ class WordRepository(
     suspend fun sync(): SyncResult = withContext(io) {
         val url = profileManager.getFeedUrl()
         if (url.isBlank()) {
-            return@withContext SyncResult.Failed("URL del feed non configurato")
+            return@withContext SyncResult.Failed(t("URL del feed non configurato"))
         }
 
         try {
@@ -324,7 +326,7 @@ class WordRepository(
             val newEtag = response.headers["ETag"]
             val body = response.body?.string()
             if (body.isNullOrBlank()) {
-                return@withContext SyncResult.Failed("Risposta vuota dal server")
+                return@withContext SyncResult.Failed(t("Risposta vuota dal server"))
             }
 
             val feed = json.decodeFromString(FeedDto.serializer(), body)
@@ -571,7 +573,7 @@ class WordRepository(
         tags: String = ""
     ): WordEntity = withContext(io) {
         if (!profileManager.isCustomWordsEnabled()) {
-            throw UnsupportedOperationException("Parole personalizzate non abilitate per questo profilo")
+            throw UnsupportedOperationException(t("Parole personalizzate non abilitate per questo profilo"))
         }
         val now = System.currentTimeMillis()
         // Il livello della parola e' quello reale del profilo (Emma parte da B1,

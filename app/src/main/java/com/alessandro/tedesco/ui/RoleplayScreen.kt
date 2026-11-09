@@ -53,7 +53,7 @@ fun RoleplayScreen(vm: TedescoViewModel) {
             listOf(
                 MessaggioRoleplay(
                     testo = if (scenarioCorrente != null)
-                        "Hai scelto: ${scenarioCorrente.titolo}. ${scenarioCorrente.situazione} Il tuo ruolo: ${scenarioCorrente.ruoloUtente}. Il mio ruolo: ${scenarioCorrente.ruoloAI}. Iniziamo!"
+                        t("Hai scelto: ${scenarioCorrente.titolo}. ${scenarioCorrente.situazione} Il tuo ruolo: ${scenarioCorrente.ruoloUtente}. Il mio ruolo: ${scenarioCorrente.ruoloAI}. Iniziamo!")
                     else
                         t("Scegli uno scenario per iniziare il gioco di ruolo."),
                     daUtente = false

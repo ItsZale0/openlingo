@@ -135,7 +135,7 @@ class VoiceHelper(private val context: Context) {
                         SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> t("Riconoscitore occupato")
                         SpeechRecognizer.ERROR_SERVER -> t("Errore del server")
                         SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> t("Nessun suono rilevato")
-                        else -> "Errore sconosciuto ($error)"
+                        else -> t("Errore sconosciuto ($error)")
                     }
                     onStateChange?.invoke(state)
                 }

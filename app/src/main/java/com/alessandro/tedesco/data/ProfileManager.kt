@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.data
 
+import com.alessandro.tedesco.i18n.t
+
 import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -213,7 +215,7 @@ class ProfileManager(
     suspend fun selezionaProfilo(profiloId: String) {
         val repo = _repository.value
         val esistente = repo.profili[profiloId]
-            ?: throw IllegalArgumentException("Profilo non trovato: $profiloId")
+            ?: throw IllegalArgumentException(t("Profilo non trovato: $profiloId"))
         val aggiornato = esistente.copy(ultimoAccesso = System.currentTimeMillis())
         _repository.value = repo.copy(
             profili = repo.profili + (profiloId to aggiornato),

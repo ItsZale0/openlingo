@@ -155,7 +155,7 @@ private fun Riepilogo(
         )
         Spacer(Modifier.height(6.dp))
         Text(
-            "${stato.giuste} su ${stato.totale} corrette",
+            t("${stato.giuste} su ${stato.totale} corrette"),
             style = MaterialTheme.typography.titleMedium
         )
         Spacer(Modifier.height(6.dp))
@@ -211,7 +211,7 @@ private fun EsercizioCorrente(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                "Livello ${stato.livello}",
+                t("Livello ${stato.livello}"),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -330,7 +330,7 @@ private fun EsercizioCorrente(
                     }
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        "Risposta corretta: ${esercizio.corretta}",
+                        t("Risposta corretta: ${esercizio.corretta}"),
                         style = MaterialTheme.typography.bodyLarge
                     )
                     if (esercizio.spiegazione.isNotBlank()) {

@@ -52,7 +52,7 @@ fun SprechuebungenScreen(
     // Ogni giorno si riparte da un esercizio diverso del banco: la stessa
     // lista "gira" senza bisogno di salvare nulla.
     val indiciGiorno = remember(livello, prompts) {
-        RotoreEsercizi.ordine("sprech-$livello", prompts.size)
+        RotoreEsercizi.ordine(t("sprech-$livello"), prompts.size)
     }
     var indice by remember(livello) { mutableIntStateOf(0) }
     var registrando by remember { mutableStateOf(false) }
@@ -135,12 +135,12 @@ fun SprechuebungenScreen(
         ) {
             Text(
                 "Esercizi di produzione orale: leggi la situazione, parla, registrati e " +
-                    "confronta con il modello. Livello ${prompt.livello}.",
+                    t("confronta con il modello. Livello ${prompt.livello}."),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                "${indice + 1} di ${prompts.size}",
+                t("${indice + 1} di ${prompts.size}"),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

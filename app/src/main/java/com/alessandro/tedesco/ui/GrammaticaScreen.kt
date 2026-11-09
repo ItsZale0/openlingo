@@ -198,7 +198,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                                     traduci(esercizio.domanda)
                                                 }
                                             } catch (e: Throwable) {
-                                                traduzione = "Errore: ${e.message}"
+                                                traduzione = t("Errore: ${e.message}")
                                             } finally {
                                                 caricamentoTraduzione = false
                                             }
@@ -282,7 +282,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                                     traduci(opzione)
                                                 }
                                             } catch (e: Throwable) {
-                                                traduzione = "Errore: ${e.message}"
+                                                traduzione = t("Errore: ${e.message}")
                                             } finally {
                                                 caricamentoTraduzione = false
                                             }
@@ -340,7 +340,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                                         traduci(esercizio.esempio)
                                                     }
                                                 } catch (e: Throwable) {
-                                                    traduzioneEsempio = "Errore: ${e.message}"
+                                                    traduzioneEsempio = t("Errore: ${e.message}")
                                                 } finally {
                                                     caricamentoTraduzione = false
                                                 }
@@ -397,7 +397,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "Punteggio: $punteggio/${esercizi.size}",
+                                text = t("Punteggio: $punteggio/${esercizi.size}"),
                                 style = MaterialTheme.typography.headlineMedium
                             )
                             Text(
@@ -407,7 +407,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                             if (erroriRef.isNotEmpty()) {
                                 Spacer(Modifier.height(12.dp))
                                 Text(
-                                    text = "Errori da ripassare: ${erroriRef.size}",
+                                    text = t("Errori da ripassare: ${erroriRef.size}"),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.error
                                 )

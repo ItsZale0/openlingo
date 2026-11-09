@@ -177,7 +177,7 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
 
                     // Progress
                     Text(
-                        text = "Domanda ${indice + 1}/${elenco.size} · ${eserciziGen.size} generati",
+                        text = t("Domanda ${indice + 1}/${elenco.size} · ${eserciziGen.size} generati"),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -414,7 +414,7 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                             )
                             Spacer(Modifier.height(8.dp))
                             Text(
-                                text = "Errori: $errori",
+                                text = t("Errori: $errori"),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.error
                             )

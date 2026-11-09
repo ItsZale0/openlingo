@@ -191,7 +191,7 @@ private fun CardProfilo(
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    "Livello ${profilo.config.livelloIniziale.label}",
+                    t("Livello ${profilo.config.livelloIniziale.label}"),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

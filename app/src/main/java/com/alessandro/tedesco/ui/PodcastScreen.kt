@@ -138,7 +138,7 @@ fun PodcastScreen(
             ) {
                 Icon(
                     Icons.Filled.Shuffle,
-                    contentDescription = "Apri un contenuto a caso per il livello $livelloSelezionato"
+                    contentDescription = t("Apri un contenuto a caso per il livello $livelloSelezionato")
                 )
             }
         }
@@ -247,8 +247,8 @@ fun PodcastScreen(
 
         Text(
             when {
-                filtriAttivi -> "${filtrati.size} contenuti con questi filtri"
-                else -> "${filtrati.size} contenuti per il livello ${infoLivello.codice}"
+                filtriAttivi -> t("${filtrati.size} contenuti con questi filtri")
+                else -> t("${filtrati.size} contenuti per il livello ${infoLivello.codice}")
             },
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant

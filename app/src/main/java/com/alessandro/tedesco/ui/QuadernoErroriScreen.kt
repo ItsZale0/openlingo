@@ -73,13 +73,13 @@ fun QuadernoErroriScreen(
                     Spacer(Modifier.width(Spaziature.sm))
                     Column(Modifier.weight(1f)) {
                         Text(
-                            "${aperti.size} errori da consolidare",
+                            t("${aperti.size} errori da consolidare"),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
                             if (daRipassare.isNotEmpty())
-                                "${daRipassare.size} pronti da ripassare adesso"
+                                t("${daRipassare.size} pronti da ripassare adesso")
                             else t("Nessun ripasso in scadenza: torna più tardi."),
                             style = MaterialTheme.typography.bodySmall
                         )
@@ -133,7 +133,7 @@ fun QuadernoErroriScreen(
                     Column(Modifier.fillMaxWidth().padding(Spaziature.md)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                "${errore.tipo} - ${errore.livello}",
+                                t("${errore.tipo} - ${errore.livello}"),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Bold,
@@ -141,7 +141,7 @@ fun QuadernoErroriScreen(
                             )
                             if (!inScadenza) {
                                 Text(
-                                    "tra ${ErroriSRS.giorniAllaScadenza(errore)} g",
+                                    t("tra ${ErroriSRS.giorniAllaScadenza(errore)} g"),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -158,7 +158,7 @@ fun QuadernoErroriScreen(
                         Text(errore.domanda, style = MaterialTheme.typography.bodyLarge)
                         if (errore.rispostaData.isNotBlank()) {
                             Text(
-                                "Hai scritto: ${errore.rispostaData}",
+                                t("Hai scritto: ${errore.rispostaData}"),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.error
                             )
@@ -166,7 +166,7 @@ fun QuadernoErroriScreen(
                         Spacer(Modifier.height(Spaziature.sm))
                         if (mostraRisposta) {
                             Text(
-                                "Risposta corretta: ${errore.rispostaCorretta}",
+                                t("Risposta corretta: ${errore.rispostaCorretta}"),
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.primary
@@ -213,7 +213,7 @@ fun QuadernoErroriScreen(
                         Icon(Icons.Filled.Check, contentDescription = null, modifier = Modifier.size(20.dp))
                         Spacer(Modifier.width(Spaziature.sm))
                         Text(
-                            "$risolti errori consolidati dopo 5 richiami",
+                            t("$risolti errori consolidati dopo 5 richiami"),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }

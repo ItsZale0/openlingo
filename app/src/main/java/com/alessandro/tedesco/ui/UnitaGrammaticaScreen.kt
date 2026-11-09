@@ -209,7 +209,7 @@ fun UnitaGrammaticaScreen(
     }
 
     ScreenScaffold(
-        title = "${unita.livello} - ${unita.titolo}",
+        title = t("${unita.livello} - ${unita.titolo}"),
         onBack = onIndietro
     ) {
         IntestazioneUnita(unita)
@@ -340,7 +340,7 @@ private fun IntestazioneUnita(unita: UnitaGrammatica) {
                 )
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    "${unita.minuti} minuti - ${unita.esercizi.size} esercizi",
+                    t("${unita.minuti} minuti - ${unita.esercizi.size} esercizi"),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
@@ -772,13 +772,13 @@ internal fun EsercizioUnitaCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    "Esercizio ${indice + 1} di $totale",
+                    t("Esercizio ${indice + 1} di $totale"),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.weight(1f)
                 )
                 Text(
-                    "${unita.livello} - ${unita.titolo}",
+                    t("${unita.livello} - ${unita.titolo}"),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -936,7 +936,7 @@ internal fun EsercizioUnitaCard(
                         if (!corretto) {
                             Spacer(Modifier.height(2.dp))
                             Text(
-                                "Risposta corretta: $rispostaCorretta",
+                                t("Risposta corretta: $rispostaCorretta"),
                                 style = MaterialTheme.typography.bodySmall,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -1031,7 +1031,7 @@ private fun DettatoUnita(
     ) {
         Column(Modifier.padding(Spaziature.md)) {
             Text(
-                "Dettato ${indice + 1} di ${esempi.size}",
+                t("Dettato ${indice + 1} di ${esempi.size}"),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -1177,7 +1177,7 @@ internal fun RiepilogoErrori(
                 HorizontalDivider(color = MaterialTheme.colorScheme.error.copy(alpha = 0.25f))
                 Spacer(Modifier.height(Spaziature.sm))
                 Text(
-                    "${errore.posizione + 1}. ${esercizio.domanda}",
+                    t("${errore.posizione + 1}. ${esercizio.domanda}"),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -1188,7 +1188,7 @@ internal fun RiepilogoErrori(
                     color = MaterialTheme.colorScheme.error
                 )
                 Text(
-                    "Risposta corretta: $corretta",
+                    t("Risposta corretta: $corretta"),
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -1241,13 +1241,13 @@ private fun RisultatoUnita(
             )
             Spacer(Modifier.height(Spaziature.sm))
             Text(
-                "$corrette / ${esercizi.size}",
+                t("$corrette / ${esercizi.size}"),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
             )
             Text(
-                "$percentuale% di risposte corrette",
+                t("$percentuale% di risposte corrette"),
                 style = MaterialTheme.typography.bodyMedium
             )
             Spacer(Modifier.height(Spaziature.sm))

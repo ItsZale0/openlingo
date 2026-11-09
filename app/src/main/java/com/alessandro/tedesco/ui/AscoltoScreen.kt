@@ -202,7 +202,7 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.padding(Spaziature.md)) {
                         Text(
-                            "Nessun esercizio per ${livelloSelezionato}",
+                            t("Nessun esercizio per ${livelloSelezionato}"),
                             style = MaterialTheme.typography.titleMedium
                         )
                         Spacer(Modifier.height(4.dp))
@@ -223,7 +223,7 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
                 val esercizio = esercizi[indice]
 
                 Text(
-                    text = "Esercizio ${indice + 1}/${esercizi.size}",
+                    text = t("Esercizio ${indice + 1}/${esercizi.size}"),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -391,7 +391,7 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
                         )
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            text = "Errori: $errori",
+                            text = t("Errori: $errori"),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.error
                         )

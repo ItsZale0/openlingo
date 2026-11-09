@@ -121,7 +121,7 @@ fun PlacementTestCard(
                 )
                 Spacer(Modifier.height(Spaziature.sm))
                 Text(
-                    "DOMANDA ${indice + 1} DI ${domande.size} · ${domanda.livello}",
+                    t("DOMANDA ${indice + 1} DI ${domande.size} · ${domanda.livello}"),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -240,7 +240,7 @@ fun PlacementTestCard(
             } else {
                 val esito = PlacementTest.valuta(corrette)
                 Text(
-                    "Risultato: $corrette / ${esito.totale}",
+                    t("Risultato: $corrette / ${esito.totale}"),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface

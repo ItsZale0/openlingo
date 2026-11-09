@@ -107,7 +107,7 @@ fun PercorsoGrammaticaScreen(
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    "$completate di ${percorso.size} unità completate",
+                    t("$completate di ${percorso.size} unità completate"),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
@@ -206,7 +206,7 @@ fun PercorsoGrammaticaScreen(
                     )
                     Spacer(Modifier.height(Spaziature.xs))
                     Text(
-                        "${GrammaticaSyllabus.unita.size} unità disponibili: dalle basi A0 alle strutture B1. " +
+                        t("${GrammaticaSyllabus.unita.size} unità disponibili: dalle basi A0 alle strutture B1. ") +
                             t("Continua con i ripassi per non perdere la padronanza."),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -297,7 +297,7 @@ private fun CardProssimaUnita(
                 color = MaterialTheme.colorScheme.onSecondaryContainer
             )
             Text(
-                "${unita.livello} - ${unita.minuti} min - ${unita.sottotitolo}",
+                t("${unita.livello} - ${unita.minuti} min - ${unita.sottotitolo}"),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
             )
@@ -384,7 +384,7 @@ private fun CardUnita(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    "${unita.livello} - ${unita.minuti} min - $descrizioneStato",
+                    t("${unita.livello} - ${unita.minuti} min - $descrizioneStato"),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

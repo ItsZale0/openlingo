@@ -119,13 +119,13 @@ fun ProduzioneAttivaScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    "Livello ${esercizio.livello} - ${esercizio.tipo.etichetta}",
+                    t("Livello ${esercizio.livello} - ${esercizio.tipo.etichetta}"),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    "$corrette / $fatte",
+                    t("$corrette / $fatte"),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -269,7 +269,7 @@ fun ProduzioneAttivaScreen(
                         }
                         Spacer(Modifier.height(Spaziature.sm))
                         Text(
-                            "Risposta: ${RisposteProduttive.rispostaMostrata(esercizio)}",
+                            t("Risposta: ${RisposteProduttive.rispostaMostrata(esercizio)}"),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -313,7 +313,7 @@ fun ProduzioneAttivaScreen(
 @Composable
 fun RigaEsercizioProduttivo(esercizio: EsercizioProduttivo) {
     Text(
-        "${esercizio.tipo.etichetta}: ${esercizio.prompt}",
+        t("${esercizio.tipo.etichetta}: ${esercizio.prompt}"),
         style = MaterialTheme.typography.bodyMedium
     )
 }
