@@ -248,4 +248,31 @@ class BackupViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
     }
+
+    /**
+     * Applica il ripristino SOVRASCRIVENDO i dati locali col backup.
+     *
+     * Nessuna unione: il telefono prende il backup così com'è. I progressi
+     * fatti localmente dopo l'ultimo backup vengono persi.
+     */
+    fun confermaRipristinoSostituendo() {
+        val json = contenutoDaRipristinare ?: return
+        _stato.value = BackupStato.InCorso
+        viewModelScope.launch {
+            try {
+                val pacchetto = BackupCloud.deserializza(json)
+                withContext(Dispatchers.IO) {
+                    app.profileManagerInstance.sostituisciRepository(pacchetto.dati)
+                    pacchetto.notifiche?.let { n: BackupCloud.NotificheBackup ->
+                        NotificheSettings(getApplication()).applica(n)
+                    }
+                }
+                _daRipristinare.value = null
+                contenutoDaRipristinare = null
+                _stato.value = BackupStato.Ok("Ripristino completato: ${pacchetto.dati.profili.size} profili (backup sostituito)")
+            } catch (e: Exception) {
+                _stato.value = BackupStato.Errore("Ripristino fallito: ${e.message}")
+            }
+        }
+    }
 }

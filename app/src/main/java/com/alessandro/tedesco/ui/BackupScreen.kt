@@ -67,6 +67,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
     var tokenInput by remember(token) { mutableStateOf(token) }
     var repoInput by remember(repo) { mutableStateOf(repo) }
     var confermaRipristino by remember { mutableStateOf(false) }
+    var confermaSostituzione by remember { mutableStateOf(false) }
 
     val contesto = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -395,10 +396,52 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                 }
             },
             confirmButton = {
-                TextButton(onClick = { confermaRipristino = true }) { Text("Continua") }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    TextButton(onClick = { confermaRipristino = true }) { Text("Unisci") }
+                    TextButton(onClick = { confermaSostituzione = true }) { Text("Sostituisci") }
+                }
             },
             dismissButton = {
                 TextButton(onClick = { vm.annullaRipristino() }) { Text("Annulla") }
+            }
+        )
+    }
+
+    // --- Conferma sostituzione: sovrascrive i dati locali col backup ---
+    if (riep != null && confermaSostituzione) {
+        AlertDialog(
+            onDismissRequest = { confermaSostituzione = false; vm.annullaRipristino() },
+            title = { Text("Sostituire i dati di questo telefono col backup?") },
+            text = {
+                Column {
+                    Text("Il backup contiene:")
+                    Spacer(Modifier.height(8.dp))
+                    Text("• ${riep.numProfili} profili")
+                    Text("• ${riep.numParole} parole")
+                    Text("• ${riep.numRipassi} ripassi registrati")
+                    Text("• ${riep.numRisposte} correzioni")
+                    Text("• ${riep.numUnitaGrammatica} unità di grammatica")
+                    Text("• ${riep.numLezioni} lezioni")
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        "ATTENZIONE: i dati attuali di questo telefono verranno " +
+                            "sovrascritti dal backup. I progressi fatti dopo l'ultimo " +
+                            "backup su questo dispositivo andranno persi.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    confermaSostituzione = false
+                    vm.confermaRipristinoSostituendo()
+                }) { Text("Sì, sostituisci") }
+            },
+            dismissButton = {
+                TextButton(onClick = { confermaSostituzione = false; vm.annullaRipristino() }) {
+                    Text("Annulla")
+                }
             }
         )
     }
