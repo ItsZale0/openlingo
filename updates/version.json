@@ -1,8 +1,8 @@
 {
-  "versionCode": 308,
-  "versionName": "1.48.75",
-  "changelog": "Esportazione dei dati con nome file Deutsch e guida aggiornata alle voci esatte dell'app. Nessuna modifica a profili, progressi o contenuti.",
+  "versionCode": 309,
+  "versionName": "1.48.76",
+  "changelog": "Ripristino del backup piu' affidabile: cerca il file del profilo attivo, poi tedesco-backup.json e infine il backup valido piu' recente nel repo. Messaggi piu' chiari quando token o repo non sono accessibili.",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.75/Deutsch-v1.48.75.apk",
-  "apkSha256": "32b760e70f474008013c08f34b6d045736cb262a7dcee2f03734bef4f4dabe5e"
+  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.48.76/Deutsch-v1.48.76.apk",
+  "apkSha256": "aef4d452b034be8e6ad8e834f3848b6aa9cc5d693bc998c8309c7ab4afe39ccd"
 }

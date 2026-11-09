@@ -4,14 +4,17 @@ import com.alessandro.tedesco.data.BackupCloud
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import java.net.URI
+import java.net.URLEncoder
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.time.Duration
+import java.time.Instant
 import java.util.Base64
 
 /**
@@ -77,6 +80,47 @@ class BackupGithub(
 
     /** sha attuale del file, o null se non esiste. Serve per l'aggiornamento. */
     fun shaCorrente(): String? = runCatching { scarica()?.sha }.getOrNull()
+
+    /**
+     * Nomi dei file di backup presenti nella radice del repo. Vuoto se il repo
+     * non è leggibile o non ne contiene.
+     */
+    fun elencaBackup(): List<String> {
+        return try {
+            val risposta = invia(richiesta("https://api.github.com/repos/$repo/contents/").GET().build())
+            if (risposta.statusCode() != 200) return emptyList()
+            val elementi = json.parseToJsonElement(risposta.body()).jsonArray
+            elementi.mapNotNull { elemento ->
+                val obj = elemento.jsonObject
+                val nome = obj["name"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null
+                val tipo = obj["type"]?.jsonPrimitive?.contentOrNull ?: "file"
+                if (tipo == "file" && BackupCloud.eFileBackup(nome)) nome else null
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    /**
+     * Data dell'ultimo commit che ha toccato [nomeFile], in millisecondi.
+     * null se non disponibile. Serve a scegliere il backup più recente quando
+     * il file del profilo attivo non esiste.
+     */
+    fun dataUltimoCommit(nomeFile: String): Long? {
+        return try {
+            val codificato = URLEncoder.encode(nomeFile, "UTF-8")
+            val url = "https://api.github.com/repos/$repo/commits?path=$codificato&per_page=1"
+            val risposta = invia(richiesta(url).GET().build())
+            if (risposta.statusCode() != 200) return null
+            val commit = json.parseToJsonElement(risposta.body()).jsonArray.firstOrNull()?.jsonObject
+            val data = commit?.get("commit")?.jsonObject
+                ?.get("committer")?.jsonObject
+                ?.get("date")?.jsonPrimitive?.contentOrNull
+            data?.let { Instant.parse(it).toEpochMilli() }
+        } catch (e: Exception) {
+            null
+        }
+    }
 
     /**
      * Carica (o aggiorna) il backup. Legge lo sha corrente: senza, GitHub

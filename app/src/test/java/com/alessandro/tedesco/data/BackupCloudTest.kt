@@ -6,6 +6,7 @@ import com.alessandro.tedesco.data.local.ProfiloUtente
 import com.alessandro.tedesco.data.local.RipassoLogEntity
 import com.alessandro.tedesco.data.local.WordEntity
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -23,6 +24,48 @@ class BackupCloudTest {
     }
 
     private val NOW = 1_700_000_000_000L
+
+    @Test
+    fun `il ripristino prova prima il file del profilo poi quello condiviso`() {
+        // Il backup viene caricato sul file del profilo attivo al momento del
+        // salvataggio: se poi si cambia profilo, il file condiviso deve comunque
+        // essere trovato.
+        assertEquals(listOf("tedesco-backup.json"), BackupCloud.candidatiRipristino("alessandro"))
+        assertEquals(listOf("tedesco-backup.json"), BackupCloud.candidatiRipristino(null))
+        assertEquals(
+            listOf("tedesco-backup-emma.json", "tedesco-backup.json"),
+            BackupCloud.candidatiRipristino("emma")
+        )
+    }
+
+    @Test
+    fun `riconosce solo i file di backup dell'app`() {
+        assertTrue(BackupCloud.eFileBackup("tedesco-backup.json"))
+        assertTrue(BackupCloud.eFileBackup("tedesco-backup-emma.json"))
+        assertFalse(BackupCloud.eFileBackup("README.md"))
+        assertFalse(BackupCloud.eFileBackup("tedesco-backup-.json"))
+        assertFalse(BackupCloud.eFileBackup("tedesco-backup-a/b.json"))
+    }
+
+    @Test
+    fun `preferisce il backup del profilo attivo anche se un altro e' piu' recente`() {
+        val nomi = listOf("tedesco-backup.json", "tedesco-backup-emma.json", "note.txt")
+        val date = mapOf("tedesco-backup.json" to 10L, "tedesco-backup-emma.json" to 99L)
+        assertEquals(
+            listOf("tedesco-backup-emma.json", "tedesco-backup.json"),
+            BackupCloud.ordinaBackup("emma", nomi, date)
+        )
+    }
+
+    @Test
+    fun `fra backup sconosciuti sceglie il piu' recente`() {
+        val nomi = listOf("tedesco-backup-anna.json", "tedesco-backup-luca.json")
+        val date = mapOf("tedesco-backup-anna.json" to 5L, "tedesco-backup-luca.json" to 50L)
+        assertEquals(
+            listOf("tedesco-backup-luca.json", "tedesco-backup-anna.json"),
+            BackupCloud.ordinaBackup("profilo_nuovo", nomi, date)
+        )
+    }
 
     private fun repo(): ProfiliRepository {
         val ale = ProfiloUtente(

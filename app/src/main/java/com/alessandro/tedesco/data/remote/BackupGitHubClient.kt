@@ -7,6 +7,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
@@ -15,6 +16,8 @@ import com.alessandro.tedesco.di.HttpCondiviso
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
+import java.net.URLEncoder
+import java.time.Instant
 import java.util.Base64
 import java.util.concurrent.TimeUnit
 
@@ -76,6 +79,52 @@ class BackupGitHubClient(
                 404 -> null
                 else -> null
             }
+        }
+    }
+
+    /**
+     * Nomi dei file di backup presenti nella radice del repo. Vuoto se il repo
+     * non è leggibile o non ne contiene.
+     */
+    suspend fun elencaBackup(): List<String> = withContext(Dispatchers.IO) {
+        val r = req("https://api.github.com/repos/$repo/contents/").get().build()
+        client.newCall(r).execute().use { resp ->
+            if (resp.code != 200) return@use emptyList()
+            val body = resp.body?.string() ?: return@use emptyList()
+            val elementi = runCatching { json.parseToJsonElement(body).jsonArray }.getOrNull()
+                ?: return@use emptyList()
+            elementi.mapNotNull { elemento ->
+                val obj = elemento.jsonObject
+                val nome = obj["name"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null
+                val tipo = obj["type"]?.jsonPrimitive?.contentOrNull ?: "file"
+                if (tipo == "file" && BackupCloud.eFileBackup(nome)) nome else null
+            }
+        }
+    }
+
+    /**
+     * Data dell'ultimo commit che ha toccato [nomeFile], in millisecondi.
+     * null se non disponibile. Serve a scegliere il backup più recente quando
+     * il file del profilo attivo non esiste.
+     */
+    suspend fun dataUltimoCommit(nomeFile: String): Long? = withContext(Dispatchers.IO) {
+        try {
+            val codificato = URLEncoder.encode(nomeFile, "UTF-8")
+            val url = "https://api.github.com/repos/$repo/commits?path=$codificato&per_page=1"
+            val r = req(url).get().build()
+            client.newCall(r).execute().use { resp ->
+                if (resp.code != 200) return@use null
+                val body = resp.body?.string() ?: return@use null
+                val commit = runCatching {
+                    json.parseToJsonElement(body).jsonArray.firstOrNull()?.jsonObject
+                }.getOrNull() ?: return@use null
+                val data = commit["commit"]?.jsonObject
+                    ?.get("committer")?.jsonObject
+                    ?.get("date")?.jsonPrimitive?.contentOrNull
+                data?.let { Instant.parse(it).toEpochMilli() }
+            }
+        } catch (e: Exception) {
+            null
         }
     }
 

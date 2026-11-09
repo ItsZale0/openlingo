@@ -208,7 +208,8 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "File usato per il profilo attivo: ${vm.nomeFileBackup.collectAsStateWithLifecycle(BackupCloud.NOME_FILE).value}",
+                        "File di backup del profilo attivo: ${vm.nomeFileBackup.collectAsStateWithLifecycle(BackupCloud.NOME_FILE).value}. " +
+                            "Il ripristino cerca anche il backup condiviso tedesco-backup.json.",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary
                     )

@@ -37,6 +37,57 @@ object BackupCloud {
     }
 
     /**
+     * File da provare nel ripristino, in ordine di preferenza: prima quello del
+     * profilo attivo, poi il backup condiviso.
+     *
+     * Serve perché il caricamento usa il file del profilo attivo al momento del
+     * backup: se in seguito si cambia profilo (o si ripristina su un profilo
+     * nuovo), il vecchio codice cercava solo il file del profilo corrente e
+     * rispondeva "Nessun backup trovato" anche se il backup esisteva.
+     */
+    fun candidatiRipristino(profiloId: String?): List<String> {
+        val preferito = nomeFilePerProfilo(profiloId)
+        return if (preferito == NOME_FILE) listOf(NOME_FILE)
+        else listOf(preferito, NOME_FILE)
+    }
+
+    /** true se [nome] è un file di backup creato dall'app. */
+    fun eFileBackup(nome: String): Boolean {
+        val n = nome.trim()
+        if (n == NOME_FILE) return true
+        if (!n.startsWith("tedesco-backup-") || !n.endsWith(".json")) return false
+        val centro = n.removePrefix("tedesco-backup-").removeSuffix(".json")
+        return centro.isNotBlank() && !centro.contains('/') && !centro.contains('\\')
+    }
+
+    /**
+     * Ordina i file presenti nel repo per il ripristino: prima i candidati del
+     * profilo attivo, poi gli altri backup dal più recente.
+     *
+     * @param date data dell'ultimo commit per nome file, in millisecondi. Se
+     *        manca, il file viene considerato più vecchio.
+     */
+    fun ordinaBackup(
+        profiloId: String?,
+        nomi: Collection<String>,
+        date: Map<String, Long> = emptyMap()
+    ): List<String> {
+        val preferiti = candidatiRipristino(profiloId)
+        return nomi.asSequence()
+            .map { it.trim() }
+            .filter { eFileBackup(it) }
+            .distinct()
+            .sortedWith(
+                compareBy<String> { nome ->
+                    preferiti.indexOf(nome).let { if (it >= 0) it else preferiti.size }
+                }
+                    .thenByDescending { nome -> date[nome] ?: 0L }
+                    .thenBy { nome -> nome }
+            )
+            .toList()
+    }
+
+    /**
      * Repo di backup di default (privato). DEVE includere l'owner:
      * l'API e' /repos/{owner}/{repo}, quindi "tedesco-backup" da solo darebbe 404.
      */

@@ -152,15 +152,59 @@ class BackupViewModel(application: Application) : AndroidViewModel(application) 
         _stato.value = BackupStato.InCorso
         viewModelScope.launch {
             try {
-                val nomeFile = BackupCloud.nomeFilePerProfilo(app.profileManagerInstance.profiloAttivoId())
-                val c = client(repoNormalizzato(), nomeFile) ?: return@launch
-                val json = c.scarica()
+                val repoAttivo = repoNormalizzato()
+                val baseClient = client(repoAttivo) ?: return@launch
+                val profiloId = app.profileManagerInstance.profiloAttivoId()
+                val cercati = BackupCloud.candidatiRipristino(profiloId)
+
+                // 1. File del profilo attivo, poi backup condiviso. Il backup
+                //    viene caricato sul file del profilo attivo al momento del
+                //    salvataggio: senza questo ordine, cambiando profilo il
+                //    ripristino non trovava più nulla.
+                var json: String? = null
+                for (nome in cercati) {
+                    val c = client(repoAttivo, nome) ?: break
+                    json = c.scarica()
+                    if (json != null) break
+                }
+
+                // 2. Nessun candidato: cerca qualunque backup nel repo e usa il
+                //    più recente e leggibile (es. backup di un altro profilo).
                 if (json == null) {
-                    _stato.value = BackupStato.Errore("Nessun backup trovato su GitHub")
+                    val disponibili = baseClient.elencaBackup()
+                    val date = disponibili.mapNotNull { nome ->
+                        baseClient.dataUltimoCommit(nome)?.let { nome to it }
+                    }.toMap()
+                    for (nome in BackupCloud.ordinaBackup(profiloId, disponibili, date)) {
+                        if (nome in cercati) continue
+                        val c = client(repoAttivo, nome) ?: continue
+                        val letto = runCatching { c.scarica() }.getOrNull() ?: continue
+                        if (runCatching { BackupCloud.deserializza(letto) }.isSuccess) {
+                            json = letto
+                            break
+                        }
+                    }
+                }
+
+                if (json == null) {
+                    // Distingue "repo/token non accessibile" da "repo vuoto".
+                    _stato.value = when (val accesso = baseClient.verificaAccesso()) {
+                        is BackupCloud.Esito.Errore ->
+                            BackupStato.Errore("${accesso.messaggio}. Backup non scaricato.")
+                        is BackupCloud.Esito.Ok ->
+                            BackupStato.Errore(
+                                "Nessun backup trovato in $repoAttivo. " +
+                                    "File cercati: ${cercati.joinToString(", ")}. " +
+                                    "Se il backup è stato caricato da un altro profilo, " +
+                                    "controlla che il repo contenga tedesco-backup.json."
+                            )
+                    }
                     return@launch
                 }
-                val pacchetto = BackupCloud.deserializza(json)
-                contenutoDaRipristinare = json
+
+                val contenuto = json
+                val pacchetto = BackupCloud.deserializza(contenuto)
+                contenutoDaRipristinare = contenuto
                 _daRipristinare.value = BackupCloud.riepilogo(pacchetto)
                 _stato.value = BackupStato.Idle
             } catch (e: Exception) {

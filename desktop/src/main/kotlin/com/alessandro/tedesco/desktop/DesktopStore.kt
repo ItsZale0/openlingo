@@ -760,15 +760,53 @@ class DesktopStore(
         val token = preferenze.githubToken.trim()
         if (token.isBlank()) return RisultatoCloud.Errore("Inserisci prima il token GitHub")
         return try {
-            val client = BackupGithub(
-                token = token,
-                repo = repoNormalizzato(token),
-                nomeFile = BackupCloud.nomeFilePerProfilo(repo.profiloAttivoId)
-            )
-            val contenuto = client.scarica()
-                ?: return RisultatoCloud.Errore("Nessun backup trovato su GitHub")
-            val pacchetto = BackupCloud.deserializza(contenuto.json)
-            RisultatoCloud.Trovato(BackupCloud.riepilogo(pacchetto), contenuto.json)
+            val repoAttivo = repoNormalizzato(token)
+            val profiloId = repo.profiloAttivoId
+            val cercati = BackupCloud.candidatiRipristino(profiloId)
+
+            // 1. File del profilo attivo, poi backup condiviso.
+            var contenuto: String? = null
+            for (nome in cercati) {
+                contenuto = BackupGithub(token, repoAttivo, nome).scarica()?.json
+                if (contenuto != null) break
+            }
+
+            // 2. Qualunque altro backup nel repo, dal più recente.
+            if (contenuto == null) {
+                val baseClient = BackupGithub(token, repoAttivo)
+                val disponibili = baseClient.elencaBackup()
+                val date = disponibili.mapNotNull { nome ->
+                    baseClient.dataUltimoCommit(nome)?.let { nome to it }
+                }.toMap()
+                for (nome in BackupCloud.ordinaBackup(profiloId, disponibili, date)) {
+                    if (nome in cercati) continue
+                    val letto = runCatching {
+                        BackupGithub(token, repoAttivo, nome).scarica()?.json
+                    }.getOrNull() ?: continue
+                    if (runCatching { BackupCloud.deserializza(letto) }.isSuccess) {
+                        contenuto = letto
+                        break
+                    }
+                }
+            }
+
+            if (contenuto == null) {
+                val accesso = runCatching {
+                    BackupGithub(token, repoAttivo).verificaAccesso()
+                }.getOrNull()
+                val motivo = (accesso as? BackupCloud.Esito.Errore)?.messaggio
+                return RisultatoCloud.Errore(
+                    if (motivo != null) {
+                        "$motivo. Backup non scaricato."
+                    } else {
+                        "Nessun backup trovato in $repoAttivo. " +
+                            "File cercati: ${cercati.joinToString(", ")}."
+                    }
+                )
+            }
+
+            val pacchetto = BackupCloud.deserializza(contenuto!!)
+            RisultatoCloud.Trovato(BackupCloud.riepilogo(pacchetto), contenuto!!)
         } catch (e: Exception) {
             RisultatoCloud.Errore(e.message ?: "Errore sconosciuto")
         }

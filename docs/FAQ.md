@@ -40,6 +40,23 @@ L'app controlla `updates/version.json` sul repository e propone la nuova
 versione. Prima dell'installazione verifica lo SHA-256 dell'APK scaricato. Puoi
 anche scaricare manualmente l'ultima release dalla pagina GitHub.
 
+## Ho salvato il backup su GitHub ma non lo trovo
+
+Dal ripristino l'app prova in ordine:
+
+1. il file del profilo attivo (`tedesco-backup-<profilo>.json`);
+2. il backup condiviso `tedesco-backup.json`;
+3. qualunque altro backup valido presente nel repository, dal più recente.
+
+Se non viene trovato nulla, controlla che:
+
+- il repository configurato sia quello giusto (utente/nome-repo);
+- il token abbia il permesso **Contents: Read and write** sul repository;
+- il repository contenga almeno un file `tedesco-backup*.json`.
+
+Il messaggio d'errore ora indica il repository e i nomi dei file cercati. In
+alternativa puoi usare **Esporta tutti i dati** e reimportare il file JSON.
+
 ## Su quali piattaforme è disponibile?
 
 Android 8.0+ e desktop (Windows, macOS, Linux). Non esiste una versione iOS.

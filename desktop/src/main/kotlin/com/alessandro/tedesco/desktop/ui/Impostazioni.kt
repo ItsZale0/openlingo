@@ -415,7 +415,8 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
                 "Carica tutti i profili (parole, ripassi, grammatica e lezioni) sul repository " +
                     "privato e ripristinali su un altro dispositivo. Il caricamento UNISCE i " +
                     "progressi fatti altrove: niente viene sovrascritto con dati meno avanzati. " +
-                    "File: ${store.nomeFileBackup}",
+                    "File del profilo attivo: ${store.nomeFileBackup} " +
+                        "(il ripristino cerca anche tedesco-backup.json)",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
