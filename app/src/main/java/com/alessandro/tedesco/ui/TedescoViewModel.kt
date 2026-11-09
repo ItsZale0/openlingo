@@ -44,7 +44,6 @@ import com.alessandro.tedesco.data.local.RotazioneUnita
 import com.alessandro.tedesco.data.local.TestGrammatica
 import com.alessandro.tedesco.data.local.TipoProfilo
 import com.alessandro.tedesco.data.local.WordEntity
-import com.alessandro.tedesco.data.remote.GeneratoreLezioni
 import com.alessandro.tedesco.data.remote.AiService
 import com.alessandro.tedesco.data.remote.TutorService
 import com.alessandro.tedesco.data.remote.EsercizioGenerato
@@ -1153,8 +1152,6 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
 
     private val _lezioneStato = MutableStateFlow<StatoLezione>(StatoLezione.Idle)
     val lezioneStato: StateFlow<StatoLezione> = _lezioneStato.asStateFlow()
-
-    private val generatoreLezioni = GeneratoreLezioni()
 
     /** Tema della lezione: titolo dal feed se c'e', altrimenti dalla scaletta base. */
     private fun argomentoLezione(numero: Int, titoloFeed: String?): String {
