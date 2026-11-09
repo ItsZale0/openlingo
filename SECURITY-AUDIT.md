@@ -16,7 +16,8 @@ modifiche a build, firma dei file di export e documentazione)
   dell'utente e non sono state sondate dinamicamente; sono state però riviste a
   livello statico (endpoint, intestazioni, gestione degli errori). Un test DAST
   completo resta tra le raccomandazioni prima della pubblicazione sugli store.
-- **OpenSSF Scorecard**: obiettivo di qualità del progetto **≥ 0.4**.
+- **OpenSSF Scorecard**: obiettivo di qualità del progetto **≥ 0.4**; punteggio
+  rilevato dopo l'ultima analisi automatica: **3.1**.
 
 ## Verifiche eseguite in questa sessione
 

@@ -111,8 +111,7 @@ altrove se non al provider AI scelto.
 - Nessun segreto, token o chiave di firma incluso nel repository.
 - Analisi statica (SAST) e report: [SECURITY-AUDIT.md](SECURITY-AUDIT.md).
 - Segnalazioni: [SECURITY.md](SECURITY.md).
-- OpenSSF Scorecard attivo su ogni push in `master`; punteggio corrente 3,1/10
-  (obiettivo minimo del progetto: 0,4).
+- OpenSSF Scorecard attivo su ogni push in `master` (punteggio corrente 3,1/10).
 
 ## Sviluppo
 
