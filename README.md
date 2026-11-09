@@ -1,196 +1,193 @@
 # Deutsch
 
-[![Ultima release](https://img.shields.io/github/v/release/ItsZale0/tedesco-app?label=release)](https://github.com/ItsZale0/tedesco-app/releases/latest)
+[![Latest release](https://img.shields.io/github/v/release/ItsZale0/tedesco-app?label=release)](https://github.com/ItsZale0/tedesco-app/releases/latest)
 [![Build APK](https://github.com/ItsZale0/tedesco-app/actions/workflows/build.yml/badge.svg)](https://github.com/ItsZale0/tedesco-app/actions/workflows/build.yml)
-[![Licenza: GPL-3.0-or-later](https://img.shields.io/badge/licenza-GPL--3.0--or--later-blue)](LICENSE)
+[![License: GPL-3.0-or-later](https://img.shields.io/badge/license-GPL--3.0--or--later-blue)](LICENSE)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/ItsZale0/tedesco-app/badge)](https://securityscorecards.dev/viewer/?uri=github.com/ItsZale0/tedesco-app)
 
-**Deutsch** è un corso di tedesco A0–B2 per Android e desktop, offline-first e
-open source. Riunisce vocabolario, grammatica, ascolto, produzione, ripasso
-spaziato e un tutor AI opzionale in un'unica app, con profili separati per ogni
-persona che la usa.
+**Deutsch** is a German course (A0–B2) for Android and desktop, offline-first and
+open source. It brings together vocabulary, grammar, listening, production,
+spaced repetition and an optional AI tutor in a single app, with separate
+profiles for each person who uses it.
 
-Nato come progetto personale, è pensato per chiunque voglia studiare il tedesco
-partendo dall'italiano: nessun account, nessuna pubblicità, nessun dato inviato
-a servizi esterni se non quelli scelti esplicitamente dall'utente.
+Originally a personal project, it is meant for anyone who wants to study German
+starting from Italian: no account, no ads, and no data sent to external services
+except those explicitly chosen by the user.
 
-## Indice
+## Table of contents
 
-- [Funzionalità](#funzionalità)
-- [Piattaforme e requisiti](#piattaforme-e-requisiti)
-- [Installazione](#installazione)
-- [Primo avvio](#primo-avvio)
-- [Intelligenza artificiale (opzionale)](#intelligenza-artificiale-opzionale)
-- [Dati, backup e privacy](#dati-backup-e-privacy)
-- [Sicurezza](#sicurezza)
-- [Sviluppo](#sviluppo)
-- [Struttura del repository](#struttura-del-repository)
-- [Documentazione](#documentazione)
-- [Contribuire](#contribuire)
-- [Licenza](#licenza)
-- [Nota sullo sviluppo: progetto vibecoded](#nota-sullo-sviluppo-progetto-vibecoded)
+- [Features](#features)
+- [Platforms and requirements](#platforms-and-requirements)
+- [Installation](#installation)
+- [First run](#first-run)
+- [Artificial intelligence (optional)](#artificial-intelligence-optional)
+- [Data, backup and privacy](#data-backup-and-privacy)
+- [Security](#security)
+- [Development](#development)
+- [Repository structure](#repository-structure)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [License](#license)
+- [Development note: a vibecoded project](#development-note-a-vibecoded-project)
 
-## Funzionalità
+## Features
 
-| Area | Contenuti |
+| Area | Contents |
 |---|---|
-| **Vocabolario** | Lessico cumulativo A1–B2: 3.108 parole (A1 670, A2 1.378, B1 2.503, B2 3.108) con articoli, plurali e frasi d'esempio |
-| **Ripasso** | Ripetizione spaziata SM-2 su lessico, grammatica ed errori, con sessione giornaliera e piano di studio |
-| **Esercizi** | Sei tipi offline (significato, parola tedesca, articolo, completamento, scrittura, ascolto) e generazione AI facoltativa |
-| **Grammatica** | Percorso per livello con unità teoriche ed esercizi dedicati |
-| **Ascolto e pronuncia** | Dettato, dialoghi, podcast, sintesi vocale (TTS) e riconoscimento vocale |
-| **Produzione** | Scrittura guidata con correzione AI opzionale ed esercizi di produzione orale |
-| **Tutor AI** | Chat, spiegazioni, esercizi e lezioni adattati al contesto personale dell'utente |
-| **Profili** | Dati completamente separati per profilo, con contesto personale (studio, lavoro, interessi) |
-| **Backup** | Esportazione/importazione completa e backup su GitHub facoltativo |
-| **Desktop** | La stessa base didattica in un'app Compose Desktop |
+| **Vocabulary** | Cumulative A1–B2 lexicon: 3,108 words (A1 670, A2 1,378, B1 2,503, B2 3,108) with articles, plurals and example sentences |
+| **Review** | SM-2 spaced repetition on vocabulary, grammar and mistakes, with daily session and study plan |
+| **Exercises** | Six offline types (meaning, German word, article, completion, writing, listening) plus optional AI generation |
+| **Grammar** | Level-based path with theory units and dedicated exercises |
+| **Listening and pronunciation** | Dictation, dialogues, podcasts, text-to-speech and speech recognition |
+| **Production** | Guided writing with optional AI correction and oral production exercises |
+| **AI tutor** | Chat, explanations, exercises and lessons adapted to the user's personal context |
+| **Profiles** | Fully separate data per profile, with personal context (study, work, interests) |
+| **Backup** | Full export/import and optional GitHub backup |
+| **Desktop** | The same teaching core in a Compose Desktop app |
 
-L'interfaccia è in italiano e usa Material 3, con temi colore selezionabili
-(teal, navy, indaco, verde, rosa, ambra) su mobile e desktop.
+The interface is in Italian and uses Material 3, with selectable colour themes
+(teal, navy, indigo, green, rose, amber) on mobile and desktop. English UI is a
+work in progress.
 
-## Piattaforme e requisiti
+## Platforms and requirements
 
-| Piattaforma | Requisiti |
+| Platform | Requirements |
 |---|---|
-| Android | Android 8.0 o successivo (API 26+) |
-| Desktop | Windows, macOS o Linux con JVM 17+ |
+| Android | Android 8.0 or later (API 26+) |
+| Desktop | Windows, macOS or Linux with JVM 17+ |
 
-L'app Android è distribuita come APK firmato tramite le release GitHub. Il
-pacchetto desktop per Windows è disponibile come archivio portabile e come
-eseguibile singolo; per Linux e macOS è possibile compilare dai sorgenti.
+The Android app is distributed as a signed APK through GitHub releases. The
+Windows desktop package is available as a portable archive and a single
+executable; for Linux and macOS you can build from source.
 
-## Installazione
+## Installation
 
-1. Apri la pagina delle [release](https://github.com/ItsZale0/tedesco-app/releases/latest).
-2. Scarica:
-   - `Deutsch-v<versione>.apk` per Android;
-   - `Deutsch-desktop-v<versione>-windows.zip` oppure `Deutsch.exe` per Windows.
-3. Su Android potresti dover autorizzare l'installazione da origini sconosciute
-   per il browser o il file manager usato.
-4. L'app verifica automaticamente la presenza di aggiornamenti e, prima di
-   installarli, controlla lo SHA-256 dell'APK scaricato.
+1. Open the [releases](https://github.com/ItsZale0/tedesco-app/releases/latest) page.
+2. Download:
+   - `Deutsch-v<version>.apk` for Android;
+   - `Deutsch-desktop-v<version>-windows.zip` or `Deutsch.exe` for Windows.
+3. On Android you may need to allow installation from unknown sources for the
+   browser or file manager you used.
+4. The app automatically checks for updates and verifies the SHA-256 of the
+   downloaded APK before installing.
 
-## Primo avvio
+## First run
 
-Non esiste alcun profilo predefinito. Al primo avvio si sceglie il livello di
-partenza e si crea un profilo personale; da quel momento ogni profilo mantiene
-separati progressi, ripassi, conversazioni e lezioni.
+There is no default profile. On first launch you choose the starting level and
+create a personal profile; from then on each profile keeps progress, reviews,
+conversations and lessons fully separate.
 
-Per aggiungere altre persone basta creare nuovi profili dalle impostazioni. Se
-si proviene da una versione precedente, il profilo esistente viene conservato e
-l'identificativo dell'applicazione resta invariato.
+To add more people, create new profiles from settings. If you come from a
+previous version, your existing profile is preserved and the application id stays
+unchanged.
 
-## Intelligenza artificiale (opzionale)
+## Artificial intelligence (optional)
 
-Il nucleo didattico funziona interamente offline. Le funzioni AI si attivano
-solo se l'utente inserisce una propria chiave API, salvata esclusivamente sul
-dispositivo:
+The teaching core works entirely offline. AI features activate only when the user
+enters their own API key, stored exclusively on the device:
 
-- **Groq** per chat, generazione di esercizi e correzioni;
-- **Gemini** come alternativa.
+- **Groq** for chat, exercise generation and corrections;
+- **Gemini** as an alternative;
+- plus OpenAI, Anthropic, OpenRouter and Kilo via the multi-provider setup.
 
-Senza chiave l'app resta utilizzabile: vocabolario, esercizi offline, ripasso,
-grammatica, ascolto e produzione continuano a funzionare. Il contesto personale
-del profilo viene usato per adattare i contenuti generati, senza essere inviato
-altrove se non al provider AI scelto.
+Without a key the app stays usable: vocabulary, offline exercises, review,
+grammar, listening and production keep working. The profile's personal context is
+used to adapt generated content and is sent only to the chosen AI provider.
 
-## Dati, backup e privacy
+## Data, backup and privacy
 
-- I dati restano sul dispositivo: nessun account obbligatorio e nessun tracker.
-- **Esportazione completa**: un unico file JSON con tutti i profili, i ripassi,
-  il tutor, le lezioni e le preferenze. Guida: [docs/EXPORT-DATI.md](docs/EXPORT-DATI.md).
-- **Backup su GitHub**: facoltativo, con un token personale a permessi limitati
-  che l'utente può revocare in qualsiasi momento.
-- Il file di esportazione contiene le chiavi API dei profili AI: va conservato
-  come un dato sensibile. Non contiene invece il token GitHub.
+- Data stays on the device: no mandatory account and no trackers.
+- **Full export**: a single JSON file with all profiles, reviews, tutor data,
+  lessons and preferences. Guide: [docs/EXPORT-DATI.md](docs/EXPORT-DATI.md).
+- **GitHub backup**: optional, with a personal token of limited scope that the
+  user can revoke at any time.
+- The export file contains the AI profile keys: store it as sensitive data. It
+  does not contain the GitHub token.
 
-## Sicurezza
+## Security
 
-- Verifica SHA-256 dell'APK prima dell'aggiornamento automatico.
-- Backup di sistema Android disabilitato, con regole di estrazione esplicite.
-- Nessun segreto, token o chiave di firma incluso nel repository.
-- Analisi statica (SAST) e report: [SECURITY-AUDIT.md](SECURITY-AUDIT.md).
-- Segnalazioni: [SECURITY.md](SECURITY.md).
-- OpenSSF Scorecard attivo su ogni push in `master` (punteggio corrente 3,1/10).
+- SHA-256 verification of the APK before automatic update.
+- Android system backup disabled, with explicit extraction rules.
+- No secret, token or signing key included in the repository.
+- Static analysis (SAST) and report: [SECURITY-AUDIT.md](SECURITY-AUDIT.md).
+- Reports: [SECURITY.md](SECURITY.md).
+- OpenSSF Scorecard active on every push to `master`.
 
-## Sviluppo
+## Development
 
-Il progetto usa Kotlin 2.0, Gradle 8.11.1, JDK 17, Jetpack Compose e Material 3.
-Non usa Room, Hilt o KSP: la persistenza si basa su DataStore e serializzazione
-JSON, con dependency injection manuale.
+The project uses Kotlin 2.0, Gradle 8.11.1, JDK 17, Jetpack Compose and Material 3.
+It does not use Room, Hilt or KSP: persistence is based on DataStore and JSON
+serialization, with manual dependency injection.
 
 ```bash
-# Build Android
+# Android build
 ./gradlew :app:assembleDebug
 
-# Build desktop
+# Desktop build
 ./gradlew :desktop:run
 
-# Test
+# Tests
 ./gradlew :app:testDebugUnitTest :core:test
 
-# Tutto insieme
+# Everything together
 ./gradlew :core:jar :app:assembleDebug :desktop:compileKotlin
 ```
 
-Per compilare servono `JAVA_HOME` (JDK 17) e `ANDROID_HOME` (Android SDK con
-piattaforma 35 e build-tools 35.0.0). Il progetto è compilabile anche offline
-una volta scaricate le dipendenze.
+For compilation you need `JAVA_HOME` (JDK 17) and `ANDROID_HOME` (Android SDK
+with platform 35 and build-tools 35.0.0). The project can also be built offline
+once dependencies are cached.
 
-I test coprono il motore didattico, i profili, la migrazione dei dati, il
-backup, l'aggiornamento e le API remote; la suite conta oltre 570 test unitari.
+Tests cover the teaching engine, profiles, data migration, backup, updates and
+remote APIs; the suite contains over 570 unit tests.
 
-## Struttura del repository
+## Repository structure
 
 ```
-core/      motore didattico e contenuti, senza dipendenze Android
-app/       applicazione Android (Compose, Material 3)
-desktop/   applicazione desktop (Compose Desktop)
-docs/      documentazione utente e tecnica
-updates/   manifest di aggiornamento (versione e SHA-256 dell'APK)
+core/      teaching engine and content, no Android dependencies
+app/       Android application (Compose, Material 3)
+desktop/   desktop application (Compose Desktop)
+docs/      user and technical documentation
+updates/   update manifest (version and APK SHA-256)
 ```
 
-## Documentazione
+## Documentation
 
-- [Architettura](docs/ARCHITECTURE.md): moduli, flusso dei dati, motore didattico.
-- [Domande frequenti](docs/FAQ.md): uso quotidiano, aggiornamenti, backup.
-- [Esportazione dati](docs/EXPORT-DATI.md): guida passo passo.
-- [Processo di rilascio](docs/RELEASE.md): versionamento, tag, asset e checksum.
-- [Contribuire](CONTRIBUTING.md) e [Codice di condotta](CODE_OF_CONDUCT.md).
-- [Sicurezza](SECURITY.md) e [report di audit](SECURITY-AUDIT.md).
+- [Architecture](docs/ARCHITECTURE.md): modules, data flow, teaching engine.
+- [FAQ](docs/FAQ.md): daily use, updates, backup.
+- [Data export](docs/EXPORT-DATI.md): step-by-step guide.
+- [Release process](docs/RELEASE.md): versioning, tags, assets and checksums.
+- [Contributing](CONTRIBUTING.md) and [Code of conduct](CODE_OF_CONDUCT.md).
+- [Security](SECURITY.md) and [audit report](SECURITY-AUDIT.md).
 
-## Contribuire
+## Contributing
 
-Ogni contributo è benvenuto: correzioni ai contenuti didattici, traduzioni,
-miglioramenti dell'interfaccia, test e segnalazioni di bug. Prima di aprire una
-pull request leggi [CONTRIBUTING.md](CONTRIBUTING.md).
+Every contribution is welcome: corrections to teaching content, translations,
+UI improvements, tests and bug reports. Before opening a pull request, read
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
-Le segnalazioni di vulnerabilità vanno inviate secondo [SECURITY.md](SECURITY.md),
-non tramite issue pubbliche.
+Vulnerability reports must follow [SECURITY.md](SECURITY.md), not public issues.
 
-## Licenza
+## License
 
-Distribuito sotto **GNU General Public License v3.0 o successiva**
-(GPL-3.0-or-later). Vedi [LICENSE](LICENSE).
+Distributed under the **GNU General Public License v3.0 or later**
+(GPL-3.0-or-later). See [LICENSE](LICENSE).
 
-I contenuti didattici sono originali o di pubblico dominio; eventuali fonti
-esterne sono citate nel codice o nella documentazione.
+Teaching content is original or public domain; any external sources are cited in
+the code or documentation.
 
-## Nota sullo sviluppo: progetto vibecoded
+## Development note: a vibecoded project
 
-Deutsch è un progetto **vibecoded**: la maggior parte del codice, dei test e
-della documentazione è stata scritta in collaborazione con agenti AI, sotto
-direzione, revisione e verifica umana.
+Deutsch is a **vibecoded** project: most of the code, tests and documentation
+were written in collaboration with AI agents, under human direction, review and
+verification.
 
-Che cosa significa in pratica:
+In practice:
+- product decisions, content structure and final review are human;
+- every change is compiled, tested and checked before a release;
+- releases are verified with SHA-256 and the CI pipeline runs build, tests and
+  OpenSSF Scorecard analysis;
+- AI accelerates development but does not replace responsibility: bugs, limits
+  and content errors are still possible.
 
-- le decisioni di prodotto, la struttura dei contenuti e la revisione finale
-  sono umane;
-- ogni modifica viene compilata, testata e controllata prima di una release;
-- le release sono verificate con SHA-256 e la pipeline CI esegue build, test e
-  analisi OpenSSF Scorecard;
-- l'AI accelera lo sviluppo, ma non sostituisce la responsabilità: bug, limiti
-  ed errori nei contenuti restano possibili.
-
-Se trovi qualcosa che non funziona o un contenuto da correggere, apri una issue:
-è il modo più utile per migliorare il progetto.
+If you find something that does not work or content to correct, open an issue:
+it is the most useful way to improve the project.

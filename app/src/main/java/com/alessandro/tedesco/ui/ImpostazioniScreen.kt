@@ -90,6 +90,7 @@ import com.alessandro.tedesco.data.remote.UpdaterViewModel
 import com.alessandro.tedesco.sync.ReminderWorker
 import com.alessandro.tedesco.sync.ImmersioneSeraleWorker
 import com.alessandro.tedesco.sync.NotificheSettings
+import com.alessandro.tedesco.sync.LinguaSettings
 import com.alessandro.tedesco.sync.TemaSettings
 import com.alessandro.tedesco.TedescoApp
 import com.alessandro.tedesco.ui.theme.dimensioneContenuto
@@ -290,6 +291,10 @@ fun ImpostazioniScreen(
     var temaColore by remember { mutableStateOf("teal") }
     LaunchedEffect(Unit) { temaColore = temaSettings.colore.first() }
 
+    val linguaSettings = remember(contestoUpdate) { LinguaSettings(contestoUpdate) }
+    var lingua by remember { mutableStateOf("it") }
+    LaunchedEffect(Unit) { lingua = linguaSettings.lingua.first() }
+
     var feedUrl by rememberSaveable {
         mutableStateOf(
             profilo?.config?.feedUrl?.takeIf { it.isNotBlank() }
@@ -371,6 +376,29 @@ fun ImpostazioniScreen(
                             onSelect = { id ->
                                 temaColore = id
                                 scopeUpdate.launch { temaSettings.setColore(id) }
+                            }
+                        )
+                    }
+                }
+                Spacer(Modifier.height(12.dp))
+
+                // --- LINGUA ---
+                GlassCard {
+                    Column {
+                        Text("Lingua", style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Spacer(Modifier.height(6.dp))
+                        Text("Lingua dell'interfaccia (richiede riavvio).",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Spacer(Modifier.height(10.dp))
+                        DropdownSelector(
+                            label = "Lingua",
+                            options = LinguaSettings.OPZIONI,
+                            selected = lingua,
+                            onSelect = { id ->
+                                lingua = id
+                                scopeUpdate.launch { linguaSettings.setLingua(id) }
                             }
                         )
                     }
