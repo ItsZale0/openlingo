@@ -1,8 +1,8 @@
 {
-  "versionCode": 329,
-  "versionName": "1.51.6",
-  "changelog": "Translated 697 A2 vocabulary meanings to English (pilot content i18n).",
+  "versionCode": 330,
+  "versionName": "1.51.7",
+  "changelog": "Translated 1070 B1 vocabulary meanings to English (pilot content i18n).",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.51.6/Deutsch-v1.51.6.apk",
-  "apkSha256": "e351ac716b2c654ca4fd0d033b31adbfaf2a867a4ec469b4b64ce972fee350f4"
+  "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.51.7/Deutsch-v1.51.7.apk",
+  "apkSha256": "f2a2cd867a07979e311e34d5c80ff7196b95e1437a96461a87d59f59d6cc14a7"
 }
