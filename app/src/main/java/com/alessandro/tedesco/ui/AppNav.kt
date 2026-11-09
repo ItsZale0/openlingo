@@ -163,6 +163,19 @@ fun AppNav(
                     onVaiANuove = { nav.navigate("nuove_parole") }
                 )
             }
+            composable("lessico") {
+                LessicoScreen(
+                    vm = vm,
+                    onIndietro = { nav.popBackStack() },
+                    onVaiAEserciziLessico = { nav.navigate("esercizi_lessico") }
+                )
+            }
+            composable("esercizi_lessico") {
+                EserciziLessicoScreen(
+                    vm = vm,
+                    onIndietro = { nav.popBackStack() }
+                )
+            }
             composable("nuove_parole") {
                 NuoveParoleScreen(
                     vm = vm,

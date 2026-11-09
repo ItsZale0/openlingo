@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -54,6 +55,7 @@ import com.alessandro.tedesco.desktop.ui.Etichetta
 import com.alessandro.tedesco.desktop.ui.SchermataEsercizi
 import com.alessandro.tedesco.desktop.ui.SchermataHome
 import com.alessandro.tedesco.desktop.ui.SchermataImpostazioni
+import com.alessandro.tedesco.desktop.ui.SchermataLessico
 import com.alessandro.tedesco.desktop.ui.SchermataPodcast
 import com.alessandro.tedesco.desktop.ui.SchermataProgresso
 import com.alessandro.tedesco.desktop.ui.SchermataRipasso
@@ -68,6 +70,7 @@ enum class Schermata(val titolo: String, val icona: ImageVector) {
     HOME("Home", Icons.Filled.Home),
     ESERCIZI("Esercizi", Icons.Filled.School),
     RIPASSO("Ripasso", Icons.Filled.Refresh),
+    LESSICO("Lessico", Icons.Filled.Translate),
     WORTLISTE("Wortliste", Icons.AutoMirrored.Filled.MenuBook),
     PODCAST("Podcast", Icons.Filled.Headphones),
     PROGRESSO("Progresso", Icons.Filled.BarChart),
@@ -149,6 +152,7 @@ fun main() = application {
                                     )
 
                                     Schermata.RIPASSO -> SchermataRipasso(store)
+                                    Schermata.LESSICO -> SchermataLessico(store)
                                     Schermata.WORTLISTE -> SchermataWortliste(store)
                                     Schermata.PODCAST -> SchermataPodcast(store)
                                     Schermata.PROGRESSO -> SchermataProgresso(store)

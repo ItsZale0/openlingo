@@ -42,6 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alessandro.tedesco.data.CalcoloProgresso
 import com.alessandro.tedesco.data.ConsigliEsercizi
 import com.alessandro.tedesco.data.CertificazioniUfficiali
+import com.alessandro.tedesco.data.LessicoLivelli
 import com.alessandro.tedesco.ui.theme.dimensioneContenuto
 import com.alessandro.tedesco.ui.theme.spaziaturaSchermo
 import androidx.compose.material.icons.automirrored.filled.Chat
@@ -193,6 +194,9 @@ private val TipiEsercizio = listOf(
         Icons.Filled.Hearing),
     TipoEsercizio("ripasso", "ripasso", "Ripasso", "Ripassa le parole sbagliate o fragili",
         Icons.Filled.Refresh),
+    TipoEsercizio("lessico", "lessico", "Lessico A1-B2",
+        "${LessicoLivelli.tutte.size} parole per livello, 6 tipi di esercizio",
+        Icons.AutoMirrored.Filled.MenuBook),
     TipoEsercizio("produzione_attiva", "produzione_attiva", "Produzione attiva",
         "Scrivi, completa, riordina: recupero attivo", Icons.Filled.Create),
     TipoEsercizio("errori", "errori", "Quaderno errori",
@@ -217,7 +221,7 @@ private val TipiEsercizio = listOf(
  */
 private val SezioniEsercizi = listOf(
     "Competenze" to listOf("grammatica", "comprensione", "produzione", "espressioni", "verifica", "ascolto"),
-    "Ripasso e consolidamento" to listOf("ripasso", "produzione_attiva", "errori"),
+    "Ripasso e consolidamento" to listOf("lessico", "ripasso", "produzione_attiva", "errori"),
     "Esplora" to listOf("dialoghi", "pronuncia", "sprechuebungen", "wortliste", "sudtirol", "podcast")
 )
 
@@ -240,6 +244,7 @@ private fun statPerTipo(
         "verifica" -> "${pr.paroleImparate}/${pr.paroleDisponibili} verificate"
         "ascolto" -> "Livello ${pr.livello.label.substringBefore(" ")}"
         "ripasso" -> if (pr.paroleFragili > 0) "${pr.paroleFragili} da ripassare" else "Tutto a posto"
+        "lessico" -> "${LessicoLivelli.tutte.size} parole A1-B2"
         "produzione_attiva" -> "72 esercizi offline"
         "errori" -> if (erroriAperti > 0) "$erroriAperti da consolidare" else "Nessun errore aperto"
         "dialoghi" -> "${Dialoghi.dialoghi.size} dialoghi"

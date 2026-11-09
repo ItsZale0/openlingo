@@ -11,6 +11,7 @@ import com.alessandro.tedesco.data.CalcoloProgresso
 import com.alessandro.tedesco.data.CalcoloStatistiche
 import com.alessandro.tedesco.data.FeedMerge
 import com.alessandro.tedesco.data.GrammaticaSyllabus
+import com.alessandro.tedesco.data.LessicoLivelli
 import com.alessandro.tedesco.data.PadronanzaGrammatica
 import com.alessandro.tedesco.data.ProfiliPreset
 import com.alessandro.tedesco.data.SrsLessico
@@ -225,6 +226,64 @@ class DesktopStore(
         val esistente = stato.reviews[wordId] ?: SrsLessico.nuova(wordId, now)
         val aggiornata = SrsLessico.conRisposta(esistente, saputa, now)
         val log = (stato.ripassiLog + RipassoLogEntity(wordId, now, saputa)).takeLast(5000)
+        aggiornaStato { st ->
+            registraStudio(
+                st.copy(
+                    reviews = st.reviews + (wordId to aggiornata),
+                    ripassiLog = log
+                ),
+                now
+            )
+        }
+    }
+
+    // ---------------------------------------------------------------- lessico
+
+    /**
+     * Aggiunge al lessico tutte le parole curate di un livello (A1-B2).
+     *
+     * È l'equivalente desktop di `WordRepository.aggiungiParoleCurate`: ogni
+     * parola nuova riceve una carta SRS in scadenza subito, quindi entra nel
+     * ripasso senza aggiungerla una per una. Dedup per lemma **e categoria**
+     * ([LessicoLivelli.chiaveParola]).
+     *
+     * @return quante parole sono state aggiunte
+     */
+    fun aggiungiLessico(livello: String): Int {
+        val now = System.currentTimeMillis()
+        val esistenti = stato.parole.mapTo(HashSet()) { LessicoLivelli.chiaveParola(it.german, it.article) }
+        val nuove = LessicoLivelli.perLivello(livello)
+            .distinctBy { LessicoLivelli.chiaveParola(it.tedesco) }
+            .filter { LessicoLivelli.chiaveParola(it.tedesco) !in esistenti }
+            .mapIndexed { i, voce -> daVoceLessico(voce, now + i) }
+        if (nuove.isEmpty()) return 0
+        aggiornaStato { st ->
+            val reviews = st.reviews.toMutableMap()
+            nuove.forEach { w -> reviews[w.id] = SrsLessico.nuova(w.id, now) }
+            registraStudio(st.copy(parole = st.parole + nuove, reviews = reviews), now)
+        }
+        return nuove.size
+    }
+
+    /** La voce curata è già nel lessico del profilo? */
+    fun giaNelLessico(voce: LessicoLivelli.Voce): Boolean {
+        val chiave = LessicoLivelli.chiaveParola(voce.tedesco)
+        return stato.parole.any { LessicoLivelli.chiaveParola(it.german, it.article) == chiave }
+    }
+
+    /** Parole del lessico che appartengono a un livello. */
+    fun paroleDelLivello(livello: String): List<WordEntity> =
+        stato.parole.filter { !it.archived && it.level.equals(livello, ignoreCase = true) }
+
+    /**
+     * Esito di un esercizio di lessico: entra nella STESSA coda SRS del ripasso,
+     * così un esercizio vale come ripasso e sposta la scadenza della parola.
+     */
+    fun rispondiVerifica(wordId: String, corretta: Boolean) {
+        val now = System.currentTimeMillis()
+        val esistente = stato.reviews[wordId] ?: SrsLessico.nuova(wordId, now)
+        val aggiornata = SrsLessico.conRisposta(esistente, corretta, now)
+        val log = (stato.ripassiLog + RipassoLogEntity(wordId, now, corretta)).takeLast(5000)
         aggiornaStato { st ->
             registraStudio(
                 st.copy(
@@ -839,6 +898,27 @@ class DesktopStore(
             val now = System.currentTimeMillis()
             return WortlisteB1.tutte.distinctBy { it.tedesco.lowercase() }
                 .map { daVoceWortliste(it, now) }
+        }
+
+        /** Voce del lessico curato (A1-B2) trasformata in parola del profilo. */
+        private fun daVoceLessico(voce: LessicoLivelli.Voce, now: Long): WordEntity {
+            val articolo = LessicoLivelli.articoloDi(voce.tedesco)
+            val parola = LessicoLivelli.parolaSenzaArticolo(voce.tedesco).trim()
+                .ifBlank { voce.tedesco.trim() }
+            return WordEntity(
+                // La categoria entra nell'id: "der Morgen" (mattina) e
+                // "morgen" (domani) hanno lo stesso lemma ma sono due id diversi.
+                id = "lessico_${voce.livello.lowercase()}_${LessicoLivelli.chiaveParola(voce.tedesco).replaceFirst(':', '_')}",
+                german = parola,
+                italian = voce.italiano,
+                example = voce.esempio,
+                article = articolo,
+                level = voce.livello,
+                lesson = 0,
+                tags = if (voce.tema.isBlank()) "lessico" else "lessico,${voce.tema}",
+                source = WordSource.CUSTOM,
+                createdAt = now
+            )
         }
 
         /**

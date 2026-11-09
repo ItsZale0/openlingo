@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -30,6 +31,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.alessandro.tedesco.data.StatoUnita
+import com.alessandro.tedesco.data.LessicoLivelli
 import com.alessandro.tedesco.data.UnitaConStato
 import com.alessandro.tedesco.desktop.DesktopStore
 import com.alessandro.tedesco.desktop.Schermata
@@ -81,6 +83,13 @@ fun SchermataEsercizi(
                 titolo = "Ripasso flashcard",
                 testo = if (daRipassare > 0) "$daRipassare carte in scadenza" else "Nessuna scadenza: ${store.paroleNuove().size} nuove da vedere",
                 onClick = { onVaiA(Schermata.RIPASSO) },
+                modifier = Modifier.weight(1f)
+            )
+            StrumentoRiga(
+                icona = Icons.Filled.Translate,
+                titolo = "Lessico A1-B2",
+                testo = "${LessicoLivelli.tutte.size} parole, sei tipi di esercizio",
+                onClick = { onVaiA(Schermata.LESSICO) },
                 modifier = Modifier.weight(1f)
             )
             StrumentoRiga(

@@ -230,6 +230,58 @@ class WordRepository(
         nuove.size
     }
 
+    /**
+     * Aggiunge al lessico del profilo un pacchetto di parole curate.
+     *
+     * È il percorso della sezione Lessico: qui il livello è quello della voce
+     * (A1, A2, B1, B2), non quello del profilo, altrimenti un A1 che studia
+     * parole A2 se le ritroverebbe tutte segnate "A1".
+     *
+     * Ogni parola nuova riceve una carta SRS in scadenza subito: entra nel
+     * ripasso e negli esercizi senza doverle aggiungere una per una.
+     * Il confronto è per lemma **e categoria** ([LessicoLivelli.chiaveParola]):
+     * "die Wohnung" e "Wohnung" sono la stessa parola, "der Morgen" e "morgen" no.
+     *
+     * @return quante parole sono state effettivamente aggiunte
+     */
+    suspend fun aggiungiParoleCurate(voci: List<LessicoLivelli.Voce>): Int = withContext(io) {
+        if (voci.isEmpty()) return@withContext 0
+        val now = System.currentTimeMillis()
+        val esistenti = _words.value.mapTo(HashSet()) { LessicoLivelli.chiaveParola(it.german, it.article) }
+        val nuove = voci
+            .distinctBy { LessicoLivelli.chiaveParola(it.tedesco) }
+            .filter { LessicoLivelli.chiaveParola(it.tedesco) !in esistenti }
+            .mapIndexed { i, v ->
+                val chiave = LessicoLivelli.chiaveParola(v.tedesco)
+                val senzaArticolo = WortlisteB1.parolaSenzaArticolo(v.tedesco).trim()
+                WordEntity(
+                    // La categoria entra nell'id: "der Morgen" (mattina) e
+                    // "morgen" (domani) hanno lo stesso lemma ma sono due id diversi.
+                    id = "lessico_${v.livello.lowercase()}_${chiave.replaceFirst(':', '_')}",
+                    german = senzaArticolo.ifBlank { v.tedesco.trim() },
+                    italian = v.italiano.trim(),
+                    example = v.esempio.trim(),
+                    article = LessicoLivelli.articoloDi(v.tedesco),
+                    pronunciation = null,
+                    level = v.livello,
+                    lesson = 0,
+                    tags = if (v.tema.isBlank()) "lessico" else "lessico,${v.tema}",
+                    archived = false,
+                    createdAt = now + i,
+                    source = WordSource.CUSTOM
+                )
+            }
+        if (nuove.isEmpty()) return@withContext 0
+
+        _words.value = _words.value + nuove
+
+        val reviews = _reviews.value.toMutableMap()
+        nuove.forEach { w -> reviews[w.id] = ReviewEntity(wordId = w.id, dueAt = now) }
+        _reviews.value = reviews
+        salvaSuProfilo()
+        nuove.size
+    }
+
     fun observeWords() = wordsFlow
         // L'ordinamento di migliaia di parole e' lavoro CPU: va fatto sul
         // dispatcher di default, mai sul thread principale della UI.

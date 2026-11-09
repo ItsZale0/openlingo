@@ -28,6 +28,9 @@ import com.alessandro.tedesco.data.local.ProfiloStato
 import com.alessandro.tedesco.data.local.LivelloIniziale
 import com.alessandro.tedesco.data.CalcoloCompetenze
 import com.alessandro.tedesco.data.ControlloGrammatica
+import com.alessandro.tedesco.data.EserciziLessico
+import com.alessandro.tedesco.data.EsercizioLessico
+import com.alessandro.tedesco.data.LessicoLivelli
 import com.alessandro.tedesco.data.local.LivelloCEFR
 import com.alessandro.tedesco.data.ProfiliPreset
 import com.alessandro.tedesco.data.local.ProfiloUtente
@@ -1832,6 +1835,140 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
             lesson = 0,
             tags = "Wortliste"
         )
+    }
+
+    // ==================== LESSICO PER LIVELLO ====================
+
+    private val _sessioneLessico = MutableStateFlow(StatoSessioneLessico())
+    val sessioneLessico: StateFlow<StatoSessioneLessico> = _sessioneLessico.asStateFlow()
+
+    /**
+     * Stato della sezione Lessico, un blocco per livello: quante parole curate
+     * esistono, quante sono già nel profilo e quante sono in scadenza di ripasso.
+     */
+    val statoLessico: StateFlow<List<StatoLessicoLivello>> = combine(
+        repo.observeWords(),
+        repo.reviewsFlow
+    ) { parole, reviews ->
+        val now = System.currentTimeMillis()
+        val chiaviProfilo = parole
+            .filterNot { it.archived }
+            .mapTo(HashSet()) { LessicoLivelli.chiaveParola(it.german, it.article) }
+        LessicoLivelli.LIVELLI.map { livello ->
+            val curate = LessicoLivelli.perLivello(livello)
+            val nelProfilo = curate.count { LessicoLivelli.chiaveParola(it.tedesco) in chiaviProfilo }
+            val daRipassare = parole.count { w ->
+                !w.archived && w.level.equals(livello, ignoreCase = true) &&
+                    (reviews[w.id]?.dueAt ?: Long.MAX_VALUE) <= now
+            }
+            StatoLessicoLivello(
+                livello = livello,
+                curate = curate.size,
+                nelProfilo = nelProfilo,
+                daRipassare = daRipassare,
+                temi = LessicoLivelli.temi(livello)
+            )
+        }
+    }.flowOn(Dispatchers.Default)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    /** Porta nel lessico (e nel ripasso) tutte le parole curate del livello. */
+    fun aggiungiLessico(livello: String) {
+        viewModelScope.launch {
+            _caricamento.value = true
+            val aggiunte = runCatching {
+                repo.aggiungiParoleCurate(LessicoLivelli.perLivello(livello))
+            }.getOrElse {
+                _messaggio.value = "Errore: ${it.message}"
+                0
+            }
+            _caricamento.value = false
+            _messaggio.value = if (aggiunte > 0) {
+                "Aggiunte $aggiunte parole $livello al ripasso"
+            } else {
+                "Le parole $livello sono già nel tuo lessico"
+            }
+        }
+    }
+
+    /**
+     * Avvia una sessione di esercizi sul lessico del livello. Se il profilo ha
+     * meno di 4 parole di quel livello, le importa prima: chi apre A2 non deve
+     * trovare "nessun esercizio disponibile".
+     */
+    fun avviaEserciziLessico(livello: String, quante: Int = 12) {
+        viewModelScope.launch {
+            _caricamento.value = true
+            var profilo = profileManager.profiloAttivo()
+            if (paroleDelLivello(profilo, livello).size < 4) {
+                repo.aggiungiParoleCurate(LessicoLivelli.perLivello(livello))
+                profilo = profileManager.profiloAttivo()
+            }
+            val delLivello = paroleDelLivello(profilo, livello)
+            val pool = profilo?.stato?.parole.orEmpty().filterNot { it.archived }
+            val esercizi = EserciziLessico.costruisci(delLivello, quante, pool)
+            _caricamento.value = false
+            if (esercizi.isEmpty()) {
+                _messaggio.value = "Nessuna parola $livello disponibile"
+                return@launch
+            }
+            _sessioneLessico.value = StatoSessioneLessico(
+                livello = livello,
+                esercizi = esercizi
+            )
+        }
+    }
+
+    private fun paroleDelLivello(profilo: ProfiloUtente?, livello: String): List<WordEntity> =
+        profilo?.stato?.parole.orEmpty()
+            .filter { !it.archived && it.level.equals(livello, ignoreCase = true) }
+
+    /**
+     * Risposta a un esercizio: vale sia per la scelta multipla sia per il testo
+     * scritto. L'esito è registrato nella STESSA coda SRS del ripasso, quindi
+     * anche un esercizio di lessico conta come ripasso e sposta la scadenza.
+     */
+    fun rispondiLessico(risposta: String) {
+        val stato = _sessioneLessico.value
+        val esercizio = stato.corrente ?: return
+        if (stato.mostrata) return
+        val corretta = if (esercizio.aScelta) {
+            risposta.trim().equals(esercizio.corretta.trim(), ignoreCase = true)
+        } else {
+            EserciziLessico.rispostaScrittaCorretta(esercizio, risposta)
+        }
+        _sessioneLessico.value = stato.copy(
+            mostrata = true,
+            corretta = corretta,
+            rispostaData = risposta,
+            giuste = stato.giuste + if (corretta) 1 else 0,
+            sbagliate = if (corretta) {
+                stato.sbagliate
+            } else {
+                stato.sbagliate + EserciziLessico.tedescoConArticolo(esercizio.parola)
+            }
+        )
+        viewModelScope.launch { repo.registraVerifica(esercizio.parola.id, corretta) }
+    }
+
+    /** Passa all'esercizio successivo (solo dopo aver risposto). */
+    fun avantiLessico() {
+        val stato = _sessioneLessico.value
+        if (!stato.mostrata) return
+        _sessioneLessico.value = stato.copy(
+            indice = stato.indice + 1,
+            mostrata = false,
+            corretta = false,
+            rispostaData = ""
+        )
+    }
+
+    /** Nuovo giro di esercizi sullo stesso livello. */
+    fun ripetiLessico() = avviaEserciziLessico(_sessioneLessico.value.livello)
+
+    /** Chiude la sessione (torna all'elenco). */
+    fun chiudiLessico() {
+        _sessioneLessico.value = StatoSessioneLessico()
     }
 
     /** Avvia una sessione strutturata. */

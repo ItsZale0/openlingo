@@ -87,6 +87,7 @@ import com.alessandro.tedesco.data.EsercizioUnita
 import com.alessandro.tedesco.data.GrammaticaSyllabus
 import com.alessandro.tedesco.data.LezioneAperta
 import com.alessandro.tedesco.data.LezionePercorso
+import com.alessandro.tedesco.data.LessicoLivelli
 import com.alessandro.tedesco.data.PercorsoLezioni
 import com.alessandro.tedesco.data.PodcastData
 import com.alessandro.tedesco.data.SessioneLezione
@@ -363,6 +364,13 @@ fun StudioVeloceScreen(
                 }
                 VocePannello(Icons.Filled.Translate, "Percorso grammaticale", "Le unità A0-B2, una alla volta") {
                     mostraMenu = false; onVaiAPercorsoGrammatica()
+                }
+                VocePannello(
+                    Icons.AutoMirrored.Filled.MenuBook,
+                    "Lessico A1-B2",
+                    "${LessicoLivelli.tutte.size} parole per livello, con esercizi"
+                ) {
+                    mostraMenu = false; onNaviga("lessico")
                 }
                 if (paroleCustomAbilitate) {
                     VocePannello(Icons.Filled.Add, "Aggiungi parola", "Nuove parole nel ripasso") {
