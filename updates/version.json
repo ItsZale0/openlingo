@@ -1,8 +1,8 @@
 {
-    "versionCode": 337,
-    "versionName": "1.51.14",
-    "changelog": "Translate CONTRIBUTING guide fully to English.",
+    "versionCode": 338,
+    "versionName": "1.51.15",
+    "changelog": "Update security policy and audit report for latest version.",
     "minVersionCode": 0,
-    "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.51.14/Deutsch-v1.51.14.apk",
+    "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.51.15/Deutsch-v1.51.15.apk",
     "apkSha256": ""
 }
