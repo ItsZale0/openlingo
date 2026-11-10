@@ -187,12 +187,12 @@ fun ProduzioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = t("Domanda ${indice + 1}/${elenco.size}"),
+                            text = t("Domanda") + " ${indice + 1}/${elenco.size}",
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = t("Livello ${livelloUtente.codiceBreve()}"),
+                            text = t("Livello ") + " ${livelloUtente.codiceBreve()}",
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -255,7 +255,7 @@ fun ProduzioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                         ) {
                             Column(modifier = Modifier.padding(Spaziature.md)) {
                                 Text(
-                                    text = if (risultato == true) "✓ Corretto! 🎉" else "✗ Sbagliato",
+                                    text = if (risultato == true) "✓ " + t("Corretto! 🎉") else "✗ " + t("Sbagliato"),
                                     fontWeight = FontWeight.Bold
                                 )
                                 Spacer(Modifier.height(4.dp))
@@ -264,7 +264,7 @@ fun ProduzioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                     style = MaterialTheme.typography.bodySmall
                                 )
                                 Spacer(Modifier.height(4.dp))
-                                Text(text = domanda.spiegazione)
+                                Text(text = t(domanda.spiegazione))
                             }
                         }
 
@@ -316,7 +316,7 @@ fun ProduzioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "Punteggio: $punteggio/${elenco.size}",
+                                text = t("Punteggio") + ": $punteggio/${elenco.size}",
                                 style = MaterialTheme.typography.headlineMedium
                             )
                             Text(

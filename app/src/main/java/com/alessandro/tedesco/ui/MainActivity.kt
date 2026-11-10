@@ -13,6 +13,7 @@ import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -91,11 +92,15 @@ class MainActivity : ComponentActivity() {
         setContent {
             val temaSettings = remember { TemaSettings(this@MainActivity) }
             val temaColore by temaSettings.colore.collectAsStateWithLifecycle(initialValue = "teal")
+            val temaModalita by temaSettings.modalita.collectAsStateWithLifecycle(initialValue = "system")
             val dynamicColor = temaColore == "material_you"
-            // Material 3: dynamic color su Android 12+, altrimenti schema baseline.
-            // App pensata dark: per seguire il sistema basta togliere darkTheme = true.
+            val darkTheme = when (temaModalita) {
+                "light" -> false
+                "dark" -> true
+                else -> isSystemInDarkTheme()
+            }
             TedescoTheme(
-                darkTheme = true,
+                darkTheme = darkTheme,
                 dynamicColor = dynamicColor,
                 temaColore = if (dynamicColor) "teal" else temaColore
             ) {

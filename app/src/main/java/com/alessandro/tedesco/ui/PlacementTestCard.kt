@@ -121,13 +121,13 @@ fun PlacementTestCard(
                 )
                 Spacer(Modifier.height(Spaziature.sm))
                 Text(
-                    t("DOMANDA ${indice + 1} DI ${domande.size} · ${domanda.livello}"),
+                    t("DOMANDA") + " ${indice + 1} " + t("DI") + " ${domande.size} · ${domanda.livello}",
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    domanda.domanda,
+                    t(domanda.domanda),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(vertical = Spaziature.sm)
@@ -198,7 +198,7 @@ fun PlacementTestCard(
                                 )
                             }
                             Spacer(Modifier.width(Spaziature.sm))
-                            Text(opzione, Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+                            Text(t(opzione), Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
                             if (verificato && giusta) {
                                 Icon(Icons.Filled.Check, contentDescription = t("Corretta"), modifier = Modifier.size(18.dp))
                             } else if (verificato && selezionata) {
@@ -240,7 +240,7 @@ fun PlacementTestCard(
             } else {
                 val esito = PlacementTest.valuta(corrette)
                 Text(
-                    t("Risultato: $corrette / ${esito.totale}"),
+                    t("Risultato") + ": $corrette / ${esito.totale}",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -264,7 +264,7 @@ fun PlacementTestCard(
                         .fillMaxWidth()
                         .height(AltezzaBottonePrincipale()),
                     shape = MaterialTheme.shapes.large
-                ) { Text(t("Parti da ${esito.livello.codiceBreve()}")) }
+                ) { Text(t("Parti da") + " ${esito.livello.codiceBreve()}") }
                 TextButton(onClick = onSalta, modifier = Modifier.fillMaxWidth()) {
                     Text(t("Resta sul livello attuale"))
                 }

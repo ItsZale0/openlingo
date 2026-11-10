@@ -126,7 +126,7 @@ fun ProduzioneScrittaScreen(
                 append(t(task.situazione))
                 append("\n\n").append(t("Punti da coprire:"))
                 task.punti.forEach { append("\n- ").append(t(it)) }
-                append("\n\n").append(t("Scrivi ${task.paroleMin}-${task.paroleMax} parole."))
+                append("\n\n").append(t("Scrivi") + " ${task.paroleMin}-${task.paroleMax} " + t("parole") + ".")
             },
             esempio = "",
             suggerimenti = task.punti.map { t(it) }
@@ -146,7 +146,7 @@ fun ProduzioneScrittaScreen(
     // Nota: la generazione avviene on-demand; carichiamo al primo entrata
     LaunchedEffect(Unit) { vm.caricaEserciziGenerati() }
 
-    ScreenScaffold("Produzione Scritta", onBack = onIndietro, scrollable = false) {
+    ScreenScaffold(t("Produzione scritta"), onBack = onIndietro, scrollable = false) {
         // Val locale: in questo modo lo smart cast funziona e non serve "!!"
         // (con un delegato 'var' il ramo else poteva leggere un valore gia' nullo).
         val esercizioCorrente = esercizioSelezionato
@@ -401,8 +401,7 @@ fun ProduzioneScrittaScreen(
                                 }
                                 apiKey.isBlank() -> {
                                     Text(
-                                        text = "Per ricevere la correzione serve una chiave API Groq gratuita " +
-                                            "(Profilo → Tutor AI). Il testo e' stato salvato.",
+                                        text = t("Per ricevere la correzione serve una chiave API gratuita (Profilo → Tutor AI). Il testo è stato salvato."),
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.error
                                     )

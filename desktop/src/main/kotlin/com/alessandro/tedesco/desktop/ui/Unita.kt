@@ -413,7 +413,7 @@ private fun EserciziUnita(
 
     val totale = stato.sessione.esercizi.size
     CardSezione(
-        titolo = t("Esercizio ${stato.indice + 1} di $totale"),
+        titolo = t("Esercizio") + " ${stato.indice + 1} " + t("di") + " $totale",
         sottotitolo = t(tipoEsercizio(esercizio.tipo))
     ) {
         BarraLineare(
@@ -425,7 +425,7 @@ private fun EserciziUnita(
         if (esercizio.suggerimento.isNotBlank() && stato.esito == null) {
             Spacer(Modifier.height(6.dp))
             Text(
-                t("Suggerimento: ${esercizio.suggerimento}"),
+                t("Suggerimento") + ": ${t(esercizio.suggerimento)}",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -578,10 +578,10 @@ private fun RisultatoSessione(
     val promosso = percentuale >= GrammaticaSyllabus.SOGLIA_PADRONANZA
     CardSezione(
         titolo = if (promosso) t("Unità superata") else t("Rivediamo la regola"),
-        sottotitolo = t("Soglia di padronanza: ${GrammaticaSyllabus.SOGLIA_PADRONANZA}%")
+        sottotitolo = t("Soglia di padronanza") + ": ${GrammaticaSyllabus.SOGLIA_PADRONANZA}%"
     ) {
         Text(
-            t("$corrette risposte corrette su $totali ($percentuale%)"),
+            "$corrette " + t("risposte corrette su") + " $totali ($percentuale%)",
             style = MaterialTheme.typography.headlineSmall,
             color = if (promosso) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.error
         )
@@ -590,7 +590,7 @@ private fun RisultatoSessione(
             if (promosso) {
                 t("L'unità è stata completata: tornerà nel ripasso tra 1, 3, 7 o 16 giorni.")
             } else {
-                t("Rileggi la regola e riprova: al ${GrammaticaSyllabus.SOGLIA_PADRONANZA}% l'unità risulta completata.")
+                t("Rileggi la regola e riprova") + ": " + t("al") + " ${GrammaticaSyllabus.SOGLIA_PADRONANZA}% " + t("l'unità risulta completata.")
             },
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant

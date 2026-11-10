@@ -132,7 +132,7 @@ fun EserciziScreen(
             }
 
             // ---- Selettore: 3 sezioni raggruppate ----
-            SezioniEsercizi.forEach { (titoloSezione, ids) ->
+            sezioniEsercizi().forEach { (titoloSezione, ids) ->
                 Text(
                     titoloSezione,
                     style = MaterialTheme.typography.titleMedium,
@@ -160,8 +160,7 @@ fun EserciziScreen(
             // Nota soglia ufficiale
             Spacer(Modifier.height(8.dp))
             Text(
-                "Soglia ufficiale Goethe/telc/ÖSD: 60% per competenza. Il livello sale solo quando " +
-                    t("TUTTE le 4 superano la soglia."),
+                t("Soglia ufficiale Goethe/telc/ÖSD: 60% per competenza. Il livello sale solo quando tutte e 4 le competenze superano la soglia."),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -181,7 +180,8 @@ private data class TipoEsercizio(
     val icona: ImageVector
 )
 
-private val TipiEsercizio = listOf(
+@Composable
+private fun tipiEsercizio(): List<TipoEsercizio> = listOf(
     TipoEsercizio("grammatica", "grammatica", t("Grammatica"), t("Regole e forme, una alla volta"),
         Icons.Filled.School),
     TipoEsercizio("gender_trainer", "gender_trainer", t("Allenatore articoli"), t("Indovina der, die o das con le parole del tuo lessico"),
@@ -199,7 +199,7 @@ private val TipiEsercizio = listOf(
     TipoEsercizio("ripasso", "ripasso", t("Ripasso"), t("Ripassa le parole sbagliate o fragili"),
         Icons.Filled.Refresh),
     TipoEsercizio("lessico", "lessico", t("Lessico A1-B2"),
-        t("${LessicoLivelli.tutte.size} parole per livello, 6 tipi di esercizio"),
+        "${LessicoLivelli.tutte.size} " + t("parole per livello, 6 tipi di esercizio"),
         Icons.AutoMirrored.Filled.MenuBook),
     TipoEsercizio("produzione_attiva", "produzione_attiva", t("Produzione attiva"),
         t("Scrivi, completa, riordina: recupero attivo"), Icons.Filled.Create),
@@ -212,7 +212,7 @@ private val TipiEsercizio = listOf(
     TipoEsercizio("sprechuebungen", "sprechuebungen", t("Sprechübungen"),
         t("Parla su un tema e confrontati con il modello"), Icons.Filled.RecordVoiceOver),
     TipoEsercizio("wortliste", "wortliste", t("Wortliste A1-B1"),
-        t("${WortlisteB1.tutte.size} parole curate da portare nel lessico"), Icons.AutoMirrored.Filled.MenuBook),
+        "${WortlisteB1.tutte.size} " + t("parole curate da portare nel lessico"), Icons.AutoMirrored.Filled.MenuBook),
     TipoEsercizio("sudtirol", "sudtirol", t("Südtirol / Austria"),
         t("Varianti locali e lessico sanitario"), Icons.Filled.Place),
     TipoEsercizio("podcast", "podcast", t("Podcast & Video"),
@@ -223,14 +223,16 @@ private val TipiEsercizio = listOf(
  * Le 15 tipologie organizzate in 3 sezioni: cosi' la scansione visiva
  * e' a colpo d'occhio invece di un ammasso unico di card.
  */
-private val SezioniEsercizi = listOf(
+@Composable
+private fun sezioniEsercizi(): List<Pair<String, List<String>>> = listOf(
     t("Competenze") to listOf("grammatica", "gender_trainer", "comprensione", "produzione", "espressioni", "verifica", "ascolto"),
     t("Ripasso e consolidamento") to listOf("lessico", "ripasso", "produzione_attiva", "errori"),
     t("Esplora") to listOf("dialoghi", "pronuncia", "sprechuebungen", "wortliste", "sudtirol", "podcast")
 )
 
+@Composable
 private fun tipoPerId(id: String): TipoEsercizio? =
-    TipiEsercizio.firstOrNull { it.id == id }
+    tipiEsercizio().firstOrNull { it.id == id }
 
 private fun statPerTipo(
     id: String,
@@ -242,21 +244,21 @@ private fun statPerTipo(
     return when (id) {
         "grammatica" -> "${pr.competenze.grammatica.toInt()}% ${if (pr.competenze.grammatica >= soglia) "✓" else ""}"
         "comprensione" -> "${pr.competenze.comprensione.toInt()}% ${if (pr.competenze.comprensione >= soglia) "✓" else ""}"
-        "produzione" -> if (pr.produzioniScritte > 0) t("${pr.produzioniScritte} testi - ${pr.mediaProduzione.toInt()}%")
+        "produzione" -> if (pr.produzioniScritte > 0) "${pr.produzioniScritte} " + t("testi") + " - ${pr.mediaProduzione.toInt()}%"
             else t("Nessun testo ancora")
         "espressioni" -> t("Quiz rapido")
-        "verifica" -> t("${pr.paroleImparate}/${pr.paroleDisponibili} verificate")
+        "verifica" -> "${pr.paroleImparate}/${pr.paroleDisponibili} " + t("verificate")
         "gender_trainer" -> t("der, die, das")
-        "ascolto" -> t("Livello ${pr.livello.label.substringBefore(" ")}")
-        "ripasso" -> if (pr.paroleFragili > 0) t("${pr.paroleFragili} da ripassare") else t("Tutto a posto")
-        "lessico" -> t("${LessicoLivelli.tutte.size} parole A1-B2")
-        "produzione_attiva" -> t("72 esercizi offline")
-        "errori" -> if (erroriAperti > 0) t("$erroriAperti da consolidare") else t("Nessun errore aperto")
-        "dialoghi" -> t("${Dialoghi.dialoghi.size} dialoghi")
+        "ascolto" -> t("Livello") + " ${pr.livello.label.substringBefore(" ")}"
+        "ripasso" -> if (pr.paroleFragili > 0) "${pr.paroleFragili} " + t("da ripassare") else t("Tutto a posto")
+        "lessico" -> "${LessicoLivelli.tutte.size} " + t("parole A1-B2")
+        "produzione_attiva" -> "72 " + t("esercizi offline")
+        "errori" -> if (erroriAperti > 0) "$erroriAperti " + t("da consolidare") else t("Nessun errore aperto")
+        "dialoghi" -> "${Dialoghi.dialoghi.size} " + t("dialoghi")
         "pronuncia" -> t("Ascolta e registrati")
-        "wortliste" -> t("${WortlisteB1.tutte.size} parole A1-B1")
-        "sudtirol" -> t("${Sudtirol.varianti.size} varianti + lessico")
-        "podcast" -> t("${PodcastData.episodi.size} contenuti per livello")
+        "wortliste" -> "${WortlisteB1.tutte.size} " + t("parole A1-B1")
+        "sudtirol" -> "${Sudtirol.varianti.size} " + t("varianti + lessico")
+        "podcast" -> "${PodcastData.episodi.size} " + t("contenuti per livello")
         else -> ""
     }
 }
@@ -271,7 +273,7 @@ private fun CardTipoEsercizio(
     Card(
         modifier = modifier
             .clickable(
-                onClickLabel = "Apri ${tipo.nome}",
+                onClickLabel = t("Apri") + " ${tipo.nome}",
                 role = Role.Button,
                 onClick = onClick
             )

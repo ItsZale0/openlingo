@@ -689,14 +689,14 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
             when (val r = repo.sync()) {
                 is SyncResult.Updated ->
                     if (mostraMessaggio) {
-                        _messaggio.value = t("Aggiornate: ${r.newWords} nuove, ${r.updatedWords} modificate")
+                        _messaggio.value = t("Aggiornate") + ": ${r.newWords} " + t("nuove") + ", ${r.updatedWords} " + t("modificate")
                     }
 
                 is SyncResult.NotModified ->
                     if (mostraMessaggio) _messaggio.value = t("Già aggiornato")
 
                 is SyncResult.Failed ->
-                    if (mostraMessaggio) _messaggio.value = t("Errore: ${r.message}")
+                    if (mostraMessaggio) _messaggio.value = t("Errore: ") + " ${r.message}"
             }
             _caricamento.value = false
         }
@@ -735,7 +735,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
             _caricamento.value = false
             _sessione.value = SessionState(cards = cards)
             _messaggio.value = if (cards.isEmpty()) t("Niente da ripassare. Torna domani.")
-            else t("Ripasso di ${cards.size} parole")
+            else t("Ripasso di ") + " ${cards.size} " + t(" parole")
         }
     }
 
@@ -860,7 +860,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                     )
                 }
             }.onFailure {
-                _messaggio.value = t("Errore: ${it.message}")
+                _messaggio.value = t("Errore: ") + " ${it.message}"
             }
         }
     }
@@ -930,7 +930,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                 progresso = profilo.stato.progresso.copy(livelloCorrente = nuovoLivello)
             )
             profileManager.aggiornaStatoAttivo(nuovoStato, immediato = true)
-            _messaggio.value = t("Livello aggiornato a ${nuovoLivello.label}")
+            _messaggio.value = t("Livello aggiornato a ") + " ${nuovoLivello.label}"
         }
     }
 
@@ -964,9 +964,9 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
             val nuovoStato = profilo.stato.copy(progresso = p.copy(livelloCorrente = stimato))
             profileManager.aggiornaStatoAttivo(nuovoStato, immediato = true)
             _messaggio.value = if (stimato.ordine > p.livelloCorrente.ordine)
-                t("Complimenti! I tuoi progressi ti portano a ${stimato.label}!")
+                t("Complimenti! I tuoi progressi ti portano a ") + " ${stimato.label} " + t("!")
             else
-                t("Livello riallineato a ${stimato.label}: completa più test per avanzare.")
+                t("Livello riallineato a ") + " ${stimato.label} " + t(": completa più test per avanzare.")
         }
     }
 
@@ -989,7 +989,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                 ),
                 immediato = true
             )
-            _messaggio.value = t("Lezione ${lezione.numero}: ${lezione.titolo}")
+            _messaggio.value = t("Lezione") + " ${lezione.numero}: ${t(lezione.titolo)}"
         }
     }
 
@@ -1113,7 +1113,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                 ),
                 immediato = true
             )
-            _messaggio.value = t("Lezione ${prossima.numero}: ${prossima.titolo}")
+            _messaggio.value = t("Lezione") + " ${prossima.numero}: ${t(prossima.titolo)}"
         }
     }
 
@@ -1486,8 +1486,8 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
         )
         val evita = esistenti.map { e ->
             if (tipo == TipoEsercizio.ASCOLTO && !e.fraseTedesca.isNullOrBlank())
-                t("${e.domanda} [${e.fraseTedesca}]")
-            else e.domanda
+                t(e.domanda) + " [${e.fraseTedesca}]"
+            else t(e.domanda)
         }
         val evitaChiavi = esistenti.map(::chiaveEntita)
         val risultato = aiService.generaEsercizi(
@@ -1907,7 +1907,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                 ),
                 immediato = true
             )
-            _messaggio.value = t("Livello impostato: ${livello.label}")
+            _messaggio.value = t("Livello impostato: ") + " ${livello.label}"
         }
     }
 
@@ -1994,7 +1994,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
             val aggiunte = runCatching {
                 repo.aggiungiParoleCurate(LessicoLivelli.perLivello(livello))
             }.getOrElse {
-                _messaggio.value = t("Errore: ${it.message}")
+                _messaggio.value = t("Errore: ") + " ${it.message}"
                 0
             }
             _caricamento.value = false
@@ -2146,7 +2146,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                         append("**Errori trovati (${erroriLetti.size})**\n\n")
                         append(erroriLetti.joinToString("\n\n"))
                     } else {
-                        append("**Nessun errore trovato. Ottimo lavoro!**\n")
+                        append("**" + t("Nessun errore trovato. Ottimo lavoro!") + "**\n")
                     }
                     if (valutazione.correzione.isNotBlank()) {
                         append("\n\n").append(valutazione.correzione)
@@ -2175,7 +2175,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
                 )
                 profileManager.aggiornaStatoAttivo(nuovoStato)
             } catch (e: Exception) {
-                _messaggio.value = t("Errore durante la correzione: ${e.message}")
+                _messaggio.value = t("Errore durante la correzione: ") + " ${e.message}"
             } finally {
                 _correzioneInCorso.value = false
             }
@@ -2198,7 +2198,7 @@ class TedescoViewModel(application: Application) : AndroidViewModel(application)
     fun ripassaErrori() {
         val errori = eserciziErrori()
         if (errori.isNotEmpty()) {
-            _messaggio.value = t("Ripasso di ${errori.size} errori")
+            _messaggio.value = t("Ripasso di ") + " ${errori.size} " + t(" errori")
         }
     }
 

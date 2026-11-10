@@ -1,4 +1,4 @@
-package com.alessandro.tedesco.ui
+﻿package com.alessandro.tedesco.ui
 
 import com.alessandro.tedesco.i18n.t
 
@@ -50,7 +50,7 @@ import java.util.Locale
 /**
  * Dialoghi per l'ascolto: conversazioni realistiche a due voci, con traduzione
  * a richiesta e domande di comprensione. Le due voci sono differenziate dal
- * pitch del TTS, così si capisce chi parla.
+ * pitch del TTS, cosÃ¬ si capisce chi parla.
  */
 @Composable
 fun DialoghiScreen(
@@ -112,7 +112,7 @@ fun DialoghiScreen(
                             )
                             Spacer(Modifier.height(4.dp))
                             Text(
-                                t("${d.battute.size} battute - ${d.domande.size} domande"),
+                                "${d.battute.size} " + t("battute") + " - ${d.domande.size} " + t("domande"),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.primary
                             )
@@ -259,7 +259,7 @@ fun DialoghiScreen(
             Spacer(Modifier.height(Spaziature.sm))
             val punteggio = dialogo.domande.indices.count { risposte[it] == dialogo.domande[it].corretta }
             Text(
-                t("Punteggio: $punteggio / ${dialogo.domande.size}"),
+                t("Punteggio") + ": $punteggio / ${dialogo.domande.size}",
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary

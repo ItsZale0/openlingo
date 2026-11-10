@@ -86,9 +86,9 @@ fun UpdateOverlay(updater: UpdaterViewModel) {
                     Spacer(Modifier.width(Spaziature.sm))
                     Text(
                         when (st) {
-                            is UpdateState.Checking -> t("Controllo aggiornamenti…")
-                            is UpdateState.Available -> "Aggiornamento disponibile: v${(st as UpdateState.Available).version.versionName}"
-                            is UpdateState.Downloading -> "Download ${(st as UpdateState.Downloading).progress}%"
+                            is UpdateState.Checking -> t("Controllo aggiornamenti...")
+                            is UpdateState.Available -> t("Aggiornamento disponibile") + ": v${(st as UpdateState.Available).version.versionName}"
+                            is UpdateState.Downloading -> t("Download") + " ${(st as UpdateState.Downloading).progress}%"
                             is UpdateState.ReadyToInstall -> t("Aggiornamento pronto all'installazione")
                             is UpdateState.NeedPermission -> t("Serve il permesso per installare app")
                             is UpdateState.Error -> t("Errore aggiornamento")
@@ -123,7 +123,7 @@ fun UpdateOverlay(updater: UpdaterViewModel) {
                     is UpdateState.Available -> {
                         val v = (st as UpdateState.Available).version
                         Text(
-                            "Versione ${v.versionName} (${v.versionCode})",
+                            t("Versione") + " ${v.versionName} (${v.versionCode})",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                             modifier = Modifier.padding(top = 4.dp)
@@ -154,7 +154,7 @@ fun UpdateOverlay(updater: UpdaterViewModel) {
                                     .clip(MaterialTheme.shapes.extraSmall)
                             )
                             Text(
-                                "$p% scaricato",
+                                "$p% " + t("scaricato"),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
                             )
@@ -163,7 +163,7 @@ fun UpdateOverlay(updater: UpdaterViewModel) {
                     is UpdateState.ReadyToInstall -> {
                         val f = (st as UpdateState.ReadyToInstall).file
                         Text(
-                            "APK scaricato: ${f.name}",
+                            t("APK scaricato") + ": ${f.name}",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                             modifier = Modifier.padding(top = 4.dp)

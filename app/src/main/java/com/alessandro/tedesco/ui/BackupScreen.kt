@@ -92,7 +92,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
             }.onSuccess {
                 messaggioExport = t("Esportazione completata.")
             }.onFailure {
-                messaggioExport = t("Esportazione non riuscita: ${it.message}")
+                messaggioExport = t("Esportazione non riuscita") + ": ${it.message}"
             }
         }
     }
@@ -205,8 +205,9 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(Modifier.height(4.dp))
+                    val nomeFileBackup = vm.nomeFileBackup.collectAsStateWithLifecycle(BackupCloud.NOME_FILE).value
                     Text(
-                        t("File di backup del profilo attivo: ${vm.nomeFileBackup.collectAsStateWithLifecycle(BackupCloud.NOME_FILE).value}. ") +
+                        t("File di backup del profilo attivo") + ": $nomeFileBackup. " +
                             t("Il ripristino cerca anche il backup condiviso tedesco-backup.json."),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary
@@ -338,12 +339,12 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                 Column {
                     Text(t("Il backup contiene:"))
                     Spacer(Modifier.height(8.dp))
-                    Text(t("• ${riep.numProfili} profili"))
-                    Text(t("• ${riep.numParole} parole"))
-                    Text(t("• ${riep.numRipassi} ripassi registrati"))
-                    Text(t("• ${riep.numRisposte} correzioni"))
-                    Text(t("• ${riep.numUnitaGrammatica} unità di grammatica"))
-                    Text(t("• ${riep.numLezioni} lezioni"))
+                    Text("• ${riep.numProfili} " + t("profili"))
+                    Text("• ${riep.numParole} " + t("parole"))
+                    Text("• ${riep.numRipassi} " + t("ripassi registrati"))
+                    Text("• ${riep.numRisposte} " + t("correzioni"))
+                    Text("• ${riep.numUnitaGrammatica} " + t("unità di grammatica"))
+                    Text("• ${riep.numLezioni} " + t("lezioni"))
                     Spacer(Modifier.height(8.dp))
                     Text(t("Data:") + " " + SimpleDateFormat("d MMM yyyy, HH:mm", Locale.forLanguageTag(if (com.alessandro.tedesco.i18n.Traduttore.lingua == "en") "en" else "it"))
                         .format(Date(riep.creatoIl)))
@@ -373,11 +374,11 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
             title = { Text(t("Backup trovato")) },
             text = {
                 Column {
-                    Text(t("• ${riep.numProfili} profili"))
-                    Text(t("• ${riep.numParole} parole"))
-                    Text(t("• ${riep.numRipassi} ripassi"))
-                    Text(t("• ${riep.numUnitaGrammatica} unità di grammatica"))
-                    Text(t("• ${riep.numLezioni} lezioni"))
+                    Text("• ${riep.numProfili} " + t("profili"))
+                    Text("• ${riep.numParole} " + t("parole"))
+                    Text("• ${riep.numRipassi} " + t("ripassi"))
+                    Text("• ${riep.numUnitaGrammatica} " + t("unità di grammatica"))
+                    Text("• ${riep.numLezioni} " + t("lezioni"))
                     Spacer(Modifier.height(8.dp))
                     Text(t("Vuoi unirlo ai dati di questo telefono?"))
                 }
@@ -403,12 +404,12 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                 Column {
                     Text(t("Il backup contiene:"))
                     Spacer(Modifier.height(8.dp))
-                    Text(t("• ${riep.numProfili} profili"))
-                    Text(t("• ${riep.numParole} parole"))
-                    Text(t("• ${riep.numRipassi} ripassi registrati"))
-                    Text(t("• ${riep.numRisposte} correzioni"))
-                    Text(t("• ${riep.numUnitaGrammatica} unità di grammatica"))
-                    Text(t("• ${riep.numLezioni} lezioni"))
+                    Text("• ${riep.numProfili} " + t("profili"))
+                    Text("• ${riep.numParole} " + t("parole"))
+                    Text("• ${riep.numRipassi} " + t("ripassi registrati"))
+                    Text("• ${riep.numRisposte} " + t("correzioni"))
+                    Text("• ${riep.numUnitaGrammatica} " + t("unità di grammatica"))
+                    Text("• ${riep.numLezioni} " + t("lezioni"))
                     Spacer(Modifier.height(8.dp))
                     Text(
                         t("ATTENZIONE: i dati attuali di questo telefono verranno sovrascritti dal backup. I progressi fatti dopo l'ultimo backup su questo dispositivo andranno persi."),

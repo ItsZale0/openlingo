@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.data
 
+import com.alessandro.tedesco.i18n.t
+
 /**
  * Consiglio dinamico del tipo di esercizio, basato sui progressi reali.
  *
@@ -22,17 +24,16 @@ object ConsigliEsercizi {
         if (pr == null) {
             return Consiglio(
                 route = "grammatica",
-                titolo = "Grammatica",
-                motivo = "Iniziamo dalle basi: la grammatica e' il fondamento di tutto il resto."
+                titolo = t("Grammatica"),
+                motivo = t("Iniziamo dalle basi: la grammatica e' il fondamento di tutto il resto.")
             )
         }
 
         if (pr.paroleFragili > 0) {
             return Consiglio(
                 route = "ripasso",
-                titolo = "Ripasso",
-                motivo = "Hai ${pr.paroleFragili} parole da ripassare: meglio fissare quelle che conosci " +
-                    "che aggiungerne di nuove."
+                titolo = t("Ripasso"),
+                motivo = t("Hai ${pr.paroleFragili} parole da ripassare: meglio fissare quelle che conosci che aggiungerne di nuove.")
             )
         }
 
@@ -48,8 +49,8 @@ object ConsigliEsercizi {
         if (dimensioni.all { it.second <= 0f }) {
             return Consiglio(
                 route = "grammatica",
-                titolo = "Grammatica",
-                motivo = "Iniziamo dalle basi: la grammatica e' il fondamento di tutto il resto."
+                titolo = t("Grammatica"),
+                motivo = t("Iniziamo dalle basi: la grammatica e' il fondamento di tutto il resto.")
             )
         }
 
@@ -58,31 +59,31 @@ object ConsigliEsercizi {
         return if (valore >= soglia) {
             Consiglio(
                 route = "ascolto",
-                titolo = "Ascolto",
-                motivo = "Tutte le competenze superano la soglia ufficiale: ora rendi l'orecchio piu' veloce."
+                titolo = t("Ascolto"),
+                motivo = t("Tutte le competenze superano la soglia ufficiale: ora rendi l'orecchio piu' veloce.")
             )
         } else {
             val pct = valore.toInt()
             when (nome) {
                 "Lessico" -> Consiglio(
                     route = "verifica",
-                    titolo = "Verifica il lessico",
-                    motivo = "Il lessico e' la tua area piu' debole ($pct%): dimostra di sapere le parole studiate."
+                    titolo = t("Verifica il lessico"),
+                    motivo = t("Il lessico e' la tua area piu' debole ($pct%): dimostra di sapere le parole studiate.")
                 )
                 "Grammatica" -> Consiglio(
                     route = "grammatica",
-                    titolo = "Grammatica",
-                    motivo = "La grammatica e' la tua area piu' debole ($pct%): una regola alla volta."
+                    titolo = t("Grammatica"),
+                    motivo = t("La grammatica e' la tua area piu' debole ($pct%): una regola alla volta.")
                 )
                 "Comprensione" -> Consiglio(
                     route = "comprensione",
-                    titolo = "Lettura",
-                    motivo = "La comprensione e' la tua area piu' debole ($pct%): leggi un testo calibrato sul tuo livello."
+                    titolo = t("Lettura"),
+                    motivo = t("La comprensione e' la tua area piu' debole ($pct%): leggi un testo calibrato sul tuo livello.")
                 )
                 else -> Consiglio(
                     route = "produzione",
-                    titolo = "Produzione scritta",
-                    motivo = "La produzione e' la tua area piu' debole ($pct%): scrivi e fai correggere."
+                    titolo = t("Produzione scritta"),
+                    motivo = t("La produzione e' la tua area piu' debole ($pct%): scrivi e fai correggere.")
                 )
             }
         }

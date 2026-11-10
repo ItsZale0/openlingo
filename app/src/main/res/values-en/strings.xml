@@ -3,7 +3,7 @@
     <string name="app_name">OpenLingo</string>
 
     <string name="welcome_title">Welcome to OpenLingo</string>
-    <string name="welcome_subtitle">Your personal space to learn German, at your own pace. Your data stays on your device, and the app works beautifully offline.</string>
+    <string name="welcome_subtitle">A free and open-source language app that feels approachable like Duolingo, but is grounded in real didactics and tested learning methods. Learn at your own pace — offline-first, private, and ad-free.</string>
     <string name="create_profile_and_start">Create your profile</string>
     <string name="create_profile">Create profile</string>
     <string name="what_is_your_name">What\'s your name?</string>

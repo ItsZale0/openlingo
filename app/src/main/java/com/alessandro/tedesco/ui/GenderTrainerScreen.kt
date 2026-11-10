@@ -162,7 +162,7 @@ fun GenderTrainerScreen(
                     )
                     if (domanda.traduzione.isNotBlank()) {
                         Text(
-                            domanda.traduzione,
+                            t(domanda.traduzione),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center

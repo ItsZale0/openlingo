@@ -258,7 +258,7 @@ fun StudioVeloceScreen(
                 } else {
                     item {
                         IntestazioneHome(
-                            saluto = nomeProfilo?.let { "Ciao, $it" } ?: t("Ciao"),
+                            saluto = nomeProfilo?.let { t("Ciao") + ", $it" } ?: t("Ciao"),
                             data = pianoOggi?.data.orEmpty(),
                             streakGiorni = pr?.streakGiorni ?: 0
                         )

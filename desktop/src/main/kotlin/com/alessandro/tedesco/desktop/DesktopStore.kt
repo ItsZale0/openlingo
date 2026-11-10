@@ -1,5 +1,6 @@
 package com.alessandro.tedesco.desktop
 
+import com.alessandro.tedesco.i18n.t
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -55,6 +56,7 @@ import kotlin.math.max
 @Serializable
 data class Preferenze(
     val temaScuro: Boolean = true,
+    val temaModalita: String = "system",
     val temaColore: String = "teal",
     val profiloAttivoId: String? = null,
     /**
@@ -180,7 +182,7 @@ class DesktopStore(
         val id = "profilo_${System.currentTimeMillis()}"
         val nuovo = ProfiliPreset.nuovo(
             id = id,
-            nome = nome.trim().ifBlank { "Profilo" },
+            nome = nome.trim().ifBlank { t("Profilo") },
             livello = livello,
             contesto = contesto,
             mostraContestoMedico = mostraContestoMedico
@@ -470,12 +472,28 @@ class DesktopStore(
     fun unitaCompletate(): Int =
         stato.padronanzaGrammatica.values.count { it.completata }
 
-    fun temaScuro(): Boolean = preferenze.temaScuro
+    fun temaModalita(): String = preferenze.temaModalita
+
+    fun temaScuroEffettivo(scuroSistema: Boolean): Boolean = when (preferenze.temaModalita) {
+        "light" -> false
+        "dark" -> true
+        else -> scuroSistema
+    }
 
     fun temaColore(): String = preferenze.temaColore
 
     fun setTemaColore(id: String) {
         preferenze = preferenze.copy(temaColore = id)
+        salvaPreferenze()
+    }
+
+    fun setTemaModalita(id: String) {
+        val scuro = when (id) {
+            "light" -> false
+            "dark" -> true
+            else -> preferenze.temaScuro
+        }
+        preferenze = preferenze.copy(temaModalita = id, temaScuro = scuro)
         salvaPreferenze()
     }
 
@@ -488,8 +506,12 @@ class DesktopStore(
     }
 
     fun commutaTema() {
-        preferenze = preferenze.copy(temaScuro = !preferenze.temaScuro)
-        salvaPreferenze()
+        val nuova = when (preferenze.temaModalita) {
+            "dark" -> "light"
+            "light" -> "dark"
+            else -> "dark"
+        }
+        setTemaModalita(nuova)
     }
 
     // ------------------------------------------------------- sincronizzazione
@@ -550,27 +572,27 @@ class DesktopStore(
      * esegue su un thread di I/O.
      */
     fun sincronizzaFeed(): EsitoRete {
-        val idProfilo = profilo?.id ?: return EsitoRete(false, "Nessun profilo attivo")
+        val idProfilo = profilo?.id ?: return EsitoRete(false, t("Nessun profilo attivo"))
         val url = profilo?.config?.feedUrl.orEmpty().trim()
-        if (url.isBlank()) return EsitoRete(false, "URL del feed non configurato")
+        if (url.isBlank()) return EsitoRete(false, t("URL del feed non configurato"))
 
         val statoPrima = repo.profili[idProfilo]?.stato ?: ProfiloStato()
         val risposta = FeedGithub.scarica(url, statoPrima.etag)
 
         if (risposta.nonModificato) {
             aggiornaStatoDi(idProfilo) { it.copy(lastSync = System.currentTimeMillis()) }
-            return EsitoRete(true, "Gia' aggiornato: il feed non e' cambiato")
+            return EsitoRete(true, t("Già aggiornato: il feed non è cambiato"))
         }
         if (!risposta.ok) {
-            return erroreFeed(idProfilo, risposta.errore ?: "Errore HTTP ${risposta.codice}")
+            return erroreFeed(idProfilo, risposta.errore ?: (t("Errore HTTP") + " ${risposta.codice}"))
         }
         val corpo = risposta.corpo
-        if (corpo.isNullOrBlank()) return erroreFeed(idProfilo, "Risposta vuota dal server")
+        if (corpo.isNullOrBlank()) return erroreFeed(idProfilo, t("Risposta vuota dal server"))
 
         val feed = try {
             jsonFeed.decodeFromString(FeedDto.serializer(), corpo)
         } catch (e: Exception) {
-            return erroreFeed(idProfilo, "Feed non leggibile: ${e.message}")
+            return erroreFeed(idProfilo, t("Feed non leggibile") + ": ${e.message}")
         }
 
         val now = System.currentTimeMillis()
@@ -662,7 +684,7 @@ class DesktopStore(
 
         return EsitoRete(
             true,
-            "Feed sincronizzato: ${esito.aggiunte} nuove, ${esito.aggiornate} aggiornate"
+            t("Feed sincronizzato") + ": ${esito.aggiunte} " + t("nuove") + ", ${esito.aggiornate} " + t("aggiornate")
         )
     }
 

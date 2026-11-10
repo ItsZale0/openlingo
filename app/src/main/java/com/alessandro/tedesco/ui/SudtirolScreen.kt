@@ -54,7 +54,7 @@ fun SudtirolScreen(
     val tts = rememberTtsHelper(LocalContext.current, Locale.GERMAN)
     var sezione by remember { mutableStateOf(SezioneSudtirol.VARIANTI) }
 
-    ScreenScaffold("Südtirol / Austria", onBack = onIndietro) {
+    ScreenScaffold(t("Alto Adige / Austria"), onBack = onIndietro) {
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(Spaziature.sm)

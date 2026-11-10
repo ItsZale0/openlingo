@@ -249,7 +249,7 @@ object AdaptiveTestEngine {
                         domanda = "Was bedeutet '${parola.german}'?",
                         opzioni = opzioni,
                         rispostaCorretta = rispostaCorretta,
-                        spiegazione = "'${parola.german}' significa '${parola.italian}'.",
+                        spiegazione = "'${parola.german}' " + t("significa") + " '${t(parola.italian)}'.",
                         livelloRichiesto = livello,
                         categoria = "Vocabolario",
                         parolaAssociata = parola.german
@@ -271,7 +271,7 @@ object AdaptiveTestEngine {
                         domanda = t("Come si dice") + " '${parola.italian}' " + t("in tedesco?"),
                         opzioni = opzioni,
                         rispostaCorretta = rispostaCorretta,
-                        spiegazione = "'${parola.italian}' " + t("in tedesco è") + " '${parola.german}'.",
+                        spiegazione = "'${t(parola.italian)}' " + t("in tedesco") + " '${parola.german}'.",
                         livelloRichiesto = livello,
                         categoria = "Vocabolario",
                         parolaAssociata = parola.german

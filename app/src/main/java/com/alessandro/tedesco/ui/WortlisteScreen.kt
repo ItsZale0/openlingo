@@ -71,7 +71,7 @@ fun WortlisteScreen(
     }
 
     Column(Modifier.fillMaxSize()) {
-        CompactTopBar(title = "Wortliste A1-B1", onBack = onIndietro)
+        CompactTopBar(title = t("Lista parole A1-B1"), onBack = onIndietro)
         Column(
             modifier = Modifier.fillMaxWidth().padding(horizontal = Spaziature.md, vertical = Spaziature.sm)
         ) {

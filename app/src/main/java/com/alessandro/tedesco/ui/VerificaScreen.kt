@@ -91,13 +91,13 @@ fun VerificaScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
                     Text(t("Verifica completata"), style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold)
                     Spacer(Modifier.height(12.dp))
-                    Text(t("${e.corrette} / ${e.totale} corrette"),
+                    Text("${e.corrette} / ${e.totale} " + t("corrette"),
                         style = MaterialTheme.typography.displaySmall,
                         fontWeight = FontWeight.Bold,
                         color = if (e.punteggio >= 60f) MaterialTheme.colorScheme.primary
                                 else MaterialTheme.colorScheme.error)
                     Spacer(Modifier.height(4.dp))
-                    Text(t("${e.punteggio.toInt()}%"), style = MaterialTheme.typography.titleMedium,
+                    Text("${e.punteggio.toInt()} " + t("%"), style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Spacer(Modifier.height(12.dp))
                     Card(
@@ -111,15 +111,15 @@ fun VerificaScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
                                 fontWeight = FontWeight.SemiBold)
                             Spacer(Modifier.height(6.dp))
                             Text(
-                                t("Hai DIMOSTRATO di sapere ${e.paroleVerificate.size} ") +
-                                    (if (e.paroleVerificate.size == 1) "parola" else "parole") +
-                                    ". Queste contano nel tuo lessico.",
+                                t("Hai dimostrato di sapere") + " ${e.paroleVerificate.size} " +
+                                    (if (e.paroleVerificate.size == 1) t("parola") else t("parole")) +
+                                    ". " + t("Queste contano nel tuo lessico."),
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             if (e.paroleDaRivedere.isNotEmpty()) {
                                 Spacer(Modifier.height(6.dp))
                                 Text(
-                                    t("${e.paroleDaRivedere.size} da rivedere: le ritroverai nel quiz."),
+                                    "${e.paroleDaRivedere.size} " + t(" da rivedere: le ritroverai nel quiz."),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.error
                                 )
@@ -141,8 +141,7 @@ fun VerificaScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
                             textAlign = TextAlign.Center)
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            "Non ci sono parole nuove da dimostrare. Le parole gia' verificate " +
-                                t("tornano nel Ripasso secondo la spaced repetition."),
+                            t("Non ci sono parole nuove da dimostrare. Le parole già verificate tornano nel ripasso secondo la ripetizione dilazionata."),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
@@ -161,7 +160,7 @@ fun VerificaScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
                     }
                 } else {
                     Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState())) {
-                        Text(t("${indice + 1} di $totale"), style = MaterialTheme.typography.labelMedium,
+                        Text("${indice + 1} " + t(" di $totale"), style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(Modifier.height(10.dp))
                         Text(t("Cosa significa questa parola?"), style = MaterialTheme.typography.titleMedium)
@@ -224,7 +223,7 @@ fun VerificaScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
                                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(opzione, modifier = Modifier.weight(1f),
+                                    Text(t(opzione), modifier = Modifier.weight(1f),
                                         style = MaterialTheme.typography.bodyLarge,
                                         textAlign = TextAlign.Start)
                                     if (rivelato && eCorretta) {
@@ -252,7 +251,7 @@ fun VerificaScreen(vm: TedescoViewModel, onIndietro: () -> Unit) {
                             ) {
                                 Column(Modifier.fillMaxWidth().padding(14.dp)) {
                                     Text(
-                                        if (scelta == d.corretta) "Corretto 🎉" else t("Sbagliato"),
+                                        if (scelta == d.corretta) t("Corretto 🎉") else t("Sbagliato"),
                                         style = MaterialTheme.typography.titleSmall,
                                         fontWeight = FontWeight.Bold,
                                         color = if (scelta == d.corretta) MaterialTheme.colorScheme.primary

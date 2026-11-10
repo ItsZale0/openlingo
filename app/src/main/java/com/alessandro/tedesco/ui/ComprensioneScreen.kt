@@ -147,7 +147,7 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
         caricato = true
     }
 
-    ScreenScaffold("Comprensione") {
+    ScreenScaffold(t("Comprensione")) {
 
             Column(
                 modifier = Modifier.widthIn(max = dimensioneContenuto()),
@@ -185,7 +185,7 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
 
                     // Progress
                     Text(
-                        text = t("Domanda ${indice + 1}/${elenco.size} · ${eserciziGen.size} generati"),
+                        text = t("Domanda") + " ${indice + 1}/${elenco.size} · ${eserciziGen.size} " + t("generati"),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -363,7 +363,7 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                         ) {
                             Column(modifier = Modifier.padding(Spaziature.md)) {
                                 Text(
-                                    text = if (risultato == true) "Corretto! 🎉" else t("Sbagliato"),
+                                    text = if (risultato == true) t("Corretto! 🎉") else t("Sbagliato"),
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
@@ -422,7 +422,7 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                             )
                             Spacer(Modifier.height(8.dp))
                             Text(
-                                text = t("Errori: $errori"),
+                                text = t("Errori") + ": $errori",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.error
                             )

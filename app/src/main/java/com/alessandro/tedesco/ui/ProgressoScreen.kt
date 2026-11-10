@@ -94,7 +94,7 @@ fun ProgressoScreen(vm: TedescoViewModel, onIndietro: (() -> Unit)? = null) {
                 pr.streakGiorni >= 14 -> t("Due settimane di fila. Il tedesco diventa naturale.")
                 pr.streakGiorni >= 7 -> t("Una settimana intera! Continua così.")
                 pr.streakGiorni >= 3 -> t("Ottimo inizio. La costanza paga.")
-                pr.paroleImparate >= 100 -> "Hai imparato oltre 100 parole. Bravo!"
+                pr.paroleImparate >= 100 -> t("Hai imparato oltre 100 parole. Bravo!")
                 else -> t("Ogni passo conta. Continua a studiare!")
             }
             Text(
@@ -169,9 +169,9 @@ private fun CardLivello(pr: CalcoloProgresso.ProgressoReale) {
             Spacer(Modifier.height(8.dp))
             Text(
                 when {
-                    pr.streakGiorni >= 7 -> t("${pr.streakGiorni} giorni di fila. Sei inarrestabile!")
-                    pr.streakGiorni >= 3 -> t("${pr.streakGiorni} giorni di fila. Continua così!")
-                    pr.streakGiorni > 0 -> t("${pr.streakGiorni} giorno di fila. Ogni giorno conta.")
+                    pr.streakGiorni >= 7 -> "${pr.streakGiorni} " + t("giorni di fila. Sei inarrestabile!")
+                    pr.streakGiorni >= 3 -> "${pr.streakGiorni} " + t("giorni di fila. Continua così!")
+                    pr.streakGiorni > 0 -> "${pr.streakGiorni} " + t("giorno di fila. Ogni giorno conta.")
                     else -> t("Inizia oggi il tuo streak: basta un esercizio.")
                 },
                 style = MaterialTheme.typography.bodyMedium,
@@ -187,7 +187,7 @@ private fun CardLivello(pr: CalcoloProgresso.ProgressoReale) {
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(t("Verso ${prossimo.label.substringBefore(" ")}"), style = MaterialTheme.typography.bodyMedium)
+                    Text(t("Verso") + " ${prossimo.label.substringBefore(" ")}", style = MaterialTheme.typography.bodyMedium)
                     Text(
                         "${(pr.versoProssimoLivello * 100).toInt()}%",
                         style = MaterialTheme.typography.bodyMedium,
@@ -212,7 +212,7 @@ private fun CardLivello(pr: CalcoloProgresso.ProgressoReale) {
                 )
             } else {
                 Text(
-                    t("Hai raggiunto il tuo obiettivo: ${pr.livelloObiettivo.label}"),
+                    t("Hai raggiunto il tuo obiettivo") + ": ${t(pr.livelloObiettivo.label)}",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary
@@ -243,7 +243,7 @@ private fun CardNumeriChiave(pr: CalcoloProgresso.ProgressoReale) {
             Spacer(Modifier.height(12.dp))
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Kpi(t("Parole"), "${pr.paroleImparate}", t("su ${pr.paroleDisponibili} disponibili"),
+                Kpi(t("Parole"), "${pr.paroleImparate}", t("su") + " ${pr.paroleDisponibili} " + t("disponibili"),
                     MaterialTheme.colorScheme.primary, Modifier.weight(1f))
                 Kpi(t("Verificate"), "${pr.paroleImparate - pr.paroleFragili}", t("dimostrate nel quiz"),
                     MaterialTheme.colorScheme.tertiary, Modifier.weight(1f))
@@ -257,9 +257,9 @@ private fun CardNumeriChiave(pr: CalcoloProgresso.ProgressoReale) {
             }
             Spacer(Modifier.height(10.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Kpi(t("Streak"), t("${pr.streakGiorni}g"), t("record ${pr.streakRecord}g"),
+                Kpi(t("Streak"), "${pr.streakGiorni}g", t("record") + " ${pr.streakRecord}g",
                     MaterialTheme.colorScheme.tertiary, Modifier.weight(1f))
-                Kpi(t("Studio"), t("${pr.minutiStudiati}m"), t("minuti stimati"),
+                Kpi(t("Studio"), "${pr.minutiStudiati}m", t("minuti stimati"),
                     MaterialTheme.colorScheme.secondary, Modifier.weight(1f))
             }
         }
@@ -350,10 +350,10 @@ private fun CardCompetenze(pr: CalcoloProgresso.ProgressoReale) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.height(12.dp))
-            BarraCompetenza("Lessico", pr.competenze.lessico)
-            BarraCompetenza("Grammatica", pr.competenze.grammatica)
-            BarraCompetenza("Comprensione", pr.competenze.comprensione)
-            BarraCompetenza("Produzione", pr.competenze.produzione)
+            BarraCompetenza(t("Lessico"), pr.competenze.lessico)
+            BarraCompetenza(t("Grammatica"), pr.competenze.grammatica)
+            BarraCompetenza(t("Comprensione"), pr.competenze.comprensione)
+            BarraCompetenza(t("Produzione"), pr.competenze.produzione)
         }
     }
 }
@@ -430,12 +430,12 @@ private fun CardProduzione(pr: CalcoloProgresso.ProgressoReale) {
                     )
                 } else {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Kpi(t("Testi"), "${pr.produzioniScritte}", "valutati",
+                        Kpi(t("Testi"), "${pr.produzioniScritte}", t("valutati"),
                             MaterialTheme.colorScheme.primary, Modifier.weight(1f))
                         Kpi(
-                            "Media",
+                            t("Media"),
                             "${pr.mediaProduzione.toInt()}%",
-                            if (pr.mediaProduzione >= 60f) "soglia superata" else "soglia 60%",
+                            if (pr.mediaProduzione >= 60f) t("soglia superata") else t("soglia 60%"),
                             if (pr.mediaProduzione >= 60f) MaterialTheme.colorScheme.primary
                             else MaterialTheme.colorScheme.error,
                             Modifier.weight(1f)
@@ -447,9 +447,9 @@ private fun CardProduzione(pr: CalcoloProgresso.ProgressoReale) {
                         Text(t("Trend"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         val trend = pr.trendProduzione
                         val (testo, colore) = when {
-                            trend > 0.5f -> "↑ migliorando" to MaterialTheme.colorScheme.primary
-                            trend < -0.5f -> "↓ peggiorando" to MaterialTheme.colorScheme.error
-                            else -> "→ stabile" to MaterialTheme.colorScheme.onSurfaceVariant
+                            trend > 0.5f -> "↑ " + t("migliorando") to MaterialTheme.colorScheme.primary
+                            trend < -0.5f -> "↓ " + t("peggiorando") to MaterialTheme.colorScheme.error
+                            else -> "→ " + t("stabile") to MaterialTheme.colorScheme.onSurfaceVariant
                         }
                         Text(
                             testo,

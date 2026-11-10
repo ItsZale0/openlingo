@@ -263,24 +263,24 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
         }
 
         // ------------------------------------------------------------- aspetto
-        CardSezione(titolo = t("Aspetto"), sottotitolo = t("Tema Material 3 chiaro o scuro")) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(Modifier.weight(1f)) {
-                    Text(t("Tema scuro"), style = MaterialTheme.typography.bodyMedium)
-                    Text(
-                        t("La preferenza viene salvata in preferenze.json"),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+        CardSezione(titolo = t("Aspetto"), sottotitolo = t("Scegli chiaro, scuro o segui le impostazioni di sistema.")) {
+            Text(t("Modalità tema"), style = MaterialTheme.typography.bodyMedium)
+            Spacer(Modifier.height(6.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf("system" to t("Sistema"), "light" to t("Chiaro"), "dark" to t("Scuro")).forEach { (id, label) ->
+                    FilterChip(
+                        selected = store.temaModalita() == id,
+                        onClick = { store.setTemaModalita(id) },
+                        label = { Text(label) }
                     )
                 }
-                Switch(
-                    checked = store.temaScuro(),
-                    onCheckedChange = { store.commutaTema() }
-                )
             }
+            Spacer(Modifier.height(8.dp))
+            Text(
+                t("La preferenza viene salvata in preferenze.json"),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
 
         // ------------------------------------------------------------- colore

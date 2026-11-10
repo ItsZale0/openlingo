@@ -1,6 +1,7 @@
 package com.alessandro.tedesco.data
 
 import com.alessandro.tedesco.data.local.WordEntity
+import com.alessandro.tedesco.i18n.t
 import kotlin.math.min
 
 /**
@@ -226,9 +227,9 @@ object EserciziLessico {
         return EsercizioLessico(
             parola = w,
             tipo = TipoEsercizioLessico.SIGNIFICATO,
-            domanda = "Che cosa significa «${tedescoConArticolo(w)}»?",
-            opzioni = opzioni,
-            corretta = w.italian.trim(),
+            domanda = t("Che cosa significa") + " «${tedescoConArticolo(w)}»?",
+            opzioni = opzioni.map { t(it) },
+            corretta = t(w.italian.trim()),
             indiceCorretto = opzioni.indexOf(w.italian.trim()),
             spiegazione = testoTedesco(w)
         )
@@ -251,7 +252,7 @@ object EserciziLessico {
         return EsercizioLessico(
             parola = w,
             tipo = TipoEsercizioLessico.TEDESCO,
-            domanda = "Come si dice «${w.italian.trim()}» in tedesco?",
+            domanda = t("Come si dice") + " «${t(w.italian.trim())}» " + t("in tedesco") + "?",
             opzioni = opzioni,
             corretta = corretta,
             indiceCorretto = opzioni.indexOf(corretta),
@@ -269,11 +270,11 @@ object EserciziLessico {
         return EsercizioLessico(
             parola = w,
             tipo = TipoEsercizioLessico.ARTICOLO,
-            domanda = "Qual è l'articolo di «$sostantivo»?",
+            domanda = t("Qual è l'articolo di") + " «$sostantivo»?",
             opzioni = opzioni,
             corretta = primo,
             indiceCorretto = opzioni.indexOf(primo),
-            spiegazione = completo + " = " + w.italian.trim()
+            spiegazione = completo + " = " + t(w.italian.trim())
         )
     }
 
@@ -298,7 +299,7 @@ object EserciziLessico {
                 tipo = TipoEsercizioLessico.CLOZE,
                 domanda = frase,
                 corretta = senzaArticolo(corretta),
-                spiegazione = w.italian.trim()
+                spiegazione = t(w.italian.trim())
             )
         }
         val opzioni = (sbagliate + corretta).shuffled(casuale)
@@ -309,7 +310,7 @@ object EserciziLessico {
             opzioni = opzioni,
             corretta = corretta,
             indiceCorretto = opzioni.indexOf(corretta),
-            spiegazione = w.italian.trim()
+            spiegazione = t(w.italian.trim())
         )
     }
 
@@ -318,9 +319,9 @@ object EserciziLessico {
             parola = w,
             tipo = if (ascolto) TipoEsercizioLessico.ASCOLTO else TipoEsercizioLessico.SCRIVI,
             domanda = if (ascolto) {
-                "Ascolta e scrivi la parola tedesca"
+                t("Ascolta e scrivi la parola tedesca")
             } else {
-                "Scrivi in tedesco: «${w.italian.trim()}»"
+                t("Scrivi in tedesco") + ": «${t(w.italian.trim())}»"
             },
             corretta = senzaArticolo(tedescoConArticolo(w)),
             spiegazione = testoTedesco(w)
@@ -329,9 +330,10 @@ object EserciziLessico {
     // ------------------------------------------------------------ helper
 
     private fun testoTedesco(w: WordEntity): String {
-        val t = tedescoConArticolo(w)
-        return if (w.example.isNotBlank()) "$t = ${w.italian.trim()} — ${w.example}"
-        else "$t = ${w.italian.trim()}"
+        val de = tedescoConArticolo(w)
+        val it = t(w.italian.trim())
+        return if (w.example.isNotBlank()) "$de = $it — ${w.example}"
+        else "$de = $it"
     }
 
     /**

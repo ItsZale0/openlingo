@@ -202,7 +202,7 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.padding(Spaziature.md)) {
                         Text(
-                            t("Nessun esercizio per ${livelloSelezionato}"),
+                            t("Nessun esercizio per") + " $livelloSelezionato",
                             style = MaterialTheme.typography.titleMedium
                         )
                         Spacer(Modifier.height(4.dp))
@@ -223,7 +223,7 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
                 val esercizio = esercizi[indice]
 
                 Text(
-                    text = t("Esercizio ${indice + 1}/${esercizi.size}"),
+                    text = t("Esercizio") + " ${indice + 1}/${esercizi.size}",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -337,7 +337,7 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
                     ) {
                         Column(modifier = Modifier.padding(Spaziature.md)) {
                             Text(
-                                text = if (risultato == true) "Corretto! 🎉" else t("Sbagliato"),
+                                text = if (risultato == true) t("Corretto! 🎉") else t("Sbagliato"),
                                 fontWeight = FontWeight.Bold
                             )
                             Spacer(Modifier.height(4.dp))
@@ -382,7 +382,7 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Punteggio: $punteggio/$eserciziTotali",
+                            text = t("Punteggio") + ": $punteggio/$eserciziTotali",
                             style = MaterialTheme.typography.headlineMedium
                         )
                         Text(
@@ -391,7 +391,7 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
                         )
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            text = t("Errori: $errori"),
+                            text = t("Errori") + ": $errori",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.error
                         )
@@ -472,8 +472,8 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
             title = { Text(t("AI non disponibile")) },
             text = {
                 Text(
-                    "${erroreGen}\n\nGli esercizi locali funzionano comunque: " +
-                        "puoi continuare senza connessione."
+                    (erroreGen ?: "") + "\n\n" +
+                        t("Gli esercizi locali funzionano comunque: puoi continuare senza connessione.")
                 )
             },
             confirmButton = { TextButton(onClick = { erroreGen = null }) { Text(t("OK")) } }

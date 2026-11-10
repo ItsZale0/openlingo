@@ -5,14 +5,18 @@
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/license-GPL--3.0--or--later-blue)](LICENSE)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/ItsZale0/tedesco-app/badge)](https://securityscorecards.dev/viewer/?uri=github.com/ItsZale0/tedesco-app)
 
-**OpenLingo** is an open-source, offline-first German course (A0–B2) for Android
-and desktop. It blends vocabulary, grammar, listening, speaking, and spaced
-repetition into one calm, focused learning space — with separate profiles for
-everyone who uses it.
+**OpenLingo** is a free and open-source language learning app that aims to feel
+as approachable and engaging as Duolingo, while being grounded in real didactics
+and tested learning methods (spaced repetition, active recall, comprehensible
+input, structured grammar progression, and deliberate practice).
 
-Built for learners starting from Italian or English, OpenLingo keeps things
-simple: no account, no ads, and no data shared with external services unless you
-choose to enable them.
+Currently focused on German (A0–B2) for Android and desktop, OpenLingo blends
+vocabulary, grammar, listening, speaking, reading, and writing into one calm,
+focused learning space — with separate profiles for everyone who uses it.
+
+OpenLingo is offline-first and privacy-respecting: no account required, no ads,
+no trackers, and no data shared with external services unless you explicitly
+enable optional features. Built for learners starting from Italian or English.
 
 ## Table of contents
 
@@ -187,6 +191,10 @@ Contributions on any of these points are welcome (see Contributing).
 Every contribution is welcome: corrections to teaching content, translations,
 UI improvements, tests and bug reports. Before opening a pull request, read
 [CONTRIBUTING.md](CONTRIBUTING.md).
+
+To contribute interface or content translations, or to add a new language, see
+[docs/TRANSLATIONS.md](docs/TRANSLATIONS.md) and the reusable workflow in
+`.opencode/skills/app-translation/SKILL.md`.
 
 Vulnerability reports must follow [SECURITY.md](SECURITY.md), not public issues.
 

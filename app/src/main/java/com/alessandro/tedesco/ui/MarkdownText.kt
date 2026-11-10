@@ -256,7 +256,7 @@ fun MarkdownText(
                     Text(riga.testo, style = stile, color = color)
                 }
                 TipoRiga.NUMERATO -> Row(modifier = Modifier.padding(start = 4.dp, top = 3.dp)) {
-                    Text(t("${riga.numero}."), color = color, style = stile)
+                    Text("${riga.numero} " + t("."), color = color, style = stile)
                     Spacer(Modifier.width(8.dp))
                     Text(riga.testo, style = stile, color = color)
                 }

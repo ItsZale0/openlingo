@@ -79,9 +79,9 @@ fun PushToTalkButton(
             .semantics {
                 contentDescription = when (state) {
                     VoiceState.LISTENING -> t("In ascolto... rilascia per inviare")
-                    VoiceState.PROCESSING -> "Elaborazione in corso..."
+                    VoiceState.PROCESSING -> t("Elaborazione in corso...")
                     VoiceState.SPEAKING -> t("Sto parlando...")
-                    VoiceState.ERROR -> "Errore: ${errorMessage ?: "sconosciuto"}"
+                    VoiceState.ERROR -> t("Errore") + ": ${errorMessage ?: t("sconosciuto")}"
                     else -> t("Tieni premuto per parlare")
                 }
             },
@@ -144,7 +144,7 @@ fun VoiceInputBar(
         val statusText = when (state) {
             VoiceState.IDLE -> hint
             VoiceState.LISTENING -> t("Ascolto in corso...")
-            VoiceState.PROCESSING -> "Elaborazione..."
+            VoiceState.PROCESSING -> t("Elaborazione...")
             VoiceState.SPEAKING -> t("Sto parlando...")
             VoiceState.ERROR -> t("Errore")
         }

@@ -123,7 +123,7 @@ fun LessicoScreen(
         }
     }
 
-    ScreenScaffold("Lessico A1-B2", onBack = onIndietro, scrollable = false) {
+    ScreenScaffold(t("Lessico A1-B2"), onBack = onIndietro, scrollable = false) {
         Column(modifier = Modifier.fillMaxSize()) {
             Text(
                 text = "${LessicoLivelli.tutte.size} " + t("parole curate, divise per livello.") + " " +
@@ -164,7 +164,7 @@ fun LessicoScreen(
                 ) {
                     Column(Modifier.fillMaxWidth().padding(14.dp)) {
                         Text(
-                            t("Livello ${riepilogo.livello}"),
+                            t("Livello ") + " ${riepilogo.livello}",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -242,7 +242,7 @@ fun LessicoScreen(
                 modifier = Modifier.weight(1f).fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                items(voci, key = { t("${it.livello}|${it.tedesco}") }) { voce ->
+                items(voci, key = { "${it.livello}|${it.tedesco}" }) { voce ->
                     val presente = LessicoLivelli.chiaveParola(voce.tedesco) in chiaviProfilo
                     Row(
                         modifier = Modifier

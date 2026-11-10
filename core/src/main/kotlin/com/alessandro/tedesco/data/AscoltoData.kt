@@ -151,7 +151,7 @@ object AscoltoData {
             fraseTedesca = "Wir treffen uns morgen um zwanzig Uhr.",
             traduzioneItaliana = "Incontriamo domani alle venti.",
             domanda = "A che ora si incontrano?",
-            opzioni = listOf("Alle vento", "Alle otto", "Alle nove", "Alle dieci"),
+            opzioni = listOf("Alle venti", "Alle otto", "Alle nove", "Alle dieci"),
             rispostaCorretta = 0,
             spiegazione = "'Um zwanzig Uhr' = alle venti (8 di sera).",
             livello = "A2"
@@ -173,7 +173,7 @@ object AscoltoData {
             domanda = "Quando inizia il film?",
             opzioni = listOf("Tra dieci minuti", "Adesso", "Tra un'ora", "Ieri"),
             rispostaCorretta = 0,
-            spiegazione = "'In zehn Minuten' = tra dieci minuten.",
+            spiegazione = "'In zehn Minuten' = tra dieci minuti.",
             livello = "A2"
         ),
         EsercizioAscolto(

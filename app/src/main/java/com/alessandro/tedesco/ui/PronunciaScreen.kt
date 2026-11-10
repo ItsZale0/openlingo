@@ -60,8 +60,8 @@ import java.util.Locale
 
 enum class SezionePronuncia(val etichetta: String) {
     COPPIE("Coppie minime"),
-    FRASI(t("Frasi")),
-    CONSIGLI(t("Regole"))
+    FRASI("Frasi"),
+    CONSIGLI("Regole")
 }
 
 /** Registratore audio minimale: un solo file in cache, riascoltabile. */
@@ -266,11 +266,11 @@ fun PronunciaScreen(
                                     )
                                 }
                                 Text(
-                                    "${coppia.italianoA} / ${coppia.italianoB}",
+                                    "${t(coppia.italianoA)} / ${t(coppia.italianoB)}",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
-                                Text(coppia.nota, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                                Text(t(coppia.nota), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
                                 Spacer(Modifier.height(Spaziature.sm))
                                 Row(horizontalArrangement = Arrangement.spacedBy(Spaziature.xs)) {
                                     OutlinedButton(onClick = { tts.speak(coppia.a, velocita = 0.7f) }) {
@@ -359,7 +359,7 @@ fun PronunciaScreen(
                                 Spacer(Modifier.height(4.dp))
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
-                                        t("Esempio: ${consiglio.esempio}"),
+                                        t("Esempio: ") + " ${consiglio.esempio}",
                                         style = MaterialTheme.typography.bodySmall,
                                         fontWeight = FontWeight.SemiBold,
                                         modifier = Modifier.weight(1f)

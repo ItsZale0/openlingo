@@ -321,7 +321,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                     text = if (risultato == true) t("Ottimo!") else t("Riprova."),
                                     style = MaterialTheme.typography.bodySmall
                                 )
-                                Text(text = esercizio.spiegazione)
+                                Text(text = t(esercizio.spiegazione))
                                 Text(
                                     text = esercizio.esempio,
                                     style = MaterialTheme.typography.bodyMedium
@@ -397,7 +397,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = t("Punteggio:") + " $punteggio/${esercizi.size}",
+                                text = t("Punteggio") + ": $punteggio/${esercizi.size}",
                                 style = MaterialTheme.typography.headlineMedium
                             )
                             Text(

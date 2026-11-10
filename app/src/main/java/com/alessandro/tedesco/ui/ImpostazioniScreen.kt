@@ -292,7 +292,11 @@ fun ImpostazioniScreen(
 
     val temaSettings = remember(contestoUpdate) { TemaSettings(contestoUpdate) }
     var temaColore by remember { mutableStateOf("teal") }
-    LaunchedEffect(Unit) { temaColore = temaSettings.colore.first() }
+    var temaModalita by remember { mutableStateOf("system") }
+    LaunchedEffect(Unit) {
+        temaColore = temaSettings.colore.first()
+        temaModalita = temaSettings.modalita.first()
+    }
 
     val linguaSettings = remember(contestoUpdate) { LinguaSettings(contestoUpdate) }
     var lingua by remember { mutableStateOf("it") }
@@ -361,9 +365,26 @@ fun ImpostazioniScreen(
                 SettingsButton(onClick = { esciSelezione = true }) { Text(t("Torna alla scelta del profilo")) }
                 Spacer(Modifier.height(12.dp))
 
-                // --- COLORE TEMA ---
+                // --- TEMA ---
                 GlassCard {
                     Column {
+                        Text(t("Tema"), style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Spacer(Modifier.height(6.dp))
+                        Text(t("Scegli chiaro, scuro o segui le impostazioni di sistema."),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Spacer(Modifier.height(10.dp))
+                        DropdownSelector(
+                            label = t("Modalità tema"),
+                            options = TemaSettings.OPZIONI_MODALITA.map { it.first to t(it.second) },
+                            selected = temaModalita,
+                            onSelect = { id ->
+                                temaModalita = id
+                                scopeUpdate.launch { temaSettings.setModalita(id) }
+                            }
+                        )
+                        Spacer(Modifier.height(14.dp))
                         Text(t("Colore tema"), style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(Modifier.height(6.dp))
@@ -374,7 +395,7 @@ fun ImpostazioniScreen(
                         Spacer(Modifier.height(10.dp))
                         DropdownSelector(
                             label = t("Colore tema"),
-                            options = TemaSettings.OPZIONI.map { it.first to it.second },
+                            options = TemaSettings.OPZIONI.map { it.first to t(it.second) },
                             selected = temaColore,
                             onSelect = { id ->
                                 temaColore = id
@@ -688,7 +709,7 @@ fun ImpostazioniScreen(
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            t("Versione installata: ${updater.versioneCorrente ?: "?"} (${updater.versioneCorrenteCode})"),
+                            t("Versione installata") + ": ${updater.versioneCorrente ?: "?"} (${updater.versioneCorrenteCode})",
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.weight(1f)
@@ -762,7 +783,7 @@ fun ImpostazioniScreen(
                         }
                         is UpdateState.Available -> {
                             Text(
-                                t("Disponibile v${s.version.versionName} (${s.version.versionCode})"),
+                                t("Disponibile") + " v${s.version.versionName} (${s.version.versionCode})",
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.primary
@@ -779,7 +800,7 @@ fun ImpostazioniScreen(
                                     modifier = Modifier.fillMaxWidth()
                                 )
                                 Text(
-                                    t("Download ${s.progress}%"),
+                                    t("Download ") + " ${s.progress} " + t("%"),
                                     style = MaterialTheme.typography.bodySmall
                                 )
                             }
@@ -873,7 +894,7 @@ fun ImpostazioniScreen(
                     Text(t("Vocabolario"), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        t("Ultimo aggiornamento: ${TedescoViewModel.formattaData(ultimoSync?.syncedAt ?: 0L)}"),
+                        t("Ultimo aggiornamento: ") + " ${TedescoViewModel.formattaData(ultimoSync?.syncedAt ?: 0L)}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -933,7 +954,7 @@ fun ImpostazioniScreen(
             title = { Text(t("Tornare alla scelta del profilo?")) },
             text = {
                 Text(
-                    t("I dati di ${profilo?.config?.nomeVisualizzato ?: "questo profilo"} restano salvati. Potrai rientrare quando vuoi.")
+                    t("I dati di ") + " ${profilo?.config?.nomeVisualizzato ?: "questo profilo"} " + t(" restano salvati. Potrai rientrare quando vuoi.")
                 )
             },
             confirmButton = {

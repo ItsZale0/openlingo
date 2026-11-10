@@ -211,7 +211,7 @@ private fun EsercizioCorrente(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                t("Livello ${stato.livello}"),
+                t("Livello ") + " ${stato.livello}",
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

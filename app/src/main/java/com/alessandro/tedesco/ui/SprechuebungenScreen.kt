@@ -126,7 +126,7 @@ fun SprechuebungenScreen(
 
     val prompt = prompts.getOrNull(indiciGiorno.getOrNull(indice) ?: indice)
 
-    ScreenScaffold("Sprechübungen", onBack = onIndietro) {
+    ScreenScaffold(t("Esercizi di conversazione"), onBack = onIndietro) {
         if (prompt == null || prompts.isEmpty()) {
             Text(t("Nessun esercizio per questo livello."))
             return@ScreenScaffold
@@ -139,12 +139,12 @@ fun SprechuebungenScreen(
             verticalArrangement = Arrangement.spacedBy(Spaziature.sm)
         ) {
             Text(
-                t("Esercizi di produzione orale: leggi la situazione, parla, registrati e confronta con il modello.") + " " + t("Livello ${prompt.livello}."),
+                t("Esercizi di produzione orale: leggi la situazione, parla, registrati e confronta con il modello.") + " " + t("Livello ") + " ${prompt.livello} " + t("."),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                t("${indice + 1} di ${prompts.size}"),
+                "${indice + 1} " + t("di") + " ${prompts.size}",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

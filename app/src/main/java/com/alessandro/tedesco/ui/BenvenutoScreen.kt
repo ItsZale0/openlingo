@@ -191,7 +191,7 @@ private fun CardProfilo(
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    t("Livello ${profilo.config.livelloIniziale.label}"),
+                    t("Livello") + " ${t(profilo.config.livelloIniziale.label)}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -213,7 +213,7 @@ private fun CardProfilo(
             title = { Text(t("Eliminare il profilo?")) },
             text = {
                 Text(
-                    t("Verranno eliminati tutti i dati di \"${profilo.config.nomeVisualizzato}\": parole, ripassi, lezioni, grammatica e conversazioni. L'operazione non è reversibile.")
+                    t("Verranno eliminati tutti i dati di") + " \"${profilo.config.nomeVisualizzato}\": " + t("parole, ripassi, lezioni, grammatica e conversazioni. L'operazione non è reversibile.")
                 )
             },
             confirmButton = {

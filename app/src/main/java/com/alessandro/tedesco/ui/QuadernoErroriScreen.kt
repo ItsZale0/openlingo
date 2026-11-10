@@ -155,7 +155,7 @@ fun QuadernoErroriScreen(
                                 )
                             }
                         }
-                        Text(errore.domanda, style = MaterialTheme.typography.bodyLarge)
+                        Text(t(errore.domanda), style = MaterialTheme.typography.bodyLarge)
                         if (errore.rispostaData.isNotBlank()) {
                             Text(
                                 t("Hai scritto:") + " ${errore.rispostaData}",
@@ -166,7 +166,7 @@ fun QuadernoErroriScreen(
                         Spacer(Modifier.height(Spaziature.sm))
                         if (mostraRisposta) {
                             Text(
-                                t("Risposta corretta:") + " ${errore.rispostaCorretta}",
+                                t("Risposta corretta:") + " ${t(errore.rispostaCorretta)}",
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.primary

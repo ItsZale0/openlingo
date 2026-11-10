@@ -3,7 +3,7 @@
     <string name="app_name">OpenLingo</string>
 
     <string name="welcome_title">Benvenuto in OpenLingo</string>
-    <string name="welcome_subtitle">Il tuo spazio personale per imparare il tedesco, con calma e continuità. I tuoi dati restano sul dispositivo e l\'app funziona anche offline.</string>
+    <string name="welcome_subtitle">Un\'app per imparare le lingue gratuita e open source, semplice e coinvolgente come Duolingo ma basata su didattica reale e metodi di apprendimento collaudati. Studia con calma — offline, privata e senza pubblicità.</string>
     <string name="create_profile_and_start">Crea il tuo profilo</string>
     <string name="create_profile">Crea profilo</string>
     <string name="what_is_your_name">Come ti chiami?</string>

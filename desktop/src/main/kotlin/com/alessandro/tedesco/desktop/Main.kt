@@ -1,6 +1,7 @@
 package com.alessandro.tedesco.desktop
 
 import androidx.compose.material3.VerticalDivider
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -89,7 +90,7 @@ fun main() = application {
 
     Window(
         onCloseRequest = ::exitApplication,
-        title = t("OpenLingo — corso A0-B2"),
+        title = t("OpenLingo — imparare le lingue con didattica reale"),
         // La finestra parte massimizzata: su schermi piccoli (o con scala 125%)
         // una finestra fissa rischierebbe di uscire dallo schermo.
         state = rememberWindowState(
@@ -121,7 +122,9 @@ fun main() = application {
             }
         }
 
-        TemaTedesco(scuro = store.temaScuro(), temaColore = store.temaColore()) {
+        val sistemaScuro = isSystemInDarkTheme()
+        val scuroEffettivo = store.temaScuroEffettivo(sistemaScuro)
+        TemaTedesco(scuro = scuroEffettivo, temaColore = store.temaColore()) {
             Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                 if (store.elencoProfili.isEmpty() || store.profilo == null) {
                     SchermataBenvenuto(store)
@@ -258,9 +261,11 @@ private fun BarraSuperiore(store: DesktopStore) {
             }
         }
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            val sistemaScuro = isSystemInDarkTheme()
+            val scuroEffettivo = store.temaScuroEffettivo(sistemaScuro)
             IconButton(onClick = { store.commutaTema() }) {
                 Icon(
-                    if (store.temaScuro()) Icons.Filled.LightMode else Icons.Filled.DarkMode,
+                    if (scuroEffettivo) Icons.Filled.LightMode else Icons.Filled.DarkMode,
                     contentDescription = t("Cambia tema")
                 )
             }

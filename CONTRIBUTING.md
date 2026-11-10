@@ -1,6 +1,8 @@
-# Contribuire a Deutsch
+# Contributing to OpenLingo
 
-Grazie per il tuo interesse a contribuire!
+Thanks for your interest in contributing!
+
+OpenLingo is a free and open-source language learning app that aims to feel as approachable and engaging as Duolingo, while being grounded in real didactics and tested learning methods. Contributions that improve learning quality, accessibility, localization, and reliability are welcome.
 
 ## Come contribuire
 
@@ -27,7 +29,10 @@ Per capire l'organizzazione del codice leggi
 - **Privacy by design**: nessun dato di un utente finisce su server di terze parti
   senza consenso esplicito.
 - **FOSS**: le modifiche al codice open-source mantengono la licenza GPL-3.0-or-later.
-- **Italiano**: la lingua utente e quella di documentazione e messaggi di prodotto.
+- **Lingue e localizzazione**: l'interfaccia è localizzabile a runtime; i contenuti
+  didattici in tedesco devono restare in tedesco. Per contribuire con nuove lingue
+  o traduzioni (UI e contenuti), segui [docs/TRANSLATIONS.md](docs/TRANSLATIONS.md)
+  e il workflow riutilizzabile in `.opencode/skills/app-translation/SKILL.md`.
 
 ## Versioning
 
