@@ -1,163 +1,119 @@
-# Architettura
+# Architecture
 
-Questo documento descrive come è organizzato Deutsch e quali scelte tecniche
-guidano il progetto. È pensato per chi vuole contribuire o valutare il codice.
+This document describes how OpenLingo is organized and which technical choices guide the project. It is intended for contributors and anyone evaluating the codebase.
 
-## Obiettivi e vincoli
+## Goals and constraints
 
-- **Offline first**: il nucleo didattico non dipende dalla rete.
-- **Nessun profilo predefinito**: i dati appartengono a un profilo creato
-  esplicitamente dall'utente.
-- **Dati locali**: nessun account, nessun backend proprietario.
-- **AI opzionale**: le funzioni AI usano una chiave fornita dall'utente e non
-  sono necessarie per studiare.
-- **Stack leggero**: Kotlin, Compose, DataStore e JSON; niente Room, Hilt o KSP,
-  dependency injection manuale.
-- **Compatibilità dei dati**: l'identificativo del pacchetto e i formati di
-  salvataggio restano stabili tra le versioni.
+- **Offline first**: the core learning experience does not depend on a network connection.
+- **No default profile**: data belongs to a profile explicitly created by the user.
+- **Local data**: no mandatory account and no proprietary backend.
+- **Optional AI**: AI features use a user-provided key and are not required to study.
+- **Lightweight stack**: Kotlin, Compose, DataStore and JSON; no Room, Hilt or KSP, with manual dependency wiring.
+- **Data compatibility**: the application/package identifier and persistence formats remain stable across versions.
 
-## Moduli
+## Modules
 
 ```
-:core      motore didattico e contenuti (Kotlin/JVM, nessuna dipendenza Android)
-:app       applicazione Android (Compose, Material 3)
-:desktop   applicazione desktop (Compose Desktop)
+:core      learning engine and content (Kotlin/JVM, no Android dependency)
+:app       Android application (Compose, Material 3)
+:desktop   desktop application (Compose Desktop)
 ```
 
-`:core` contiene vocabolario, grammatica, esercizi, dialoghi, ascolto, motori
-adattivi, backup e merge. Non conosce Android: può essere testato con la sola
-JVM. `:app` e `:desktop` sono due interfacce sullo stesso motore.
+`:core` contains vocabulary, grammar, exercises, dialogues, listening, adaptive engines, backup and merge logic. It does not depend on Android and can be tested with the JVM alone. `:app` and `:desktop` are two user interfaces on top of the same engine.
 
-Dipendenze:
+Dependencies:
 
 ```
-app ──────► core
-desktop ──► core
+app     ──▶ core
+desktop ──▶ core
 ```
 
-## Profili e dati
+## Profiles and data
 
-Ogni profilo è descritto da `ProfiloConfig` e contiene:
+Each profile is described by `ProfiloConfig` and contains:
 
-- nome, livello di partenza e tema colore;
-- contesto personale (`contestoUtente`): studio, lavoro, interessi, obiettivi,
-  usato per personalizzare i contenuti AI;
-- stato didattico: parole, ripassi, errori, grammatica, ascolto, produzione,
-  lezioni generate, badge, streak, piano e sessioni.
+- name, starting level and color theme;
+- personal context (`contestoUtente`): study, work, interests, goals, used to personalize AI-generated content;
+- learning state: words, reviews, mistakes, grammar, listening, production, generated lessons, badges, streaks, study plan and sessions.
 
-I profili sono salvati come JSON. Su Android il documento vive in un DataStore
-(`profili_data`), su desktop in `profili.json` e `preferenze.json` accanto ai
-dati dell'app. I nuovi profili ricevono un identificativo `profilo_<timestamp>`;
-i profili storici mantengono il proprio identificativo per non perdere dati.
+Profiles are stored as JSON. On Android the document lives in a DataStore (`profili_data`); on desktop in `profili.json` and `preferenze.json` alongside the app data. New profiles receive a `profilo_<timestamp>` identifier; historical profiles keep their identifier to avoid data loss.
 
-Non viene creato alcun profilo automaticamente: la schermata di benvenuto guida
-la creazione del primo profilo e la migrazione dei dati esistenti avviene solo
-quando necessario.
+No profile is created automatically: the welcome screen guides creation of the first profile, and migration of existing data happens only when necessary.
 
-## Motore didattico
+## Learning engine
 
-### Livelli e contenuti
+### Levels and content
 
-I livelli seguono il Quadro comune europeo: A0, A1, A2, B1, B2. Il lessico è
-cumulativo e verificato da test dedicati:
+Levels follow the Common European Framework of Reference: A0, A1, A2, B1, B2. Vocabulary is cumulative and verified by dedicated tests:
 
-| Livello | Parole cumulative | Obiettivo di riferimento |
-|---|---|---|
+| Level | Cumulative words | Reference target |
+|---|---:|---:|
 | A1 | 670 | 650 |
-| A2 | 1.378 | 1.300 |
-| B1 | 2.503 | 2.400 |
-| B2 | 3.108 | 3.000 |
+| A2 | 1,378 | 1,300 |
+| B1 | 2,503 | 2,400 |
+| B2 | 3,108 | 3,000 |
 
-I contenuti comprendono parole con articolo, plurale e frase d'esempio,
-unità di grammatica, dialoghi, esercizi di ascolto, testi per la produzione e
-brani per l'immersione.
+Content includes words with articles, plurals and example sentences, grammar units, dialogues, listening exercises, writing/production texts and immersion passages.
 
-### Esercizi
+### Exercises
 
-Gli esercizi offline coprono sei tipologie: significato, parola tedesca,
-articolo, completamento della frase, scrittura e ascolto. Le varianti generate
-dall'AI devono avere una sola risposta corretta e vengono filtrate per evitare
-ambiguità.
+Offline exercises cover six types: meaning, German word, article, sentence completion, writing and listening. AI-generated variants must have a single correct answer and are filtered to avoid ambiguity.
 
-### Ripetizione spaziata
+### Spaced repetition
 
-Il lessico usa una variante di **SM-2**: ogni risposta aggiorna intervallo,
-fattore di facilità e data del prossimo ripasso. Grammatica ed errori hanno
-code di ripasso dedicate, più semplici ma coerenti con lo stesso modello.
-Sessione giornaliera e piano di studio scelgono cosa proporre in base alle
-scadenze e alle competenze.
+Vocabulary uses an **SM-2** variant: each answer updates the interval, ease factor and next review date. Grammar and mistakes have dedicated, simpler review queues consistent with the same model. The daily session and study plan select what to present based on due items and competencies.
 
-### Motori adattivi
+### Adaptive engines
 
-`AdaptiveTestEngine` e `AdaptiveSessionEngine` stimano il livello dell'utente e
-compongono sessioni calibrate sulle aree più deboli, evitando di ripetere gli
-stessi esercizi. Le competenze (lessico, grammatica, ascolto, produzione) sono
-calcolate da dati reali di ripasso, non da valori simulati.
+`AdaptiveTestEngine` and `AdaptiveSessionEngine` estimate the user's level and compose sessions calibrated to weaker areas, avoiding repetition of the same exercises. Competencies (vocabulary, grammar, listening, production) are calculated from real review data, not simulated values.
 
-## Livello AI
+## AI layer
 
-Le funzioni AI sono isolate in `:app`, perché richiedono rete e configurazione
-utente:
+AI features are isolated in `:app` because they require network access and user configuration:
 
-- `TutorService`: chat e spiegazioni, con provider Groq o Gemini;
-- `GeneratoreEsercizi`: esercizi e verifiche con vincolo di unica risposta;
-- `GeneratoreLezioni`: lezioni e materiali a partire dal contesto del profilo.
+- `TutorService`: chat and explanations, with Groq or Gemini providers;
+- `GeneratoreEsercizi`: exercises and checks with a single-correct-answer constraint;
+- `GeneratoreLezioni`: lessons and materials based on the active profile context.
 
-I prompt includono il contesto personale del profilo attivo. Le chiavi API sono
-salvate nel DataStore locale e non vengono mai incluse nel repository né nei
-file di backup cloud. Senza chiave, queste classi non vengono usate e l'app
-resta pienamente funzionante offline.
+Prompts include the active profile's personal context. API keys are stored in local DataStore and are never included in the repository or in cloud backup files. Without a key, these classes are not used and the app remains fully functional offline.
 
-## Aggiornamenti
+## Updates
 
-Il manifest `updates/version.json` sul branch `master` dichiara:
+The `updates/version.json` manifest on the `master` branch declares:
 
-- `versionCode` e `versionName`;
-- `apkUrl` e changelog;
-- `apkSha256`, lo SHA-256 dell'APK pubblicato.
+- `versionCode` and `versionName`;
+- `apkUrl` and changelog;
+- `apkSha256`, the SHA-256 hash of the published APK.
 
-L'app confronta la versione locale con il manifest, scarica l'APK nella cache e
-lo accetta solo se:
+The app compares the local version with the manifest, downloads the APK to cache and accepts it only if:
 
-1. la dimensione e l'intestazione sono compatibili con un APK;
-2. lo SHA-256 coincide con quello dichiarato;
-3. la firma è la stessa dell'app installata.
+1. size and header are compatible with an APK;
+2. the SHA-256 matches the declared hash;
+3. the signature matches the installed app.
 
-Il punto 3 è garantito dal fatto che tutte le release usano la stessa chiave di
-firma; cambiarla renderebbe impossibile l'aggiornamento in-place.
+Point 3 is guaranteed by using the same signing key for all releases; changing it would prevent in-place updates.
 
-## Backup ed esportazione
+## Backup and export
 
-- **Esportazione completa** (`EsportaDati`): un unico documento JSON con tutti i
-  profili, le preferenze, il tema e le notifiche. Il formato è versionato e
-  validato prima dell'importazione.
-- **Backup su GitHub**: facoltativo, usa un repository e un token scelti
-  dall'utente. Il merge tra backup e dati locali è gestito da `BackupMerge`, che
-  confronta le date e conserva la versione più recente di ogni elemento.
+- **Full export** (`EsportaDati`): a single JSON document with all profiles, preferences, theme and notifications. The format is versioned and validated before import.
+- **GitHub backup**: optional, using a repository and token chosen by the user. Merging between backup and local data is handled by `BackupMerge`, which compares timestamps and keeps the most recent version of each item.
 
-L'esportazione non contiene il token GitHub, ma contiene le chiavi API dei
-profili AI: è un dato sensibile.
+The export does not contain the GitHub token, but it does contain AI profile API keys: treat it as sensitive data.
 
-## Test
+## Testing
 
-La suite unitaria copre:
+The unit test suite covers:
 
-- motore didattico, livelli, lessico e generazione degli esercizi;
-- profili, migrazione, isolamento e mancata creazione automatica;
-- ripetizione spaziata, motori adattivi e calcolo delle competenze;
-- backup, merge, esportazione e validazione del formato;
-- parsing del manifest, verifica degli APK e API remote.
+- learning engine, levels, vocabulary and exercise generation;
+- profiles, migration, isolation and no automatic profile creation;
+- spaced repetition, adaptive engines and competency calculation;
+- backup, merge, export and format validation;
+- manifest parsing, APK verification and remote APIs.
 
-I test girano con `:app:testDebugUnitTest` e `:core:test`. Il progetto non usa
-test strumentali obbligatori: le parti Android sono progettate per essere
-testabili sulla JVM.
+Tests run with `:app:testDebugUnitTest` and `:core:test`. The project does not require instrumented tests: Android-specific parts are designed to be testable on the JVM.
 
-## Limiti noti
+## Known limitations
 
-- L'APK pubblico è firmato con una chiave di sviluppo: non è adatto agli store
-  senza una chiave di release dedicata.
-- Le funzioni AI dipendono dalla disponibilità e dai limiti del provider scelto.
-- Il test dinamico (DAST) delle superfici di rete non è automatizzato; il report
-  in [SECURITY-AUDIT.md](../SECURITY-AUDIT.md) descrive lo stato attuale.
-
-Per il processo di rilascio vedi [RELEASE.md](RELEASE.md).
+- Public APKs may be signed with a development/debug-oriented setup depending on release configuration; store distribution requires an appropriate release key.
+- AI features depend on the availability and limits of the chosen provider.
+- Dynamic testing (DAST) of network surfaces is not automated; the security report documents the current scope and residual risks.

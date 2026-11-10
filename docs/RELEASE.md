@@ -1,123 +1,110 @@
-# Processo di rilascio
+# Release process
 
-Questa pagina descrive come viene preparata e pubblicata una versione di
-Deutsch. Il processo è volutamente semplice e verificabile: gli asset sono
-costruiti localmente, il manifest dichiara lo SHA-256 dell'APK e la CI controlla
-che il tag sia coerente.
+This page describes how a version of OpenLingo is prepared and published. The process is intentionally simple and verifiable: assets are built locally, the manifest declares the APK SHA-256, and CI checks tag consistency.
 
-## Versionamento
+## Versioning
 
-La fonte di verità è `version.properties`:
+The source of truth is `version.properties`:
 
 ```properties
-VERSION_CODE=308
-VERSION_NAME=1.48.75
+VERSION_CODE=...
+VERSION_NAME=...
 ```
 
-`VERSION_CODE` è l'intero usato da Android per confrontare le versioni;
-`VERSION_NAME` è la versione leggibile. I tag seguono il formato `v<versione>`
-(es. `v1.48.75`).
+`VERSION_CODE` is the integer Android uses to compare versions; `VERSION_NAME` is the human-readable version. Tags follow the format `v<version>` (e.g. `v1.51.12`).
 
-Il task Gradle `bumpVersion` incrementa entrambi e riscrive
-`updates/version.json`:
+The Gradle task `bumpVersion` increments both and rewrites `updates/version.json`:
 
 ```bash
-./gradlew bumpVersion -Pchangelog="Cosa è cambiato"
+./gradlew bumpVersion -Pchangelog="What changed"
 ```
 
-Il manifest contiene anche `apkUrl` e `apkSha256`. `bumpVersion` non conosce
-l'hash dell'APK: va inserito dopo la build, prima del commit.
+The manifest also contains `apkUrl` and `apkSha256`. `bumpVersion` does not know the APK hash: it must be filled in after the build, before committing/tagging the release.
 
-## 1. Preparare la versione
+## 1. Prepare the version
 
-1. Aggiorna `VERSION_CODE` e `VERSION_NAME` (o usa `bumpVersion`).
-2. Aggiorna `updates/version.json`: versione, changelog e `apkUrl` del tag che
-   si sta per creare.
-3. Aggiorna la documentazione se cambiano comportamento o voci dell'interfaccia.
+1. Update `VERSION_CODE` and `VERSION_NAME` (or use `bumpVersion`).
+2. Update `updates/version.json`: version, changelog and `apkUrl` for the tag you are about to create.
+3. Update documentation if behavior or UI changes.
 
-## 2. Costruire gli asset
+## 2. Build the assets
 
 ```bash
 ./gradlew :core:jar :app:assembleDebug :desktop:compileKotlin
 ./gradlew :app:testDebugUnitTest :core:test
 ```
 
-Per il pacchetto desktop:
+For the desktop package:
 
 ```bash
 ./gradlew :desktop:createDistributable
 ```
 
-Gli artefatti prodotti sono:
+Produced artifacts include:
 
-- `app/build/outputs/apk/debug/app-debug.apk`;
-- `desktop/build/compose/binaries/main/app/Deutsch/`.
+- `app/build/outputs/apk/debug/app-debug.apk` (or the configured build output);
+- `desktop/build/compose/binaries/main/app/Deutsch/` (desktop distributable path as configured).
 
-Rinomina gli asset con lo schema usato dalle release:
+Rename assets using the release naming scheme:
 
 ```
-Deutsch-v<versione>.apk
-Deutsch-desktop-v<versione>-windows.zip
+Deutsch-v<version>.apk
+Deutsch-desktop-v<version>-windows.zip
 Deutsch.exe
 ```
 
-## 3. Calcolare lo SHA-256
+> Note: artifact/file names may still include legacy `Deutsch` naming for compatibility with existing release/update conventions.
+
+## 3. Compute SHA-256
 
 ```powershell
-Get-FileHash "Deutsch-v<versione>.apk" -Algorithm SHA256
+Get-FileHash "Deutsch-v<version>.apk" -Algorithm SHA256
 ```
 
-Inserisci l'hash (minuscolo) in `updates/version.json`:
+Insert the (lowercase) hash into `updates/version.json`:
 
 ```json
 "apkSha256": "<hash>"
 ```
 
-L'app rifiuta un APK il cui hash non coincide con quello dichiarato. Se l'APK
-viene ricostruito dopo questo passaggio, l'hash va ricalcolato.
+The app rejects an APK whose hash does not match the declared one. If the APK is rebuilt after this step, the hash must be recalculated.
 
-## 4. Pubblicare il codice
+## 4. Publish the code
 
 ```bash
 git add -A
-git commit -m "v<versione>: <sintesi>"
+git commit -m "v<version>: <summary>"
 git push origin master
-git tag v<versione>
-git push origin v<versione>
+git tag v<version>
+git push origin v<version>
 ```
 
-Il push del tag avvia il workflow **Verify release**, che controlla:
+Pushing the tag triggers the **Verify release** workflow, which checks:
 
-- coerenza tra `version.properties`, `updates/version.json` e nome del tag;
-- compilazione dell'APK.
+- consistency between `version.properties`, `updates/version.json` and the tag name;
+- APK compilation (as configured).
 
-Il workflow non pubblica nulla: la release viene creata dal maintainer, così
-l'APK distribuito mantiene la stessa firma e lo stesso SHA-256 del manifest.
+The workflow does not publish the release: the maintainer creates it so the distributed APK keeps the same signature and SHA-256 as declared in the manifest.
 
-## 5. Creare la release
+## 5. Create the release
 
-Crea una release GitHub associata al tag e carica i tre asset:
+Create a GitHub release associated with the tag and upload the assets:
 
-- `Deutsch-v<versione>.apk`;
-- `Deutsch-desktop-v<versione>-windows.zip`;
+- `Deutsch-v<version>.apk`;
+- `Deutsch-desktop-v<version>-windows.zip`;
 - `Deutsch.exe`.
 
-La descrizione deve riportare le novità principali e i requisiti di
-installazione. Al termine verifica che:
+The description should include key changes and installation requirements. Before finishing, verify that:
 
-1. l'APK scaricato abbia lo stesso SHA-256 del manifest;
-2. la firma sia la stessa della versione precedente;
-3. il manifest su `master` punti alla release corretta.
+1. the downloaded APK has the same SHA-256 as the manifest;
+2. the signature matches the previous version;
+3. the manifest on `master` points to the correct release.
 
-## Firme e aggiornamenti
+## Signing and updates
 
-Tutte le release devono essere firmate con la **stessa chiave**. Android
-rifiuta un aggiornamento firmato con una chiave diversa: cambiare chiave
-richiede una nuova installazione e la perdita dei dati locali, a meno di
-esportazione e ripristino.
+All releases must be signed with the **same key**. Android rejects updates signed with a different key: changing keys requires a fresh install and loss of local data unless data is exported and restored.
 
-Il keystore di debug non è versionato. Per build riproducibili o per una chiave
-di release si usano le variabili d'ambiente:
+The debug keystore is not versioned. For reproducible/release builds use environment variables as configured in the project:
 
 ```
 TEDESCO_KEYSTORE_FILE
@@ -126,13 +113,14 @@ TEDESCO_KEY_ALIAS
 TEDESCO_KEY_PASSWORD
 ```
 
-Senza queste variabili Gradle usa il keystore di debug locale.
+Without these variables Gradle uses the local debug keystore.
 
-## Controlli prima della pubblicazione
+## Pre-release checklist
 
-- [ ] `version.properties` e `updates/version.json` allineati.
-- [ ] Test verdi (`:app:testDebugUnitTest`, `:core:test`).
-- [ ] APK installabile e aggiornabile dalla versione precedente.
-- [ ] `apkSha256` corrispondente all'APK caricato.
-- [ ] Asset desktop avviabili.
-- [ ] Changelog e note di release aggiornati.
+- [ ] `version.properties` and `updates/version.json` aligned.
+- [ ] Tests passing (`:app:testDebugUnitTest`, `:core:test`).
+- [ ] APK installable and updatable from the previous version.
+- [ ] `apkSha256` matches the uploaded APK.
+- [ ] Desktop assets runnable.
+- [ ] Changelog and release notes updated.
+- [ ] Full data export performed before push (per project workflow).

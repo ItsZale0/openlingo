@@ -1,14 +1,14 @@
 ---
 name: Feature request
-about: Proponi una funzione
+about: Suggest a feature
 title: "[Feature] "
 labels: enhancement
 ---
 
-**Problema da risolvere**
+**Problem to solve**
 
-**Soluzione proposta**
+**Proposed solution**
 
-**Alternative considerate**
+**Alternatives considered**
 
-**Contesto aggiuntivo** (mockup, esempi)
+**Additional context** (mockups, examples)

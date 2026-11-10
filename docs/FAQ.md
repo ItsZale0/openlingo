@@ -1,76 +1,39 @@
-# Domande frequenti
+# Frequently asked questions
 
-## Devo creare un account?
+## Do I need to create an account?
 
-No. Deutsch non richiede registrazione e non ha pubblicità o tracker. Al primo
-avvio si crea un profilo locale.
+No. OpenLingo does not require registration and has no ads or trackers. On first launch you create a local profile.
 
-## Funziona senza internet?
+## Does it work without internet?
 
-Sì. Vocabolario, esercizi offline, ripasso spaziato, grammatica, ascolto e
-produzione funzionano senza connessione. Internet serve solo per le funzioni AI
-facoltative, il backup su GitHub e il controllo degli aggiornamenti.
+Yes. Vocabulary, offline exercises, spaced repetition, grammar, listening and production work without a connection. Internet is only needed for optional AI features, GitHub backup and update checks.
 
-## L'AI è obbligatoria?
+## Is AI required?
 
-No. Se non inserisci una chiave API, l'app usa solo i contenuti e gli esercizi
-inclusi. Con una chiave Groq o Gemini ottieni tutor, esercizi e correzioni
-personalizzate.
+No. If you do not enter an API key, the app uses only included content and offline exercises. With a Groq or Gemini key (or other supported providers) you can enable tutor, generated exercises and personalized corrections.
 
-## Dove finiscono i miei dati?
+## Where does my data go?
 
-Restano sul dispositivo. Puoi esportarli in un unico file JSON da
-**Impostazioni → Backup → Esporta tutti i dati**. Vedi
-[EXPORT-DATI.md](EXPORT-DATI.md).
+It stays on your device. You can export everything to a single JSON file from **Settings → Backup → Export all data**. See [EXPORT-DATI.md](EXPORT-DATI.md).
 
-## Posso usare l'app in più persone?
+## Can multiple people use the app?
 
-Sì. Ogni profilo ha dati separati: progressi, ripassi, conversazioni e lezioni.
-Puoi crearne quanti vuoi dalle impostazioni.
+Yes. Each profile has separate data: progress, reviews, conversations and lessons. You can create as many profiles as you want from settings.
 
-## Ho aggiornato l'app: perdo i progressi?
+## Will I lose progress when I update the app?
 
-No. Gli aggiornamenti mantengono lo stesso identificativo del pacchetto e la
-stessa firma, quindi profili e progressi restano disponibili. Prima di un
-cambio dispositivo, esporta comunque tutti i dati.
+No. Updates keep the same application identifier and signing identity, so profiles and progress remain available. Before changing devices, still export all data.
 
-## Come si aggiorna l'app?
+## How does the app update?
 
-L'app controlla `updates/version.json` sul repository e propone la nuova
-versione. Prima dell'installazione verifica lo SHA-256 dell'APK scaricato. Puoi
-anche scaricare manualmente l'ultima release dalla pagina GitHub.
+The app checks `updates/version.json` in the repository and offers a new version when available. Before installation it verifies the SHA-256 of the downloaded APK. You can also manually download the latest release from the GitHub releases page.
 
-## Ho salvato il backup su GitHub ma non lo trovo
+## I saved a backup to GitHub but can’t find it
 
-Dal ripristino l'app prova in ordine:
+During restore the app tries, in order:
 
-1. il file del profilo attivo (`tedesco-backup-<profilo>.json`);
-2. il backup condiviso `tedesco-backup.json`;
-3. qualunque altro backup valido presente nel repository, dal più recente.
+1. the active profile’s backup file (`tedesco-backup-<profile>.json`);
+2. the shared backup `tedesco-backup.json`;
+3. any other valid backup in the repository, from most recent.
 
-Se non viene trovato nulla, controlla che:
-
-- il repository configurato sia quello giusto (utente/nome-repo);
-- il token abbia il permesso **Contents: Read and write** sul repository;
-- il repository contenga almeno un file `tedesco-backup*.json`.
-
-Il messaggio d'errore ora indica il repository e i nomi dei file cercati. In
-alternativa puoi usare **Esporta tutti i dati** e reimportare il file JSON.
-
-## Su quali piattaforme è disponibile?
-
-Android 8.0+ e desktop (Windows, macOS, Linux). Non esiste una versione iOS.
-
-## Posso contribuire?
-
-Sì: correzioni ai contenuti, traduzioni, miglioramenti dell'interfaccia, test e
-segnalazioni. Leggi [CONTRIBUTING.md](../CONTRIBUTING.md).
-
-## Ho trovato un problema di sicurezza. Dove lo segnalo?
-
-Secondo [SECURITY.md](../SECURITY.md), non tramite issue pubbliche.
-
-## Perché il progetto si definisce "vibecoded"?
-
-Perché è sviluppato in collaborazione con agenti AI, con revisione e verifica
-umana. La nota completa è in fondo al [README](../README.md#nota-sullo-sviluppo-progetto-vibecoded).
+If restore cannot find a readable backup, verify the repository, token permissions, and that a backup file exists for the expected profile/name.

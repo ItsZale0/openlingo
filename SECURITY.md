@@ -1,37 +1,29 @@
-# Sicurezza
+# Security
 
-## Reporting di una vulnerabilità
+## Reporting a vulnerability
 
-Si prega di aprire una issue privata su GitHub o di contattare direttamente gli
-amministratori del repository, descrivendo:
+Please open a private security advisory on GitHub or contact the repository maintainers directly, describing:
 
-- l'ambiente e la versione dell'app;
-- i passi per riprodurre;
-- l'impatto stimato.
+- the environment and app version;
+- steps to reproduce;
+- estimated impact.
 
-Non si accettano segnalazioni che coinvolgono attacchi su sistemi terzi.
+Do not report issues that involve attacks on third-party systems.
 
-## Pratiche di sicurezza attive nel progetto
+## Security practices in this project
 
-- **Verifica integrità APK**: gli aggiornamenti scaricano l'APK e lo verificano
-  tramite SHA-256 (`VersionInfo.apkSha256`, `VerificaApk.isApkValido`).
-- **Backup cloud**: token GitHub a scelta dell'utente (fine-grained, permessi
-  limitati), salvato solo nel DataStore locale; nessun token incorporato nel repo.
-- **Export dati**: i dati personali dell'utente possono essere esportati in JSON
-  dal dispositivo (vedi [docs/EXPORT-DATI.md](docs/EXPORT-DATI.md)).
-- **Data safety**: `allowBackup="false"` e regole di estrazione dati
-  personalizzate per cloud backup e trasferimento dispositivo.
-- **Chiavi AI**: configurate dall'utente in Impostazioni; nessuna chiave condivisa
-  o incorporata.
+- **APK integrity verification**: updates download the APK and verify it via SHA-256 (`VersionInfo.apkSha256`, `VerificaApk.isApkValido`).
+- **Cloud backup**: user-chosen GitHub token (fine-grained, limited permissions), stored only in local DataStore; no token embedded in the repository.
+- **Data export**: user data can be exported to JSON from the device (see [docs/EXPORT-DATI.md](docs/EXPORT-DATI.md)).
+- **Data safety**: `allowBackup="false"` and custom data extraction rules for cloud backup and device transfer.
+- **AI keys**: configured by the user in Settings; no shared or embedded keys.
 
-## Scoping degli audit
+## Audit scope
 
-- SAST: analisi statica del codice Kotlin/Compose/Gradle.
-- DAST: non applicabile in forma autonoma per un'app Android/ChromeOS; il perimetro
-  di valutazione resta l'APK pubblicato e le superfici di rete (API AI, GitHub).
-- Ogni finding è classificato con severità (Critico / Alto / Medio / Basso).
+- **SAST**: static analysis of Kotlin/Compose/Gradle code.
+- **DAST**: not applicable in a fully autonomous form for an Android/desktop app; evaluation scope includes the published APK and network surfaces (AI APIs, GitHub).
+- Findings are classified by severity (Critical / High / Medium / Low).
 
 ## OpenSSF Scorecard
 
-Obiettivo di qualità del progetto: **Scorecard ≥ 0.4** (OSSRF). I risultati
-degli step correnti sono riportati nel report di audit.
+Project quality target: **Scorecard ≥ 0.4** (as tracked). Current results and analysis details are reported in [SECURITY-AUDIT.md](SECURITY-AUDIT.md).

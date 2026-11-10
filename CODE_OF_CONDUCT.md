@@ -1,18 +1,17 @@
-# Codice di condotta
+# Code of Conduct
 
-## Il nostro impegno
+## Our pledge
 
-Ci impegniamo a fornire un ambiente di contribuzione rispettoso e inclusivo per
-tutti.
+We are committed to providing a respectful and inclusive environment for everyone who contributes to or interacts with this project.
 
-## Le nostre standard
+## Our standards
 
-- Trattare gli altri con gentilezza e rispetto.
-- Accettare critiche costruttive e feedback in modo aperto.
-- Non tollerare molestie, insulti o comportamenti discriminatori.
+- Treat others with kindness and respect.
+- Accept constructive criticism and feedback openly.
+- Do not tolerate harassment, insults or discriminatory behavior.
 
-## Applicazione
+## Enforcement
 
-Le violazioni possono essere segnalate ai manutentori del repository.
+Violations can be reported to the repository maintainers.
 
-Per maggiori dettagli: https://www.contributor-covenant.org/version/2/1/code_of_conduct/
+For more details, see the [Contributor Covenant Code of Conduct v2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/).

@@ -1,77 +1,67 @@
-# Esportazione dei dati dell'utente
+# User data export
 
-Questa guida spiega come esportare **tutti i dati** salvati nell'app **Deutsch**,
-per passare a un nuovo dispositivo o per fare un backup personale.
+This guide explains how to export **all data** saved in **OpenLingo**, for moving to a new device or keeping a personal backup.
 
-## Panoramica
+## Overview
 
-L'esportazione produce un singolo file JSON (`Pacchetto`, formato 1) che contiene:
+The export produces a single JSON file (`Pacchetto`, format 1) containing:
 
-- **tutti i profili utente** salvati (parole, ripassi SRS, risposte del tutor,
-  correzioni, grammatica, comprensione, produzione, ascolto, lezioni generate,
-  badge, streak, piano di studio, sessioni);
-- **le preferenze delle notifiche** e **il tema** scelto.
+- **all saved user profiles** (words, SRS reviews, tutor answers, corrections, grammar, comprehension, production, listening, generated lessons, badges, streaks, study plan, sessions);
+- **notification preferences** and the selected **theme**.
 
-Il file è lo stesso utilizzato dal backup cloud, quindi è riutilizzabile con la
-funzione di ripristino.
+The file uses the same structure as cloud backup, so it can be used with the restore function.
 
-## Su Android
+## On Android
 
-1. Apri l'app.
-2. Apri **Impostazioni** e vai alla sezione **Backup**.
-3. Tocca **Esporta tutti i dati**, poi **Esporta su file**.
-4. Scegli il percorso di salvataggio (documenti del dispositivo).
-5. Conserva il file `deutsch-dati-AAAAMMGG-HHMM.json` in un luogo sicuro.
+1. Open the app.
+2. Go to **Settings** and open the **Backup** section.
+3. Tap **Export all data**, then **Export to file**.
+4. Choose where to save the file on your device.
+5. Keep the `openlingo-dati-YYYYMMDD-HHMM.json` (or `deutsch-dati-...`) file in a safe place.
 
-Il file esportato:
+Notes about the exported file:
 
-- **non contiene** il token GitHub del backup cloud (credenziale, va reinserito
-  manualmente);
-- **contiene** le chiavi API dei profili AI (configurazione): il file va custodito
-  in un luogo sicuro.
+- it **does not include** the GitHub cloud-backup token (a credential you must re-enter manually);
+- it **may include** AI profile API keys/configuration: store the file securely.
 
-## Su desktop
+## On desktop
 
-1. Apri le impostazioni desktop.
-2. Nella sezione backup usa la voce **Esporta tutti i dati**.
-3. Il JSON viene salvato nella cartella Download come
-   `deutsch-dati-AAAAMMGG-HHMM.json`; spostalo in un luogo sicuro.
+1. Open desktop settings.
+2. In the backup section use **Export all data**.
+3. The JSON is saved to the Downloads folder as `openlingo-dati-YYYYMMDD-HHMM.json` (or equivalent); move it to a safe place.
 
-## Struttura del file
+## File structure
 
 ```json
 {
   "formato": 1,
   "creatoIl": 0,
-  "versioneApp": "1.48.75",
+  "versioneApp": "x.y.z",
   "profili": { ... },
   "notifiche": { ... },
   "temaColore": "..."
 }
 ```
 
-## Cosa significa "tutti i dati"
+## What “all data” means
 
-| Dato | Descrizione |
+| Data | Description |
 |---|---|
-| Profili | Ogni profilo con parole, ripassi, progressi, conversazioni, lezioni. |
-| Ripassi | Log delle schedature SRS (ripasso spaziato). |
-| Tutor | Chat, correzioni, valutazioni di produzione. |
-| Lezioni | Contenuti generati dall'AI e lezioni dal feed. |
-| Progressi | Piano, sessioni, badge, streak. |
+| Profiles | Each profile with words, reviews, progress, conversations, lessons. |
+| Reviews | SRS scheduling/review logs. |
+| Tutor | Chat, corrections, production evaluations. |
+| Lessons | AI-generated content and feed lessons. |
+| Progress | Plan, sessions, badges, streaks. |
 
-## Nota importante per il passaggio di dispositivo
+## Important notes when moving to a new device
 
-- L'export include **tutti i profili**: selezionando il profilo corretto al nuovo
-  dispositivo, i progressi tornano disponibili.
-- Il **primo avvio non crea profili predefiniti**: il nuovo utente ne crea uno
-  (vedi *Benvenuto* / *SchermataBenvenuto*).
-- Se si passa da un dispositivo con profili esistenti, il ripristino preserva i
-  dati.
+- The export includes **all profiles**: selecting the correct profile on the new device restores its progress.
+- **First launch does not create default profiles**: the new user creates one (see the Welcome screen).
+- When restoring on a device with existing profiles, restore/merge preserves data according to the app's backup/merge rules.
 
-## Backup vs esportazione
+## Backup vs export
 
-- **Backup automatico/cloud**: file di backup (formato backup) con token GitHub.
-- **Esportazione completa**: pacchetto di dati utente (vedi sopra).
+- **Automatic/cloud backup**: backup file format with GitHub token configuration handled separately.
+- **Full export**: user data package (see above).
 
-Per un passaggio di dispositivo completo (dati + contesto), usare entrambi.
+For a complete device migration (data + context), use both as appropriate.

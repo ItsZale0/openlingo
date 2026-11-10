@@ -1,63 +1,48 @@
-# Report di sicurezza — Deutsch
+# Security report — OpenLingo
 
-Data: 2026-11-09
-Versione auditata: 1.48.73 (le versioni 1.48.74 e 1.48.75 introducono solo
-modifiche a build, firma dei file di export e documentazione)
+Date: 2026-11-09  
+Audited version: 1.48.73 (versions 1.48.74 and 1.48.75 introduced only build, export-file signing and documentation changes)
 
-## Ambito e metodologia
+## Scope and methodology
 
-- **SAST**: analisi statica del codice sorgente (Kotlin/Compose, moduli `:core`,
-  `:app`, `:desktop`, workflow GitHub Actions, configurazioni Gradle) tramite
-  pattern scan dedicati (credenziali hardcoded, eval/exec/runtime code loading,
-  deserializzazione pericolosa, XSS/dangerouslySetInnerHTML, WebView+Javascript,
-  injection).
-- **DAST**: non eseguito in questa sessione. Le superfici di rete dell'app
-  (API AI Groq/Gemini, GitHub Contents API per il backup) richiedono credenziali
-  dell'utente e non sono state sondate dinamicamente; sono state però riviste a
-  livello statico (endpoint, intestazioni, gestione degli errori). Un test DAST
-  completo resta tra le raccomandazioni prima della pubblicazione sugli store.
-- **OpenSSF Scorecard**: obiettivo di qualità del progetto **≥ 0.4**; punteggio
-  rilevato dopo l'ultima analisi automatica: **3.1**.
+- **SAST**: static analysis of source code (Kotlin/Compose, `:core`, `:app`, `:desktop`, GitHub Actions workflows, Gradle configurations) using dedicated pattern scans (hardcoded credentials, eval/exec/runtime code loading, unsafe deserialization, XSS/dangerouslySetInnerHTML, WebView+JavaScript, injection).
+- **DAST**: not executed in this session. The app’s network surfaces (Groq/Gemini AI APIs, GitHub Contents API for backup) require user credentials and were not dynamically probed; they were reviewed statically (endpoints, headers, error handling). A full authenticated DAST remains recommended before store publication.
+- **OpenSSF Scorecard**: project quality target **≥ 0.4**; score observed after the last automated analysis: **3.1**.
 
-## Verifiche eseguite in questa sessione
+## Checks performed in this session
 
-| # | Area | Risultato |
+| # | Area | Result |
 |---|---|---|
-| 1 | Hardcoded secret/API key/tokens nel codice sorgente | **OK**: nessuna chiave reale incorporata; token AI e token GitHub gestiti come configurazione utente (DataStore) |
-| 2 | Sistemi di deserializzazione pericolosi (`eval`, `exec`, `ProcessBuilder`, `Runtime.load`, `ObjectInputStream`, pickle) | **OK**: nessun utilizzo in Kotlin/Gradle |
-| 3 | XSS / `dangerouslySetInnerHTML` / WebView scripting | **OK**: niente XSS surface in UI Compose; nessun WebView |
-| 4 | Integrità download APK | **TROVATO + RIFIXATO**: aggiunta verifica SHA-256 (`VersionInfo.apkSha256`, `VerificaApk.isApkValido`, `sha256(file)`) |
-| 5 | Backup dati sul dispositivo | **TROVATO + RIFIXATO**: `allowBackup="false"` + `data_extraction_rules.xml` per cloud backup e trasferimento dispositivo |
-| 6 | Keystore di debug | **TROVATO + RIFIXATO**: keystore debug rimosso dal tracking Git (`git rm --cached`) |
-| 7 | Deep link / export file | OK: export dati in JSON locale con validazione formato |
+| 1 | Hardcoded secrets/API keys/tokens in source code | **OK**: no real embedded keys; AI and GitHub tokens managed as user configuration (DataStore) |
+| 2 | Unsafe deserialization systems (`eval`, `exec`, `ProcessBuilder`, runtime loading, `ObjectInputStream`, pickle) | **OK**: no usage found in Kotlin/Gradle code paths reviewed |
+| 3 | XSS / `dangerouslySetInnerHTML` / WebView scripting | **OK**: no XSS surface in Compose UI; no WebView |
+| 4 | APK download integrity | **Found + fixed**: added SHA-256 verification (`VersionInfo.apkSha256`, `VerificaApk.isApkValido`, `sha256(file)`) |
+| 5 | Device data backup | **Found + fixed**: `allowBackup="false"` + `data_extraction_rules.xml` for cloud backup and device transfer |
+| 6 | Debug keystore | **Found + fixed**: debug keystore removed from Git tracking (`git rm --cached`) |
+| 7 | Deep links / export files | OK: local JSON data export with format validation |
 
-## Finding e stato
+## Findings and status
 
-| Severità | Finding | Stato |
+| Severity | Finding | Status |
 |---|---|---|
-| Critico | Keystore debug tracciato nel repository | **Risolto**: rimosso dal version control |
-| Alto | Aggiornamento senza verifica hash APK scaricato | **Risolto**: verifica SHA-256 attiva |
-| Alto | Backup Android potenzialmente abilitato di default | **Risolto**: `allowBackup=false` + regole |
-| Medio | — | Nessuno residuo emerso dallo scan statico |
-| Basso | — | Nessuno residuo emerso dallo scan statico |
+| Critical | Debug keystore tracked in repository | **Resolved**: removed from version control |
+| High | Update flow without verification of downloaded APK hash | **Resolved**: SHA-256 verification active |
+| High | Android backup potentially enabled by default | **Resolved**: `allowBackup=false` + rules |
+| Medium | — | None identified in static scan |
+| Low | — | None identified in static scan |
 
-### Residui accettati
+### Accepted residuals
 
-- API AI e token GitHub sono per utente: non sono segreti condivisi e restano locali.
-- L'APK pubblicato non è firmato con release-key: firmato con keystore via variabili
-  d'ambiente (`TEDESCO_KEYSTORE_FILE`, …) per build release; debug keystore non più
-  versionato.
+- AI APIs and GitHub tokens are per-user: they are not shared secrets and remain local.
+- Release signing depends on configured keystore/environment (`TEDESCO_KEYSTORE_*` variables for release builds where used); debug keystore is no longer versioned.
 
-## Raccomandazioni
+## Recommendations
 
-1. Eseguire OpenSSF Scorecard su ogni release (≥ 0.4 come obiettivo).
-2. CI aggiuntiva di analisi SAST (Semgrep/CodeQL) per regressioni.
-3. Valutare firma release-key per gli APK pubblicati.
-4. Eseguire un test DAST autenticato sulla superficie di rete prima della
-   pubblicazione sugli store.
+1. Run OpenSSF Scorecard on every release (target ≥ 0.4).
+2. Add CI SAST (e.g. Semgrep/CodeQL) for regressions.
+3. Use a dedicated release signing key for published APKs.
+4. Perform authenticated DAST on network surfaces before store publication.
 
-## Conclusioni
+## Conclusions
 
-Nessun finding critico residuo emerso dall'audit statico e dalla revisione manuale
-delle superfici di rischio. Le vulnerabilità classificate come alte sono state
-remediate nella sessione di preparazione della release 1.48.73.
+No residual critical findings emerged from static analysis and manual review of risk surfaces. High-severity issues identified during preparation of release 1.48.73 were remediated in that session.

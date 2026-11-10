@@ -1,23 +1,23 @@
 ---
 name: Bug report
-about: Segnala un problema
+about: Report a problem
 title: "[Bug] "
 labels: bug
 ---
 
-**Descrizione**
-Cosa è successo?
+**Description**
+What happened?
 
-**Passi per riprodurre**
+**Steps to reproduce**
 1.
 2.
 3.
 
-**Comportamento atteso**
+**Expected behavior**
 
-**Ambiente**
-- Versione app:
-- Dispositivo/Android:
-- Profilo (se rilevante):
+**Environment**
+- App version:
+- Device / OS / Android version:
+- Profile (if relevant):
 
-**Log / screenshot** (redigi dati personali)
+**Logs / screenshots** (redact personal data)
