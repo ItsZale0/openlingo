@@ -1,8 +1,8 @@
 {
-    "versionCode":  336,
-    "versionName":  "1.51.13",
-    "changelog":  "Translate repository documentation and issue templates to English and update project docs.",
-    "minVersionCode":  0,
-    "apkUrl":  "https://github.com/ItsZale0/tedesco-app/releases/download/v1.51.13/Deutsch-v1.51.13.apk",
-    "apkSha256":  ""
+    "versionCode": 337,
+    "versionName": "1.51.14",
+    "changelog": "Translate CONTRIBUTING guide fully to English.",
+    "minVersionCode": 0,
+    "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.51.14/Deutsch-v1.51.14.apk",
+    "apkSha256": ""
 }
