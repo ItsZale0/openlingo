@@ -8,7 +8,9 @@ import com.alessandro.tedesco.data.BackupCloud
 import com.alessandro.tedesco.data.BackupEsecutore
 import com.alessandro.tedesco.data.BackupMerge
 import com.alessandro.tedesco.data.BackupSettings
+import com.alessandro.tedesco.data.EsportaDati
 import com.alessandro.tedesco.sync.NotificheSettings
+import com.alessandro.tedesco.sync.TemaSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -80,10 +82,12 @@ class BackupViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    /** Riepilogo del backup scaricato, in attesa di conferma per il ripristino. */
+    /** Riepilogo del backup scaricato/importato, in attesa di conferma per il ripristino. */
     private val _daRipristinare = MutableStateFlow<BackupCloud.Riepilogo?>(null)
     val daRipristinare: StateFlow<BackupCloud.Riepilogo?> = _daRipristinare
     private var contenutoDaRipristinare: String? = null
+    /** Colore tema da un file di esportazione completa (se presente). */
+    private var temaDaRipristinare: String? = null
 
     fun salvaToken(t: String) { viewModelScope.launch { settings.salvaToken(t) } }
     fun salvaRepo(r: String) { viewModelScope.launch { settings.salvaRepo(r) } }
@@ -216,6 +220,40 @@ class BackupViewModel(application: Application) : AndroidViewModel(application) 
     fun annullaRipristino() {
         _daRipristinare.value = null
         contenutoDaRipristinare = null
+        temaDaRipristinare = null
+    }
+
+    /**
+     * Carica un backup da file locale (esportazione completa o backup cloud JSON)
+     * e mostra il riepilogo; il ripristino richiede conferma come per il cloud.
+     */
+    fun preparaRipristinoDaFile(jsonTesto: String) {
+        _stato.value = BackupStato.InCorso
+        viewModelScope.launch {
+            try {
+                val (contenutoBackup, tema) = withContext(Dispatchers.Default) {
+                    if (EsportaDati.valida(jsonTesto)) {
+                        val comeBackup = EsportaDati.comeBackup(jsonTesto)
+                            ?: error("File di esportazione non leggibile")
+                        val temaColore = runCatching {
+                            val p = kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
+                                .decodeFromString(EsportaDati.Pacchetto.serializer(), jsonTesto)
+                            p.temaColore.takeIf { it.isNotBlank() }
+                        }.getOrNull()
+                        comeBackup to temaColore
+                    } else {
+                        jsonTesto to null
+                    }
+                }
+                val pacchetto = BackupCloud.deserializza(contenutoBackup)
+                contenutoDaRipristinare = contenutoBackup
+                temaDaRipristinare = tema
+                _daRipristinare.value = BackupCloud.riepilogo(pacchetto)
+                _stato.value = BackupStato.Idle
+            } catch (e: Exception) {
+                _stato.value = BackupStato.Errore(e.message ?: "Errore sconosciuto")
+            }
+        }
     }
 
     /**
@@ -228,6 +266,7 @@ class BackupViewModel(application: Application) : AndroidViewModel(application) 
      */
     fun confermaRipristino() {
         val json = contenutoDaRipristinare ?: return
+        val tema = temaDaRipristinare
         _stato.value = BackupStato.InCorso
         viewModelScope.launch {
             try {
@@ -239,9 +278,13 @@ class BackupViewModel(application: Application) : AndroidViewModel(application) 
                     pacchetto.notifiche?.let { n: BackupCloud.NotificheBackup ->
                         NotificheSettings(getApplication()).applica(n)
                     }
+                    if (!tema.isNullOrBlank()) {
+                        TemaSettings(getApplication()).setColore(tema)
+                    }
                 }
                 _daRipristinare.value = null
                 contenutoDaRipristinare = null
+                temaDaRipristinare = null
                 _stato.value = BackupStato.Ok("Ripristino completato: ${pacchetto.dati.profili.size} profili (progressi uniti)")
             } catch (e: Exception) {
                 _stato.value = BackupStato.Errore("Ripristino fallito: ${e.message}")
@@ -257,6 +300,7 @@ class BackupViewModel(application: Application) : AndroidViewModel(application) 
      */
     fun confermaRipristinoSostituendo() {
         val json = contenutoDaRipristinare ?: return
+        val tema = temaDaRipristinare
         _stato.value = BackupStato.InCorso
         viewModelScope.launch {
             try {
@@ -266,9 +310,13 @@ class BackupViewModel(application: Application) : AndroidViewModel(application) 
                     pacchetto.notifiche?.let { n: BackupCloud.NotificheBackup ->
                         NotificheSettings(getApplication()).applica(n)
                     }
+                    if (!tema.isNullOrBlank()) {
+                        TemaSettings(getApplication()).setColore(tema)
+                    }
                 }
                 _daRipristinare.value = null
                 contenutoDaRipristinare = null
+                temaDaRipristinare = null
                 _stato.value = BackupStato.Ok("Ripristino completato: ${pacchetto.dati.profili.size} profili (backup sostituito)")
             } catch (e: Exception) {
                 _stato.value = BackupStato.Errore("Ripristino fallito: ${e.message}")

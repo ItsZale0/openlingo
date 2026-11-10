@@ -1,8 +1,8 @@
 {
-    "versionCode": 338,
-    "versionName": "1.51.15",
-    "changelog": "Security policy/audit updated, English localization and documentation/branding improvements, BOM fix for release verification.",
+    "versionCode": 339,
+    "versionName": "1.51.16",
+    "changelog": "Add import from file for exported backups in Backup settings.",
     "minVersionCode": 0,
-    "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.51.15/OpenLingo-v1.51.15.apk",
-    "apkSha256": "791d92c9974b39541cf7427cdaf040d1e8fb55d98c6c57d0e571f3d994772562"
+    "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.51.16/OpenLingo-v1.51.16.apk",
+    "apkSha256": ""
 }

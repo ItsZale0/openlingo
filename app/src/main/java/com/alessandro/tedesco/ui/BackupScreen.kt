@@ -96,6 +96,25 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
             }
         }
     }
+    val importa = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            messaggioExport = t("Lettura file in corso…")
+            runCatching {
+                withContext(Dispatchers.IO) {
+                    contesto.contentResolver.openInputStream(uri)?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }
+                        ?: error(t("Impossibile leggere il file"))
+                }
+            }.onSuccess { testo ->
+                messaggioExport = ""
+                vm.preparaRipristinoDaFile(testo)
+            }.onFailure {
+                messaggioExport = t("Importazione non riuscita") + ": ${it.message}"
+            }
+        }
+    }
 
     ScreenScaffold(t("Backup cloud"), onBack = onIndietro) {
         Column(
@@ -169,6 +188,11 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) { Text(t("Esporta su file")) }
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedButton(
+                        onClick = { importa.launch(arrayOf("application/json", "text/plain", "*/*")) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) { Text(t("Importa da file")) }
                     if (messaggioExport.isNotBlank()) {
                         Spacer(Modifier.height(8.dp))
                         Text(

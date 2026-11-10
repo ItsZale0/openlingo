@@ -10695,6 +10695,11 @@ object Traduttore {
         "accento" to "Word stress",
         "s iniziale" to "Initial s",
         "OpenLingo — imparare le lingue con didattica reale" to "OpenLingo — language learning with real didactics",
+        "Importa da file" to "Import from file",
+        "Lettura file in corso…" to "Reading file…",
+        "Importazione non riuscita" to "Import failed",
+        "Impossibile leggere il file" to "Unable to read the file",
+        "File di esportazione non leggibile" to "Export file is not readable",
     )
 
 }

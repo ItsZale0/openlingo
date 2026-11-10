@@ -2,6 +2,11 @@
 
 All notable changes to OpenLingo are documented here. Release tags: https://github.com/ItsZale0/tedesco-app/tags
 
+## v1.51.16 — 2026-11-11
+
+### Backup
+- Added **Import from file** in Backup settings to restore/load a previously exported backup JSON (full export or backup format), with merge/replace confirmation flow.
+
 ## v1.51.15 — 2026-11-11
 
 ### Security
