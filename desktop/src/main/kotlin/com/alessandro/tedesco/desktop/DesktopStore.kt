@@ -753,7 +753,7 @@ class DesktopStore(
                 versioneApp = Versione.nome,
                 now = System.currentTimeMillis()
             )
-            client.carica(testo, "Backup Deutsch (desktop)")
+            client.carica(testo, "Backup OpenLingo (desktop)")
             preferenze = preferenze.copy(
                 ultimoBackup = System.currentTimeMillis(),
                 ultimaSincronizzazioneCloud = System.currentTimeMillis(),

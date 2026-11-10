@@ -1,8 +1,8 @@
 ﻿{
-    "versionCode":  334,
-    "versionName":  "1.51.11",
-    "changelog":  "Improve English localization coverage (including pronunciation), refresh app/desktop branding and documentation to emphasize Duolingo-like experience grounded in real didactics, tested methods, free and open source.",
+    "versionCode":  335,
+    "versionName":  "1.51.12",
+    "changelog":  "Update About/branding strings to OpenLingo and refine EN localization.",
     "minVersionCode":  0,
-    "apkUrl":  "https://github.com/ItsZale0/tedesco-app/releases/download/v1.51.11/Deutsch-v1.51.11.apk",
+    "apkUrl":  "https://github.com/ItsZale0/tedesco-app/releases/download/v1.51.12/Deutsch-v1.51.12.apk",
     "apkSha256":  ""
 }

@@ -6338,7 +6338,7 @@ object Traduttore {
 
             "Le trappole per chi parla italiano" to "Traps for Italian speakers",
 
-            "Deutsch e italiano, a confronto" to "German and Italian, side by side",
+            "Deutsch e italiano, a confronto" to "German and translation, side by side",
 
             "Il cuore della unità, in ordine" to "The core of the unit, in order",
 
