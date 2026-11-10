@@ -1,4 +1,4 @@
-package com.alessandro.tedesco.ui
+﻿package com.alessandro.tedesco.ui
 
 import com.alessandro.tedesco.i18n.t
 
@@ -264,7 +264,7 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
                         if (mostraTraduzione) {
                             Spacer(Modifier.height(8.dp))
                             Text(
-                                text = esercizio.traduzioneItaliana,
+                                text = t(esercizio.traduzioneItaliana),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
@@ -282,7 +282,7 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
                     shape = MaterialTheme.shapes.medium
                 ) {
                     Text(
-                        text = esercizio.domanda,
+                        text = t(esercizio.domanda),
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(Spaziature.md)
                     )
@@ -316,7 +316,7 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
                         colors = CardDefaults.cardColors(containerColor = colore)
                     ) {
                         Text(
-                            text = opzione,
+                            text = t(opzione),
                             modifier = Modifier.padding(Spaziature.md)
                         )
                     }
@@ -346,7 +346,7 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
                                 style = MaterialTheme.typography.bodySmall
                             )
                             Spacer(Modifier.height(4.dp))
-                            Text(text = esercizio.spiegazione)
+                            Text(text = t(esercizio.spiegazione))
                         }
                     }
 
@@ -476,7 +476,7 @@ fun AscoltoScreen(vm: TedescoViewModel, profilo: ProfiloUtente? = null, onFatto:
                         "puoi continuare senza connessione."
                 )
             },
-            confirmButton = { TextButton(onClick = { erroreGen = null }) { Text("OK") } }
+            confirmButton = { TextButton(onClick = { erroreGen = null }) { Text(t("OK")) } }
         )
     }
 }

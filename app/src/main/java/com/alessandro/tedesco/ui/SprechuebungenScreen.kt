@@ -48,13 +48,18 @@ fun SprechuebungenScreen(
     val registratore = remember { RegistratoreAudio(context) }
     val profilo by vm.profiloAttivo.collectAsStateWithLifecycle(null)
     val livello = profilo?.stato?.progresso?.livelloCorrente?.codiceBreve() ?: "A1"
-    val prompts = remember(livello) { Sprechuebungen.perLivello(livello) }
+    val mostraMedico by vm.mostraContestoMedico.collectAsStateWithLifecycle()
+    val contesto by vm.contestoUtente.collectAsStateWithLifecycle()
+    val mostraSanitario = remember(mostraMedico, contesto) {
+        Sprechuebungen.contestoSanitarioRichiesto(mostraMedico, contesto)
+    }
+    val prompts = remember(livello, mostraSanitario) { Sprechuebungen.perLivello(livello, mostraSanitario) }
     // Ogni giorno si riparte da un esercizio diverso del banco: la stessa
     // lista "gira" senza bisogno di salvare nulla.
-    val indiciGiorno = remember(livello, prompts) {
-        RotoreEsercizi.ordine(t("sprech-$livello"), prompts.size)
+    val indiciGiorno = remember(livello, prompts, mostraSanitario) {
+        RotoreEsercizi.ordine(t("sprech-$livello-$mostraSanitario"), prompts.size)
     }
-    var indice by remember(livello) { mutableIntStateOf(0) }
+    var indice by remember(livello, mostraSanitario) { mutableIntStateOf(0) }
     var registrando by remember { mutableStateOf(false) }
     var messaggio by remember { mutableStateOf<String?>(null) }
     var permessoNegato by remember { mutableStateOf(false) }
@@ -122,7 +127,7 @@ fun SprechuebungenScreen(
     val prompt = prompts.getOrNull(indiciGiorno.getOrNull(indice) ?: indice)
 
     ScreenScaffold("Sprechübungen", onBack = onIndietro) {
-        if (prompt == null) {
+        if (prompt == null || prompts.isEmpty()) {
             Text(t("Nessun esercizio per questo livello."))
             return@ScreenScaffold
         }
@@ -134,8 +139,7 @@ fun SprechuebungenScreen(
             verticalArrangement = Arrangement.spacedBy(Spaziature.sm)
         ) {
             Text(
-                "Esercizi di produzione orale: leggi la situazione, parla, registrati e " +
-                    t("confronta con il modello. Livello ${prompt.livello}."),
+                t("Esercizi di produzione orale: leggi la situazione, parla, registrati e confronta con il modello.") + " " + t("Livello ${prompt.livello}."),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -151,21 +155,21 @@ fun SprechuebungenScreen(
             ) {
                 Column(Modifier.padding(Spaziature.md)) {
                     Text(
-                        prompt.situazione.uppercase(),
+                        t(prompt.situazione).uppercase(),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        prompt.prompt,
+                        t(prompt.prompt),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        "Vocabolario utile: ${prompt.vocabolario.joinToString(", ")}",
+                        t("Vocabolario utile") + ": " + prompt.vocabolario.joinToString(", ") { t(it) },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )

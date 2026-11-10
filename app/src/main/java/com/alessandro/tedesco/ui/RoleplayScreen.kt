@@ -53,7 +53,9 @@ fun RoleplayScreen(vm: TedescoViewModel) {
             listOf(
                 MessaggioRoleplay(
                     testo = if (scenarioCorrente != null)
-                        t("Hai scelto: ${scenarioCorrente.titolo}. ${scenarioCorrente.situazione} Il tuo ruolo: ${scenarioCorrente.ruoloUtente}. Il mio ruolo: ${scenarioCorrente.ruoloAI}. Iniziamo!")
+                        t("Hai scelto") + ": ${t(scenarioCorrente.titolo)}. ${t(scenarioCorrente.situazione)} " +
+                            t("Il tuo ruolo") + ": ${t(scenarioCorrente.ruoloUtente)}. " +
+                            t("Il mio ruolo") + ": ${t(scenarioCorrente.ruoloAI)}. " + t("Iniziamo!")
                     else
                         t("Scegli uno scenario per iniziare il gioco di ruolo."),
                     daUtente = false
@@ -166,8 +168,7 @@ fun RoleplayScreen(vm: TedescoViewModel) {
                     )
                 ) {
                     Text(
-                        "Per il gioco di ruolo serve una chiave API Groq. " +
-                            t("Vai in Profilo → Tutor AI e inseriscila."),
+                        t("Per il gioco di ruolo serve una chiave API. Vai in Profilo → Tutor AI e inseriscila."),
                         modifier = Modifier.padding(12.dp),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onErrorContainer
@@ -202,19 +203,19 @@ fun RoleplayScreen(vm: TedescoViewModel) {
                         ) {
                             Column(modifier = Modifier.padding(12.dp).animateContentSize()) {
                                 Text(
-                                    s.titolo,
+                                    t(s.titolo),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold
                                 )
                                 Spacer(Modifier.height(4.dp))
                                 Text(
-                                    s.descrizione,
+                                    t(s.descrizione),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Spacer(Modifier.height(4.dp))
                                 Text(
-                                    "Tu: ${s.ruoloUtente} · Io: ${s.ruoloAI}",
+                                    t("Tu:") + " ${t(s.ruoloUtente)} · " + t("Io:") + " ${t(s.ruoloAI)}",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.primary
                                 )

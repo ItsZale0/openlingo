@@ -1,4 +1,4 @@
-package com.alessandro.tedesco.ui
+﻿package com.alessandro.tedesco.ui
 
 import com.alessandro.tedesco.i18n.t
 
@@ -123,7 +123,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
     val context = LocalContext.current
     val ttsHelper = rememberTtsHelper(context)
 
-    ScreenScaffold("Grammatica") {
+    ScreenScaffold(t("Grammatica")) {
 
             Column(
                 modifier = Modifier.widthIn(max = dimensioneContenuto()),
@@ -198,7 +198,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                                     traduci(esercizio.domanda)
                                                 }
                                             } catch (e: Throwable) {
-                                                traduzione = t("Errore: ${e.message}")
+                                                traduzione = t("Errore:") + " ${e.message}"
                                             } finally {
                                                 caricamentoTraduzione = false
                                             }
@@ -282,7 +282,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                                     traduci(opzione)
                                                 }
                                             } catch (e: Throwable) {
-                                                traduzione = t("Errore: ${e.message}")
+                                                traduzione = t("Errore:") + " ${e.message}"
                                             } finally {
                                                 caricamentoTraduzione = false
                                             }
@@ -314,7 +314,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                         ) {
                             Column(modifier = Modifier.padding(Spaziature.md)) {
                                 Text(
-                                    text = if (risultato == true) "✓ Corretto! 🎉" else "✗ Sbagliato",
+                                    text = if (risultato == true) t("Corretto!") + " 🎉" else t("Sbagliato"),
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
@@ -340,7 +340,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                                         traduci(esercizio.esempio)
                                                     }
                                                 } catch (e: Throwable) {
-                                                    traduzioneEsempio = t("Errore: ${e.message}")
+                                                    traduzioneEsempio = t("Errore:") + " ${e.message}"
                                                 } finally {
                                                     caricamentoTraduzione = false
                                                 }
@@ -397,7 +397,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = t("Punteggio: $punteggio/${esercizi.size}"),
+                                text = t("Punteggio:") + " $punteggio/${esercizi.size}",
                                 style = MaterialTheme.typography.headlineMedium
                             )
                             Text(
@@ -407,7 +407,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                             if (erroriRef.isNotEmpty()) {
                                 Spacer(Modifier.height(12.dp))
                                 Text(
-                                    text = t("Errori da ripassare: ${erroriRef.size}"),
+                                    text = t("Errori da ripassare:") + " ${erroriRef.size}",
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.error
                                 )
@@ -455,7 +455,7 @@ fun GrammaticaScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
             onDismissRequest = { erroreGen = null },
             title = { Text(t("Chiave API necessaria")) },
             text = { Text(t("Per generare esercizi infiniti inserisci una chiave Groq gratuita in Profilo → Tutor AI.")) },
-            confirmButton = { TextButton(onClick = { erroreGen = null }) { Text("OK") } }
+            confirmButton = { TextButton(onClick = { erroreGen = null }) { Text(t("OK")) } }
         )
     }
 }

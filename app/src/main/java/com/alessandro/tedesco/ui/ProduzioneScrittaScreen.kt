@@ -1,4 +1,4 @@
-package com.alessandro.tedesco.ui
+﻿package com.alessandro.tedesco.ui
 
 import com.alessandro.tedesco.i18n.t
 
@@ -49,7 +49,7 @@ fun getEserciziScrittura(profilo: ProfiloUtente?): List<EsercizioScrittura> {
                 "Ich heiße Thomas. Ich wohne in Bozen. Ich bin Physiotherapeut. Ich lerne Deutsch."
             else
                 "Ich heiße Sophie. Ich wohne in Bozen. Ich bin Studentin. Ich lerne Deutsch.",
-            suggerimenti = listOf(t("Nome"), t("Città"), t("Lavoro/Studi"), "Hobby")
+            suggerimenti = listOf(t("Nome"), t("Città"), t("Lavoro/Studi"), t("Hobby"))
         ),
         EsercizioScrittura(
             id = "sc2",
@@ -73,8 +73,12 @@ fun getEserciziScrittura(profilo: ProfiloUtente?): List<EsercizioScrittura> {
             suggerimenti = listOf(t("Oggetto"), t("Saluto formale"), t("Richiesta"), t("Chiusura"))
         )
     )
-    // Esercizio studio fisioterapia solo per profili medici
-    if (profilo?.config?.mostraContestoMedico == true) {
+    // Esercizio studio fisioterapia solo per profili/contesti sanitari
+    val mostraSanitario = com.alessandro.tedesco.data.TaskB1.contestoSanitarioRichiesto(
+        profilo?.config?.mostraContestoMedico == true,
+        profilo?.config?.contestoUtente.orEmpty()
+    )
+    if (mostraSanitario) {
         return base + EsercizioScrittura(
             id = "sc4",
             titolo = t("Descrivi il tuo studio"),
@@ -110,13 +114,22 @@ fun ProduzioneScrittaScreen(
 
     // Lista di base + compiti d'esame Goethe/telc + esercizi generati dall'AI
     val listaBase = getEserciziScrittura(profilo)
-    val taskEsame = com.alessandro.tedesco.data.TaskB1.scrittura.map { task ->
+    val mostraSanitarioTask = com.alessandro.tedesco.data.TaskB1.contestoSanitarioRichiesto(
+        profilo?.config?.mostraContestoMedico == true,
+        profilo?.config?.contestoUtente.orEmpty()
+    )
+    val taskEsame = com.alessandro.tedesco.data.TaskB1.scritturaPerContesto(mostraSanitarioTask).map { task ->
         EsercizioScrittura(
             id = task.id,
-            titolo = "Esame B1: ${task.titolo}",
-            istruzioni = task.istruzioni(),
+            titolo = t("Esame B1") + ": " + t(task.titolo),
+            istruzioni = buildString {
+                append(t(task.situazione))
+                append("\n\n").append(t("Punti da coprire:"))
+                task.punti.forEach { append("\n- ").append(t(it)) }
+                append("\n\n").append(t("Scrivi ${task.paroleMin}-${task.paroleMax} parole."))
+            },
             esempio = "",
-            suggerimenti = task.punti
+            suggerimenti = task.punti.map { t(it) }
         )
     }
     val eserciziGeneratiConvenieti = DeduplicaEsercizi.distinti(eserciziGen) {
@@ -421,7 +434,7 @@ fun ProduzioneScrittaScreen(
             onDismissRequest = { erroreGen = null },
             title = { Text(t("Chiave API necessaria")) },
             text = { Text(t("Per generare esercizi infiniti inserisci una chiave Groq gratuita in Profilo → Tutor AI.")) },
-            confirmButton = { TextButton(onClick = { erroreGen = null }) { Text("OK") } }
+            confirmButton = { TextButton(onClick = { erroreGen = null }) { Text(t("OK")) } }
         )
     }
 }

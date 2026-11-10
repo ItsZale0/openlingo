@@ -37,9 +37,9 @@ import com.alessandro.tedesco.ui.theme.Spaziature
 import java.util.Locale
 
 enum class SezioneSudtirol(val etichetta: String) {
-    VARIANTI(t("Austriaco")),
+    VARIANTI("Austriaco"),
     LESSICO("Lessico"),
-    FRASI(t("Frasi"))
+    FRASI("Frasi")
 }
 
 /**
@@ -60,8 +60,7 @@ fun SudtirolScreen(
             verticalArrangement = Arrangement.spacedBy(Spaziature.sm)
         ) {
             Text(
-                "A Bressanone e in Austria molte parole quotidiane sono diverse dallo standard. " +
-                    t("Capirle è parte della competenza reale, non un vezzo. Ogni variante è un arricchimento!"),
+                t("A Bressanone e in Austria molte parole quotidiane sono diverse dallo standard. Capirle è parte della competenza reale, non un vezzo. Ogni variante è un arricchimento!"),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -98,7 +97,7 @@ fun SudtirolScreen(
                                 Column(Modifier.weight(1f)) {
                                     Text(v.austriaco, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
                                     Text(
-                                        "standard: ${v.standard}",
+                                        t("standard") + ": ${v.standard}",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -116,7 +115,7 @@ fun SudtirolScreen(
                     val categorie = remember { Sudtirol.lessico.map { it.categoria }.distinct() }
                     categorie.forEach { categoria ->
                         Text(
-                            categoria,
+                            t(categoria),
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
@@ -167,13 +166,13 @@ fun SudtirolScreen(
                                     }
                                 }
                                 Text(
-                                    frase.italiano,
+                                    t(frase.italiano),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 if (frase.nota.isNotBlank()) {
                                     Spacer(Modifier.height(4.dp))
-                                    Text(frase.nota, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                                    Text(t(frase.nota), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
                                 }
                             }
                         }

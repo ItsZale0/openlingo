@@ -51,15 +51,21 @@ import com.alessandro.tedesco.data.TipoEsercizioGrammatica
 import com.alessandro.tedesco.data.UnitaGrammatica
 import com.alessandro.tedesco.desktop.DesktopStore
 import kotlin.random.Random
+import com.alessandro.tedesco.i18n.t
 
 @Composable
-fun SchermataUnita(store: DesktopStore, unitaId: String, onIndietro: () -> Unit) {
+fun SchermataUnita(
+    store: DesktopStore,
+    unitaId: String,
+    onIndietro: () -> Unit,
+    onVaiAGenderTrainer: () -> Unit = {}
+) {
     store.repo
     val unita = GrammaticaSyllabus.perId(unitaId)
     if (unita == null) {
         Pagina {
-            Text("Unità non trovata.", style = MaterialTheme.typography.bodyLarge)
-            OutlinedButton(onClick = onIndietro) { Text("Torna agli esercizi") }
+            Text(t("Unità non trovata."), style = MaterialTheme.typography.bodyLarge)
+            OutlinedButton(onClick = onIndietro) { Text(t("Torna agli esercizi")) }
         }
         return
     }
@@ -76,7 +82,7 @@ fun SchermataUnita(store: DesktopStore, unitaId: String, onIndietro: () -> Unit)
         TextButton(onClick = onIndietro) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(6.dp))
-            Text("Esercizi")
+            Text(t("Esercizi"))
         }
 
         Card(
@@ -89,14 +95,14 @@ fun SchermataUnita(store: DesktopStore, unitaId: String, onIndietro: () -> Unit)
                     Etichetta(unita.livello)
                     Spacer(Modifier.width(10.dp))
                     Text(
-                        "${unita.minuti} min",
+                        "${unita.minuti} " + t("min"),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.75f)
                     )
                     Spacer(Modifier.weight(1f))
                     if (padronanza != null && padronanza.totali > 0) {
                         Text(
-                            "Padronanza ${padronanza.percentuale}%",
+                            t("Padronanza") + " ${padronanza.percentuale}%",
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
@@ -104,18 +110,18 @@ fun SchermataUnita(store: DesktopStore, unitaId: String, onIndietro: () -> Unit)
                 }
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    unita.titolo,
+                    t(unita.titolo),
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Text(
-                    unita.sottotitolo,
+                    t(unita.sottotitolo),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f)
                 )
                 Spacer(Modifier.height(10.dp))
                 Text(
-                    "Obiettivo: ${unita.obiettivo}",
+                    t("Obiettivo") + ": ${t(unita.obiettivo)}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
@@ -126,17 +132,21 @@ fun SchermataUnita(store: DesktopStore, unitaId: String, onIndietro: () -> Unit)
             Tab(
                 selected = scheda == 0,
                 onClick = { scheda = 0 },
-                text = { Text("Teoria") }
+                text = { Text(t("Teoria")) }
             )
             Tab(
                 selected = scheda == 1,
                 onClick = { scheda = 1 },
-                text = { Text("Esercizi (${unita.esercizi.size})") }
+                text = { Text(t("Esercizi") + " (${unita.esercizi.size})") }
             )
         }
 
         if (scheda == 0) {
-            TeoriaUnita(unita = unita, onVaiEsercizi = { scheda = 1 })
+            TeoriaUnita(
+                unita = unita,
+                onVaiEsercizi = { scheda = 1 },
+                onVaiAGenderTrainer = onVaiAGenderTrainer
+            )
         } else {
             EserciziUnita(
                 store = store,
@@ -151,10 +161,14 @@ fun SchermataUnita(store: DesktopStore, unitaId: String, onIndietro: () -> Unit)
 // ---------------------------------------------------------------- teoria
 
 @Composable
-private fun TeoriaUnita(unita: UnitaGrammatica, onVaiEsercizi: () -> Unit) {
+private fun TeoriaUnita(
+    unita: UnitaGrammatica,
+    onVaiEsercizi: () -> Unit,
+    onVaiAGenderTrainer: () -> Unit = {}
+) {
     val teoria = unita.teoria
 
-    CardSezione(titolo = "Regola", sottotitolo = "Il cuore della unità, in ordine") {
+    CardSezione(titolo = t("Regola"), sottotitolo = t("Il cuore della unità, in ordine")) {
         teoria.regola.forEach { regola ->
             Row(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp),
@@ -166,7 +180,7 @@ private fun TeoriaUnita(unita: UnitaGrammatica, onVaiEsercizi: () -> Unit) {
                     color = MaterialTheme.colorScheme.primary
                 )
                 Spacer(Modifier.width(8.dp))
-                Text(regola, style = MaterialTheme.typography.bodyMedium)
+                Text(t(regola), style = MaterialTheme.typography.bodyMedium)
             }
         }
     }
@@ -176,7 +190,7 @@ private fun TeoriaUnita(unita: UnitaGrammatica, onVaiEsercizi: () -> Unit) {
     }
 
     if (teoria.esempi.isNotEmpty()) {
-        CardSezione(titolo = "Esempi", sottotitolo = "Deutsch e italiano, a confronto") {
+        CardSezione(titolo = t("Esempi"), sottotitolo = t("Deutsch e italiano, a confronto")) {
             teoria.esempi.forEach { esempio ->
                 EsempioCard(esempio)
                 Spacer(Modifier.height(8.dp))
@@ -185,7 +199,7 @@ private fun TeoriaUnita(unita: UnitaGrammatica, onVaiEsercizi: () -> Unit) {
     }
 
     if (teoria.erroriTipici.isNotEmpty()) {
-        CardSezione(titolo = "Errori tipici", sottotitolo = "Le trappole per chi parla italiano") {
+        CardSezione(titolo = t("Errori tipici"), sottotitolo = t("Le trappole per chi parla italiano")) {
             teoria.erroriTipici.forEach { errore ->
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
@@ -200,7 +214,7 @@ private fun TeoriaUnita(unita: UnitaGrammatica, onVaiEsercizi: () -> Unit) {
                     Spacer(Modifier.width(8.dp))
                     Column(Modifier.weight(1f)) {
                         Text(
-                            errore.sbagliato,
+                            t(errore.sbagliato),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.error
                         )
@@ -213,13 +227,13 @@ private fun TeoriaUnita(unita: UnitaGrammatica, onVaiEsercizi: () -> Unit) {
                             )
                             Spacer(Modifier.width(6.dp))
                             Text(
-                                errore.corretto,
+                                t(errore.corretto),
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold
                             )
                         }
                         Text(
-                            errore.spiegazione,
+                            t(errore.spiegazione),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -232,13 +246,13 @@ private fun TeoriaUnita(unita: UnitaGrammatica, onVaiEsercizi: () -> Unit) {
     if (teoria.merksatz.isNotBlank()) {
         CardSezione(colore = MaterialTheme.colorScheme.tertiaryContainer) {
             Text(
-                "Merksatz",
+                t("Merksatz"),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onTertiaryContainer
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                teoria.merksatz,
+                t(teoria.merksatz),
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onTertiaryContainer
@@ -246,14 +260,41 @@ private fun TeoriaUnita(unita: UnitaGrammatica, onVaiEsercizi: () -> Unit) {
         }
     }
 
+    val eUnitArticoli = unita.id.contains("articol", ignoreCase = true) ||
+        unita.titolo.contains("articol", ignoreCase = true)
+    if (eUnitArticoli) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+        ) {
+            Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    t("Allenati sugli articoli con il tuo lessico"),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    t("Indovina der, die o das usando le parole che hai già nel lessico, filtrate per livello."),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Button(onClick = onVaiAGenderTrainer, modifier = Modifier.fillMaxWidth()) {
+                    Text(t("Apri allenatore articoli"))
+                }
+            }
+        }
+        Spacer(Modifier.height(10.dp))
+    }
+
     Button(onClick = onVaiEsercizi) {
-        Text("Passa agli esercizi (${unita.esercizi.size})")
+        Text(t("Passa agli esercizi") + " (${unita.esercizi.size})")
     }
 }
 
 @Composable
 private fun TabellaCard(tabella: TabellaGrammatica) {
-    CardSezione(titolo = tabella.titolo) {
+    CardSezione(titolo = t(tabella.titolo)) {
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(10.dp),
@@ -263,7 +304,7 @@ private fun TabellaCard(tabella: TabellaGrammatica) {
                 Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp)) {
                     tabella.intestazioni.forEach { intestazione ->
                         Text(
-                            intestazione,
+                            t(intestazione),
                             modifier = Modifier.weight(1f),
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Bold
@@ -277,7 +318,7 @@ private fun TabellaCard(tabella: TabellaGrammatica) {
                     ) {
                         riga.forEach { cella ->
                             Text(
-                                cella,
+                                t(cella),
                                 modifier = Modifier.weight(1f),
                                 style = MaterialTheme.typography.bodySmall
                             )
@@ -289,7 +330,7 @@ private fun TabellaCard(tabella: TabellaGrammatica) {
         if (tabella.nota.isNotBlank()) {
             Spacer(Modifier.height(8.dp))
             Text(
-                tabella.nota,
+                t(tabella.nota),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -307,13 +348,13 @@ private fun EsempioCard(esempio: EsempioGrammatica) {
         Column(Modifier.fillMaxWidth().padding(12.dp)) {
             Text(esempio.tedesco, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
             Text(
-                esempio.italiano,
+                t(esempio.italiano),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             if (esempio.nota.isNotBlank()) {
                 Text(
-                    esempio.nota,
+                    t(esempio.nota),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -372,19 +413,19 @@ private fun EserciziUnita(
 
     val totale = stato.sessione.esercizi.size
     CardSezione(
-        titolo = "Esercizio ${stato.indice + 1} di $totale",
-        sottotitolo = tipoEsercizio(esercizio.tipo)
+        titolo = t("Esercizio ${stato.indice + 1} di $totale"),
+        sottotitolo = t(tipoEsercizio(esercizio.tipo))
     ) {
         BarraLineare(
             valore = stato.indice.toFloat() / totale,
             modifier = Modifier.fillMaxWidth().height(6.dp)
         )
         Spacer(Modifier.height(14.dp))
-        Text(esercizio.domanda, style = MaterialTheme.typography.bodyLarge)
+        Text(t(esercizio.domanda), style = MaterialTheme.typography.bodyLarge)
         if (esercizio.suggerimento.isNotBlank() && stato.esito == null) {
             Spacer(Modifier.height(6.dp))
             Text(
-                "Suggerimento: ${esercizio.suggerimento}",
+                t("Suggerimento: ${esercizio.suggerimento}"),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -425,7 +466,7 @@ private fun EserciziUnita(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(Modifier.width(12.dp))
-                        Text(opzione, style = MaterialTheme.typography.bodyMedium)
+                        Text(t(opzione), style = MaterialTheme.typography.bodyMedium)
                     }
                 }
             }
@@ -436,7 +477,7 @@ private fun EserciziUnita(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 enabled = stato.esito == null,
-                label = { Text("La tua risposta") },
+                label = { Text(t("La tua risposta")) },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { verifica(esercizio, stato) })
             )
@@ -452,7 +493,7 @@ private fun EserciziUnita(
                     stato.testo.isNotBlank()
                 }
             ) {
-                Text("Verifica")
+                Text(t("Verifica"))
             }
         } else {
             val corretto = stato.esito == true
@@ -465,7 +506,7 @@ private fun EserciziUnita(
             ) {
                 Column(Modifier.fillMaxWidth().padding(14.dp)) {
                     Text(
-                        if (corretto) "Corretto" else "Non corretto",
+                        if (corretto) t("Corretto") else t("Non corretto"),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold
                     )
@@ -477,7 +518,7 @@ private fun EserciziUnita(
                         }
                         if (attesa.isNotBlank()) {
                             Text(
-                                "Risposta attesa: $attesa",
+                                t("Risposta attesa: $attesa"),
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
@@ -512,7 +553,7 @@ private fun EserciziUnita(
                     stato.esito = null
                 }
             }) {
-                Text(if (stato.indice + 1 >= totale) "Vedi risultato" else "Avanti")
+                Text(if (stato.indice + 1 >= totale) t("Vedi risultato") else t("Avanti"))
             }
         }
     }
@@ -536,35 +577,35 @@ private fun RisultatoSessione(
     val percentuale = if (totali == 0) 0 else corrette * 100 / totali
     val promosso = percentuale >= GrammaticaSyllabus.SOGLIA_PADRONANZA
     CardSezione(
-        titolo = if (promosso) "Unità superata" else "Rivediamo la regola",
-        sottotitolo = "Soglia di padronanza: ${GrammaticaSyllabus.SOGLIA_PADRONANZA}%"
+        titolo = if (promosso) t("Unità superata") else t("Rivediamo la regola"),
+        sottotitolo = t("Soglia di padronanza: ${GrammaticaSyllabus.SOGLIA_PADRONANZA}%")
     ) {
         Text(
-            "$corrette risposte corrette su $totali ($percentuale%)",
+            t("$corrette risposte corrette su $totali ($percentuale%)"),
             style = MaterialTheme.typography.headlineSmall,
             color = if (promosso) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.error
         )
         Spacer(Modifier.height(8.dp))
         Text(
             if (promosso) {
-                "L'unità è stata completata: tornerà nel ripasso tra 1, 3, 7 o 16 giorni."
+                t("L'unità è stata completata: tornerà nel ripasso tra 1, 3, 7 o 16 giorni.")
             } else {
-                "Rileggi la regola e riprova: al ${GrammaticaSyllabus.SOGLIA_PADRONANZA}% l'unità risulta completata."
+                t("Rileggi la regola e riprova: al ${GrammaticaSyllabus.SOGLIA_PADRONANZA}% l'unità risulta completata.")
             },
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(Modifier.height(16.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Button(onClick = onRipeti) { Text("Ripeti la sessione") }
-            OutlinedButton(onClick = onTornaPercorso) { Text("Torna al percorso") }
+            Button(onClick = onRipeti) { Text(t("Ripeti la sessione")) }
+            OutlinedButton(onClick = onTornaPercorso) { Text(t("Torna al percorso")) }
         }
     }
 }
 
 private fun tipoEsercizio(tipo: TipoEsercizioGrammatica): String = when (tipo) {
-    TipoEsercizioGrammatica.SCELTA_MULTIPLA -> "Scelta multipla"
-    TipoEsercizioGrammatica.COMPLETAMENTO -> "Completamento"
-    TipoEsercizioGrammatica.TRASFORMAZIONE -> "Trasformazione"
-    TipoEsercizioGrammatica.PRODUZIONE -> "Produzione"
+    TipoEsercizioGrammatica.SCELTA_MULTIPLA -> t("Scelta multipla")
+    TipoEsercizioGrammatica.COMPLETAMENTO -> t("Completamento")
+    TipoEsercizioGrammatica.TRASFORMAZIONE -> t("Trasformazione")
+    TipoEsercizioGrammatica.PRODUZIONE -> t("Produzione")
 }

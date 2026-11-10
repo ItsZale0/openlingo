@@ -126,9 +126,8 @@ fun LessicoScreen(
     ScreenScaffold("Lessico A1-B2", onBack = onIndietro, scrollable = false) {
         Column(modifier = Modifier.fillMaxSize()) {
             Text(
-                text = t("${LessicoLivelli.tutte.size} parole curate, divise in parole nuove per ") +
-                    "livello. I traguardi sono cumulativi (A1 650, A2 1.300, B1 2.400, B2 3.000): " +
-                    "aggiungi un livello al ripasso e allenati in sei modi diversi.",
+                text = "${LessicoLivelli.tutte.size} " + t("parole curate, divise per livello.") + " " +
+                    t("I traguardi sono cumulativi (A1 650, A2 1.300, B1 2.400, B2 3.000): aggiungi un livello al ripasso e allenati in sei modi diversi."),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -147,7 +146,7 @@ fun LessicoScreen(
                         onClick = { livelloScelto = livello },
                         label = {
                             Text(
-                                if (s == null) livello else t("$livello · ${s.nelProfilo}/${s.curate}")
+                                if (s == null) livello else "$livello · ${s.nelProfilo}/${s.curate}"
                             )
                         }
                     )
@@ -172,9 +171,9 @@ fun LessicoScreen(
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            t("${riepilogo.curate} parole nuove di ${riepilogo.livello} · ") +
-                                t("${riepilogo.nelProfilo} già nel tuo lessico") +
-                                if (riepilogo.daRipassare > 0) " · ${riepilogo.daRipassare} da ripassare"
+                            "${riepilogo.curate} " + t("parole nuove di") + " ${riepilogo.livello} · " +
+                                "${riepilogo.nelProfilo} " + t("già nel tuo lessico") +
+                                if (riepilogo.daRipassare > 0) " · ${riepilogo.daRipassare} " + t("da ripassare")
                                 else "",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -183,8 +182,8 @@ fun LessicoScreen(
                         val obiettivo = LessicoLivelli.targetCumulativo(riepilogo.livello)
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            t("Copertura fino a ${riepilogo.livello}: ") +
-                                "%,d di %,d parole (obiettivo cumulativo)".format(coperte, obiettivo),
+                            t("Copertura fino a") + " ${riepilogo.livello}: " +
+                                "%,d".format(coperte) + " " + t("di") + " " + "%,d".format(obiettivo) + " " + t("parole (obiettivo cumulativo)"),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
@@ -198,7 +197,7 @@ fun LessicoScreen(
                         if (riepilogo.temi.isNotEmpty()) {
                             Spacer(Modifier.height(4.dp))
                             Text(
-                                "Temi: " + riepilogo.temi.take(8).joinToString(" · "),
+                                t("Temi:") + " " + riepilogo.temi.take(8).joinToString(" · ") { t(it) },
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
@@ -269,7 +268,7 @@ fun LessicoScreen(
                         }
                         if (voce.tema.isNotBlank()) {
                             Text(
-                                voce.tema,
+                                t(voce.tema),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )

@@ -73,20 +73,20 @@ fun QuadernoErroriScreen(
                     Spacer(Modifier.width(Spaziature.sm))
                     Column(Modifier.weight(1f)) {
                         Text(
-                            t("${aperti.size} errori da consolidare"),
+                            "${aperti.size} " + t("errori da consolidare"),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
                             if (daRipassare.isNotEmpty())
-                                t("${daRipassare.size} pronti da ripassare adesso")
+                                "${daRipassare.size} " + t("pronti da ripassare adesso")
                             else t("Nessun ripasso in scadenza: torna più tardi."),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
                     if (risolti > 0) {
                         TextButton(onClick = { vm.svuotaErroriRisolti() }) {
-                            Text(t("Pulisci ($risolti)"))
+                            Text(t("Pulisci") + " ($risolti)")
                         }
                     }
                 }
@@ -107,7 +107,7 @@ fun QuadernoErroriScreen(
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            "Gli errori di grammatica e produzione finiscono qui automaticamente. " +
+                            t("Gli errori di grammatica e produzione finiscono qui automaticamente.") + " " +
                                 t("Fai esercizi per riempire il quaderno."),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -133,7 +133,7 @@ fun QuadernoErroriScreen(
                     Column(Modifier.fillMaxWidth().padding(Spaziature.md)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                t("${errore.tipo} - ${errore.livello}"),
+                                t(errore.tipo) + " - " + errore.livello,
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Bold,
@@ -141,7 +141,7 @@ fun QuadernoErroriScreen(
                             )
                             if (!inScadenza) {
                                 Text(
-                                    t("tra ${ErroriSRS.giorniAllaScadenza(errore)} g"),
+                                    t("tra") + " ${ErroriSRS.giorniAllaScadenza(errore)} " + t("g"),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -158,7 +158,7 @@ fun QuadernoErroriScreen(
                         Text(errore.domanda, style = MaterialTheme.typography.bodyLarge)
                         if (errore.rispostaData.isNotBlank()) {
                             Text(
-                                t("Hai scritto: ${errore.rispostaData}"),
+                                t("Hai scritto:") + " ${errore.rispostaData}",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.error
                             )
@@ -166,14 +166,14 @@ fun QuadernoErroriScreen(
                         Spacer(Modifier.height(Spaziature.sm))
                         if (mostraRisposta) {
                             Text(
-                                t("Risposta corretta: ${errore.rispostaCorretta}"),
+                                t("Risposta corretta:") + " ${errore.rispostaCorretta}",
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.primary
                             )
                             if (errore.spiegazione.isNotBlank()) {
                                 Spacer(Modifier.height(4.dp))
-                                Text(errore.spiegazione, style = MaterialTheme.typography.bodySmall)
+                                Text(t(errore.spiegazione), style = MaterialTheme.typography.bodySmall)
                             }
                             Spacer(Modifier.height(Spaziature.sm))
                             Row(horizontalArrangement = Arrangement.spacedBy(Spaziature.sm)) {
@@ -213,7 +213,7 @@ fun QuadernoErroriScreen(
                         Icon(Icons.Filled.Check, contentDescription = null, modifier = Modifier.size(20.dp))
                         Spacer(Modifier.width(Spaziature.sm))
                         Text(
-                            t("$risolti errori consolidati dopo 5 richiami"),
+                            "$risolti " + t("errori consolidati dopo 5 richiami"),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }

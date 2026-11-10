@@ -2,6 +2,8 @@ package com.alessandro.tedesco.data
 
 import com.alessandro.tedesco.data.local.LivelloCEFR
 import com.alessandro.tedesco.data.local.TestLivello
+import com.alessandro.tedesco.i18n.Traduttore
+import com.alessandro.tedesco.i18n.t
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -101,7 +103,8 @@ object CalcoloPercorsoGiornaliero {
         prossimaUnitaId: String? = null,
         prossimaUnitaTitolo: String? = null
     ): PercorsoGiornaliero {
-        val data = SimpleDateFormat("EEEE d MMMM", Locale.ITALIAN).format(Date())
+        val locale = if (Traduttore.lingua == "en") Locale.ENGLISH else Locale.ITALIAN
+        val data = SimpleDateFormat("EEEE d MMMM", locale).format(Date())
         val candidati = mutableListOf<PassoPercorso>()
         var prioritaCounter = 1
 
@@ -112,8 +115,8 @@ object CalcoloPercorsoGiornaliero {
             candidati.add(
                 PassoPercorso(
                     id = "ripasso",
-                    titolo = "Ripasso flashcard",
-                    descrizione = "$daRipassare parole in scadenza · ~$minuti min",
+                    titolo = t("Ripasso flashcard"),
+                    descrizione = t("$daRipassare parole in scadenza") + " · " + t("~$minuti min"),
                     tipo = TipoPasso.RIPASSO,
                     priorita = prioritaCounter++,
                     stimaMinuti = minuti,
@@ -141,8 +144,8 @@ object CalcoloPercorsoGiornaliero {
             candidati.add(
                 PassoPercorso(
                     id = "test-livello",
-                    titolo = "Verifica il tuo livello",
-                    descrizione = "Test di ${obiettivoLivello.label} · ~$minuti min",
+                    titolo = t("Verifica il tuo livello"),
+                    descrizione = t("Test di") + " ${obiettivoLivello.label} · ~$minuti min",
                     tipo = TipoPasso.TEST_LIVELLO,
                     priorita = prioritaCounter++,
                     stimaMinuti = minuti,
@@ -158,15 +161,15 @@ object CalcoloPercorsoGiornaliero {
         if (includiGrammatica) {
             val minuti = 8
             val descrizione = if (prossimaUnitaId != null) {
-                val titolo = prossimaUnitaTitolo?.takeIf { it.isNotBlank() } ?: "prossima unità"
-                "$titolo · ~$minuti min"
+                val titolo = prossimaUnitaTitolo?.takeIf { it.isNotBlank() }?.let { t(it) } ?: t("prossima unità")
+                "$titolo · " + t("~$minuti min")
             } else {
-                "Grammatica al ${competenze.grammatica.toInt()}% · ~$minuti min"
+                t("Grammatica al") + " ${competenze.grammatica.toInt()}% · ~$minuti min"
             }
             candidati.add(
                 PassoPercorso(
                     id = "grammatica",
-                    titolo = if (prossimaUnitaId != null) "Percorso grammaticale" else "Esercizi di grammatica",
+                    titolo = if (prossimaUnitaId != null) t("Percorso grammaticale") else t("Esercizi di grammatica"),
                     descrizione = descrizione,
                     tipo = TipoPasso.GRAMMATICA,
                     priorita = prioritaCounter++,
@@ -187,8 +190,8 @@ object CalcoloPercorsoGiornaliero {
                 Supporto(
                     PassoPercorso(
                         id = "comprensione",
-                        titolo = "Comprensione",
-                        descrizione = "Ascolto e lettura · ~$minuti min",
+                        titolo = t("Comprensione"),
+                        descrizione = t("Ascolto e lettura") + " · " + t("~$minuti min"),
                         tipo = TipoPasso.COMPRENSIONE,
                         priorita = 0,
                         stimaMinuti = minuti,
@@ -207,8 +210,8 @@ object CalcoloPercorsoGiornaliero {
                 Supporto(
                     PassoPercorso(
                         id = "produzione",
-                        titolo = "Produzione",
-                        descrizione = "Scrivi e rivedi un testo · ~$minuti min",
+                        titolo = t("Produzione"),
+                        descrizione = t("Scrivi e rivedi un testo") + " · " + t("~$minuti min"),
                         tipo = TipoPasso.PRODUZIONE,
                         priorita = 0,
                         stimaMinuti = minuti,
@@ -227,8 +230,8 @@ object CalcoloPercorsoGiornaliero {
                 Supporto(
                     PassoPercorso(
                         id = "vocabolario",
-                        titolo = "Lessico",
-                        descrizione = "Parole utili per il livello · ~$minuti min",
+                        titolo = t("Lessico"),
+                        descrizione = t("Parole utili per il livello") + " · " + t("~$minuti min"),
                         tipo = TipoPasso.VOCABOLARIO,
                         priorita = 0,
                         stimaMinuti = minuti,
@@ -252,8 +255,8 @@ object CalcoloPercorsoGiornaliero {
             candidati.add(
                 PassoPercorso(
                     id = "sessione",
-                    titolo = "Sessione di studio",
-                    descrizione = "Ripasso completo e nuovi argomenti · ~20 min",
+                    titolo = t("Sessione di studio"),
+                    descrizione = t("Ripasso completo e nuovi argomenti") + " · " + t("~20 min"),
                     tipo = TipoPasso.SESSIONE_GUIDATA,
                     priorita = 1,
                     stimaMinuti = 20,
@@ -268,21 +271,21 @@ object CalcoloPercorsoGiornaliero {
         val minutiCompletati = passi.filter { it.completato }.sumOf { it.stimaMinuti }
 
         val messaggio = when {
-            passi.any { it.urgente } -> "Oggi conviene concentrarsi sulle aree con il badge Priorità."
-            daRipassare >= 20 -> "Tante parole da ripassare. Inizia dal ripasso!"
-            daRipassare >= 10 -> "Buon ritmo! Mantieni la costanza."
-            statistiche.streakGiorni >= 7 -> "Streak di ${statistiche.streakGiorni} giorni! Sei inarrestabile."
-            competenze.grammatica >= 60f && daRipassare == 0 -> "Prosegui così, stai facendo ottimi progressi."
-            competenze.lessico < 30f -> "Sei all'inizio del viaggio. Ogni parola conta!"
-            else -> "Buona sessione di studio!"
+            passi.any { it.urgente } -> t("Oggi conviene concentrarsi sulle aree con il badge Priorità.")
+            daRipassare >= 20 -> t("Tante parole da ripassare. Inizia dal ripasso!")
+            daRipassare >= 10 -> t("Buon ritmo! Mantieni la costanza.")
+            statistiche.streakGiorni >= 7 -> t("Streak di") + " ${statistiche.streakGiorni} " + t("giorni! Sei inarrestabile.")
+            competenze.grammatica >= 60f && daRipassare == 0 -> t("Prosegui così, stai facendo ottimi progressi.")
+            competenze.lessico < 30f -> t("Sei all'inizio del viaggio. Ogni parola conta!")
+            else -> t("Buona sessione di studio!")
         }
 
         val prossimoObiettivo = when {
-            livelloCorrente < LivelloCEFR.A1 -> "Raggiungere A1 con 50 parole"
-            livelloCorrente < LivelloCEFR.A2 -> "Raggiungere A2 con 150 parole"
-            livelloCorrente < LivelloCEFR.B1 -> "Raggiungere B1 con 900 parole"
-            livelloCorrente < LivelloCEFR.B2 -> "Raggiungere B2 con 1800 parole"
-            else -> "Raggiungere C1 con 3500 parole"
+            livelloCorrente < LivelloCEFR.A1 -> t("Raggiungere A1 con 50 parole")
+            livelloCorrente < LivelloCEFR.A2 -> t("Raggiungere A2 con 150 parole")
+            livelloCorrente < LivelloCEFR.B1 -> t("Raggiungere B1 con 900 parole")
+            livelloCorrente < LivelloCEFR.B2 -> t("Raggiungere B2 con 1800 parole")
+            else -> t("Raggiungere C1 con 3500 parole")
         }
 
         return PercorsoGiornaliero(
@@ -313,7 +316,7 @@ object CalcoloPercorsoGiornaliero {
             // deve mostrare la durata reale, non quella teorica.
             val descrizione = passo.descrizione.replace(
                 Regex("""~\d+ min"""),
-                "~$minuti min"
+                t("~$minuti min")
             )
             scelti.add(passo.copy(stimaMinuti = minuti, descrizione = descrizione))
             totale += minuti

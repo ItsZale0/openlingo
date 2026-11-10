@@ -93,7 +93,7 @@ fun PercorsoGrammaticaScreen(
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Text(
-                    "20 minuti al giorno. La grammatica comanda il percorso.\nOgni unità completata è un passo verso la padronanza.",
+                    t("20 minuti al giorno. La grammatica comanda il percorso.\nOgni unità completata è un passo verso la padronanza."),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
@@ -107,7 +107,7 @@ fun PercorsoGrammaticaScreen(
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    t("$completate di ${percorso.size} unità completate"),
+                    "$completate " + t("di") + " ${percorso.size} " + t("unità completate"),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
@@ -206,7 +206,7 @@ fun PercorsoGrammaticaScreen(
                     )
                     Spacer(Modifier.height(Spaziature.xs))
                     Text(
-                        t("${GrammaticaSyllabus.unita.size} unità disponibili: dalle basi A0 alle strutture B1. ") +
+                        "${GrammaticaSyllabus.unita.size} " + t("unità disponibili: dalle basi A0 alle strutture B1.") + " " +
                             t("Continua con i ripassi per non perdere la padronanza."),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -243,7 +243,7 @@ fun PercorsoGrammaticaScreen(
                             }
                             Spacer(Modifier.width(Spaziature.sm))
                             Text(
-                                tappa.titolo,
+                                t(tappa.titolo),
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
@@ -291,13 +291,13 @@ private fun CardProssimaUnita(
             )
             Spacer(Modifier.height(2.dp))
             Text(
-                unita.titolo,
+                t(unita.titolo),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
             )
             Text(
-                t("${unita.livello} - ${unita.minuti} min - ${unita.sottotitolo}"),
+                "${unita.livello} · ${unita.minuti} min · " + t(unita.sottotitolo),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
             )
@@ -379,18 +379,18 @@ private fun CardUnita(
             Spacer(Modifier.width(Spaziature.sm))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    unita.titolo,
+                    t(unita.titolo),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    t("${unita.livello} - ${unita.minuti} min - $descrizioneStato"),
+                    "${unita.livello} · ${unita.minuti} min · " + descrizioneStato,
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 if (bloccata && prerequisiti.isNotEmpty()) {
                     Text(
-                        "Sblocca completando: ${prerequisiti.joinToString(", ")}",
+                        t("Sblocca completando:") + " " + prerequisiti.joinToString(", "),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -405,7 +405,7 @@ private fun CardUnita(
                             .clip(MaterialTheme.shapes.extraSmall)
                     )
                     Text(
-                        "Padronanza ${padronanza.percentuale}%",
+                        t("Padronanza") + " ${padronanza.percentuale}%",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

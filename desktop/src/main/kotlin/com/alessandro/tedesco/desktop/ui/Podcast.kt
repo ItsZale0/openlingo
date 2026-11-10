@@ -32,6 +32,7 @@ import com.alessandro.tedesco.data.PodcastData
 import com.alessandro.tedesco.desktop.DesktopStore
 import java.awt.Desktop
 import java.net.URI
+import com.alessandro.tedesco.i18n.t
 
 @Composable
 fun SchermataPodcast(store: DesktopStore) {
@@ -47,15 +48,15 @@ fun SchermataPodcast(store: DesktopStore) {
 
     Pagina {
         Testata(
-            titolo = "Podcast e video",
-            sottotitolo = "Ascolto autentico per il livello $livello · i link si aprono nel browser"
+            titolo = t("Podcast e video"),
+            sottotitolo = t("Ascolto autentico per il livello $livello · i link si aprono nel browser")
         )
 
-        CardSezione(titolo = info.titolo, sottotitolo = "Livello $livello") {
-            Text(info.obiettivo, style = MaterialTheme.typography.bodyMedium)
+        CardSezione(titolo = t(info.titolo), sottotitolo = t("Livello $livello")) {
+            Text(t(info.obiettivo), style = MaterialTheme.typography.bodyMedium)
             Spacer(Modifier.height(6.dp))
             Text(
-                info.consiglio,
+                t(info.consiglio),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -74,13 +75,13 @@ fun SchermataPodcast(store: DesktopStore) {
             FilterChip(
                 selected = tipo == null,
                 onClick = { tipo = null },
-                label = { Text("Tutti") }
+                label = { Text(t("Tutti")) }
             )
             PodcastData.Tipo.entries.forEach { t ->
                 FilterChip(
                     selected = tipo == t,
                     onClick = { tipo = t },
-                    label = { Text(t.etichetta) }
+                    label = { Text(t(t.etichetta)) }
                 )
             }
         }
@@ -107,47 +108,47 @@ fun SchermataPodcast(store: DesktopStore) {
                         Column(Modifier.weight(1f)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
-                                    episodio.titolo,
+                                    t(episodio.titolo),
                                     style = MaterialTheme.typography.bodyLarge,
                                     fontWeight = FontWeight.Medium
                                 )
                                 if (episodio.consigliato) {
                                     Spacer(Modifier.width(8.dp))
                                     Etichetta(
-                                        "Consigliato",
+                                        t("Consigliato"),
                                         MaterialTheme.colorScheme.tertiaryContainer,
                                         MaterialTheme.colorScheme.onTertiaryContainer
                                     )
                                 }
                             }
                             Text(
-                                "${episodio.canale} · ${episodio.durata} · ${episodio.velocita.etichetta} · ${episodio.tema}",
+                                "${episodio.canale} · ${episodio.durata} · ${t(episodio.velocita.etichetta)} · ${t(episodio.tema)}",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Spacer(Modifier.height(4.dp))
                             Text(
-                                episodio.descrizione,
+                                t(episodio.descrizione),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Spacer(Modifier.height(4.dp))
                             Text(
-                                "Supporto: ${episodio.supporto}",
+                                t("Supporto") + ": ${episodio.supporto}",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         Spacer(Modifier.width(12.dp))
-                        Etichetta(episodio.piattaforma.etichetta)
+                        Etichetta(t(episodio.piattaforma.etichetta))
                         Spacer(Modifier.width(10.dp))
                         OutlinedButton(onClick = {
                             val esito = apriLink(episodio.url)
-                            messaggio = if (esito) "" else "Impossibile aprire il link nel browser."
+                            messaggio = if (esito) "" else t("Impossibile aprire il link nel browser.")
                         }) {
                             Icon(Icons.Filled.OpenInNew, contentDescription = null)
                             Spacer(Modifier.width(4.dp))
-                            Text("Apri")
+                            Text(t("Apri"))
                         }
                     }
                 }
@@ -155,7 +156,7 @@ fun SchermataPodcast(store: DesktopStore) {
         }
 
         Text(
-            "Serve una connessione solo per il contenuto esterno: il resto dell'app funziona offline.",
+            t("Serve una connessione solo per il contenuto esterno: il resto dell'app funziona offline."),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

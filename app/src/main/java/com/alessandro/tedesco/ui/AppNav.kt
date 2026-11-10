@@ -1,4 +1,4 @@
-package com.alessandro.tedesco.ui
+﻿package com.alessandro.tedesco.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
@@ -76,8 +76,8 @@ fun AppNav(
 
     val nav = rememberNavController()
 
-    // Prima schermata: caricamento → benvenuto (nessun profilo) → scelta profilo
-    // → app. Nessun profilo viene creato automaticamente al primo avvio.
+    // Prima schermata: caricamento â†’ benvenuto (nessun profilo) â†’ scelta profilo
+    // â†’ app. Nessun profilo viene creato automaticamente al primo avvio.
     val pronto by vm.pronto.collectAsStateWithLifecycle(false)
     val profili by vm.profiliDisponibili.collectAsStateWithLifecycle(emptyList())
     val profiloAttivo by vm.profiloAttivo.collectAsStateWithLifecycle(null)
@@ -125,7 +125,8 @@ fun AppNav(
                     vm = vm,
                     unitaId = entry.arguments?.getString("id").orEmpty(),
                     onIndietro = { nav.popBackStack() },
-                    onCompletata = { nav.popBackStack() }
+                    onCompletata = { nav.popBackStack() },
+                    onVaiAGenderTrainer = { nav.navigate("gender_trainer") }
                 )
             }
             composable("immersione") {
@@ -150,7 +151,7 @@ fun AppNav(
                 ComprensioneScreen(vm = vm, onFatto = { nav.popBackStack() })
             }
             // Produzione = sezione di SCRITTURA: si scrive un testo e lo corregge il tutor
-            // (criteri Goethe). Il quiz a scelta multipla è "espressioni", più sotto.
+            // (criteri Goethe). Il quiz a scelta multipla Ã¨ "espressioni", piÃ¹ sotto.
             composable("produzione") {
                 val profiloAttivo by vm.profiloAttivo.collectAsStateWithLifecycle()
                 ProduzioneScrittaScreen(
@@ -165,6 +166,9 @@ fun AppNav(
             }
             composable("verifica") {
                 VerificaScreen(vm = vm, onIndietro = { nav.popBackStack() })
+            }
+            composable("gender_trainer") {
+                GenderTrainerScreen(vm = vm, onIndietro = { nav.popBackStack() })
             }
             composable("ascolto") {
                 AscoltoScreen(vm = vm, onFatto = { nav.popBackStack() })
@@ -217,7 +221,7 @@ fun AppNav(
                 WortlisteScreen(vm = vm, onIndietro = { nav.popBackStack() })
             }
             composable("dialoghi") {
-                DialoghiScreen(onIndietro = { nav.popBackStack() })
+                DialoghiScreen(vm = vm, onIndietro = { nav.popBackStack() })
             }
             composable("progresso") {
                 ProgressoScreen(vm = vm, onIndietro = { nav.popBackStack() })
@@ -249,3 +253,4 @@ fun AppNav(
         }
     }
 }
+

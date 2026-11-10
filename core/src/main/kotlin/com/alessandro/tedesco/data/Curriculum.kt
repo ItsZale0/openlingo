@@ -1,5 +1,7 @@
 package com.alessandro.tedesco.data
 
+import com.alessandro.tedesco.i18n.t
+
 /**
  * Curriculum strutturato per livello CEFR.
  * Ogni lezione ha un argomento specifico e progressivo.
@@ -98,8 +100,8 @@ object Curriculum {
         val giro = (n - 1) / lista.size
         val idx = (n - 1) % lista.size
         val base = lista[idx]
-        return if (giro == 0) base
-        else "$base — approfondimento ${giro + 1}: nuove parole e strutture sullo stesso tema"
+        return if (giro == 0) t(base)
+        else t(base) + " — " + t("approfondimento") + " ${giro + 1}: " + t("nuove parole e strutture sullo stesso tema")
     }
 
     /**
@@ -107,11 +109,11 @@ object Curriculum {
      */
     fun focusGrammaticale(livello: String): String {
         return when (livello.uppercase().substringBefore(" ")) {
-            "A0", "A1" -> "presente, frasi SVO, articoli der/die/das, vocabolario quotidiano. NIENTE passato, subordinate, congiuntivo."
-            "A2" -> "presente + Perfetto, accusativo/dativo, modali, verbi separabili, frasi semplici legate."
-            "B1" -> "Adjektivdeklination, Genitiv, Relativsätze, Konnektoren, Verben mit Präpositionen, Wechselpräpositionen, reflexive Verben, indirekte Fragen, Passiv (anche con modali), Präteritum vs Perfekt, Konjunktiv II."
-            "B2" -> "congiuntivo, lessico astratto, strutture complesse."
-            else -> "presente, frasi SVO, articoli der/die/das, vocabolario quotidiano."
+            "A0", "A1" -> t("presente, frasi SVO, articoli der/die/das, vocabolario quotidiano. NIENTE passato, subordinate, congiuntivo.")
+            "A2" -> t("presente + Perfetto, accusativo/dativo, modali, verbi separabili, frasi semplici legate.")
+            "B1" -> t("Adjektivdeklination, Genitiv, Relativsätze, Konnektoren, Verben mit Präpositionen, Wechselpräpositionen, reflexive Verben, indirekte Fragen, Passiv (anche con modali), Präteritum vs Perfekt, Konjunktiv II.")
+            "B2" -> t("congiuntivo, lessico astratto, strutture complesse.")
+            else -> t("presente, frasi SVO, articoli der/die/das, vocabolario quotidiano. NIENTE passato, subordinate, congiuntivo.")
         }
     }
 }

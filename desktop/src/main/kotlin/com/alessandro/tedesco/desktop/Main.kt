@@ -53,6 +53,7 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.rememberWindowState
 import com.alessandro.tedesco.desktop.ui.Etichetta
 import com.alessandro.tedesco.desktop.ui.SchermataEsercizi
+import com.alessandro.tedesco.desktop.ui.SchermataGenderTrainer
 import com.alessandro.tedesco.desktop.ui.SchermataHome
 import com.alessandro.tedesco.desktop.ui.SchermataBenvenuto
 import com.alessandro.tedesco.desktop.ui.SchermataImpostazioni
@@ -63,6 +64,7 @@ import com.alessandro.tedesco.desktop.ui.SchermataRipasso
 import com.alessandro.tedesco.desktop.ui.SchermataUnita
 import com.alessandro.tedesco.desktop.ui.SchermataWortliste
 import com.alessandro.tedesco.desktop.ui.TemaTedesco
+import com.alessandro.tedesco.i18n.t
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -72,6 +74,7 @@ enum class Schermata(val titolo: String, val icona: ImageVector) {
     ESERCIZI("Esercizi", Icons.Filled.School),
     RIPASSO("Ripasso", Icons.Filled.Refresh),
     LESSICO("Lessico", Icons.Filled.Translate),
+    GENDER_TRAINER("Allenatore articoli", Icons.Filled.School),
     WORTLISTE("Wortliste", Icons.AutoMirrored.Filled.MenuBook),
     PODCAST("Podcast", Icons.Filled.Headphones),
     PROGRESSO("Progresso", Icons.Filled.BarChart),
@@ -86,7 +89,7 @@ fun main() = application {
 
     Window(
         onCloseRequest = ::exitApplication,
-        title = "Deutsch — corso A0-B2",
+        title = t("OpenLingo — corso A0-B2"),
         // La finestra parte massimizzata: su schermi piccoli (o con scala 125%)
         // una finestra fissa rischierebbe di uscire dallo schermo.
         state = rememberWindowState(
@@ -140,7 +143,11 @@ fun main() = application {
                                 unita != null -> SchermataUnita(
                                     store = store,
                                     unitaId = unita,
-                                    onIndietro = { unitaId = null }
+                                    onIndietro = { unitaId = null },
+                                    onVaiAGenderTrainer = {
+                                        unitaId = null
+                                        schermata = Schermata.GENDER_TRAINER
+                                    }
                                 )
 
                                 else -> when (schermata) {
@@ -158,6 +165,7 @@ fun main() = application {
 
                                     Schermata.RIPASSO -> SchermataRipasso(store)
                                     Schermata.LESSICO -> SchermataLessico(store)
+                                    Schermata.GENDER_TRAINER -> SchermataGenderTrainer(store)
                                     Schermata.WORTLISTE -> SchermataWortliste(store)
                                     Schermata.PODCAST -> SchermataPodcast(store)
                                     Schermata.PROGRESSO -> SchermataProgresso(store)
@@ -189,12 +197,12 @@ private fun BarraNavigazione(schermata: Schermata, onScegli: (Schermata) -> Unit
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    "TEDESCO",
+                    t("OPENLINGO"),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    "desktop",
+                    t("desktop"),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -207,7 +215,7 @@ private fun BarraNavigazione(schermata: Schermata, onScegli: (Schermata) -> Unit
                 selected = schermata == voce,
                 onClick = { onScegli(voce) },
                 icon = { Icon(voce.icona, contentDescription = null) },
-                label = { Text(voce.titolo, style = MaterialTheme.typography.labelMedium) },
+                label = { Text(t(voce.titolo), style = MaterialTheme.typography.labelMedium) },
                 colors = NavigationRailItemDefaults.colors(
                     selectedIconColor = MaterialTheme.colorScheme.onSecondaryContainer,
                     selectedTextColor = MaterialTheme.colorScheme.onSurface,
@@ -232,18 +240,18 @@ private fun BarraSuperiore(store: DesktopStore) {
     ) {
         Column {
             Text(
-                profilo?.config?.nomeVisualizzato ?: "Nessun profilo",
+                profilo?.config?.nomeVisualizzato ?: t("Nessun profilo"),
                 style = MaterialTheme.typography.titleMedium
             )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Etichetta(store.stato.progresso.livelloCorrente.label.substringBefore(" — "))
+                Etichetta(t(store.stato.progresso.livelloCorrente.label.substringBefore(" — ")))
                 Text(
-                    "obiettivo ${store.stato.progresso.obiettivoLivello.label.substringBefore(" — ")}",
+                    "${t("obiettivo")} ${t(store.stato.progresso.obiettivoLivello.label.substringBefore(" — "))}",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    "${store.stato.streakGiorni} giorni di fila",
+                    "${store.stato.streakGiorni} ${t("giorni di fila")}",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -253,14 +261,14 @@ private fun BarraSuperiore(store: DesktopStore) {
             IconButton(onClick = { store.commutaTema() }) {
                 Icon(
                     if (store.temaScuro()) Icons.Filled.LightMode else Icons.Filled.DarkMode,
-                    contentDescription = "Cambia tema"
+                    contentDescription = t("Cambia tema")
                 )
             }
             Box {
                 TextButton(onClick = { menuAperto = true }) {
                     Icon(Icons.Filled.SwapHoriz, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(6.dp))
-                    Text("Profilo")
+                    Text(t("Profilo"))
                 }
                 DropdownMenu(expanded = menuAperto, onDismissRequest = { menuAperto = false }) {
                     store.elencoProfili.forEach { p ->

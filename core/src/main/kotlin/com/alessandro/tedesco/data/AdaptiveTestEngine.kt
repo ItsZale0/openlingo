@@ -7,6 +7,7 @@ import com.alessandro.tedesco.data.local.ReviewEntity
 import com.alessandro.tedesco.data.local.TipoDomanda
 import com.alessandro.tedesco.data.local.WordEntity
 import kotlin.random.Random
+import com.alessandro.tedesco.i18n.t
 
 /**
  * Motore di test adattivi: genera domande dinamicamente basate su
@@ -267,10 +268,10 @@ object AdaptiveTestEngine {
                     DomandaAdattiva(
                         id = "adapt_v_${parola.id}",
                         tipo = tipoDomanda,
-                        domanda = "Come si dice '${parola.italian}' in tedesco?",
+                        domanda = t("Come si dice") + " '${parola.italian}' " + t("in tedesco?"),
                         opzioni = opzioni,
                         rispostaCorretta = rispostaCorretta,
-                        spiegazione = "'${parola.italian}' in tedesco è '${parola.german}'.",
+                        spiegazione = "'${parola.italian}' " + t("in tedesco è") + " '${parola.german}'.",
                         livelloRichiesto = livello,
                         categoria = "Vocabolario",
                         parolaAssociata = parola.german

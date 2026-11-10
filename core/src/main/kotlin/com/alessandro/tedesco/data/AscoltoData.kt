@@ -281,26 +281,38 @@ object AscoltoData {
     }
 }
 
+private fun sanitarioDaProfilo(profilo: ProfiloUtente?): Boolean {
+    val mc = profilo?.config?.mostraContestoMedico == true
+    if (mc) return true
+    val c = profilo?.config?.contestoUtente.orEmpty().lowercase()
+    val chiavi = listOf(
+        "fisioterap", "physio", "sanitar", "medic", "infermier", "nurs",
+        "ospedal", "hospital", "clinic", "pazient", "patient", "terap",
+        "doctor", "dottor", "farmac", "dent", "riabilit"
+    )
+    return chiavi.any { c.contains(it) }
+}
+
 // Esercizi A0 - Presentazioni (profile-aware)
 fun getEserciziA0(profilo: ProfiloUtente?): List<EsercizioAscolto> {
     val base = listOf(
         EsercizioAscolto(
             id = "a0_1",
-            fraseTedesca = if (profilo?.config?.mostraContestoMedico == true)
+            fraseTedesca = if (sanitarioDaProfilo(profilo))
                 "Ich heiße Stefan."
             else
                 "Ich heiße Sophie.",
-            traduzioneItaliana = if (profilo?.config?.mostraContestoMedico == true)
+            traduzioneItaliana = if (sanitarioDaProfilo(profilo))
                 "Mi chiamo Stefan."
             else
                 "Mi chiamo Sophie.",
             domanda = "Come si chiama il parlante?",
-            opzioni = if (profilo?.config?.mostraContestoMedico == true)
+            opzioni = if (sanitarioDaProfilo(profilo))
                 listOf("Stefan", "Marco", "Luca", "Paolo")
             else
                 listOf("Sophie", "Anna", "Julia", "Lea"),
             rispostaCorretta = 0,
-            spiegazione = if (profilo?.config?.mostraContestoMedico == true)
+            spiegazione = if (sanitarioDaProfilo(profilo))
                 "Il parlante dice 'Ich heiße Stefan' (Mi chiamo Stefan)"
             else
                 "Il parlante dice 'Ich heiße Sophie' (Mi chiamo Sophie)",
@@ -318,21 +330,21 @@ fun getEserciziA0(profilo: ProfiloUtente?): List<EsercizioAscolto> {
         ),
         EsercizioAscolto(
             id = "a0_3",
-            fraseTedesca = if (profilo?.config?.mostraContestoMedico == true)
+            fraseTedesca = if (sanitarioDaProfilo(profilo))
                 "Ich bin Physiotherapeut."
             else
                 "Ich bin Studentin.",
-            traduzioneItaliana = if (profilo?.config?.mostraContestoMedico == true)
+            traduzioneItaliana = if (sanitarioDaProfilo(profilo))
                 "Sono fisioterapeuta."
             else
                 "Sono studentessa.",
             domanda = "Qual è il lavoro/studio del parlante?",
-            opzioni = if (profilo?.config?.mostraContestoMedico == true)
+            opzioni = if (sanitarioDaProfilo(profilo))
                 listOf("Medico", "Insegnante", "Fisioterapeuta", "Infermiere")
             else
                 listOf("Studentessa", "Insegnante", "Medica", "Avvocata"),
-            rispostaCorretta = if (profilo?.config?.mostraContestoMedico == true) 2 else 0,
-            spiegazione = if (profilo?.config?.mostraContestoMedico == true)
+            rispostaCorretta = if (sanitarioDaProfilo(profilo)) 2 else 0,
+            spiegazione = if (sanitarioDaProfilo(profilo))
                 "Il parlante dice 'Ich bin Physiotherapeut' (Sono fisioterapeuta)"
             else
                 "Il parlante dice 'Ich bin Studentin' (Sono studentessa)",
@@ -360,21 +372,21 @@ fun getEserciziA0(profilo: ProfiloUtente?): List<EsercizioAscolto> {
         ),
         EsercizioAscolto(
             id = "a0_6",
-            fraseTedesca = if (profilo?.config?.mostraContestoMedico == true)
+            fraseTedesca = if (sanitarioDaProfilo(profilo))
                 "Ich wohne in Bozen."
             else
                 "Ich wohne in Berlin.",
-            traduzioneItaliana = if (profilo?.config?.mostraContestoMedico == true)
+            traduzioneItaliana = if (sanitarioDaProfilo(profilo))
                 "Vivo a Bolzano."
             else
                 "Vivo a Berlino.",
             domanda = "Dove vive il parlante?",
-            opzioni = if (profilo?.config?.mostraContestoMedico == true)
+            opzioni = if (sanitarioDaProfilo(profilo))
                 listOf("Milano", "Bozen", "Roma", "Venezia")
             else
                 listOf("Monaco", "Berlino", "Amburgo", "Vienna"),
-            rispostaCorretta = if (profilo?.config?.mostraContestoMedico == true) 1 else 1,
-            spiegazione = if (profilo?.config?.mostraContestoMedico == true)
+            rispostaCorretta = if (sanitarioDaProfilo(profilo)) 1 else 1,
+            spiegazione = if (sanitarioDaProfilo(profilo))
                 "Il parlante dice 'Ich wohne in Bozen' (Vivo a Bolzano)"
             else
                 "Il parlante dice 'Ich wohne in Berlin' (Vivo a Berlino)",

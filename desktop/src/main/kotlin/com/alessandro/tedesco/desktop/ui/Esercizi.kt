@@ -35,6 +35,7 @@ import com.alessandro.tedesco.data.LessicoLivelli
 import com.alessandro.tedesco.data.UnitaConStato
 import com.alessandro.tedesco.desktop.DesktopStore
 import com.alessandro.tedesco.desktop.Schermata
+import com.alessandro.tedesco.i18n.t
 
 @Composable
 fun SchermataEsercizi(
@@ -50,28 +51,28 @@ fun SchermataEsercizi(
 
     Pagina {
         Testata(
-            titolo = "Esercizi",
-            sottotitolo = "$completate unità completate su ${unita.size} · tutto il percorso A0-B2"
+            titolo = t("Esercizi"),
+            sottotitolo = "$completate " + t("unità completate su") + " ${unita.size} · " + t("tutto il percorso A0-B2")
         )
 
         if (prossima != null) {
             CardSezione(
-                titolo = "Consigliato ora",
-                sottotitolo = "La prossima unità in linea con il tuo livello"
+                titolo = t("Consigliato ora"),
+                sottotitolo = t("La prossima unità in linea con il tuo livello")
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Etichetta(prossima.unita.livello)
                     Spacer(Modifier.width(10.dp))
                     Column(Modifier.weight(1f)) {
-                        Text(prossima.unita.titolo, style = MaterialTheme.typography.titleMedium)
+                        Text(t(prossima.unita.titolo), style = MaterialTheme.typography.titleMedium)
                         Text(
-                            prossima.unita.sottotitolo,
+                            t(prossima.unita.sottotitolo),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                     OutlinedButton(onClick = { onApriUnita(prossima.unita.id) }) {
-                        Text("Apri")
+                        Text(t("Apri"))
                     }
                 }
             }
@@ -80,29 +81,38 @@ fun SchermataEsercizi(
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             StrumentoRiga(
                 icona = Icons.Filled.Refresh,
-                titolo = "Ripasso flashcard",
-                testo = if (daRipassare > 0) "$daRipassare carte in scadenza" else "Nessuna scadenza: ${store.paroleNuove().size} nuove da vedere",
+                titolo = t("Ripasso flashcard"),
+                testo = if (daRipassare > 0) "$daRipassare " + t("carte in scadenza") else t("Nessuna scadenza") + ": ${store.paroleNuove().size} " + t("nuove da vedere"),
                 onClick = { onVaiA(Schermata.RIPASSO) },
                 modifier = Modifier.weight(1f)
             )
             StrumentoRiga(
                 icona = Icons.Filled.Translate,
-                titolo = "Lessico A1-B2",
-                testo = "${LessicoLivelli.tutte.size} parole, sei tipi di esercizio",
+                titolo = t("Lessico A1-B2"),
+                testo = "${LessicoLivelli.tutte.size} " + t("parole, sei tipi di esercizio"),
                 onClick = { onVaiA(Schermata.LESSICO) },
                 modifier = Modifier.weight(1f)
             )
             StrumentoRiga(
+                icona = Icons.Filled.School,
+                titolo = t("Allenatore articoli"),
+                testo = t("Indovina der, die o das con le parole del tuo lessico"),
+                onClick = { onVaiA(Schermata.GENDER_TRAINER) },
+                modifier = Modifier.weight(1f)
+            )
+        }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            StrumentoRiga(
                 icona = Icons.AutoMirrored.Filled.MenuBook,
-                titolo = "Wortliste A1-B1",
-                testo = "Aggiungi parole curate al lessico",
+                titolo = t("Wortliste A1-B1"),
+                testo = t("Aggiungi parole curate al lessico"),
                 onClick = { onVaiA(Schermata.WORTLISTE) },
                 modifier = Modifier.weight(1f)
             )
             StrumentoRiga(
                 icona = Icons.Filled.Headphones,
-                titolo = "Podcast e video",
-                testo = "Ascolto autentico per livello",
+                titolo = t("Podcast e video"),
+                testo = t("Ascolto autentico per livello"),
                 onClick = { onVaiA(Schermata.PODCAST) },
                 modifier = Modifier.weight(1f)
             )
@@ -113,7 +123,7 @@ fun SchermataEsercizi(
             val gruppo = unita.filter { it.unita.livello.equals(livello, ignoreCase = true) }
             if (gruppo.isEmpty()) return@forEach
             Text(
-                "Livello $livello",
+                t("Livello") + " $livello",
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(top = 8.dp)
             )
@@ -129,11 +139,11 @@ fun SchermataEsercizi(
 @Composable
 private fun RigaUnita(voce: UnitaConStato, onApri: () -> Unit) {
     val (testoStato, coloreStato) = when {
-        voce.stato == StatoUnita.COMPLETATA -> "Completata" to MaterialTheme.colorScheme.tertiary
-        voce.stato == StatoUnita.DA_RIPASSARE -> "Da ripassare" to MaterialTheme.colorScheme.secondary
-        voce.stato == StatoUnita.DISPONIBILE -> "Disponibile" to MaterialTheme.colorScheme.primary
-        voce.accessibile -> "Apri libero" to MaterialTheme.colorScheme.primary
-        else -> "Bloccata" to MaterialTheme.colorScheme.onSurfaceVariant
+        voce.stato == StatoUnita.COMPLETATA -> t("Completata") to MaterialTheme.colorScheme.tertiary
+        voce.stato == StatoUnita.DA_RIPASSARE -> t("Da ripassare") to MaterialTheme.colorScheme.secondary
+        voce.stato == StatoUnita.DISPONIBILE -> t("Disponibile") to MaterialTheme.colorScheme.primary
+        voce.accessibile -> t("Apri libero") to MaterialTheme.colorScheme.primary
+        else -> t("Bloccata") to MaterialTheme.colorScheme.onSurfaceVariant
     }
     val apribile = voce.accessibile
 
@@ -161,12 +171,12 @@ private fun RigaUnita(voce: UnitaConStato, onApri: () -> Unit) {
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
                 Text(
-                    voce.unita.titolo,
+                    t(voce.unita.titolo),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    "${voce.unita.sottotitolo} · ${voce.unita.minuti} min",
+                    t(voce.unita.sottotitolo) + " · ${voce.unita.minuti} " + t("min"),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -189,7 +199,7 @@ private fun RigaUnita(voce: UnitaConStato, onApri: () -> Unit) {
             )
             if (apribile) {
                 Spacer(Modifier.width(8.dp))
-                TextButton(onClick = onApri) { Text("Apri") }
+                TextButton(onClick = onApri) { Text(t("Apri")) }
             }
         }
     }

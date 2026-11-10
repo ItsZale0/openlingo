@@ -51,6 +51,7 @@ import com.alessandro.tedesco.data.local.LivelloIniziale
 import com.alessandro.tedesco.data.local.TipoProfilo
 import com.alessandro.tedesco.desktop.DesktopStore
 import com.alessandro.tedesco.desktop.Versione
+import com.alessandro.tedesco.i18n.t
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -60,11 +61,12 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import com.alessandro.tedesco.i18n.t
 
 private val versione: String by lazy { Versione.conBuild }
 
 private fun dataOra(millis: Long): String =
-    if (millis <= 0L) "mai"
+    if (millis <= 0L) t("mai")
     else LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneId.systemDefault())
         .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
 
@@ -98,7 +100,7 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
         messaggio = ""
         scope.launch {
             val esito = withContext(Dispatchers.IO) { runCatching(azione) }
-                .getOrElse { DesktopStore.EsitoRete(false, it.message ?: "Errore sconosciuto") }
+                .getOrElse { DesktopStore.EsitoRete(false, it.message ?: t("Errore sconosciuto")) }
             messaggio = esito.messaggio
             operazioneInCorso = ""
         }
@@ -119,27 +121,27 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
 
     Pagina {
         Testata(
-            titolo = "Impostazioni",
-            sottotitolo = "Profilo, livello, aspetto e dati locali · versione $versione"
+            titolo = t("Impostazioni"),
+            sottotitolo = t("Profilo, livello, aspetto e dati locali · versione $versione")
         )
 
         // ----------------------------------------------------------- profilo
         CardSezione(
-            titolo = "Profilo attivo",
-            sottotitolo = "Ogni profilo ha dati e progressi separati dagli altri"
+            titolo = t("Profilo attivo"),
+            sottotitolo = t("Ogni profilo ha dati e progressi separati dagli altri")
         ) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 store.elencoProfili.forEach { p ->
                     val attivo = p.id == store.repo.profiloAttivoId
                     ProfiloCard(
                         nome = p.config.nomeVisualizzato,
-                        descrizione = p.config.tipo.descrizione,
+                        descrizione = t(p.config.tipo.descrizione),
                         livello = p.stato.progresso.livelloCorrente.label.substringBefore(" — "),
                         attivo = attivo,
                         modifier = Modifier.weight(1f),
                         onClick = {
                             store.attivaProfilo(p.id)
-                            messaggio = "Profilo attivo: ${p.config.nomeVisualizzato}"
+                            messaggio = t("Profilo attivo") + ": ${p.config.nomeVisualizzato}"
                             onCambiaProfilo()
                         }
                     )
@@ -153,38 +155,37 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
                     onValueChange = { nome = it },
                     modifier = Modifier.weight(1f),
                     singleLine = true,
-                    label = { Text("Nome visualizzato") }
+                    label = { Text(t("Nome visualizzato")) }
                 )
                 Spacer(Modifier.width(10.dp))
                 Button(
                     onClick = {
                         store.rinominaProfilo(nome)
-                        messaggio = "Nome aggiornato."
+                        messaggio = t("Nome aggiornato.")
                     },
                     enabled = nome.isNotBlank() && nome != profilo?.config?.nomeVisualizzato
                 ) {
-                    Text("Salva nome")
+                    Text(t("Salva nome"))
                 }
             }
         }
 
         // ---------------------------------------------------- contesto per l'AI
         CardSezione(
-            titolo = "Contesto e obiettivi",
-            sottotitolo = "L'AI usa queste informazioni per scegliere esempi, esercizi e vocabolario"
+            titolo = t("Contesto e obiettivi"),
+            sottotitolo = t("L'AI usa queste informazioni per scegliere esempi, esercizi e vocabolario")
         ) {
             OutlinedTextField(
                 value = contestoTesto,
                 onValueChange = { contestoTesto = it },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 3,
-                label = { Text("Professione, interessi, cosa vuoi saper fare") },
-                placeholder = { Text("Es. elettricista: parlare con clienti e fornitori") }
+                label = { Text(t("Professione, interessi, cosa vuoi saper fare")) },
+                placeholder = { Text(t("Es. elettricista: parlare con clienti e fornitori")) }
             )
             Spacer(Modifier.height(6.dp))
             Text(
-                "Resta su questo computer e viene inviato solo ai provider AI quando " +
-                    "generi contenuti. Vuoto = nessuna personalizzazione.",
+                t("Resta su questo computer e viene inviato solo ai provider AI quando generi contenuti. Vuoto = nessuna personalizzazione."),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -192,20 +193,20 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
             Button(
                 onClick = {
                     store.impostaContestoUtente(contestoTesto)
-                    messaggio = "Contesto salvato."
+                    messaggio = t("Contesto salvato.")
                 },
                 enabled = contestoTesto.trim() != profilo?.config?.contestoUtente.orEmpty()
             ) {
-                Text("Salva contesto")
+                Text(t("Salva contesto"))
             }
         }
 
         // ------------------------------------------------------------ livello
         CardSezione(
-            titolo = "Livello e obiettivo",
-            sottotitolo = "Il livello attuale resta quello reale raggiunto: qui imposti la partenza e il traguardo"
+            titolo = t("Livello e obiettivo"),
+            sottotitolo = t("Il livello attuale resta quello reale raggiunto: qui imposti la partenza e il traguardo")
         ) {
-            Text("Livello di partenza", style = MaterialTheme.typography.bodyMedium)
+            Text(t("Livello di partenza"), style = MaterialTheme.typography.bodyMedium)
             Spacer(Modifier.height(6.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 LivelloIniziale.entries.forEach { livello ->
@@ -216,7 +217,7 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
                                 iniziale = livello,
                                 obiettivo = store.stato.progresso.obiettivoLivello
                             )
-                            messaggio = "Livello di partenza: ${livello.label}"
+                            messaggio = t("Livello di partenza") + ": ${livello.label}"
                         },
                         label = { Text(livello.label) }
                     )
@@ -224,7 +225,7 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
             }
 
             Spacer(Modifier.height(16.dp))
-            Text("Obiettivo", style = MaterialTheme.typography.bodyMedium)
+            Text(t("Obiettivo"), style = MaterialTheme.typography.bodyMedium)
             Spacer(Modifier.height(6.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 LivelloCEFR.entries
@@ -235,7 +236,7 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
                             onClick = {
                                 val iniziale = profilo?.config?.livelloIniziale ?: LivelloIniziale.A0
                                 store.impostaLivelloEObiettivo(iniziale, livello)
-                                messaggio = "Obiettivo: ${livello.codiceBreve()}"
+                                messaggio = t("Obiettivo") + ": ${livello.codiceBreve()}"
                             },
                             label = { Text(livello.codiceBreve()) }
                         )
@@ -249,12 +250,11 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
             ) {
                 Column(Modifier.padding(12.dp)) {
                     Text(
-                        "Livello attuale: ${store.stato.progresso.livelloCorrente.label}",
+                        t("Livello attuale") + ": ${store.stato.progresso.livelloCorrente.label}",
                         style = MaterialTheme.typography.bodySmall
                     )
                     Text(
-                        "Il livello attuale avanza solo con i test e con le competenze dimostrate, " +
-                            "non perché lo imposti a mano.",
+                        t("Il livello attuale avanza solo con i test e con le competenze dimostrate, non perché lo imposti a mano."),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -263,15 +263,15 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
         }
 
         // ------------------------------------------------------------- aspetto
-        CardSezione(titolo = "Aspetto", sottotitolo = "Tema Material 3 chiaro o scuro") {
+        CardSezione(titolo = t("Aspetto"), sottotitolo = t("Tema Material 3 chiaro o scuro")) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(Modifier.weight(1f)) {
-                    Text("Tema scuro", style = MaterialTheme.typography.bodyMedium)
+                    Text(t("Tema scuro"), style = MaterialTheme.typography.bodyMedium)
                     Text(
-                        "La preferenza viene salvata in preferenze.json",
+                        t("La preferenza viene salvata in preferenze.json"),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -284,11 +284,11 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
         }
 
         // ------------------------------------------------------------- colore
-        CardSezione(titolo = "Colore tema", sottotitolo = "Colore principale dell'app") {
+        CardSezione(titolo = t("Colore tema"), sottotitolo = t("Colore principale dell'app")) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 listOf(
                     "teal" to "Teal", "navy" to "Blu navy", "indigo" to "Indaco",
-                    "forest" to "Verde", "rose" to "Rosa", "amber" to "Ambra"
+                    "forest" to t("Verde"), "rose" to t("Rosa"), "amber" to t("Ambra")
                 ).forEach { (id, label) ->
                     FilterChip(
                         selected = store.temaColore() == id,
@@ -301,44 +301,42 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
 
         // ------------------------------------------------------------ lessico
         CardSezione(
-            titolo = "Lessico",
-            sottotitolo = "${store.stato.parole.size} parole nel profilo attivo"
+            titolo = t("Lessico"),
+            sottotitolo = "${store.stato.parole.size} " + t("parole nel profilo attivo")
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(
-                        "Importa la Wortliste curata A1-B1",
+                        t("Importa la Wortliste curata A1-B1"),
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
-                        "Aggiunge le parole mancanti al lessico, senza duplicati.",
+                        t("Aggiunge le parole mancanti al lessico, senza duplicati."),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 Button(onClick = {
                     val aggiunte = store.importaWortliste()
-                    messaggio = if (aggiunte == 0) "Nessuna parola nuova: erano già tutte presenti."
-                    else "Aggiunte $aggiunte parole."
+                    messaggio = if (aggiunte == 0) t("Nessuna parola nuova: erano già tutte presenti.")
+                    else t("Aggiunte $aggiunte parole.")
                 }) {
                     Icon(Icons.Filled.Download, contentDescription = null)
                     Spacer(Modifier.width(6.dp))
-                    Text("Importa")
+                    Text(t("Importa"))
                 }
             }
         }
 
         // ---------------------------------------------------- sincronizzazione
         CardSezione(
-            titolo = "Sincronizzazione",
-            sottotitolo = "Stesso vocabolario e stesso backup GitHub dell'app Android"
+            titolo = t("Sincronizzazione"),
+            sottotitolo = t("Stesso vocabolario e stesso backup GitHub dell'app Android")
         ) {
-            Text("Feed del vocabolario", style = MaterialTheme.typography.titleSmall)
+            Text(t("Feed del vocabolario"), style = MaterialTheme.typography.titleSmall)
             Spacer(Modifier.height(2.dp))
             Text(
-                "Scarica le parole pubblicate su un repository GitHub e le unisce al lessico " +
-                    "di questo profilo con le stesse regole dell'app. Il feed è facoltativo: " +
-                    "senza URL si usa il lessico incluso nell'app.",
+                t("Scarica le parole pubblicate su un repository GitHub e le unisce al lessico di questo profilo con le stesse regole dell'app. Il feed è facoltativo: senza URL si usa il lessico incluso nell'app."),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -348,7 +346,7 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
                 onValueChange = { feedTesto = it },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                label = { Text("URL del feed (JSON)") }
+                label = { Text(t("URL del feed (JSON)")) }
             )
             Spacer(Modifier.height(10.dp))
             Row(
@@ -372,32 +370,31 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
                         Icon(Icons.Filled.Sync, contentDescription = null)
                         Spacer(Modifier.width(6.dp))
                     }
-                    Text("Sincronizza ora")
+                    Text(t("Sincronizza ora"))
                 }
                 OutlinedButton(
                     enabled = operazioneInCorso.isEmpty(),
                     onClick = {
                         feedTesto = ""
                         store.impostaFeedUrl("")
-                        messaggio = "Feed rimosso: resta il lessico incluso nell'app."
+                        messaggio = t("Feed rimosso: resta il lessico incluso nell'app.")
                     }
                 ) {
                     Icon(Icons.Filled.Delete, contentDescription = null)
                     Spacer(Modifier.width(6.dp))
-                    Text("Rimuovi feed")
+                    Text(t("Rimuovi feed"))
                 }
             }
             Spacer(Modifier.height(8.dp))
             Text(
-                "Ultima sincronizzazione: ${dataOra(store.ultimaSincronizzazione)} · " +
-                    "${store.stato.parole.size} parole nel lessico",
+                t("Ultima sincronizzazione") + ": ${dataOra(store.ultimaSincronizzazione)} · ${store.stato.parole.size} " + t("parole nel lessico"),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             store.stato.feedLog.lastOrNull()?.let { log ->
+                val statoEsito = if (log.status == "ok") t("OK") else t("errore")
                 Text(
-                    "Ultimo esito: ${if (log.status == "ok") "OK" else "errore"} · " +
-                        "${dataOra(log.syncedAt)} · ${log.message.orEmpty()}",
+                    t("Ultimo esito") + ": $statoEsito · ${dataOra(log.syncedAt)} · ${log.message.orEmpty()}",
                     style = MaterialTheme.typography.labelSmall,
                     color = if (log.status == "ok") MaterialTheme.colorScheme.onSurfaceVariant
                     else MaterialTheme.colorScheme.error
@@ -409,14 +406,10 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
             )
 
-            Text("Backup GitHub", style = MaterialTheme.typography.titleSmall)
+            Text(t("Backup GitHub"), style = MaterialTheme.typography.titleSmall)
             Spacer(Modifier.height(2.dp))
             Text(
-                "Carica tutti i profili (parole, ripassi, grammatica e lezioni) sul repository " +
-                    "privato e ripristinali su un altro dispositivo. Il caricamento UNISCE i " +
-                    "progressi fatti altrove: niente viene sovrascritto con dati meno avanzati. " +
-                    "File del profilo attivo: ${store.nomeFileBackup} " +
-                        "(il ripristino cerca anche tedesco-backup.json)",
+                t("Carica tutti i profili (parole, ripassi, grammatica e lezioni) sul repository privato e ripristinali su un altro dispositivo. Il caricamento UNISCE i progressi fatti altrove: niente viene sovrascritto con dati meno avanzati.") + " " + t("File del profilo attivo") + ": ${store.nomeFileBackup} " + t("(il ripristino cerca anche tedesco-backup.json)"),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -429,7 +422,7 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
                 },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                label = { Text("Token GitHub (Contents: Read and write)") },
+                label = { Text(t("Token GitHub (Contents: Read and write)")) },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
@@ -442,8 +435,8 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
                 },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                label = { Text("Repository (owner/nome)") },
-                supportingText = { Text("Vuoto = tedesco-backup dell'account del token") }
+                label = { Text(t("Repository (owner/nome)")) },
+                supportingText = { Text(t("Vuoto = tedesco-backup dell'account del token")) }
             )
             Spacer(Modifier.height(10.dp))
             Row(
@@ -461,7 +454,7 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
                         )
                         Spacer(Modifier.width(8.dp))
                     }
-                    Text("Prova connessione")
+                    Text(t("Prova connessione"))
                 }
                 Button(
                     enabled = operazioneInCorso.isEmpty() && store.stato.parole.isNotEmpty(),
@@ -477,7 +470,7 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
                         Icon(Icons.Filled.CloudUpload, contentDescription = null)
                         Spacer(Modifier.width(6.dp))
                     }
-                    Text("Carica backup")
+                    Text(t("Carica backup"))
                 }
                 OutlinedButton(
                     enabled = operazioneInCorso.isEmpty(),
@@ -493,31 +486,29 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
                         Icon(Icons.Filled.CloudDownload, contentDescription = null)
                         Spacer(Modifier.width(6.dp))
                     }
-                    Text("Scarica backup")
+                    Text(t("Scarica backup"))
                 }
             }
             Spacer(Modifier.height(8.dp))
             Text(
-                "Ultimo backup caricato: ${dataOra(store.ultimoBackupCloud)}",
+                t("Ultimo backup caricato") + ": ${dataOra(store.ultimoBackupCloud)}",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                "Ultima sincronizzazione automatica: ${dataOra(store.ultimaSincronizzazioneCloud)} " +
-                    "(ogni 5 minuti, se il token e' inserito)",
+                t("Ultima sincronizzazione automatica") + ": ${dataOra(store.ultimaSincronizzazioneCloud)} " + t("(ogni 5 minuti, se il token è inserito)"),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             if (store.sincronizzazioneCloudInCorso) {
                 Text(
-                    "Sincronizzazione in corso...",
+                    t("Sincronizzazione in corso..."),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary
                 )
             }
             Text(
-                "Il token resta solo su questo computer, in preferenze.json. " +
-                    "Usa un token fine-grained limitato al repo di backup.",
+                t("Il token resta solo su questo computer, in preferenze.json. Usa un token fine-grained limitato al repo di backup."),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -525,8 +516,8 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
 
         // -------------------------------------------------------------- dati
         CardSezione(
-            titolo = "Dati locali",
-            sottotitolo = "Parole, ripassi e progressi vivono in un file JSON leggibile, senza account"
+            titolo = t("Dati locali"),
+            sottotitolo = t("Parole, ripassi e progressi vivono in un file JSON leggibile, senza account")
         ) {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
@@ -543,36 +534,33 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 OutlinedButton(onClick = {
                     val esito = apriCartella(File(store.percorsoDati))
-                    if (!esito) messaggio = "Impossibile aprire la cartella dei dati."
+                    if (!esito) messaggio = t("Impossibile aprire la cartella dei dati.")
                 }) {
                     Icon(Icons.Filled.FolderOpen, contentDescription = null)
                     Spacer(Modifier.width(6.dp))
-                    Text("Apri cartella")
+                    Text(t("Apri cartella"))
                 }
                 OutlinedButton(onClick = {
                     messaggio = esportaBackup(store)
                 }) {
                     Icon(Icons.Filled.Download, contentDescription = null)
                     Spacer(Modifier.width(6.dp))
-                    Text("Esporta backup")
+                    Text(t("Esporta backup"))
                 }
                 Button(onClick = {
                     messaggio = runCatching {
                         val file = store.esportaDatiCompleti()
-                        "Esportazione completa salvata in ${file.absolutePath}"
-                    }.getOrElse { "Esportazione non riuscita: ${it.message}" }
+                        t("Esportazione completa salvata in") + " ${file.absolutePath}"
+                    }.getOrElse { t("Esportazione non riuscita") + ": ${it.message}" }
                 }) {
                     Icon(Icons.Filled.Download, contentDescription = null)
                     Spacer(Modifier.width(6.dp))
-                    Text("Esporta tutti i dati")
+                    Text(t("Esporta tutti i dati"))
                 }
             }
             Spacer(Modifier.height(10.dp))
             Text(
-                "«Esporta tutti i dati» crea un unico file JSON con tutti i profili, le " +
-                    "preferenze e il tema: è il file da conservare o importare altrove. " +
-                    "Il token GitHub non viene incluso. «Esporta backup» copia solo " +
-                    "profili.json nella cartella Download.",
+                t("«Esporta tutti i dati» crea un unico file JSON con tutti i profili, le preferenze e il tema: è il file da conservare o importare altrove. Il token GitHub non viene incluso. «Esporta backup» copia solo profili.json nella cartella Download."),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -580,15 +568,14 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
 
         // ------------------------------------------------------------ ripristino
         CardSezione(
-            titolo = "Ripristino",
-            sottotitolo = "Azzera solo i progressi del profilo attivo: i profili restano"
+            titolo = t("Ripristino"),
+            sottotitolo = t("Azzera solo i progressi del profilo attivo: i profili restano")
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text("Svuota il profilo", style = MaterialTheme.typography.bodyMedium)
+                    Text(t("Svuota il profilo"), style = MaterialTheme.typography.bodyMedium)
                     Text(
-                        "Rimuove parole, ripassi, unità completate e piano di oggi. " +
-                            "Il lessico può essere reimportato dalla Wortliste.",
+                        t("Rimuove parole, ripassi, unità completate e piano di oggi. Il lessico può essere reimportato dalla Wortliste."),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -596,7 +583,7 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
                 OutlinedButton(onClick = { confermaSvuota = true }) {
                     Icon(Icons.Filled.Delete, contentDescription = null)
                     Spacer(Modifier.width(6.dp))
-                    Text("Svuota")
+                    Text(t("Svuota"))
                 }
             }
         }
@@ -614,7 +601,7 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                "Funziona offline: feed e backup si aggiornano solo quando li chiedi.",
+                t("Funziona offline: feed e backup si aggiornano solo quando li chiedi."),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -633,17 +620,13 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
         val r = trovato.riepilogo
         AlertDialog(
             onDismissRequest = { downloadInAttesa = null },
-            title = { Text("Ripristinare il backup?") },
+            title = { Text(t("Ripristinare il backup?")) },
             text = {
                 Text(
-                    "Backup del ${dataOra(r.creatoIl)}" +
-                        (if (r.versioneApp.isBlank()) "" else " (versione ${r.versioneApp})") +
-                        ":\n${r.numProfili} profili · ${r.numParole} parole · " +
-                        "${r.numRipassi} ripassi · ${r.numRisposte} risposte · " +
-                        "${r.numUnitaGrammatica} unità di grammatica · ${r.numLezioni} lezioni.\n\n" +
-                        "I progressi del backup vengono UNITI a quelli di questo computer: " +
-                        "per ogni parola, unità e lezione resta la versione più avanzata, " +
-                        "quindi niente viene perso."
+                    t("Backup del") + " ${dataOra(r.creatoIl)}" +
+                        (if (r.versioneApp.isBlank()) "" else  " (" + t("versione") + " ${r.versioneApp})") +
+                        ":\n" + "${r.numProfili} " + t("profili") + " · ${r.numParole} " + t("parole") + " · ${r.numRipassi} " + t("ripassi") + " · ${r.numRisposte} " + t("risposte") + " · ${r.numUnitaGrammatica} " + t("unità di grammatica") + " · ${r.numLezioni} " + t("lezioni") + "." + "\n\n" +
+                        t("I progressi del backup vengono UNITI a quelli di questo computer: per ogni parola, unità e lezione resta la versione più avanzata, quindi niente viene perso.")
                 )
             },
             confirmButton = {
@@ -651,10 +634,10 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
                     val contenuto = trovato.contenuto
                     downloadInAttesa = null
                     esegui("ripristino") { store.applicaBackupCloud(contenuto) }
-                }) { Text("Ripristina") }
+                }) { Text(t("Ripristina")) }
             },
             dismissButton = {
-                TextButton(onClick = { downloadInAttesa = null }) { Text("Annulla") }
+                TextButton(onClick = { downloadInAttesa = null }) { Text(t("Annulla")) }
             }
         )
     }
@@ -662,22 +645,19 @@ fun SchermataImpostazioni(store: DesktopStore, onCambiaProfilo: () -> Unit) {
     if (confermaSvuota) {
         AlertDialog(
             onDismissRequest = { confermaSvuota = false },
-            title = { Text("Svuotare il profilo?") },
+            title = { Text(t("Svuotare il profilo?")) },
             text = {
-                Text(
-                    "Verranno cancellati i dati del profilo attivo su questo computer. " +
-                        "L'operazione non si può annullare."
-                )
+                Text(t("Verranno cancellati i dati del profilo attivo su questo computer. L'operazione non si può annullare."))
             },
             confirmButton = {
                 TextButton(onClick = {
                     store.svuotaProfilo()
                     confermaSvuota = false
-                    messaggio = "Profilo svuotato."
-                }) { Text("Svuota") }
+                    messaggio = t("Profilo svuotato.")
+                }) { Text(t("Svuota")) }
             },
             dismissButton = {
-                TextButton(onClick = { confermaSvuota = false }) { Text("Annulla") }
+                TextButton(onClick = { confermaSvuota = false }) { Text(t("Annulla")) }
             }
         )
     }
@@ -716,14 +696,14 @@ private fun ProfiloCard(
                     Spacer(Modifier.width(8.dp))
                     Icon(
                         Icons.Filled.Check,
-                        contentDescription = "Profilo attivo",
+                        contentDescription = t("Profilo attivo"),
                         tint = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                 }
             }
             Spacer(Modifier.height(6.dp))
             Text(
-                descrizione,
+                t(descrizione),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -743,11 +723,11 @@ private fun apriCartella(cartella: File): Boolean = runCatching {
 
 private fun esportaBackup(store: DesktopStore): String = runCatching {
     val origine = File(store.percorsoDati, "profili.json")
-    if (!origine.exists()) return "Nessun dato da esportare."
+    if (!origine.exists()) return t("Nessun dato da esportare.")
     val download = File(System.getProperty("user.home"), "Downloads").takeIf { it.isDirectory }
         ?: File(System.getProperty("user.home"))
     val marca = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmm"))
     val destinazione = File(download, "tedesco-desktop-backup-$marca.json")
     origine.copyTo(destinazione, overwrite = true)
-    "Backup salvato in ${destinazione.absolutePath}"
-}.getOrElse { "Esportazione non riuscita: ${it.message}" }
+    t("Backup salvato in") + " ${destinazione.absolutePath}"
+}.getOrElse { t("Esportazione non riuscita") + ": ${it.message}" }

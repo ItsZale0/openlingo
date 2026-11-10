@@ -1,18 +1,18 @@
-# Deutsch
+# OpenLingo
 
 [![Latest release](https://img.shields.io/github/v/release/ItsZale0/tedesco-app?label=release)](https://github.com/ItsZale0/tedesco-app/releases/latest)
 [![Build APK](https://github.com/ItsZale0/tedesco-app/actions/workflows/build.yml/badge.svg)](https://github.com/ItsZale0/tedesco-app/actions/workflows/build.yml)
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/license-GPL--3.0--or--later-blue)](LICENSE)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/ItsZale0/tedesco-app/badge)](https://securityscorecards.dev/viewer/?uri=github.com/ItsZale0/tedesco-app)
 
-**Deutsch** is a German course (A0–B2) for Android and desktop, offline-first and
-open source. It brings together vocabulary, grammar, listening, production,
-spaced repetition and an optional AI tutor in a single app, with separate
-profiles for each person who uses it.
+**OpenLingo** is an open-source, offline-first German course (A0–B2) for Android
+and desktop. It blends vocabulary, grammar, listening, speaking, and spaced
+repetition into one calm, focused learning space — with separate profiles for
+everyone who uses it.
 
-Originally a personal project, it is meant for anyone who wants to study German
-starting from Italian or English: no account, no ads, and no data sent to
-external services except those explicitly chosen by the user.
+Built for learners starting from Italian or English, OpenLingo keeps things
+simple: no account, no ads, and no data shared with external services unless you
+choose to enable them.
 
 ## Table of contents
 

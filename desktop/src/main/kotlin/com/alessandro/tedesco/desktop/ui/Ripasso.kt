@@ -29,6 +29,7 @@ import com.alessandro.tedesco.data.WortlisteB1
 import com.alessandro.tedesco.data.local.WordEntity
 import com.alessandro.tedesco.desktop.DesktopStore
 import com.alessandro.tedesco.desktop.etichetta
+import com.alessandro.tedesco.i18n.t
 
 @Composable
 fun SchermataRipasso(store: DesktopStore) {
@@ -49,24 +50,23 @@ fun SchermataRipasso(store: DesktopStore) {
 
     Pagina {
         Testata(
-            titolo = "Ripasso",
-            sottotitolo = "${inScadenza.size} in scadenza · ${store.paroleNuove().size} nuove da vedere · " +
-                "${statistiche.mature} parole mature · ripetizione spaziata"
+            titolo = t("Ripasso"),
+            sottotitolo = "${inScadenza.size} " + t("in scadenza") + " · ${store.paroleNuove().size} " + t("nuove da vedere") + " · ${statistiche.mature} " + t("parole mature") + " · " + t("ripetizione spaziata")
         )
 
         if (coda.isEmpty()) {
             CardSezione(
-                titolo = "Nessuna carta da ripassare",
-                sottotitolo = "Il lessico del profilo è vuoto oppure tutto è già al suo posto"
+                titolo = t("Nessuna carta da ripassare"),
+                sottotitolo = t("Il lessico del profilo è vuoto oppure tutto è già al suo posto")
             ) {
                 Text(
-                    "Aggiungi parole dalla Wortliste: entrano subito nella coda e il ripasso parte da lì.",
+                    t("Aggiungi parole dalla Wortliste: entrano subito nella coda e il ripasso parte da lì."),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(Modifier.height(12.dp))
                 Text(
-                    "Parole disponibili nella Wortliste: ${WortlisteB1.tutte.size}",
+                    t("Parole disponibili nella Wortliste") + ": ${WortlisteB1.tutte.size}",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -76,8 +76,8 @@ fun SchermataRipasso(store: DesktopStore) {
 
         if (indice >= coda.size) {
             CardSezione(
-                titolo = "Sessione completata",
-                sottotitolo = "${coda.size} carte ripassate"
+                titolo = t("Sessione completata"),
+                sottotitolo = "${coda.size} " + t("carte ripassate")
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
@@ -87,15 +87,14 @@ fun SchermataRipasso(store: DesktopStore) {
                     )
                     Spacer(Modifier.width(10.dp))
                     Text(
-                        "risposte \"lo sapevo\"",
+                        t("risposte \"lo sapevo\""),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 Spacer(Modifier.height(12.dp))
                 Text(
-                    "Le carte sapute tornano tra 1, 3, 7, 16, 35, 75, 150 o 300 giorni; " +
-                        "quelle sbagliate tornano domani e abbassano la facilità.",
+                    t("Le carte sapute tornano tra 1, 3, 7, 16, 35, 75, 150 o 300 giorni; quelle sbagliate tornano domani e abbassano la facilità."),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -106,7 +105,7 @@ fun SchermataRipasso(store: DesktopStore) {
                     sapute = 0
                     mostrata = false
                 }) {
-                    Text("Nuova sessione")
+                    Text(t("Nuova sessione"))
                 }
             }
             return@Pagina
@@ -133,7 +132,7 @@ fun SchermataRipasso(store: DesktopStore) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Etichetta(if (nuova) "Nuova" else "Ripasso ${recensione.repetitions}")
+                    Etichetta(if (nuova) t("Nuova") else t("Ripasso") + " ${recensione.repetitions}")
                     Text(
                         "${indice + 1} / ${coda.size}",
                         style = MaterialTheme.typography.labelMedium,
@@ -164,7 +163,7 @@ fun SchermataRipasso(store: DesktopStore) {
                 Spacer(Modifier.height(22.dp))
                 if (!mostrata) {
                     OutlinedButton(onClick = { mostrata = true }) {
-                        Text("Mostra traduzione")
+                        Text(t("Mostra traduzione"))
                     }
                 } else {
                     Card(
@@ -177,14 +176,14 @@ fun SchermataRipasso(store: DesktopStore) {
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                parola.italian,
+                                t(parola.italian),
                                 style = MaterialTheme.typography.headlineSmall,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                             if (parola.article != null) {
                                 Spacer(Modifier.height(4.dp))
                                 Text(
-                                    "articolo: ${parola.article}",
+                                    t("articolo") + ": ${parola.article}",
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                                 )
@@ -198,7 +197,7 @@ fun SchermataRipasso(store: DesktopStore) {
                             mostrata = false
                             indice += 1
                         }) {
-                            Text("Non lo sapevo")
+                            Text(t("Non lo sapevo"))
                         }
                         Button(onClick = {
                             store.rispondiRipasso(parola.id, saputa = true)
@@ -206,7 +205,7 @@ fun SchermataRipasso(store: DesktopStore) {
                             mostrata = false
                             indice += 1
                         }) {
-                            Text("Lo sapevo")
+                            Text(t("Lo sapevo"))
                         }
                     }
                 }
@@ -214,7 +213,7 @@ fun SchermataRipasso(store: DesktopStore) {
         }
 
         Text(
-            "Il ripasso aggiorna anche le statistiche: accuratezza, parole mature e giorni di studio.",
+            t("Il ripasso aggiorna anche le statistiche: accuratezza, parole mature e giorni di studio."),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

@@ -155,7 +155,7 @@ fun NuoveParoleScreen(vm: TedescoViewModel, onIndietro: () -> Unit = {}) {
                         FilterChip(
                             selected = lezioneFiltrata == l,
                             onClick = { lezioneFiltrata = if (lezioneFiltrata == l) null else l },
-                            label = { Text(t("Lezione $l")) }
+                            label = { Text(t("Lezione") + " $l") }
                         )
                     }
                 }
@@ -163,7 +163,7 @@ fun NuoveParoleScreen(vm: TedescoViewModel, onIndietro: () -> Unit = {}) {
                 Spacer(Modifier.height(8.dp))
 
                 lezioneFiltrata?.let { l ->
-                    val titolo = lezioneTitoli[l] ?: t("Lezione $l")
+                    val titolo = lezioneTitoli[l] ?: (t("Lezione") + " $l")
                     Text(
                         text = "L${l.toString().padStart(2, '0')} — $titolo",
                         style = MaterialTheme.typography.titleSmall,
@@ -187,7 +187,7 @@ fun NuoveParoleScreen(vm: TedescoViewModel, onIndietro: () -> Unit = {}) {
 
                     else -> {
                         Text(
-                            text = t("${filtrate.size} parole"),
+                            text = "${filtrate.size} " + t("parole"),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(vertical = 4.dp)

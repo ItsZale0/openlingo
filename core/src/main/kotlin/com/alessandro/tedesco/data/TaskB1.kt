@@ -14,7 +14,8 @@ object TaskB1 {
         val situazione: String,
         val punti: List<String>,
         val paroleMin: Int,
-        val paroleMax: Int
+        val paroleMax: Int,
+        val sanitario: Boolean = false
     ) {
         /** Istruzioni complete da passare al tutor. */
         fun istruzioni(): String = buildString {
@@ -30,7 +31,8 @@ object TaskB1 {
         val livello: String,
         val titolo: String,
         val descrizione: String,
-        val punti: List<String>
+        val punti: List<String>,
+        val sanitario: Boolean = false
     )
 
     val scrittura: List<TaskScrittura> = listOf(
@@ -71,7 +73,8 @@ object TaskB1 {
                 "quando sei disponibile per un colloquio"
             ),
             paroleMin = 80,
-            paroleMax = 120
+            paroleMax = 120,
+        sanitario = true
         ),
         TaskScrittura(
             id = "b1_email_formale_disdetta",
@@ -84,7 +87,7 @@ object TaskB1 {
                 "scusati per il disturbo"
             ),
             paroleMin = 60,
-            paroleMax = 90
+            paroleMax = 90,
         ),
         TaskScrittura(
             id = "b1_reclamo",
@@ -123,7 +126,8 @@ object TaskB1 {
                 "chiedi conferma"
             ),
             paroleMin = 60,
-            paroleMax = 90
+            paroleMax = 90,
+        sanitario = true
         ),
         TaskScrittura(
             id = "b1_resoconto_terapia",
@@ -136,7 +140,8 @@ object TaskB1 {
                 "quali esercizi ha ricevuto"
             ),
             paroleMin = 80,
-            paroleMax = 120
+            paroleMax = 120,
+        sanitario = true
         ),
         TaskScrittura(
             id = "a2_messaggio_collega",
@@ -217,14 +222,16 @@ object TaskB1 {
             livello = "B1",
             titolo = "Roleplay: primo colloquio con un paziente",
             descrizione = "Sei fisioterapista. Fai l'anamnesi a un paziente con mal di schiena.",
-            punti = listOf("saluta e presentati", "chiedi dove e da quando fa male", "chiedi l'intensità 1-10", "spiega il prossimo passo")
+            punti = listOf("saluta e presentati", "chiedi dove e da quando fa male", "chiedi l'intensità 1-10", "spiega il prossimo passo"),
+        sanitario = true
         ),
         TaskOrale(
             id = "or_b1_telefono",
             livello = "B1",
             titolo = "Roleplay: appuntamento al telefono",
             descrizione = "Chiami uno studio di fisioterapia per fissare un appuntamento.",
-            punti = listOf("presentati", "spiega il problema", "chiedi giorno e ora", "conferma")
+            punti = listOf("presentati", "spiega il problema", "chiedi giorno e ora", "conferma"),
+        sanitario = true
         ),
         TaskOrale(
             id = "or_b1_opinione",
@@ -235,9 +242,27 @@ object TaskB1 {
         )
     )
 
-    fun scritturaPerLivello(livello: String): List<TaskScrittura> {
+    fun scritturaPerLivello(livello: String, mostraSanitario: Boolean = true): List<TaskScrittura> {
         val codice = livello.substringBefore(" ").substringBefore("-").trim().uppercase()
-        return if (codice == "A0" || codice == "A1") scrittura.filter { it.livello == "A2" }
-        else scrittura
+        val base = if (codice == "A0" || codice == "A1") scrittura.filter { it.livello == "A2" } else scrittura
+        return if (mostraSanitario) base else base.filter { !it.sanitario }
     }
+
+    fun contestoSanitarioRichiesto(mostraContestoMedico: Boolean, contestoUtente: String): Boolean {
+        if (mostraContestoMedico) return true
+        val c = contestoUtente.lowercase()
+        val chiavi = listOf(
+            "fisioterap", "physio", "sanitar", "medic", "infermier", "nurs",
+            "ospedal", "hospital", "clinic", "pazient", "patient", "terap",
+            "doctor", "dottor", "farmac", "dent", "riabilit"
+        )
+        return chiavi.any { c.contains(it) }
+    }
+
+    fun scritturaPerContesto(mostraSanitario: Boolean): List<TaskScrittura> =
+        if (mostraSanitario) scrittura else scrittura.filter { !it.sanitario }
+
+    fun oralePerContesto(mostraSanitario: Boolean): List<TaskOrale> =
+        if (mostraSanitario) orale else orale.filter { !it.sanitario }
+
 }

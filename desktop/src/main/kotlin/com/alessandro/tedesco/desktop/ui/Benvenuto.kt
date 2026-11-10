@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.alessandro.tedesco.data.local.LivelloIniziale
 import com.alessandro.tedesco.desktop.DesktopStore
+import com.alessandro.tedesco.i18n.t
 
 /**
  * Schermata mostrata quando non esiste alcun profilo (primo avvio) o quando
@@ -50,14 +51,13 @@ fun SchermataBenvenuto(store: DesktopStore) {
     ) {
         Column(Modifier.widthIn(max = 720.dp).fillMaxWidth()) {
             Text(
-                "Benvenuto",
+                t("Benvenuto"),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
             Spacer(Modifier.height(6.dp))
             Text(
-                "Crea il tuo profilo per iniziare. I dati restano su questo computer: " +
-                    "l'app funziona anche senza connessione.",
+                t("Crea il tuo profilo per iniziare. I dati restano su questo computer: l'app funziona anche senza connessione."),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -65,8 +65,8 @@ fun SchermataBenvenuto(store: DesktopStore) {
 
             if (profili.isNotEmpty()) {
                 CardSezione(
-                    titolo = "Profili esistenti",
-                    sottotitolo = "Ogni profilo ha progressi separati dagli altri"
+                    titolo = t("Profili esistenti"),
+                    sottotitolo = t("Ogni profilo ha progressi separati dagli altri")
                 ) {
                     profili.forEach { p ->
                         Row(
@@ -80,14 +80,14 @@ fun SchermataBenvenuto(store: DesktopStore) {
                                     fontWeight = FontWeight.SemiBold
                                 )
                                 Text(
-                                    "Livello ${p.config.livelloIniziale.label} · " +
-                                        "${p.stato.parole.size} parole",
+                                    "${t("Livello")} ${p.config.livelloIniziale.label} · " +
+                                        "${p.stato.parole.size} ${t("parole")}",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                             OutlinedButton(onClick = { store.attivaProfilo(p.id) }) {
-                                Text("Entra")
+                                Text(t("Entra"))
                             }
                         }
                     }
@@ -96,8 +96,8 @@ fun SchermataBenvenuto(store: DesktopStore) {
             }
 
             CardSezione(
-                titolo = if (profili.isEmpty()) "Il tuo profilo" else "Nuovo profilo",
-                sottotitolo = "Puoi cambiare tutto in seguito dalle impostazioni"
+                titolo = if (profili.isEmpty()) t("Il tuo profilo") else t("Nuovo profilo"),
+                sottotitolo = t("Puoi cambiare tutto in seguito dalle impostazioni")
             ) {
                 ModuloProfilo(onCrea = { nome, livello, contesto, medico ->
                     store.creaProfilo(nome, livello, contesto, medico)
@@ -116,18 +116,18 @@ private fun ModuloProfilo(
     var contesto by remember { mutableStateOf("") }
     var medico by remember { mutableStateOf(false) }
 
-    Text("Come ti chiami?", style = MaterialTheme.typography.bodyMedium)
+    Text(t("Come ti chiami?"), style = MaterialTheme.typography.bodyMedium)
     Spacer(Modifier.height(6.dp))
     OutlinedTextField(
         value = nome,
         onValueChange = { nome = it },
         singleLine = true,
-        placeholder = { Text("Nome del profilo") },
+        placeholder = { Text(t("Nome del profilo")) },
         modifier = Modifier.fillMaxWidth()
     )
     Spacer(Modifier.height(16.dp))
 
-    Text("Livello di partenza", style = MaterialTheme.typography.bodyMedium)
+    Text(t("Livello di partenza"), style = MaterialTheme.typography.bodyMedium)
     Spacer(Modifier.height(6.dp))
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         LivelloIniziale.entries.forEach { l ->
@@ -140,11 +140,10 @@ private fun ModuloProfilo(
     }
     Spacer(Modifier.height(16.dp))
 
-    Text("Contesto e obiettivi (facoltativo)", style = MaterialTheme.typography.bodyMedium)
+    Text(t("Contesto e obiettivi (facoltativo)"), style = MaterialTheme.typography.bodyMedium)
     Spacer(Modifier.height(2.dp))
     Text(
-        "Professione, interessi, cosa vuoi saper fare: l'AI sceglie esempi e " +
-            "vocabolario adatti a te.",
+        t("Professione, interessi, cosa vuoi saper fare: l'AI sceglie esempi e vocabolario adatti a te."),
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
@@ -152,7 +151,7 @@ private fun ModuloProfilo(
     OutlinedTextField(
         value = contesto,
         onValueChange = { contesto = it },
-        placeholder = { Text("Es. elettricista: parlare con clienti e fornitori") },
+        placeholder = { Text(t("Es. elettricista: parlare con clienti e fornitori")) },
         minLines = 3,
         modifier = Modifier.fillMaxWidth()
     )
@@ -160,9 +159,9 @@ private fun ModuloProfilo(
 
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
-            Text("Contesto sanitario", style = MaterialTheme.typography.bodyMedium)
+            Text(t("Contesto sanitario"), style = MaterialTheme.typography.bodyMedium)
             Text(
-                "Esercizi e vocaboli con lessico medico/ospedaliero.",
+                t("Esercizi e vocaboli con lessico medico/ospedaliero."),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -176,6 +175,6 @@ private fun ModuloProfilo(
         enabled = nome.isNotBlank(),
         modifier = Modifier.height(48.dp)
     ) {
-        Text("Crea profilo e inizia")
+        Text(t("Crea profilo e inizia"))
     }
 }

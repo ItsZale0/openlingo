@@ -1,4 +1,4 @@
-package com.alessandro.tedesco.ui
+﻿package com.alessandro.tedesco.ui
 
 import com.alessandro.tedesco.i18n.t
 
@@ -364,7 +364,7 @@ fun ProduzioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
             title = { Text(t("Chiave API necessaria")) },
             text = { Text(t("Per generare esercizi infiniti inserisci una chiave Groq gratuita in Profilo → Tutor AI.")) },
 
-            confirmButton = { TextButton(onClick = { erroreGen = null }) { Text("OK") } }
+            confirmButton = { TextButton(onClick = { erroreGen = null }) { Text(t("OK")) } }
         )
     }
 }

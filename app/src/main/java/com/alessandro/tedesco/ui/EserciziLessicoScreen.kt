@@ -132,7 +132,7 @@ private fun StatoVuoto(vm: TedescoViewModel, livello: String) {
             Button(
                 onClick = { vm.avviaEserciziLessico(lv) },
                 modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
-            ) { Text(t("Esercizi $lv (${LessicoLivelli.conteggio(lv)})")) }
+            ) { Text(t("Esercizi") + " $lv (${LessicoLivelli.conteggio(lv)})") }
         }
     }
 }
@@ -155,7 +155,7 @@ private fun Riepilogo(
         )
         Spacer(Modifier.height(6.dp))
         Text(
-            t("${stato.giuste} su ${stato.totale} corrette"),
+            "${stato.giuste} " + t("su") + " ${stato.totale} " + t("corrette"),
             style = MaterialTheme.typography.titleMedium
         )
         Spacer(Modifier.height(6.dp))
@@ -168,7 +168,7 @@ private fun Riepilogo(
         if (stato.sbagliate.isNotEmpty()) {
             Spacer(Modifier.height(10.dp))
             Text(
-                "Da rivedere: " + stato.sbagliate.distinct().take(8).joinToString(", "),
+                t("Da rivedere:") + " " + stato.sbagliate.distinct().take(8).joinToString(", "),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.error,
                 textAlign = TextAlign.Center
@@ -234,7 +234,7 @@ private fun EsercizioCorrente(
                 Spacer(Modifier.height(8.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        esercizio.domanda,
+                        t(esercizio.domanda),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -274,13 +274,13 @@ private fun EsercizioCorrente(
                         enabled = false,
                         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                         colors = colori
-                    ) { Text(opzione) }
+                    ) { Text(t(opzione)) }
                 } else {
                     OutlinedButton(
                         onClick = { vm.rispondiLessico(opzione) },
                         enabled = !stato.mostrata,
                         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
-                    ) { Text(opzione) }
+                    ) { Text(t(opzione)) }
                 }
             }
         } else {
@@ -330,13 +330,13 @@ private fun EsercizioCorrente(
                     }
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        t("Risposta corretta: ${esercizio.corretta}"),
+                        t("Risposta corretta:") + " ${esercizio.corretta}",
                         style = MaterialTheme.typography.bodyLarge
                     )
                     if (esercizio.spiegazione.isNotBlank()) {
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            esercizio.spiegazione,
+                            t(esercizio.spiegazione),
                             style = MaterialTheme.typography.bodySmall,
                             fontStyle = FontStyle.Italic
                         )

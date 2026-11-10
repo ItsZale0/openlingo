@@ -2,6 +2,7 @@ package com.alessandro.tedesco.data
 
 import com.alessandro.tedesco.data.local.LivelloCEFR
 import com.alessandro.tedesco.data.local.TestLivello
+import com.alessandro.tedesco.i18n.t
 
 /**
  * Motore adattivo: genera raccomandazioni di studio personalizzate
@@ -65,8 +66,8 @@ object CalcoloPercorsoAdattivo {
                 Raccomandazione(
                     priorita = prioritaCounter++,
                     categoria = CategoriaRaccomandazione.RIPASSO,
-                    titolo = "Ripasso flashcard",
-                    descrizione = "$daRipassare parole in scadenza. Mantieni il ritmo!",
+                    titolo = t("Ripasso flashcard"),
+                    descrizione = "$daRipassare " + t("parole in scadenza. Mantieni il ritmo!"),
                     azione = "ripasso",
                     urgente = daRipassare >= 10
                 )
@@ -79,9 +80,8 @@ object CalcoloPercorsoAdattivo {
                 Raccomandazione(
                     priorita = prioritaCounter++,
                     categoria = CategoriaRaccomandazione.GRAMMATICA,
-                    titolo = "Esercizi di grammatica",
-                    descrizione = "Grammatica al ${competenze.grammatica.toInt()}%. " +
-                        "Concentrati su: articoli, verbi modali e congiuntivo.",
+                    titolo = t("Esercizi di grammatica"),
+                    descrizione = t("Grammatica al") + " ${competenze.grammatica.toInt()}%. " + t("Concentrati su: articoli, verbi modali e congiuntivo."),
                     azione = "grammatica",
                     urgente = competenze.grammatica < 50f
                 )
@@ -94,9 +94,8 @@ object CalcoloPercorsoAdattivo {
                 Raccomandazione(
                     priorita = prioritaCounter++,
                     categoria = CategoriaRaccomandazione.COMPRENSIONE,
-                    titolo = "Quiz di comprensione",
-                    descrizione = "Comprensione al ${competenze.comprensione.toInt()}%. " +
-                        "Leggi testi e rispondi alle domande.",
+                    titolo = t("Quiz di comprensione"),
+                    descrizione = t("Comprensione al") + " ${competenze.comprensione.toInt()}%. " + t("Leggi testi e rispondi alle domande."),
                     azione = "quiz-comprensione",
                     urgente = competenze.comprensione < 40f
                 )
@@ -109,9 +108,8 @@ object CalcoloPercorsoAdattivo {
                 Raccomandazione(
                     priorita = prioritaCounter++,
                     categoria = CategoriaRaccomandazione.PRODUZIONE,
-                    titolo = "Esercizi di produzione",
-                    descrizione = "Produzione al ${competenze.produzione.toInt()}%. " +
-                        "Scrivi frasi complete in tedesco.",
+                    titolo = t("Esercizi di produzione"),
+                    descrizione = t("Produzione al") + " ${competenze.produzione.toInt()}%. " + t("Scrivi frasi complete in tedesco."),
                     azione = "quiz-produzione",
                     urgente = competenze.produzione < 40f
                 )
@@ -134,9 +132,8 @@ object CalcoloPercorsoAdattivo {
                 Raccomandazione(
                     priorita = prioritaCounter++,
                     categoria = CategoriaRaccomandazione.TEST_LIVELLO,
-                    titolo = "Verifica il tuo livello",
-                    descrizione = "Sei pronto per un test di ${obiettivoLivello.label}. " +
-                        "Metti alla prova ciò che hai imparato.",
+                    titolo = t("Verifica il tuo livello"),
+                    descrizione = t("Sei pronto per un test di") + " ${obiettivoLivello.label}. " + t("Metti alla prova ciò che hai imparato."),
                     azione = "testb1"
                 )
             )
@@ -148,9 +145,8 @@ object CalcoloPercorsoAdattivo {
                 Raccomandazione(
                     priorita = prioritaCounter++,
                     categoria = CategoriaRaccomandazione.SESSIONE_GUIDATA,
-                    titolo = "Sessione di studio",
-                    descrizione = "Nessun ripasso in scadenza. " +
-                        "Approfondisci con una sessione guidata.",
+                    titolo = t("Sessione di studio"),
+                    descrizione = t("Nessun ripasso in scadenza.") + " " + t("Approfondisci con una sessione guidata."),
                     azione = "sessioni"
                 )
             )
@@ -162,9 +158,8 @@ object CalcoloPercorsoAdattivo {
                 Raccomandazione(
                     priorita = prioritaCounter++,
                     categoria = CategoriaRaccomandazione.VOCABOLARIO,
-                    titolo = "Nuove parole",
-                    descrizione = "Lessico al ${competenze.lessico.toInt()}%. " +
-                        "Impara nuove parole dalla lezione ${statistiche.perLezione.size + 1}.",
+                    titolo = t("Nuove parole"),
+                    descrizione = t("Lessico al") + " ${competenze.lessico.toInt()}%. " + t("Impara nuove parole dalla lezione") + " ${statistiche.perLezione.size + 1}.",
                     azione = "nuove"
                 )
             )
@@ -176,36 +171,35 @@ object CalcoloPercorsoAdattivo {
                 Raccomandazione(
                     priorita = 1,
                     categoria = CategoriaRaccomandazione.SESSIONE_GUIDATA,
-                    titolo = "Ottimo lavoro!",
-                    descrizione = "Hai coperto tutte le aree principali. " +
-                        "Continua così con una sessione di approfondimento.",
+                    titolo = t("Ottimo lavoro!"),
+                    descrizione = t("Hai coperto tutte le aree principali.") + " " + t("Continua così con una sessione di approfondimento."),
                     azione = "sessioni"
                 )
             )
         }
 
         val messaggio = when {
-            daRipassare >= 20 -> "Torna in carriera! Tante parole da ripassare."
-            daRipassare >= 10 -> "Buon ritmo! Mantieni la costanza."
-            statistiche.streakGiorni >= 7 -> "Streak di ${statistiche.streakGiorni} giorni! Sei inarrestabile."
-            competenze.grammatica >= 60f && daRipassare == 0 -> "Prosegui così, stai facendo ottimi progressi."
-            competenze.grammatica < 40f -> "La grammatica ti sta mettendo alla prova. Forza, puoi farcela!"
-            competenze.lessico < 30f -> "Sei all'inizio del viaggio. Ogni parola conta!"
-            else -> "Prosegui così, stai facendo ottimi progressi."
+            daRipassare >= 20 -> t("Torna in carriera! Tante parole da ripassare.")
+            daRipassare >= 10 -> t("Buon ritmo! Mantieni la costanza.")
+            statistiche.streakGiorni >= 7 -> t("Streak di") + " ${statistiche.streakGiorni} " + t("giorni! Sei inarrestabile.")
+            competenze.grammatica >= 60f && daRipassare == 0 -> t("Prosegui così, stai facendo ottimi progressi.")
+            competenze.grammatica < 40f -> t("La grammatica ti sta mettendo alla prova. Forza, puoi farcela!")
+            competenze.lessico < 30f -> t("Sei all'inizio del viaggio. Ogni parola conta!")
+            else -> t("Prosegui così, stai facendo ottimi progressi.")
         }
 
         // Obiettivi con il vocabolario ATTIVO ufficiale (Wortliste Goethe / 2).
         val prossimoObiettivo = when {
             livelloCorrente < LivelloCEFR.A1 ->
-                "Raggiungere A1: ${CertificazioniUfficiali.vocabolarioAttivoRichiesto(LivelloCEFR.A1)} parole attive"
+                t("Raggiungere A1:") + " ${CertificazioniUfficiali.vocabolarioAttivoRichiesto(LivelloCEFR.A1)} " + t("parole attive")
             livelloCorrente < LivelloCEFR.A2 ->
-                "Raggiungere A2: ${CertificazioniUfficiali.vocabolarioAttivoRichiesto(LivelloCEFR.A2)} parole attive"
+                t("Raggiungere A2:") + " ${CertificazioniUfficiali.vocabolarioAttivoRichiesto(LivelloCEFR.A2)} " + t("parole attive")
             livelloCorrente < LivelloCEFR.B1 ->
-                "Raggiungere B1: ${CertificazioniUfficiali.vocabolarioAttivoRichiesto(LivelloCEFR.B1)} parole attive"
+                t("Raggiungere B1:") + " ${CertificazioniUfficiali.vocabolarioAttivoRichiesto(LivelloCEFR.B1)} " + t("parole attive")
             livelloCorrente < LivelloCEFR.B2 ->
-                "Raggiungere B2: ${CertificazioniUfficiali.vocabolarioAttivoRichiesto(LivelloCEFR.B2)} parole attive"
+                t("Raggiungere B2:") + " ${CertificazioniUfficiali.vocabolarioAttivoRichiesto(LivelloCEFR.B2)} " + t("parole attive")
             else ->
-                "Raggiungere C1: ${CertificazioniUfficiali.vocabolarioAttivoRichiesto(LivelloCEFR.C1)} parole attive"
+                t("Raggiungere C1:") + " ${CertificazioniUfficiali.vocabolarioAttivoRichiesto(LivelloCEFR.C1)} " + t("parole attive")
         }
 
         return PercorsoAdattivo(

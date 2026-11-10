@@ -1,4 +1,4 @@
-package com.alessandro.tedesco.ui
+﻿package com.alessandro.tedesco.ui
 
 import com.alessandro.tedesco.i18n.t
 
@@ -40,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.material3.TextButton
+import com.alessandro.tedesco.data.QuizData
 import com.alessandro.tedesco.data.remote.TipoEsercizio
 import com.alessandro.tedesco.data.DeduplicaEsercizi
 import com.alessandro.tedesco.data.local.DomandaTest
@@ -118,7 +119,7 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                 )
             }
         } else {
-            DeduplicaEsercizi.distinti(eserciziGen.filterNot { it.completato }) {
+            val cached = DeduplicaEsercizi.distinti(eserciziGen.filterNot { it.completato }) {
                 DeduplicaEsercizi.chiave(it.domanda, it.fraseTedesca)
             }.map {
                 DomandaTest(
@@ -133,6 +134,13 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                     testoLettura = it.testoLettura,
                     glossario = it.glossario
                 )
+            }
+            if (cached.isNotEmpty()) cached else {
+                // Fallback senza AI / senza rete: default predefiniti (quiz comprensione).
+                val ordine = LivelloCEFR.entries.indexOf(livelloUtente).coerceAtLeast(0)
+                QuizData.domandeComprensione.filter {
+                    LivelloCEFR.entries.indexOf(it.livelloRichiesto) <= ordine
+                }.ifEmpty { QuizData.domandeComprensione }.shuffled().take(10)
             }
         }
         indice = 0
@@ -198,7 +206,7 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
-                                        text = "Lies den Text (leggi il testo)",
+                                        text = t("Leggi il testo"),
                                         style = MaterialTheme.typography.titleSmall,
                                         fontWeight = FontWeight.SemiBold,
                                         modifier = Modifier.weight(1f)
@@ -281,7 +289,7 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = domanda.domanda,
+                                text = t(domanda.domanda),
                                 style = MaterialTheme.typography.bodyLarge,
                                 modifier = Modifier.weight(1f)
                             )
@@ -326,7 +334,7 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = opzione,
+                                    text = t(opzione),
                                     modifier = Modifier.weight(1f)
                                 )
                                 IconButton(onClick = { ttsHelper.speak(opzione) }) {
@@ -363,7 +371,7 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
-                                Text(text = domanda.spiegazione)
+                                Text(text = t(domanda.spiegazione))
                             }
                         }
 
@@ -405,7 +413,7 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "Punteggio: $punteggio/${elenco.size}",
+                                text = t("Punteggio") + ": $punteggio/${elenco.size}",
                                 style = MaterialTheme.typography.headlineMedium
                             )
                             Text(
@@ -465,7 +473,7 @@ fun ComprensioneScreen(vm: TedescoViewModel, onFatto: () -> Unit = {}) {
             title = { Text(t("Chiave API necessaria")) },
             text = { Text(t("Per generare esercizi infiniti inserisci una chiave Groq gratuita in Profilo → Tutor AI.")) },
             confirmButton = {
-                TextButton(onClick = { erroreGen = null }) { Text("OK") }
+                TextButton(onClick = { erroreGen = null }) { Text(t("OK")) }
             }
         )
     }

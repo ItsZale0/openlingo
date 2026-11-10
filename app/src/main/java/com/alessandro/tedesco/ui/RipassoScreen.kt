@@ -146,7 +146,7 @@ fun RipassoScreen(vm: TedescoViewModel, onIndietro: () -> Unit, onVaiANuove: () 
                         Text(
                             text = when {
                                 sessionState.sbagliate.isEmpty() -> t("Perfetto! Tutte le parole consolidate.")
-                                sessionState.sbagliate.size <= 2 -> t("Quasi perfetto. Rivedi le ${sessionState.sbagliate.size} parole segnalate.")
+                                sessionState.sbagliate.size <= 2 -> t("Quasi perfetto. Rivedi le") + " ${sessionState.sbagliate.size} " + t("parole segnalate.")
                                 else -> t("Continua a ripassare: la memoria si rafforza con la pratica.")
                             },
                             style = MaterialTheme.typography.bodyMedium,
@@ -154,13 +154,13 @@ fun RipassoScreen(vm: TedescoViewModel, onIndietro: () -> Unit, onVaiANuove: () 
                         )
                         Spacer(Modifier.height(12.dp))
                         Text(
-                            text = t("${sessionState.totale} parole ripassate"),
+                            text = "${sessionState.totale} " + t("parole ripassate"),
                             style = MaterialTheme.typography.bodyLarge
                         )
                         if (sessionState.sbagliate.isNotEmpty()) {
                             Spacer(Modifier.height(8.dp))
                             Text(
-                                text = "Da rivedere: ${sessionState.sbagliate.joinToString(", ")}",
+                                text = t("Da rivedere:") + " ${sessionState.sbagliate.joinToString(", ")}",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.error,
                                 textAlign = TextAlign.Center

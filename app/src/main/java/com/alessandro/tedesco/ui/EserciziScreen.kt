@@ -109,14 +109,14 @@ fun EserciziScreen(
                     }
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        consiglio.titolo,
+                        t(consiglio.titolo),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        consiglio.motivo,
+                        t(consiglio.motivo),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
@@ -182,8 +182,10 @@ private data class TipoEsercizio(
 )
 
 private val TipiEsercizio = listOf(
-    TipoEsercizio("grammatica", "grammatica", "Grammatica", t("Regole e forme, una alla volta"),
+    TipoEsercizio("grammatica", "grammatica", t("Grammatica"), t("Regole e forme, una alla volta"),
         Icons.Filled.School),
+    TipoEsercizio("gender_trainer", "gender_trainer", t("Allenatore articoli"), t("Indovina der, die o das con le parole del tuo lessico"),
+        Icons.Filled.Translate),
     TipoEsercizio("comprensione", "comprensione", t("Lettura"), t("Un testo calibrato al tuo livello"),
         Icons.Filled.Quiz),
     TipoEsercizio("produzione", "produzione", t("Produzione scritta"), t("Scrivi un testo: lo corregge il tutor"),
@@ -192,28 +194,28 @@ private val TipiEsercizio = listOf(
         Icons.AutoMirrored.Filled.Chat),
     TipoEsercizio("verifica", "verifica", t("Verifica lessico"), t("Dimostra di sapere le parole studiate"),
         Icons.Filled.Translate),
-    TipoEsercizio("ascolto", "ascolto", "Ascolto", t("Audio con domande per l'orecchio"),
+    TipoEsercizio("ascolto", "ascolto", t("Ascolto"), t("Audio con domande per l'orecchio"),
         Icons.Filled.Hearing),
     TipoEsercizio("ripasso", "ripasso", t("Ripasso"), t("Ripassa le parole sbagliate o fragili"),
         Icons.Filled.Refresh),
-    TipoEsercizio("lessico", "lessico", "Lessico A1-B2",
+    TipoEsercizio("lessico", "lessico", t("Lessico A1-B2"),
         t("${LessicoLivelli.tutte.size} parole per livello, 6 tipi di esercizio"),
         Icons.AutoMirrored.Filled.MenuBook),
     TipoEsercizio("produzione_attiva", "produzione_attiva", t("Produzione attiva"),
         t("Scrivi, completa, riordina: recupero attivo"), Icons.Filled.Create),
     TipoEsercizio("errori", "errori", t("Quaderno errori"),
         t("Gli errori tornano al momento giusto (SRS)"), Icons.Filled.ErrorOutline),
-    TipoEsercizio("dialoghi", "dialoghi", "Dialoghi",
+    TipoEsercizio("dialoghi", "dialoghi", t("Dialoghi"),
         t("Conversazioni a due voci con domande"), Icons.Filled.Headphones),
     TipoEsercizio("pronuncia", "pronuncia", t("Pronuncia"),
-        "Coppie minime, registro e confronto", Icons.Filled.RecordVoiceOver),
-    TipoEsercizio("sprechuebungen", "sprechuebungen", "Sprechübungen",
+        t("Coppie minime, registro e confronto"), Icons.Filled.RecordVoiceOver),
+    TipoEsercizio("sprechuebungen", "sprechuebungen", t("Sprechübungen"),
         t("Parla su un tema e confrontati con il modello"), Icons.Filled.RecordVoiceOver),
-    TipoEsercizio("wortliste", "wortliste", "Wortliste A1-B1",
+    TipoEsercizio("wortliste", "wortliste", t("Wortliste A1-B1"),
         t("${WortlisteB1.tutte.size} parole curate da portare nel lessico"), Icons.AutoMirrored.Filled.MenuBook),
-    TipoEsercizio("sudtirol", "sudtirol", "Südtirol / Austria",
+    TipoEsercizio("sudtirol", "sudtirol", t("Südtirol / Austria"),
         t("Varianti locali e lessico sanitario"), Icons.Filled.Place),
-    TipoEsercizio("podcast", "podcast", "Podcast & Video",
+    TipoEsercizio("podcast", "podcast", t("Podcast & Video"),
         t("Ascolto autentico per livello: YouTube, Spotify, DW"), Icons.Filled.Headphones)
 )
 
@@ -222,7 +224,7 @@ private val TipiEsercizio = listOf(
  * e' a colpo d'occhio invece di un ammasso unico di card.
  */
 private val SezioniEsercizi = listOf(
-    t("Competenze") to listOf("grammatica", "comprensione", "produzione", "espressioni", "verifica", "ascolto"),
+    t("Competenze") to listOf("grammatica", "gender_trainer", "comprensione", "produzione", "espressioni", "verifica", "ascolto"),
     t("Ripasso e consolidamento") to listOf("lessico", "ripasso", "produzione_attiva", "errori"),
     t("Esplora") to listOf("dialoghi", "pronuncia", "sprechuebungen", "wortliste", "sudtirol", "podcast")
 )
@@ -243,16 +245,17 @@ private fun statPerTipo(
         "produzione" -> if (pr.produzioniScritte > 0) t("${pr.produzioniScritte} testi - ${pr.mediaProduzione.toInt()}%")
             else t("Nessun testo ancora")
         "espressioni" -> t("Quiz rapido")
-        "verifica" -> "${pr.paroleImparate}/${pr.paroleDisponibili} verificate"
-        "ascolto" -> "Livello ${pr.livello.label.substringBefore(" ")}"
-        "ripasso" -> if (pr.paroleFragili > 0) "${pr.paroleFragili} da ripassare" else t("Tutto a posto")
+        "verifica" -> t("${pr.paroleImparate}/${pr.paroleDisponibili} verificate")
+        "gender_trainer" -> t("der, die, das")
+        "ascolto" -> t("Livello ${pr.livello.label.substringBefore(" ")}")
+        "ripasso" -> if (pr.paroleFragili > 0) t("${pr.paroleFragili} da ripassare") else t("Tutto a posto")
         "lessico" -> t("${LessicoLivelli.tutte.size} parole A1-B2")
-        "produzione_attiva" -> "72 esercizi offline"
-        "errori" -> if (erroriAperti > 0) "$erroriAperti da consolidare" else t("Nessun errore aperto")
-        "dialoghi" -> "${Dialoghi.dialoghi.size} dialoghi"
+        "produzione_attiva" -> t("72 esercizi offline")
+        "errori" -> if (erroriAperti > 0) t("$erroriAperti da consolidare") else t("Nessun errore aperto")
+        "dialoghi" -> t("${Dialoghi.dialoghi.size} dialoghi")
         "pronuncia" -> t("Ascolta e registrati")
         "wortliste" -> t("${WortlisteB1.tutte.size} parole A1-B1")
-        "sudtirol" -> "${Sudtirol.varianti.size} varianti + lessico"
+        "sudtirol" -> t("${Sudtirol.varianti.size} varianti + lessico")
         "podcast" -> t("${PodcastData.episodi.size} contenuti per livello")
         else -> ""
     }

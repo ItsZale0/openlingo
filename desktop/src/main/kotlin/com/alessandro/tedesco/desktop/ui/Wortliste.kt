@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.alessandro.tedesco.data.WortlisteB1
 import com.alessandro.tedesco.desktop.DesktopStore
+import com.alessandro.tedesco.i18n.t
 
 @Composable
 fun SchermataWortliste(store: DesktopStore) {
@@ -57,9 +58,8 @@ fun SchermataWortliste(store: DesktopStore) {
 
     Pagina {
         Testata(
-            titolo = "Wortliste A1-B1",
-            sottotitolo = "${WortlisteB1.tutte.size} parole curate · ${nelLessico.size} nel tuo lessico · " +
-                "$aggiungibili da aggiungere in questa vista"
+            titolo = t("Wortliste A1-B1"),
+            sottotitolo = "${WortlisteB1.tutte.size} " + t("parole curate") + " · ${nelLessico.size} " + t("nel tuo lessico") + " · $aggiungibili " + t("da aggiungere in questa vista")
         )
 
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -69,17 +69,17 @@ fun SchermataWortliste(store: DesktopStore) {
                 modifier = Modifier.weight(1f),
                 singleLine = true,
                 leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
-                label = { Text("Cerca in tedesco o in italiano") }
+                label = { Text(t("Cerca in tedesco o in italiano")) }
             )
             Spacer(Modifier.width(12.dp))
             Button(
                 onClick = {
                     val aggiunte = store.importaWortliste()
-                    messaggio = if (aggiunte == 0) "Tutte le parole erano già nel lessico."
-                    else "Aggiunte $aggiunte parole al lessico."
+                    messaggio = if (aggiunte == 0) t("Tutte le parole erano già nel lessico.")
+                    else t("Aggiunte") + " $aggiunte " + t("parole al lessico.")
                 }
             ) {
-                Text("Importa tutto")
+                Text(t("Importa tutto"))
             }
         }
 
@@ -88,7 +88,7 @@ fun SchermataWortliste(store: DesktopStore) {
                 FilterChip(
                     selected = livello == codice,
                     onClick = { livello = codice },
-                    label = { Text(codice ?: "Tutti") }
+                    label = { Text(codice ?: t("Tutti")) }
                 )
             }
         }
@@ -108,7 +108,7 @@ fun SchermataWortliste(store: DesktopStore) {
         ) {
             if (elenco.isEmpty()) {
                 Text(
-                    "Nessuna parola per questa ricerca.",
+                    t("Nessuna parola per questa ricerca."),
                     modifier = Modifier.padding(22.dp),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -132,7 +132,7 @@ fun SchermataWortliste(store: DesktopStore) {
                                     Etichetta(voce.livello)
                                 }
                                 Text(
-                                    voce.italiano,
+                                    t(voce.italiano),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -145,7 +145,7 @@ fun SchermataWortliste(store: DesktopStore) {
                                 }
                             }
                             Text(
-                                voce.tema,
+                                t(voce.tema),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -154,17 +154,17 @@ fun SchermataWortliste(store: DesktopStore) {
                                 OutlinedButton(onClick = {}, enabled = false) {
                                     Icon(Icons.Filled.Check, contentDescription = null)
                                     Spacer(Modifier.width(4.dp))
-                                    Text("Nel lessico")
+                                    Text(t("Nel lessico"))
                                 }
                             } else {
                                 Button(onClick = {
                                     val aggiunta = store.aggiungiParola(voce)
-                                    messaggio = if (aggiunta) "Aggiunta: ${voce.tedesco}"
-                                    else "Già presente nel lessico."
+                                    messaggio = if (aggiunta) t("Aggiunta") + ": ${voce.tedesco}"
+                                    else t("Già presente nel lessico.")
                                 }) {
                                     Icon(Icons.Filled.Add, contentDescription = null)
                                     Spacer(Modifier.width(4.dp))
-                                    Text("Aggiungi")
+                                    Text(t("Aggiungi"))
                                 }
                             }
                         }
@@ -174,7 +174,7 @@ fun SchermataWortliste(store: DesktopStore) {
         }
 
         Text(
-            "Le parole aggiunte entrano nella coda di ripasso: la prima risposta crea la carta SRS.",
+            t("Le parole aggiunte entrano nella coda di ripasso: la prima risposta crea la carta SRS."),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

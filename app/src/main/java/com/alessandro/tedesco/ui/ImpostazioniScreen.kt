@@ -326,7 +326,7 @@ fun ImpostazioniScreen(
     }
     val oreDisponibili = (12..23).map { it to "%02d:00".format(it) }
 
-    Scaffold(topBar = { CompactTopBar("Impostazioni", onBack = onIndietro) }, contentWindowInsets = WindowInsets(0)) { inner ->
+    Scaffold(topBar = { CompactTopBar(t("Impostazioni"), onBack = onIndietro) }, contentWindowInsets = WindowInsets(0)) { inner ->
         Column(
             modifier = Modifier
                 .padding(inner)
@@ -350,7 +350,7 @@ fun ImpostazioniScreen(
                         )
                         profilo?.config?.tipo?.descrizione?.let {
                             Spacer(Modifier.height(6.dp))
-                            Text(it, style = MaterialTheme.typography.bodySmall,
+                            Text(t(it), style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
@@ -368,7 +368,7 @@ fun ImpostazioniScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(Modifier.height(6.dp))
                         Text(t("Scegli il colore principale dell'app. \"Material You\" " +
-                            "usa i colori del sistema (Android 12+)."),
+                            t("usa i colori del sistema (Android 12+).")),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(Modifier.height(10.dp))
@@ -575,17 +575,11 @@ fun ImpostazioniScreen(
                             Text(t("Rimuovi feed"))
                         }
                         GlassExpandableSection(
-                            title = "Info",
+                            title = t("Info"),
                             description = null
                         ) {
                             Text(
-                                text = "Come creare il TUO vocabolario su GitHub:\n\n" +
-                                "1. Vai su github.com e accedi (o crea un account gratis)\n" +
-                                "2. Crea un repository pubblico\n" +
-                                "3. Carica un file vokabeln.json\n" +
-                                "4. Copia l'URL Raw e incollalo qui\n\n" +
-                                "Formato: {\"words\":[{\"id\":\"1\",\"german\":\"der Hund\",\" " +
-                                "\"italian\":\"il cane\",\"level\":\"A1\",\"lesson\":1}]}",
+                                text = t("Come creare il TUO vocabolario su GitHub:\n\n1. Vai su github.com e accedi (o crea un account gratis)\n2. Crea un repository pubblico\n3. Carica un file vokabeln.json\n4. Copia l'URL Raw e incollalo qui\n\nFormato: {\"words\":[{\"id\":\"1\",\"german\":\"der Hund\", \"italian\":\"il cane\",\"level\":\"A1\",\"lesson\":1}]}"),
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.padding(12.dp)
                             )
@@ -604,15 +598,11 @@ fun ImpostazioniScreen(
                         )
                         Spacer(Modifier.height(8.dp))
                         GlassExpandableSection(
-                            title = "Info",
+                            title = t("Info"),
                             description = null
                         ) {
                             Text(
-                                text = "Come usare il TUO documento Google:\n\n" +
-                                "1. Apri Google Docs e crea un documento\n" +
-                                "2. Scrivi la guida (usa i Titoli)\n" +
-                                "3. Condividi ��' Chiunque abbia il link ��' Visualizzatore\n" +
-                                "4. Copia l'indirizzo e incollalo qui",
+                                text = t("Come usare il TUO documento Google:\n\n1. Apri Google Docs e crea un documento\n2. Scrivi la guida (usa i Titoli)\n3. Condividi → Chiunque abbia il link → Visualizzatore\n4. Copia l'indirizzo e incollalo qui"),
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.padding(12.dp)
                             )
@@ -630,8 +620,7 @@ fun ImpostazioniScreen(
                 // --- CONTESTO PER L'AI ---
                 SettingsExpandableSection(
                     title = t("Contesto e obiettivi"),
-                    description = "L'AI usa queste informazioni per scegliere esempi, " +
-                        "esercizi e vocabolario adatti a te."
+                    description = t("L'AI usa queste informazioni per scegliere esempi, esercizi e vocabolario adatti a te.")
                 ) {
                     OutlinedTextField(
                         value = contestoUtente,
@@ -648,8 +637,7 @@ fun ImpostazioniScreen(
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "Resta sul dispositivo e viene inviato solo ai provider AI " +
-                            "quando generi contenuti. Vuoto = nessuna personalizzazione.",
+                        t("Resta sul dispositivo e viene inviato solo ai provider AI quando generi contenuti. Vuoto = nessuna personalizzazione."),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -663,8 +651,7 @@ fun ImpostazioniScreen(
 // --- TUTOR AI ---
                 SettingsExpandableSection(
                     title = t("Tutor AI"),
-                    description = "Facoltativo: scegli un provider e incolla la chiave. " +
-                        t("Senza chiave restano disponibili tutti i contenuti offline.")
+                    description = t("Facoltativo: scegli un provider e incolla la chiave. ") + t("Senza chiave restano disponibili tutti i contenuti offline.")
                 ) {
                     ProviderAIChips(provider = providerAI, onProvider = { providerAI = it })
                     Spacer(Modifier.height(8.dp))
@@ -697,11 +684,11 @@ fun ImpostazioniScreen(
                 // --- AGGIORNAMENTI ---
                 SettingsExpandableSection(
                     title = t("Aggiornamenti"),
-                    description = "L'app controlla da sola all'apertura e ti avvisa. Puoi anche forzare il controllo."
+                    description = t("L'app controlla da sola all'apertura e ti avvisa. Puoi anche forzare il controllo.")
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            "Versione installata: ${updater.versioneCorrente ?: "?"} (${updater.versioneCorrenteCode})",
+                            t("Versione installata: ${updater.versioneCorrente ?: "?"} (${updater.versioneCorrenteCode})"),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.weight(1f)
@@ -775,7 +762,7 @@ fun ImpostazioniScreen(
                         }
                         is UpdateState.Available -> {
                             Text(
-                                "Disponibile v${s.version.versionName} (${s.version.versionCode})",
+                                t("Disponibile v${s.version.versionName} (${s.version.versionCode})"),
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.primary
@@ -792,7 +779,7 @@ fun ImpostazioniScreen(
                                     modifier = Modifier.fillMaxWidth()
                                 )
                                 Text(
-                                    "Download v${s.progress}%",
+                                    t("Download ${s.progress}%"),
                                     style = MaterialTheme.typography.bodySmall
                                 )
                             }
@@ -848,7 +835,7 @@ fun ImpostazioniScreen(
                 TedescoApp.ultimoCrash(ctx)?.let { trace ->
                     SettingsExpandableSection(
                         title = t("Ultimo arresto anomalo"),
-                        description = "L'app si e' interrotta. Guarda lo stack trace."
+                        description = t("L'app si è interrotta. Guarda lo stack trace.")
                     ) {
                         Text(
                             trace.take(1200),
@@ -876,8 +863,7 @@ fun ImpostazioniScreen(
                     SettingsButton(onClick = onVaiABackup) { Text(t("Apri backup cloud")) }
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "Il backup contiene tutti i profili (parole, ripassi, test, progressi). " +
-                            t("Serve un token GitHub gratuito con permesso Contents sul repo di backup."),
+                        t("Il backup contiene tutti i profili (parole, ripassi, test, progressi). ") + t("Serve un token GitHub gratuito con permesso Contents sul repo di backup."),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -887,7 +873,7 @@ fun ImpostazioniScreen(
                     Text(t("Vocabolario"), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "Ultimo aggiornamento: ${TedescoViewModel.formattaData(ultimoSync?.syncedAt ?: 0L)}",
+                        t("Ultimo aggiornamento: ${TedescoViewModel.formattaData(ultimoSync?.syncedAt ?: 0L)}"),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -904,8 +890,7 @@ fun ImpostazioniScreen(
                     Text(t("Ripasso"), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "Quando rispondi giusto l'intervallo si allunga: 1, 3, 7, 16, 35, 75, " +
-                            "150, 300 giorni. Quando sbagli torna a domani.",
+                        t("Quando rispondi giusto l'intervallo si allunga: 1, 3, 7, 16, 35, 75, 150, 300 giorni. Quando sbagli torna a domani."),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -948,8 +933,7 @@ fun ImpostazioniScreen(
             title = { Text(t("Tornare alla scelta del profilo?")) },
             text = {
                 Text(
-                    "I dati di ${profilo?.config?.nomeVisualizzato ?: "questo profilo"} " +
-                        t("restano salvati. Potrai rientrare quando vuoi.")
+                    t("I dati di ${profilo?.config?.nomeVisualizzato ?: "questo profilo"} restano salvati. Potrai rientrare quando vuoi.")
                 )
             },
             confirmButton = {
@@ -964,8 +948,7 @@ fun ImpostazioniScreen(
             title = { Text(t("Cancellare i dati?")) },
             text = {
                 Text(
-                    "Vengono rimossi vocaboli e ripetizioni solo di questo profilo. " +
-                        t("Gli altri profili non vengono toccati.")
+                    t("Vengono rimossi vocaboli e ripetizioni solo di questo profilo. Gli altri profili non vengono toccati.")
                 )
             },
             confirmButton = {

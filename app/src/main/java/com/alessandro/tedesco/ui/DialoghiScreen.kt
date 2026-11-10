@@ -39,7 +39,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alessandro.tedesco.data.Dialoghi
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alessandro.tedesco.data.Dialoghi.DialogoAscolto
 import com.alessandro.tedesco.data.RotoreEsercizi
 import com.alessandro.tedesco.ui.theme.Spaziature
@@ -52,15 +54,22 @@ import java.util.Locale
  */
 @Composable
 fun DialoghiScreen(
+    vm: TedescoViewModel? = null,
     onIndietro: () -> Unit = {}
 ) {
     val tts = rememberTtsHelper(LocalContext.current, Locale.GERMAN)
     var aperto by remember { mutableStateOf<DialogoAscolto?>(null) }
+    val mostraMedico = vm?.mostraContestoMedico?.collectAsStateWithLifecycle()?.value ?: false
+    val contesto = vm?.contestoUtente?.collectAsStateWithLifecycle()?.value ?: ""
+    val mostraSanitario = remember(mostraMedico, contesto) {
+        Dialoghi.contestoSanitarioRichiesto(mostraMedico, contesto)
+    }
+    val dialoghiVisibili = remember(mostraSanitario) { Dialoghi.perContesto(mostraSanitario) }
 
     val dialogo = aperto
     if (dialogo == null) {
         Column(Modifier.fillMaxSize()) {
-            CompactTopBar(title = "Dialoghi", onBack = onIndietro)
+            CompactTopBar(title = t("Dialoghi"), onBack = onIndietro)
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -69,13 +78,12 @@ fun DialoghiScreen(
                 verticalArrangement = Arrangement.spacedBy(Spaziature.sm)
             ) {
                 Text(
-                    "Ascolto a due voci: prima senza traduzione, poi con. " +
-                        t("Rispondi alle domande senza rileggere."),
+                    t("Ascolto a due voci: prima senza traduzione, poi con. Rispondi alle domande senza rileggere."),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                RotoreEsercizi.ordine("dialoghi", Dialoghi.dialoghi.size)
-                    .map { Dialoghi.dialoghi[it] }.forEach { d ->
+                RotoreEsercizi.ordine("dialoghi", dialoghiVisibili.size)
+                    .map { dialoghiVisibili[it] }.forEach { d ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -85,7 +93,7 @@ fun DialoghiScreen(
                         Column(Modifier.fillMaxWidth().padding(Spaziature.md).animateContentSize()) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
-                                    d.titolo,
+                                    t(d.titolo),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold,
                                     modifier = Modifier.weight(1f)
@@ -98,7 +106,7 @@ fun DialoghiScreen(
                                 )
                             }
                             Text(
-                                d.traduzione,
+                                t(d.traduzione),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -117,7 +125,7 @@ fun DialoghiScreen(
     }
 
     Column(Modifier.fillMaxSize()) {
-        CompactTopBar(title = dialogo.titolo, onBack = {
+        CompactTopBar(title = t(dialogo.titolo), onBack = {
             tts.stop()
             aperto = null
         })
@@ -129,7 +137,7 @@ fun DialoghiScreen(
             verticalArrangement = Arrangement.spacedBy(Spaziature.sm)
         ) {
             Text(
-                dialogo.traduzione,
+                t(dialogo.traduzione),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -192,7 +200,7 @@ fun DialoghiScreen(
                             contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 0.dp, vertical = 0.dp)
                         ) {
                             Text(
-                                if (traduzioneVisibile) battuta.traduzione else t("Mostra traduzione"),
+                                if (traduzioneVisibile) t(battuta.traduzione) else t("Mostra traduzione"),
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
@@ -214,7 +222,7 @@ fun DialoghiScreen(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
                 ) {
                     Column(Modifier.fillMaxWidth().padding(Spaziature.md)) {
-                        Text(domanda.domanda, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
+                        Text(t(domanda.domanda), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
                         Spacer(Modifier.height(Spaziature.xs))
                         domanda.opzioni.forEachIndexed { oi, opzione ->
                             val verificato = scelta != null
@@ -236,7 +244,7 @@ fun DialoghiScreen(
                                     Modifier.fillMaxWidth().padding(10.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(opzione, Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+                                    Text(t(opzione), Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
                                     if (verificato && giusta) {
                                         Icon(Icons.Filled.Check, contentDescription = null, modifier = Modifier.size(16.dp))
                                     } else if (verificato && scelta == oi) {
@@ -249,8 +257,9 @@ fun DialoghiScreen(
                 }
             }
             Spacer(Modifier.height(Spaziature.sm))
+            val punteggio = dialogo.domande.indices.count { risposte[it] == dialogo.domande[it].corretta }
             Text(
-                "Punteggio: ${dialogo.domande.indices.count { risposte[it] == dialogo.domande[it].corretta }} / ${dialogo.domande.size}",
+                t("Punteggio: $punteggio / ${dialogo.domande.size}"),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary

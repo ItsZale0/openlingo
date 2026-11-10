@@ -116,16 +116,16 @@ fun WortlisteScreen(
                     onClick = { tema = null },
                     label = { Text(t("Tutti i temi")) }
                 )
-                temi.forEach { t ->
+                temi.forEach { temaItem ->
                     FilterChip(
-                        selected = tema == t,
-                        onClick = { tema = if (tema == t) null else t },
-                        label = { Text(t) }
+                        selected = tema == temaItem,
+                        onClick = { tema = if (tema == temaItem) null else temaItem },
+                        label = { Text(t(temaItem)) }
                     )
                 }
             }
             Text(
-                t("${voci.size} parole - tocca + per aggiungerle al tuo lessico"),
+                "${voci.size} " + t("parole - tocca + per aggiungerle al tuo lessico"),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -179,7 +179,7 @@ fun WortlisteScreen(
                                 )
                             }
                             Text(
-                                t("${voce.livello} · ${voce.tema}"),
+                                "${voce.livello} · ${t(voce.tema)}",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )

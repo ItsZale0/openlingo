@@ -247,8 +247,8 @@ fun PodcastScreen(
 
         Text(
             when {
-                filtriAttivi -> t("${filtrati.size} contenuti con questi filtri")
-                else -> t("${filtrati.size} contenuti per il livello ${infoLivello.codice}")
+                filtriAttivi -> "${filtrati.size} " + t("contenuti con questi filtri")
+                else -> "${filtrati.size} " + t("contenuti per il livello") + " ${infoLivello.codice}"
             },
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -331,9 +331,9 @@ private fun HeroPodcast() {
             )
             Spacer(Modifier.height(Spaziature.md))
             Row(horizontalArrangement = Arrangement.spacedBy(Spaziature.xs)) {
-                StatPill("${PodcastData.episodi.size}", "contenuti")
-                StatPill("4", "livelli")
-                StatPill(t("Gratis"), "sempre")
+                StatPill("${PodcastData.episodi.size}", t("contenuti"))
+                StatPill("4", t("livelli"))
+                StatPill(t("Gratis"), t("sempre"))
             }
         }
     }
@@ -423,7 +423,7 @@ private fun CardLivello(info: PodcastData.Livello) {
         Column(modifier = Modifier.padding(Spaziature.md)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    info.titolo,
+                    t(info.titolo),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f)
@@ -443,7 +443,7 @@ private fun CardLivello(info: PodcastData.Livello) {
             }
             Spacer(Modifier.height(4.dp))
             Text(
-                info.obiettivo,
+                t(info.obiettivo),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -464,7 +464,7 @@ private fun CardLivello(info: PodcastData.Livello) {
                     )
                     Spacer(Modifier.width(6.dp))
                     Text(
-                        info.consiglio,
+                        t(info.consiglio),
                         style = MaterialTheme.typography.labelSmall
                     )
                 }
@@ -498,7 +498,7 @@ private fun CardInEvidenza(
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 ) {
                     Text(
-                        "Scelto per te",
+                        t("Scelto per te"),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
@@ -515,7 +515,7 @@ private fun CardInEvidenza(
                 Spacer(Modifier.width(Spaziature.sm))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        episodio.titolo,
+                        t(episodio.titolo),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         maxLines = 2,
@@ -532,7 +532,7 @@ private fun CardInEvidenza(
             Spacer(Modifier.height(Spaziature.sm))
 
             Text(
-                episodio.descrizione,
+                t(episodio.descrizione),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -545,7 +545,7 @@ private fun CardInEvidenza(
             ) {
                 MetaTag(
                     icona = Icons.Filled.Schedule,
-                    testo = episodio.durata,
+                    testo = t(episodio.durata),
                     modifier = Modifier.weight(1f, fill = false)
                 )
                 MetaTag(
@@ -555,7 +555,7 @@ private fun CardInEvidenza(
                 )
                 MetaTag(
                     icona = Icons.Filled.Subtitles,
-                    testo = episodio.supporto,
+                    testo = t(episodio.supporto),
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -599,7 +599,7 @@ private fun CardEpisodio(
                 Spacer(Modifier.width(Spaziature.sm))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        episodio.titolo,
+                        t(episodio.titolo),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold,
                         maxLines = 2,
@@ -615,7 +615,7 @@ private fun CardEpisodio(
                     )
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        episodio.descrizione,
+                        t(episodio.descrizione),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 3,
@@ -628,7 +628,7 @@ private fun CardEpisodio(
                     ) {
                         MetaTag(
                             icona = Icons.Filled.Schedule,
-                            testo = episodio.durata,
+                            testo = t(episodio.durata),
                             modifier = Modifier.weight(1f, fill = false)
                         )
                         MetaTag(
@@ -819,12 +819,12 @@ private fun ComeAscoltare() {
             }
             if (expanded) {
                 Spacer(Modifier.height(Spaziature.sm))
-                PuntoAscolto("1", "Scegli un contenuto solo e portalo a termine: la costanza vale più della quantità.")
-                PuntoAscolto("2", "Prima ascolta con il supporto scritto, poi riascolta senza: il secondo passaggio è quello che fa crescere.")
-                PuntoAscolto("3", "Chiudi con 3 parole nuove e una frase tua: l'ascolto diventa lessico attivo.")
+                PuntoAscolto("1", t("Scegli un contenuto solo e portalo a termine: la costanza vale più della quantità."))
+                PuntoAscolto("2", t("Prima ascolta con il supporto scritto, poi riascolta senza: il secondo passaggio è quello che fa crescere."))
+                PuntoAscolto("3", t("Chiudi con 3 parole nuove e una frase tua: l'ascolto diventa lessico attivo."))
                 Spacer(Modifier.height(Spaziature.sm))
                 Text(
-                    "Serve una connessione: i link si aprono in YouTube, Spotify o nel browser. " +
+                    t("Serve una connessione: i link si aprono in YouTube, Spotify o nel browser.") + " " +
                         t("Il resto dell'app resta offline."),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant

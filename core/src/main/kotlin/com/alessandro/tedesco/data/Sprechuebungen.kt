@@ -16,7 +16,8 @@ object Sprechuebungen {
         val situazione: String,
         val prompt: String,
         val vocabolario: List<String>,
-        val modello: String
+        val modello: String,
+        val sanitario: Boolean = false
     )
 
     val prompts: List<Prompt> = listOf(
@@ -25,7 +26,7 @@ object Sprechuebungen {
         Prompt("sp-a0-02", "A0", "Dire il proprio nome", "Dì come ti chiami e di dove sei.", listOf("Ich heiße...", "Ich bin aus...", "Und du?"), "Hallo, ich heiße Thomas. Ich bin aus Italien. Und du? Wie heißt du?"),
         Prompt("sp-a0-03", "A0", "Sillabare il nome", "Sillaba il tuo nome alla reception, lettera per lettera.", listOf("Mein Name ist...", "der Buchstabe", "Bitte buchstabieren Sie"), "Entschuldigung, bitte buchstabieren Sie Ihren Namen. - Mein Name ist Thomas: T-H-O-M-A-S."),
         Prompt("sp-a0-04", "A0", "Numeri e telefono", "Dì i numeri da 1 a 12 e lascia il tuo numero di telefono.", listOf("eins, zwei, drei", "Meine Nummer ist...", "null, sieben"), "Eins, zwei, drei, vier, fünf, sechs, sieben, acht, neun, zehn, elf, zwölf. Meine Telefonnummer ist null-drei-vier-sieben-zwei..."),
-        Prompt("sp-a0-05", "A0", "Non stare bene", "Dì che non ti senti bene e ringrazia un fisioterapista.", listOf("Ich bin krank", "Es tut weh", "Danke schön", "Tschüss"), "Ich bin krank. Der Rücken tut weh. Danke schön für Ihre Hilfe. Tschüss!"),
+        Prompt("sp-a0-05", "A0", "Non stare bene", "Dì che non ti senti bene e ringrazia un fisioterapista.", listOf("Ich bin krank", "Es tut weh", "Danke schön", "Tschüss"), "Ich bin krank. Der Rücken tut weh. Danke schön für Ihre Hilfe. Tschüss!", true),
         Prompt("sp-a0-06", "A0", "Dire l'età", "Dì quanti anni hai e chiedi l'età a qualcuno.", listOf("Ich bin ... Jahre alt", "Wie alt bist du?", "Jahre"), "Ich bin 32 Jahre alt. Und du? Wie alt bist du? — Ich bin 28."),
         Prompt("sp-a0-07", "A0", "I giorni della settimana", "Dì che giorno è oggi e quando è il tuo appuntamento.", listOf("Heute ist...", "am Dienstag", "der Termin", "morgen"), "Heute ist Montag. Mein Termin ist am Dienstag. Morgen gehe ich zur Therapie."),
         Prompt("sp-a0-08", "A0", "Presentare la famiglia", "Presenta la tua famiglia con le frasi più semplici.", listOf("Das ist meine Frau", "mein Mann", "die Kinder", "Wir haben..."), "Das ist meine Frau. Wir haben zwei Kinder. Das ist mein Bruder."),
@@ -53,26 +54,35 @@ object Sprechuebungen {
         // ---- B1 ----
         Prompt("sp-b1-01", "B1", "Esperienza di viaggio", "Racconta un viaggio che hai fatto: dove, quando, cosa hai fatto.", listOf("Ich war in...", "Es war...", "Wir haben...", "Das Beste war..."), "Ich war letztes Jahr in Berlin. Es war sehr interessant. Wir haben viele Museen besucht. Das Beste war das Brandenburger Tor."),
         Prompt("sp-b1-02", "B1", "Pro e contro", "Dai la tua opinione su lavorare da casa: vantaggi e svantaggi.", listOf("Ich finde, dass...", "Ein Vorteil ist...", "Ein Nachteil ist...", "Trotzdem..."), "Ich finde, dass Homeoffice gut ist. Ein Vorteil ist die Flexibilität. Ein Nachteil ist die Einsamkeit. Trotzdem bevorzuge ich es."),
-        Prompt("sp-b1-03", "B1", "Esperienza lavorativa", "Racconta la tua esperienza professionale e i tuoi obiettivi.", listOf("Ich arbeite als...", "Meine Aufgaben sind...", "In Zukunft möchte ich..."), "Ich arbeite als Physiotherapeut. Meine Aufgaben sind Behandlungen und Beratung. In Zukunft möchte ich mich weiterbilden."),
+        Prompt("sp-b1-03", "B1", "Esperienza lavorativa", "Racconta la tua esperienza professionale e i tuoi obiettivi.", listOf("Ich arbeite als...", "Meine Aufgaben sind...", "In Zukunft möchte ich..."), "Ich arbeite als Physiotherapeut. Meine Aufgaben sind Behandlungen und Beratung. In Zukunft möchte ich mich weiterbilden.", true),
         Prompt("sp-b1-04", "B1", "Pianificare insieme", "Proponi a un collega di organizzare un evento: data, luogo, attività.", listOf("Wir könnten...", "Was hältst du von...?", "Wann passt es dir?", "Einverstanden?"), "Wir könnten am Samstag ein Fest machen. Was hältst du von einem Grillabend? Wann passt es dir? Einverstanden?"),
         Prompt("sp-b1-05", "B1", "Raccontare un problema", "Racconta un problema che hai avuto e come lo hai risolto.", listOf("Ich hatte ein Problem...", "Das Problem war...", "Ich habe... gemacht", "Am Ende..."), "Ich hatte ein Problem mit meinem Computer. Das Problem war ein Virus. Ich habe einen Techniker gerufen. Am Ende war alles gelöst."),
         Prompt("sp-b1-06", "B1", "Presentare la tua città", "Presenta la tua città a un ospite: cosa visitare e fare.", listOf("Meine Heimatstadt ist...", "Die Lage ist...", "Man kann...", "Sehr gut gefällt mir..."), "Meine Heimatstadt ist Bozen. Die Lage zwischen den Bergen ist wunderschön. Man kann dort sehr gut wandern und essen. Sehr gut gefällt mir der Markt."),
         // ---- B2 ----
-        Prompt("sp-b2-01", "B2", "Presentazione professionale", "Presenta il tuo profilo professionale: formazione, esperienza, obiettivi.", listOf("Ich habe... studiert", "Meine Erfahrung umfasst...", "Mein Ziel ist...", "Ich bin besonders interessiert an..."), "Ich habe Physiotherapie studiert. Meine Erfahrung umfasst fünf Jahre in einer Klinik. Mein Ziel ist, mich auf Sportmedizin zu spezialisieren."),
+        Prompt("sp-b2-01", "B2", "Presentazione professionale", "Presenta il tuo profilo professionale: formazione, esperienza, obiettivi.", listOf("Ich habe... studiert", "Meine Erfahrung umfasst...", "Mein Ziel ist...", "Ich bin besonders interessiert an..."), "Ich habe Physiotherapie studiert. Meine Erfahrung umfasst fünf Jahre in einer Klinik. Mein Ziel ist, mich auf Sportmedizin zu spezialisieren.", true),
         Prompt("sp-b2-02", "B2", "Argomentare", "Argomenta su un tema attuale: vantaggi e svantaggi, poi la tua posizione.", listOf("Einerseits... andererseits...", "Ich bin der Meinung, dass...", "Zusammenfassend...", "Meiner Ansicht nach..."), "Einerseits spart Homeoffice Zeit, andererseits fehlt der soziale Kontakt. Ich bin der Meinung, dass eine Mischung am besten ist. Zusammenfassend: Flexibilität ist wichtig, aber nicht auf Kosten der Teamarbeit."),
-        Prompt("sp-b2-03", "B2", "Spiegare un processo", "Spiega un processo o una procedura step by step.", listOf("Zuerst...", "Dann...", "Anschließend...", "Zum Schluss..."), "Zuerst begrüße ich den Patienten. Dann erkläre ich die Übung. Anschließend demonstriere ich die Bewegung. Zum Schluss lasse ich den Patienten die Übung selbst machen."),
+        Prompt("sp-b2-03", "B2", "Spiegare un processo", "Spiega un processo o una procedura step by step.", listOf("Zuerst...", "Dann...", "Anschließend...", "Zum Schluss..."), "Zuerst begrüße ich den Patienten. Dann erkläre ich die Übung. Anschließend demonstriere ich die Bewegung. Zum Schluss lasse ich den Patienten die Übung selbst machen.", true),
         Prompt("sp-b2-04", "B2", "Discutere", "Discuti con un collega: proponi una soluzione e difendi la tua posizione.", listOf("Ich würde vorschlagen...", "Das hat den Vorteil, dass...", "Allerdings...", "Es wäre sinnvoll, wenn..."), "Ich würde vorschlagen, die Termine neu zu organisieren. Das hat den Vorteil, dass die Wartezeiten kürzer werden. Allerdings brauchen wir mehr Personal. Es wäre sinnvoll, wenn wir das mit dem Team besprechen."),
         Prompt("sp-b2-05", "B2", "Raccontare un'esperienza", "Racconta un'esperienza significativa e cosa hai imparato.", listOf("Es war eine Situation, in der...", "Ich habe gelernt, dass...", "Rückblickend...", "Das hat mich geprägt, weil..."), "Es war eine Situation, in der ich einen schwierigen Patienten hatte. Ich habe gelernt, dass Geduld wichtig ist. Rückblickend war es eine wertvolle Erfahrung. Das hat mich geprägt, weil ich jetzt besser mit Stress umgehen kann."),
         Prompt("sp-b2-06", "B2", "Discutere del futuro", "Discuti con un collega come sarà il futuro della tua professione.", listOf("Meiner Meinung nach wird...", "Eine Herausforderung ist...", "Wichtig für die Zukunft...", "Ich stelle mir vor, dass..."), "Meiner Meinung nach wird die Telemedizin eine größere Rolle spielen. Eine Herausforderung ist die technische Ausbildung. Wichtig für die Zukunft bleibt das persönliche Gespräch. Ich stelle mir vor, dass beides zusammen funktioniert.")
     )
 
-    fun perLivello(livello: String?): List<Prompt> {
+    fun perLivello(livello: String?, mostraSanitario: Boolean = true): List<Prompt> {
         val codice = livello?.uppercase()?.substringBefore(" ")?.trim() ?: "A1"
         val esatti = prompts.filter { it.livello == codice }
-        if (esatti.isNotEmpty()) return esatti
-        // Livello senza contenuto dedicato (es. A0 prima dei suoi prompt, C1, C2):
-        // si mostra quello del livello precedente invece di una schermata vuota.
-        return prompts.filter { it.livello == "A1" }
+        val base = if (esatti.isNotEmpty()) esatti else prompts.filter { it.livello == "A1" }
+        return if (mostraSanitario) base else base.filter { !it.sanitario }
+    }
+
+    fun contestoSanitarioRichiesto(mostraContestoMedico: Boolean, contestoUtente: String): Boolean {
+        if (mostraContestoMedico) return true
+        val c = contestoUtente.lowercase()
+        val chiavi = listOf(
+            "fisioterap", "physio", "sanitar", "medic", "infermier", "nurs",
+            "ospedal", "hospital", "clinic", "pazient", "patient", "terap",
+            "doctor", "dottor", "farmac", "dent", "riabilit"
+        )
+        return chiavi.any { c.contains(it) }
     }
 
     fun perCodice(codice: String): Prompt? = prompts.firstOrNull { it.id == codice }

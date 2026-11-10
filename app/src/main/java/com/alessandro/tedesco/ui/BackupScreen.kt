@@ -122,15 +122,14 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                         fontWeight = FontWeight.SemiBold)
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "TUTTI i profili con parole, ripassi, log, test, progressi, " +
-                            "conversazioni e correzioni. Il backup va su un repo GitHub privato.",
+                        t("TUTTI i profili con parole, ripassi, log, test, progressi, conversazioni e correzioni. Il backup va su un repo GitHub privato."),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     if (ultimo > 0) {
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            "Ultimo backup: " + SimpleDateFormat("d MMM yyyy, HH:mm", Locale.ITALIAN)
+                            t("Ultimo backup:") + " " + SimpleDateFormat("d MMM yyyy, HH:mm", Locale.forLanguageTag(if (com.alessandro.tedesco.i18n.Traduttore.lingua == "en") "en" else "it"))
                                 .format(Date(ultimo)),
                             style = MaterialTheme.typography.bodySmall,
                             fontWeight = FontWeight.SemiBold
@@ -151,16 +150,13 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                         fontWeight = FontWeight.SemiBold)
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "Salva un file JSON con tutti i profili (parole, ripassi, " +
-                            "lezioni, grammatica, conversazioni), le notifiche e il tema. " +
-                            "Puoi conservarlo o importarlo su un altro dispositivo.",
+                        t("Salva un file JSON con tutti i profili (parole, ripassi, lezioni, grammatica, conversazioni), le notifiche e il tema. Puoi conservarlo o importarlo su un altro dispositivo."),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "Attenzione: il file contiene anche le chiavi API dei profili. " +
-                            t("Trattalo come un documento riservato. Il token GitHub non è incluso."),
+                        t("Attenzione: il file contiene anche le chiavi API dei profili. Trattalo come un documento riservato. Il token GitHub non è incluso."),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -169,7 +165,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                         onClick = {
                             val marca = LocalDateTime.now()
                                 .format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmm"))
-                            esporta.launch("deutsch-dati-$marca.json")
+                            esporta.launch("openlingo-dati-$marca.json")
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) { Text(t("Esporta su file")) }
@@ -204,7 +200,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "Formato: utente/nome-repo (es. ItsZale0/tedesco-backup).",
+                        t("Formato: utente/nome-repo (es. ItsZale0/tedesco-backup)."),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -227,14 +223,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                     )
                     Spacer(Modifier.height(6.dp))
                     TutorialGrigioBackup(
-                        "PASSI:\n" +
-                            "1. Crea un repo privato su github.com/new (es. tedesco-backup).\n" +
-                            "2. Vai su github.com/settings/personal-access-tokens/new\n" +
-                            "3. In \"Repository access\" scegli SOLO il repo di backup.\n" +
-                            "4. In \"Permissions\" → Repository permissions → Contents: Read and write.\n" +
-                            "5. Genera il token (inizia con github_pat_) e incollalo qui sopra.\n" +
-                            "Il token resta solo sul telefono: non viene inviato da nessuna parte " +
-                            "tranne a GitHub."
+                        t("PASSI:\n1. Crea un repo privato su github.com/new (es. tedesco-backup).\n2. Vai su github.com/settings/personal-access-tokens/new\n3. In \"Repository access\" scegli SOLO il repo di backup.\n4. In \"Permissions\" → Repository permissions → Contents: Read and write.\n5. Genera il token (inizia con github_pat_) e incollalo qui sopra.\nIl token resta solo sul telefono: non viene inviato da nessuna parte tranne a GitHub.")
                     )
                     Spacer(Modifier.height(12.dp))
                     Button(
@@ -314,7 +303,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                     if (ultimoAuto > 0) {
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            "Ultimo automatico: " + SimpleDateFormat("d MMM HH:mm", Locale.ITALIAN)
+                            t("Ultimo automatico:") + " " + SimpleDateFormat("d MMM HH:mm", Locale.forLanguageTag(if (com.alessandro.tedesco.i18n.Traduttore.lingua == "en") "en" else "it"))
                                 .format(Date(ultimoAuto)),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -328,8 +317,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                     }
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        "Salva solo quando qualcosa cambia (confronto hash): " +
-                            "non consuma richieste GitHub inutilmente.",
+                        t("Salva solo quando qualcosa cambia (confronto hash): non consuma richieste GitHub inutilmente."),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -357,13 +345,11 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                     Text(t("• ${riep.numUnitaGrammatica} unità di grammatica"))
                     Text(t("• ${riep.numLezioni} lezioni"))
                     Spacer(Modifier.height(8.dp))
-                    Text("Data: " + SimpleDateFormat("d MMM yyyy, HH:mm", Locale.ITALIAN)
+                    Text(t("Data:") + " " + SimpleDateFormat("d MMM yyyy, HH:mm", Locale.forLanguageTag(if (com.alessandro.tedesco.i18n.Traduttore.lingua == "en") "en" else "it"))
                         .format(Date(riep.creatoIl)))
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        "I progressi vengono UNITI a quelli del telefono: per ogni parola, " +
-                            "unità di grammatica e lezione resta la versione più avanzata. " +
-                            t("Nessuna delle due parti viene cancellata."),
+                        t("I progressi vengono UNITI a quelli del telefono: per ogni parola, unità di grammatica e lezione resta la versione più avanzata. Nessuna delle due parti viene cancellata."),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -425,9 +411,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                     Text(t("• ${riep.numLezioni} lezioni"))
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        "ATTENZIONE: i dati attuali di questo telefono verranno " +
-                            "sovrascritti dal backup. I progressi fatti dopo l'ultimo " +
-                            "backup su questo dispositivo andranno persi.",
+                        t("ATTENZIONE: i dati attuali di questo telefono verranno sovrascritti dal backup. I progressi fatti dopo l'ultimo backup su questo dispositivo andranno persi."),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.error
                     )

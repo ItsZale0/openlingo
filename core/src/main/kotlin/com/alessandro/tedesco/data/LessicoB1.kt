@@ -460,21 +460,21 @@ object LessicoB1 {
         die Vorsicht|prudenza|Vorsicht ist besser als Nachsicht.|Società B1
         das Interesse|interesse|Das Interesse ist geweckt.|Società B1
 
-        die Demokratie|democrazia|Die Demokratie lebt von Wahlen.|SocietÃ  B1
-        die Diktatur|dittatura|Die Diktatur verbietet Kritik.|SocietÃ  B1
-        die Freiheit|libertÃ|Die Freiheit ist wichtig.|SocietÃ  B1
-        die Gleichheit|uguaglianza|Die Gleichheit ist ein Ziel.|SocietÃ  B1
-        die KriminalitÃ¤t|criminalitÃ|Die KriminalitÃ¤t ist gesunken.|SocietÃ  B1
-        das GefÃ¤ngnis|carcere|Das GefÃ¤ngnis ist voll.|SocietÃ  B1
-        das Opfer|vittima|Das Opfer sagte aus.|SocietÃ  B1
-        der TÃ¤ter|autore del reato|Der TÃ¤ter ist bekannt.|SocietÃ  B1
-        die Armut|povertÃ|Die Armut wÃ¤chst.|SocietÃ  B1
-        der Reichtum|ricchezza|Der Reichtum ist ungleich verteilt.|SocietÃ  B1
-        die Bildung|istruzione|Bildung ist der SchlÃ¼ssel.|SocietÃ  B1
-        die Sitte|usanza|Die Sitte ist alt.|SocietÃ  B1
-        der Wert|valore|Der Wert ist schwer zu messen.|SocietÃ  B1
-        die Norm|norma|Die Norm gilt fÃ¼r alle.|SocietÃ  B1
-        die Moral|morale|Die Moral ist umstritten.|SocietÃ  B1
+        die Demokratie|democrazia|Die Demokratie lebt von Wahlen.|Società B1
+        die Diktatur|dittatura|Die Diktatur verbietet Kritik.|Società B1
+        die Freiheit|libertÃ|Die Freiheit ist wichtig.|Società B1
+        die Gleichheit|uguaglianza|Die Gleichheit ist ein Ziel.|Società B1
+        die KriminalitÃ¤t|criminalitÃ|Die KriminalitÃ¤t ist gesunken.|Società B1
+        das GefÃ¤ngnis|carcere|Das GefÃ¤ngnis ist voll.|Società B1
+        das Opfer|vittima|Das Opfer sagte aus.|Società B1
+        der TÃ¤ter|autore del reato|Der TÃ¤ter ist bekannt.|Società B1
+        die Armut|povertÃ|Die Armut wÃ¤chst.|Società B1
+        der Reichtum|ricchezza|Der Reichtum ist ungleich verteilt.|Società B1
+        die Bildung|istruzione|Bildung ist der SchlÃ¼ssel.|Società B1
+        die Sitte|usanza|Die Sitte ist alt.|Società B1
+        der Wert|valore|Der Wert ist schwer zu messen.|Società B1
+        die Norm|norma|Die Norm gilt fÃ¼r alle.|Società B1
+        die Moral|morale|Die Moral ist umstritten.|Società B1
         die Dienstleistung|servizio|Die Dienstleistung ist gefragt.|Economia B1
         die Produktion|produzione|Die Produktion lÃ¤uft gut.|Economia B1
         der Konsum|consumo|Der Konsum steigt.|Economia B1

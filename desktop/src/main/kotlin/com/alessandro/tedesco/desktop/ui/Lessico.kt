@@ -41,6 +41,7 @@ import com.alessandro.tedesco.data.EsercizioLessico
 import com.alessandro.tedesco.data.LessicoLivelli
 import com.alessandro.tedesco.data.TipoEsercizioLessico
 import com.alessandro.tedesco.desktop.DesktopStore
+import com.alessandro.tedesco.i18n.t
 
 /**
  * Lessico per livello (A1-B2) su desktop: stessa base condivisa dell'app
@@ -79,7 +80,7 @@ fun SchermataLessico(store: DesktopStore) {
         risposta = ""
         giuste = 0
         sbagliate = emptyList()
-        messaggio = if (sessione.isEmpty()) "Nessuna parola disponibile per $livello." else ""
+        messaggio = if (sessione.isEmpty()) t("Nessuna parola disponibile per $livello.") else ""
     }
 
     // ------------------------------------------------------------- esercizi
@@ -87,33 +88,33 @@ fun SchermataLessico(store: DesktopStore) {
         val esercizio = sessione.getOrNull(indice)
         Pagina {
             Testata(
-                titolo = "Lessico $livello",
-                sottotitolo = if (esercizio == null) "Sessione completata"
-                else "Esercizio ${indice + 1} di ${sessione.size} · ${esercizio.tipo.etichetta}"
+                titolo = t("Lessico $livello"),
+                sottotitolo = if (esercizio == null) t("Sessione completata")
+                else t("Esercizio") + " ${indice + 1} " + t("di") + " ${sessione.size} · " + t(esercizio.tipo.etichetta)
             )
 
             if (esercizio == null) {
                 CardSezione(
-                    titolo = "Sessione completata",
-                    sottotitolo = "$giuste corrette su ${sessione.size}"
+                    titolo = t("Sessione completata"),
+                    sottotitolo = "$giuste " + t("corrette su") + " ${sessione.size}"
                 ) {
                     Text(
-                        "Le parole giuste tornano più avanti, quelle sbagliate tornano domani.",
+                        t("Le parole giuste tornano più avanti, quelle sbagliate tornano domani."),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     if (sbagliate.isNotEmpty()) {
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            "Da rivedere: " + sbagliate.distinct().take(8).joinToString(", "),
+                            t("Da rivedere: ") + sbagliate.distinct().take(8).joinToString(", "),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.error
                         )
                     }
                     Spacer(Modifier.height(16.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Button(onClick = { avviaEsercizi() }) { Text("Nuovo giro") }
-                        OutlinedButton(onClick = { sessione = emptyList() }) { Text("Torna al lessico") }
+                        Button(onClick = { avviaEsercizi() }) { Text(t("Nuovo giro")) }
+                        OutlinedButton(onClick = { sessione = emptyList() }) { Text(t("Torna al lessico")) }
                     }
                 }
                 return@Pagina
@@ -131,26 +132,26 @@ fun SchermataLessico(store: DesktopStore) {
             ) {
                 Column(Modifier.fillMaxWidth().padding(22.dp)) {
                     Text(
-                        esercizio.domanda,
+                        t(esercizio.domanda),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.SemiBold
                     )
                     if (mostrata) {
                         Spacer(Modifier.height(10.dp))
                         Text(
-                            if (corretta) "Giusto" else "Non è questa",
+                            if (corretta) t("Giusto") else t("Non è questa"),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = if (corretta) MaterialTheme.colorScheme.primary
                             else MaterialTheme.colorScheme.error
                         )
                         Text(
-                            "Risposta corretta: ${esercizio.corretta}",
+                            t("Risposta corretta") + ": ${esercizio.corretta}",
                             style = MaterialTheme.typography.bodyLarge
                         )
                         if (esercizio.spiegazione.isNotBlank()) {
                             Text(
-                                esercizio.spiegazione,
+                                t(esercizio.spiegazione),
                                 style = MaterialTheme.typography.bodySmall,
                                 fontStyle = FontStyle.Italic,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -175,7 +176,7 @@ fun SchermataLessico(store: DesktopStore) {
                                 store.rispondiVerifica(esercizio.parola.id, corretta)
                             },
                             modifier = Modifier.fillMaxWidth()
-                        ) { Text(opzione) }
+                        ) { Text(t(opzione)) }
                     }
                 }
             } else if (!mostrata) {
@@ -184,7 +185,7 @@ fun SchermataLessico(store: DesktopStore) {
                     onValueChange = { risposta = it },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    label = { Text("La tua risposta in tedesco") }
+                    label = { Text(t("La tua risposta in tedesco")) }
                 )
                 Spacer(Modifier.height(10.dp))
                 Button(
@@ -204,7 +205,7 @@ fun SchermataLessico(store: DesktopStore) {
                     corretta = false
                     risposta = ""
                 }) {
-                    Text(if (indice + 1 >= sessione.size) "Vedi il risultato" else "Avanti")
+                    Text(if (indice + 1 >= sessione.size) t("Vedi il risultato") else t("Avanti"))
                 }
             }
         }
@@ -226,9 +227,8 @@ fun SchermataLessico(store: DesktopStore) {
 
     Pagina {
         Testata(
-            titolo = "Lessico A1-B2",
-            sottotitolo = "${LessicoLivelli.tutte.size} parole curate · copertura fino a $livello: " +
-                "%,d di %,d parole".format(coperte, obiettivo)
+            titolo = t("Lessico A1-B2"),
+            sottotitolo = t("${LessicoLivelli.tutte.size} parole curate · copertura fino a $livello: ${"%,d".format(coperte)} di ${"%,d".format(obiettivo)} parole")
         )
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -242,20 +242,19 @@ fun SchermataLessico(store: DesktopStore) {
         }
 
         CardSezione(
-            titolo = "Livello $livello",
+            titolo = t("Livello $livello"),
             sottotitolo = if (LessicoLivelli.temi(livello).isNotEmpty())
-                "Temi: " + LessicoLivelli.temi(livello).take(8).joinToString(" · ")
+                t("Temi: ") + LessicoLivelli.temi(livello).take(8).joinToString(" · ")
             else null
         ) {
             Text(
-                "$curateLivello parole nuove di $livello · $nelProfilo già nel tuo lessico. " +
-                    "I traguardi sono cumulativi: A1 650, A2 1.300, B1 2.400, B2 3.000.",
+                t("$curateLivello parole nuove di $livello · $nelProfilo già nel tuo lessico. I traguardi sono cumulativi: A1 650, A2 1.300, B1 2.400, B2 3.000."),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.height(8.dp))
             Text(
-                "Copertura fino a $livello: %,d di %,d parole".format(coperte, obiettivo),
+                t("Copertura fino a $livello: ${"%,d".format(coperte)} di ${"%,d".format(obiettivo)} parole"),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -266,7 +265,7 @@ fun SchermataLessico(store: DesktopStore) {
             )
             Spacer(Modifier.height(10.dp))
             Text(
-                "Importa il livello per portare le parole nel ripasso.",
+                t("Importa il livello per portare le parole nel ripasso."),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -274,13 +273,13 @@ fun SchermataLessico(store: DesktopStore) {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 OutlinedButton(onClick = {
                     val aggiunte = store.aggiungiLessico(livello)
-                    messaggio = if (aggiunte > 0) "Aggiunte $aggiunte parole $livello al ripasso."
-                    else "Le parole $livello sono già nel tuo lessico."
-                }) { Text("Aggiungi al ripasso") }
+                    messaggio = if (aggiunte > 0) t("Aggiunte $aggiunte parole $livello al ripasso.")
+                    else t("Le parole $livello sono già nel tuo lessico.")
+                }) { Text(t("Aggiungi al ripasso")) }
                 Button(onClick = { avviaEsercizi() }) {
                     Icon(Icons.Filled.PlayArrow, contentDescription = null)
                     Spacer(Modifier.width(6.dp))
-                    Text("Esercizi")
+                    Text(t("Esercizi"))
                 }
             }
             if (messaggio.isNotBlank()) {
@@ -299,7 +298,7 @@ fun SchermataLessico(store: DesktopStore) {
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
-            label = { Text("Cerca in tedesco o in italiano") }
+            label = { Text(t("Cerca in tedesco o in italiano")) }
         )
 
         Surface(
@@ -309,7 +308,7 @@ fun SchermataLessico(store: DesktopStore) {
         ) {
             if (voci.isEmpty()) {
                 Text(
-                    "Nessuna parola per questa ricerca.",
+                    t("Nessuna parola per questa ricerca."),
                     modifier = Modifier.padding(22.dp),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -330,13 +329,13 @@ fun SchermataLessico(store: DesktopStore) {
                                     fontWeight = FontWeight.Medium
                                 )
                                 Text(
-                                    voce.italiano,
+                                    t(voce.italiano),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                             Text(
-                                voce.tema,
+                                t(voce.tema),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -344,7 +343,7 @@ fun SchermataLessico(store: DesktopStore) {
                             if (presente) {
                                 Icon(
                                     Icons.Filled.Check,
-                                    contentDescription = "Già nel lessico",
+                                    contentDescription = t("Già nel lessico"),
                                     tint = MaterialTheme.colorScheme.primary
                                 )
                             }

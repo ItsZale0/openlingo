@@ -146,12 +146,14 @@ object EserciziLessico {
      * @param parole parole da esercitare (di solito quelle del livello scelto)
      * @param quante quanti esercizi generare
      * @param pool tutte le parole disponibili, per i distrattori
+     * @param soloTipo se impostato, genera solo esercizi di questo tipo (es. ARTICOLO per il gender trainer)
      */
     fun costruisci(
         parole: List<WordEntity>,
         quante: Int,
         pool: List<WordEntity> = parole,
-        casuale: kotlin.random.Random = kotlin.random.Random.Default
+        casuale: kotlin.random.Random = kotlin.random.Random.Default,
+        soloTipo: TipoEsercizioLessico? = null
     ): List<EsercizioLessico> {
         val base = parole
             .filter { ParolaTedesca.utilizzabile(it) }
@@ -170,7 +172,7 @@ object EserciziLessico {
         // prevedere "dopo il cloze arriva l'ascolto".
         while (risultato.size < quante) {
             val w = base[indice % base.size]
-            val tipo = tipoPer(w, risultato.size, casuale)
+            val tipo = soloTipo ?: tipoPer(w, risultato.size, casuale)
             val esercizio = when (tipo) {
                 TipoEsercizioLessico.SIGNIFICATO -> significato(w, candidati, casuale)
                 TipoEsercizioLessico.TEDESCO -> tedesco(w, candidati, casuale)

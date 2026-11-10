@@ -21,7 +21,8 @@ object Dialoghi {
         val livello: String,
         val battute: List<BattutaDialogo>,
         val domande: List<DomandaDialogo>,
-        val traduzione: String // descrizione generale
+        val traduzione: String, // descrizione generale
+        val sanitario: Boolean = false
     )
 
     val dialoghi: List<DialogoAscolto> = listOf(
@@ -44,7 +45,8 @@ object Dialoghi {
                 DomandaDialogo("A che ora è l'appuntamento?", listOf("Alle 9", "Alle 10", "Alle 11", "Alle 12"), 1),
                 DomandaDialogo("Cosa porta il paziente?", listOf("Solo l'impegnativa", "Impegnativa e referto", "Solo il referto", "Niente"), 1),
                 DomandaDialogo("Quanto dura la prima seduta?", listOf("30 minuti", "45 minuti", "60 minuti", "90 minuti"), 1)
-            )
+            ),
+            sanitario = true
         ),
         DialogoAscolto(
             id = "dial_02",
@@ -66,7 +68,8 @@ object Dialoghi {
                 DomandaDialogo("Da quanto tempo ha dolore il paziente?", listOf("Una settimana", "Due settimane", "Tre settimane", "Un mese"), 2),
                 DomandaDialogo("Dove irradia il dolore?", listOf("Al braccio", "Alla gamba", "Al collo", "Non irradia"), 1),
                 DomandaDialogo("Cosa fa il paziente di lavoro?", listOf("Lavoro fisico", "Lavoro alla scrivania", "Insegnante", "In pensione"), 1)
-            )
+            ),
+            sanitario = true
         ),
         DialogoAscolto(
             id = "dial_03",
@@ -88,7 +91,8 @@ object Dialoghi {
                 DomandaDialogo("Quando ha tempo il paziente?", listOf("Mattina", "Pomeriggio dalle 14", "Sera", "Weekend"), 1),
                 DomandaDialogo("Quando è l'appuntamento?", listOf("Oggi 14:30", "Domani 14:30", "Domani 10:00", "Dopodomani 14:30"), 1),
                 DomandaDialogo("Cosa deve portare?", listOf("Solo documento", "Impegnativa e abbigliamento comodo", "Referto RM", "Niente"), 1)
-            )
+            ),
+            sanitario = true
         ),
         DialogoAscolto(
             id = "dial_04",
@@ -109,7 +113,8 @@ object Dialoghi {
                 DomandaDialogo("Quando è andato in vacanza il collega B?", listOf("A luglio", "A gennaio", "Ad agosto", "A Natale"), 1),
                 DomandaDialogo("Quale dolce austriaco menzionano?", listOf("Apfelstrudel", "Topfenstrudel", "Sachertorte", "Kaiserschmarrn"), 1),
                 DomandaDialogo("Come dicono 'panino' in Austria?", listOf("Brötchen", "Semmel", "Weck", "Schrippe"), 1)
-            )
+            ),
+            sanitario = false
         ),
         DialogoAscolto(
             id = "dial_05",
@@ -131,7 +136,8 @@ object Dialoghi {
                 DomandaDialogo("Quante volte al giorno gli esercizi?", listOf("Una", "Due", "Tre", "Quattro"), 2),
                 DomandaDialogo("Quando è il prossimo controllo?", listOf("Tra una settimana", "Tra due settimane", "Tra un mese", "Non c'è"), 1),
                 DomandaDialogo("Cosa portare al controllo?", listOf("Il referto", "Il diario degli esercizi", "La ricetta", "L'impegnativa"), 1)
-            )
+            ),
+            sanitario = true
         ),
         DialogoAscolto(
             id = "dial_06",
@@ -151,7 +157,8 @@ object Dialoghi {
                 DomandaDialogo("Da dove viene Sophie?", listOf("Da Bolzano", "Da Bressanone", "Da Merano", "Da Trento"), 1),
                 DomandaDialogo("Perché studia Thomas?", listOf("Per esame", "Per il lavoro all'ospedale", "Per hobby", "Per un trasloco"), 1),
                 DomandaDialogo("Quando è il corso?", listOf("Lunedì", "Mercoledì", "Martedì", "Giovedì"), 2)
-            )
+            ),
+            sanitario = false
         ),
         DialogoAscolto(
             id = "dial_07",
@@ -171,7 +178,8 @@ object Dialoghi {
                 DomandaDialogo("Che cosa ha il cliente?", listOf("Raffreddore e mal di testa", "Solo febbre", "Mal di schiena", "Vertigini"), 0),
                 DomandaDialogo("Da quanto ha i sintomi?", listOf("Da un giorno", "Da tre giorni", "Da una settimana", "Da un mese"), 1),
                 DomandaDialogo("Come si prendono le gocce?", listOf("Prima dei pasti", "Tre volte al giorno dopo i pasti", "Solo la sera", "Due volte nel weekend"), 1)
-            )
+            ),
+            sanitario = false
         ),
         DialogoAscolto(
             id = "dial_08",
@@ -191,7 +199,8 @@ object Dialoghi {
                 DomandaDialogo("Quanto costa la ciabatta?", listOf("30 centesimi", "40 centesimi", "Un euro", "Un euro e venti"), 1),
                 DomandaDialogo("Che promozione c'è oggi?", listOf("Tre ciabatte per un euro", "Due latte per uno", "Sconto del 20%", "Formaggio gratis"), 0),
                 DomandaDialogo("Da dove viene il formaggio?", listOf("Da una latteria altoatesina", "Dall'Austria", "Dall'Olanda", "Da una fabbrica locale"), 0)
-            )
+            ),
+            sanitario = false
         ),
         DialogoAscolto(
             id = "dial_09",
@@ -211,7 +220,8 @@ object Dialoghi {
                 DomandaDialogo("Dove fa male?", listOf("Sotto la spalla sinistra", "Sotto la spalla destra", "Sul collo", "Alla gamba"), 0),
                 DomandaDialogo("Cosa riceve la paziente?", listOf("Antidolorifico e impegnativa", "Solo la impegnativa", "Una radiografia", "Iniezioni"), 0),
                 DomandaDialogo("Per quanto tempo le compresse?", listOf("Due giorni", "Quattro giorni", "Una settimana", "Un mese"), 1)
-            )
+            ),
+            sanitario = true
         ),
         DialogoAscolto(
             id = "dial_10",
@@ -231,7 +241,8 @@ object Dialoghi {
                 DomandaDialogo("Quale dente fa male?", listOf("La molare in basso a destra", "L'incisivo in alto", "Il dente del giudizio", "Nessuno"), 0),
                 DomandaDialogo("Che trattamento servirà?", listOf("Una devitalizzazione", "Un'otturazione", "L'estrazione", "Una pulizia"), 1),
                 DomandaDialogo("Quando si può mangiare?", listOf("Subito", "Dopo due ore", "Il giorno dopo", "Mai con anestesia"), 1)
-            )
+            ),
+            sanitario = false
         ),
         DialogoAscolto(
             id = "dial_11",
@@ -252,7 +263,8 @@ object Dialoghi {
                 DomandaDialogo("Dove ha lavorato prima Thomas?", listOf("In un ospedale a Merano", "In un centro di riabilitazione a Bolzano", "In una palestra", "In un ambulatorio lombardo"), 1),
                 DomandaDialogo("Quali pazienti sono più frequenti?", listOf("Con mal di schiena", "Con problemi cardiaci", "Bambini", "Post-operatori del ginocchio"), 0),
                 DomandaDialogo("Quando arriva la prima paziente per Thomas?", listOf("Giovedì alle 9", "Lunedì alle 9", "Mercoledì alle 11", "Sabato alle 8"), 1)
-            )
+            ),
+            sanitario = true
         ),
         DialogoAscolto(
             id = "dial_12",
@@ -273,7 +285,23 @@ object Dialoghi {
                 DomandaDialogo("Da quanti anni lavora il candidato?", listOf("Due", "Cinque", "Dieci", "Venti"), 1),
                 DomandaDialogo("Cosa pianifica come formazione aggiuntiva?", listOf("Terapia manuale", "Osteopatia", "Yoga terapeutico", "Bioingegneria"), 0),
                 DomandaDialogo("Quando riceverà la risposta?", listOf("Entro lunedì", "Entro giovedì", "Entro venerdì", "Il mese prossimo"), 2)
-            )
-        )
+            ),
+            sanitario = true
+        ),
     )
+
+    fun perContesto(mostraSanitario: Boolean): List<DialogoAscolto> =
+        if (mostraSanitario) dialoghi else dialoghi.filter { !it.sanitario }
+
+    fun contestoSanitarioRichiesto(mostraContestoMedico: Boolean, contestoUtente: String): Boolean {
+        if (mostraContestoMedico) return true
+        val c = contestoUtente.lowercase()
+        val chiavi = listOf(
+            "fisioterap", "physio", "sanitar", "medic", "infermier", "nurs",
+            "ospedal", "hospital", "clinic", "pazient", "patient", "terap",
+            "doctor", "dottor", "farmac", "dent", "riabilit"
+        )
+        return chiavi.any { c.contains(it) }
+    }
+
 }

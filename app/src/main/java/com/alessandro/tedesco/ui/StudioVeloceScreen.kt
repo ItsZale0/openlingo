@@ -182,7 +182,7 @@ fun StudioVeloceScreen(
         contentWindowInsets = WindowInsets(0),
         topBar = {
             CompactTopBar(
-                title = "Studio",
+                title = t("Studio"),
                 actions = {
                     // ---- Selettore di lezione: icona discreta, senza chip ----
                     IconButton(onClick = { mostraSelettore = true }) {
@@ -303,13 +303,13 @@ fun StudioVeloceScreen(
                             )
                             AzioneRapida(
                                 icona = Icons.Filled.Translate,
-                                etichetta = "Grammatica",
+                                etichetta = t("Grammatica"),
                                 onClick = onVaiAPercorsoGrammatica,
                                 modifier = Modifier.weight(1f)
                             )
                             AzioneRapida(
                                 icona = Icons.Filled.BarChart,
-                                etichetta = "Progresso",
+                                etichetta = t("Progresso"),
                                 onClick = onVaiAProgresso,
                                 modifier = Modifier.weight(1f)
                             )
@@ -369,8 +369,8 @@ fun StudioVeloceScreen(
                 }
                 VocePannello(
                     Icons.AutoMirrored.Filled.MenuBook,
-                    "Lessico A1-B2",
-                    t("${LessicoLivelli.tutte.size} parole per livello, con esercizi")
+                    t("Lessico A1-B2"),
+                    "${LessicoLivelli.tutte.size} " + t("parole per livello, con esercizi")
                 ) {
                     mostraMenu = false; onNaviga("lessico")
                 }
@@ -382,19 +382,19 @@ fun StudioVeloceScreen(
                 VocePannello(Icons.Filled.Waves, t("Modalità Immersione"), t("Storie, shadowing, ascolto")) {
                     mostraMenu = false; onVaiAImmersione()
                 }
-                VocePannello(Icons.Filled.Headphones, "Podcast & Video", t("Ascolto autentico per livello")) {
+                VocePannello(Icons.Filled.Headphones, t("Podcast & Video"), t("Ascolto autentico per livello")) {
                     mostraMenu = false; onNaviga("podcast")
                 }
-                VocePannello(Icons.Filled.EmojiEvents, "Progresso", t("Livello, competenze, numeri")) {
+                VocePannello(Icons.Filled.EmojiEvents, t("Progresso"), t("Livello, competenze, numeri")) {
                     mostraMenu = false; onVaiAProgresso()
                 }
                 VocePannello(Icons.Filled.SmartToy, t("Tutor AI"), t("Chiedi, correggi, esercitati")) {
                     mostraMenu = false; onVaiATutor()
                 }
-                VocePannello(Icons.Filled.CloudUpload, "Backup", t("Salva e ripristina i dati")) {
+                VocePannello(Icons.Filled.CloudUpload, t("Backup"), t("Salva e ripristina i dati")) {
                     mostraMenu = false; onVaiABackup()
                 }
-                VocePannello(Icons.Filled.Settings, "Impostazioni", t("Profilo, chiave, aggiornamenti")) {
+                VocePannello(Icons.Filled.Settings, t("Impostazioni"), t("Profilo, chiave, aggiornamenti")) {
                     mostraMenu = false; onVaiAImpostazioni()
                 }
             }
@@ -430,8 +430,7 @@ fun StudioVeloceScreen(
                 Text(t("Piano di oggi"), style = MaterialTheme.typography.titleLarge)
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    "${pianoOggi!!.passiCompletati}/${pianoOggi!!.passiTotali} passi · " +
-                        t("${pianoOggi!!.minutiTotali} minuti"),
+                    "${pianoOggi!!.passiCompletati}/${pianoOggi!!.passiTotali} " + t("passi") + " · ${pianoOggi!!.minutiTotali} " + t("minuti"),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -461,7 +460,7 @@ private fun IntestazioneHome(
 ) {
     Column(Modifier.fillMaxWidth()) {
         Text(
-            saluto,
+            t(saluto),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground
@@ -470,7 +469,7 @@ private fun IntestazioneHome(
         Text(
             listOfNotNull(
                 data.takeIf { it.isNotBlank() },
-                if (streakGiorni > 0) t("$streakGiorni giorni di fila") else null
+                if (streakGiorni > 0) "$streakGiorni " + t("giorni di fila") else null
             ).joinToString(" · "),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -504,21 +503,21 @@ private fun PianoOggiCard(
             ) {
                 Column(Modifier.weight(1f)) {
                     Text(
-                        "PIANO DI OGGI",
+                        t("PIANO DI OGGI"),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.65f)
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        prossimo?.titolo ?: t("Piano completato"),
+                        prossimo?.let { t(it.titolo) } ?: t("Piano completato"),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        prossimo?.descrizione ?: percorso.messaggioMotivazionale,
+                        prossimo?.let { t(it.descrizione) } ?: t(percorso.messaggioMotivazionale),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.82f)
                     )
@@ -546,8 +545,7 @@ private fun PianoOggiCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    "${percorso.passiCompletati}/${percorso.passiTotali} passi · " +
-                        "${percorso.minutiTotali} min",
+                    "${percorso.passiCompletati}/${percorso.passiTotali} " + t("passi") + " · ${percorso.minutiTotali} min",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
                     modifier = Modifier.weight(1f)
@@ -583,7 +581,7 @@ private fun PercorsoLezioneCard(
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
             .clickable(
-                onClickLabel = t("Apri ${lezione.titolo}"),
+                onClickLabel = t("Apri") + " " + t(lezione.titolo),
                 role = Role.Button,
                 onClick = onApri
             ),
@@ -618,13 +616,12 @@ private fun PercorsoLezioneCard(
                     )
                     Spacer(Modifier.height(2.dp))
                     Text(
-                        lezione.titolo,
+                        t(lezione.titolo),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        t("Lezione ${lezione.numero} · ${lezione.livello} · ") +
-                            t("${lezione.unita.minuti} min"),
+                        t("Lezione") + " ${lezione.numero} · ${lezione.livello} · ${lezione.unita.minuti} min",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -650,7 +647,7 @@ private fun PercorsoLezioneCard(
                 Spacer(Modifier.height(6.dp))
                 Text(
                     if (stato.conclusa) t("Lezione conclusa · ripassa quando vuoi")
-                    else t("${stato.indice}/${stato.totale} esercizi completati"),
+                    else "${stato.indice}/${stato.totale} " + t("esercizi completati"),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -691,7 +688,7 @@ private fun ProgressoOggiRing(
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Text(
-                t("$completati/$totali"),
+                "$completati/$totali",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
             )
@@ -711,7 +708,7 @@ private fun PassoPianoRiga(
             .fillMaxWidth()
             .clip(forma)
             .clickable(
-                onClickLabel = "Apri ${passo.titolo}",
+                onClickLabel = t("Apri") + " " + t(passo.titolo),
                 role = Role.Button,
                 onClick = onApri
             ),
@@ -745,7 +742,7 @@ private fun PassoPianoRiga(
             Spacer(Modifier.width(10.dp))
             Column(Modifier.weight(1f)) {
                 Text(
-                    passo.titolo,
+                    t(passo.titolo),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = if (passo.completato) {
@@ -755,7 +752,7 @@ private fun PassoPianoRiga(
                     }
                 )
                 Text(
-                    passo.descrizione,
+                    t(passo.descrizione),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 2,
@@ -772,7 +769,7 @@ private fun PassoPianoRiga(
                 IconButton(onClick = onCompleta) {
                     Icon(
                         Icons.Filled.Check,
-                        contentDescription = t("Segna ${passo.titolo} come fatto"),
+                        contentDescription = t("Segna") + " " + t(passo.titolo) + " " + t("come fatto"),
                         modifier = Modifier.size(20.dp),
                         tint = MaterialTheme.colorScheme.primary
                     )
@@ -794,7 +791,7 @@ private fun AzioneRapida(
             .heightIn(min = 76.dp)
             .clip(MaterialTheme.shapes.medium)
             .clickable(
-                onClickLabel = "Apri $etichetta",
+                onClickLabel = t("Apri") + " " + etichetta,
                 role = Role.Button,
                 onClick = onClick
             ),
@@ -881,7 +878,7 @@ private fun PercorsoGrammaticaCard(
                         color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.75f)
                     )
                     Text(
-                        prossima?.unita?.titolo ?: t("Tutto il percorso"),
+                        t(prossima?.unita?.titolo ?: "Tutto il percorso"),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -900,7 +897,7 @@ private fun PercorsoGrammaticaCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     if (prossima != null) {
-                        t("$etichetta · ${prossima.unita.livello} · ${prossima.unita.minuti} min")
+                        "$etichetta · ${prossima.unita.livello} · ${prossima.unita.minuti} min"
                     } else {
                         t("Teoria, esempi ed esercizi in ordine")
                     },
@@ -911,7 +908,7 @@ private fun PercorsoGrammaticaCard(
                     modifier = Modifier.weight(1f)
                 )
                 Text(
-                    t("$completate/$totale"),
+                    "$completate/$totale",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
@@ -1094,7 +1091,7 @@ private fun VocePannello(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(
-                onClickLabel = "Apri $titolo",
+                onClickLabel = t("Apri") + " " + titolo,
                 role = Role.Button,
                 onClick = onClick
             )
@@ -1252,28 +1249,28 @@ private fun SezioneLezionePercorso(
         Column(modifier = Modifier.padding(Spaziature.md)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    t("LEZIONE ${stato.lezione.numero}"),
+                    t("LEZIONE") + " ${stato.lezione.numero}",
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Spacer(Modifier.weight(1f))
                 Text(
-                    t("${unita.livello} · ${unita.minuti} min"),
+                    "${unita.livello} · ${unita.minuti} min",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                 )
             }
             Spacer(Modifier.height(4.dp))
             Text(
-                unita.titolo,
+                t(unita.titolo),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             if (unita.sottotitolo.isNotBlank()) {
                 Text(
-                    unita.sottotitolo,
+                    t(unita.sottotitolo),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                 )
@@ -1289,7 +1286,7 @@ private fun SezioneLezionePercorso(
                         Text(
                             when {
                                 finita -> t("Lezione conclusa")
-                                indice > 0 -> t("Domanda ${indice + 1} di $totale")
+                                indice > 0 -> t("Domanda") + " ${indice + 1} " + t("di") + " $totale"
                                 else -> t("Inizia · $totale esercizi")
                             }
                         )
@@ -1540,7 +1537,7 @@ private fun RisultatoLezione(
             )
             if (!promosso) {
                 Text(
-                    t("Ti servono almeno ${GrammaticaSyllabus.SOGLIA_PADRONANZA}% per la padronanza: ripeti la lezione quando vuoi."),
+                    t("Ti servono almeno") + " ${GrammaticaSyllabus.SOGLIA_PADRONANZA}% " + t("per la padronanza: ripeti la lezione quando vuoi."),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
                 )
@@ -1598,7 +1595,7 @@ private fun SelettoreLezioniSheet(
                 fontWeight = FontWeight.Bold
             )
             Text(
-                t("$completate di ${lezioni.size} completate · percorso A0 → B2"),
+                "$completate " + t("di") + " ${lezioni.size} " + t("completate") + " · " + t("percorso A0 → B2"),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -1726,7 +1723,7 @@ private fun RigaLezione(
             Spacer(Modifier.width(Spaziature.sm))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    lezione.titolo,
+                    t(lezione.titolo),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
                     color = if (lezione.accessibile) {
@@ -1762,7 +1759,7 @@ private fun RigaLezione(
 private fun descrizioneLivello(livello: String): String = when (livello.uppercase()) {
     "A0" -> t("Basi")
     "A1" -> t("Elementare")
-    "A2" -> "Base"
+    "A2" -> t("Base")
     "B1" -> t("Intermedio")
     "B2" -> t("Avanzato")
     else -> ""

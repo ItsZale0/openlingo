@@ -4,6 +4,7 @@ import com.alessandro.tedesco.data.local.LivelloCEFR
 import com.alessandro.tedesco.data.local.ProgressoUtente
 import com.alessandro.tedesco.data.local.ReviewEntity
 import com.alessandro.tedesco.data.local.WordEntity
+import com.alessandro.tedesco.i18n.t
 
 /**
  * Motore di generazione dinamica di sessioni adattive.
@@ -87,8 +88,8 @@ object AdaptiveSessionEngine {
                 SessioneAdattiva(
                     id = "adapt_ripasso",
                     tipo = TipoSessione.RIPASSO,
-                    titolo = "Ripasso flashcard",
-                    descrizione = "$daRipassare parole in scadenza · ~$minuti min",
+                    titolo = t("Ripasso flashcard"),
+                    descrizione = t("$daRipassare parole in scadenza") + " · " + t("~$minuti min"),
                     durataMinuti = minuti,
                     priorita = prioritaCounter++,
                     urgente = daRipassare >= 10,
@@ -107,16 +108,16 @@ object AdaptiveSessionEngine {
             }
             val categorieErrori = progresso.erroriGrammatica.take(3)
             val descErrori = if (categorieErrori.isNotEmpty()) {
-                "Errori recenti: ${categorieErrori.joinToString("; ")}"
+                t("Errori recenti: ") + categorieErrori.joinToString("; ")
             } else {
-                "Grammatica al ${competenze.grammatica.toInt()}%"
+                t("Grammatica al ${competenze.grammatica.toInt()}%")
             }
             sessioni.add(
                 SessioneAdattiva(
                     id = "adapt_grammatica",
                     tipo = TipoSessione.GRAMMATICA,
-                    titolo = "Esercizi di grammatica",
-                    descrizione = "$descErrori · ~$minuti min",
+                    titolo = t("Esercizi di grammatica"),
+                    descrizione = descErrori + " · " + t("~$minuti min"),
                     durataMinuti = minuti,
                     priorita = prioritaCounter++,
                     urgente = competenze.grammatica < 40f,
@@ -138,8 +139,8 @@ object AdaptiveSessionEngine {
                 SessioneAdattiva(
                     id = "adapt_comprensione",
                     tipo = TipoSessione.COMPRENSIONE,
-                    titolo = "Quiz di comprensione",
-                    descrizione = "Comprensione al ${competenze.comprensione.toInt()}% · ~$minuti min",
+                    titolo = t("Quiz di comprensione"),
+                    descrizione = t("Comprensione al ${competenze.comprensione.toInt()}%") + " · " + t("~$minuti min"),
                     durataMinuti = minuti,
                     priorita = prioritaCounter++,
                     urgente = competenze.comprensione < 40f,
@@ -161,8 +162,8 @@ object AdaptiveSessionEngine {
                 SessioneAdattiva(
                     id = "adapt_produzione",
                     tipo = TipoSessione.PRODUZIONE,
-                    titolo = "Esercizi di produzione",
-                    descrizione = "Produzione al ${competenze.produzione.toInt()}% · ~$minuti min",
+                    titolo = t("Esercizi di produzione"),
+                    descrizione = t("Produzione al ${competenze.produzione.toInt()}%") + " · " + t("~$minuti min"),
                     durataMinuti = minuti,
                     priorita = prioritaCounter++,
                     urgente = competenze.produzione < 40f,
@@ -188,8 +189,8 @@ object AdaptiveSessionEngine {
                 SessioneAdattiva(
                     id = "adapt_vocabolario",
                     tipo = TipoSessione.VOCABOLARIO,
-                    titolo = "Nuove parole",
-                    descrizione = "Lessico al ${competenze.lessico.toInt()}% · $nuoveParole nuove parole · ~$minuti min",
+                    titolo = t("Nuove parole"),
+                    descrizione = t("Lessico al ${competenze.lessico.toInt()}%") + " · " + t("$nuoveParole nuove parole") + " · " + t("~$minuti min"),
                     durataMinuti = minuti,
                     priorita = prioritaCounter++,
                     urgente = competenze.lessico < 20f,
@@ -216,8 +217,8 @@ object AdaptiveSessionEngine {
                 SessioneAdattiva(
                     id = "adapt_test_livello",
                     tipo = TipoSessione.TEST_LIVELLO,
-                    titolo = "Verifica il tuo livello",
-                    descrizione = "Test di ${obiettivoLivello.label} · ~15 min",
+                    titolo = t("Verifica il tuo livello"),
+                    descrizione = t("Test di ${obiettivoLivello.label}") + " · " + t("~15 min"),
                     durataMinuti = 15,
                     priorita = prioritaCounter++,
                     urgente = false,
@@ -232,8 +233,8 @@ object AdaptiveSessionEngine {
                 SessioneAdattiva(
                     id = "adapt_roleplay",
                     tipo = TipoSessione.ROLEPLAY,
-                    titolo = "Conversazione guidata",
-                    descrizione = "Roleplay in tedesco per livello ${livelloCorrente.label} · ~10 min",
+                    titolo = t("Conversazione guidata"),
+                    descrizione = t("Roleplay in tedesco per livello ${livelloCorrente.label}") + " · " + t("~10 min"),
                     durataMinuti = 10,
                     priorita = prioritaCounter++,
                     urgente = false,
@@ -248,8 +249,8 @@ object AdaptiveSessionEngine {
                 SessioneAdattiva(
                     id = "adapt_sessione_guidata",
                     tipo = TipoSessione.SESSIONE_GUIDATA,
-                    titolo = "Sessione di approfondimento",
-                    descrizione = "Ripasso completo e nuovi argomenti · ~20 min",
+                    titolo = t("Sessione di approfondimento"),
+                    descrizione = t("Ripasso completo e nuovi argomenti") + " · " + t("~20 min"),
                     durataMinuti = 20,
                     priorita = prioritaCounter++,
                     urgente = false,
@@ -264,8 +265,8 @@ object AdaptiveSessionEngine {
                 SessioneAdattiva(
                     id = "adapt_base",
                     tipo = TipoSessione.SESSIONE_GUIDATA,
-                    titolo = "Sessione di studio",
-                    descrizione = "Inizia il tuo percorso di studio · ~15 min",
+                    titolo = t("Sessione di studio"),
+                    descrizione = t("Inizia il tuo percorso di studio") + " · " + t("~15 min"),
                     durataMinuti = 15,
                     priorita = 1,
                     urgente = false,
@@ -279,13 +280,13 @@ object AdaptiveSessionEngine {
         val messaggio = when {
             // Chi è agli inizi non ha "priorità": ha solo tanto da imparare. Messaggio incoraggiante.
             competenze.lessico < 30f && daRipassare < 10 ->
-                "Sei all'inizio del viaggio. Parti dalle nuove parole: ogni parola conta!"
-            sessioni.any { it.urgente } -> "Oggi conviene concentrarsi sulle aree con il badge Priorità."
-            daRipassare >= 20 -> "Tante parole da ripassare. Inizia dal ripasso!"
-            daRipassare >= 10 -> "Buon ritmo! Mantieni la costanza."
-            progresso.streakGiorni >= 7 -> "Streak di ${progresso.streakGiorni} giorni! Sei inarrestabile."
-            competenze.grammatica >= 60f && daRipassare == 0 -> "Prosegui così, stai facendo ottimi progressi."
-            else -> "Buona sessione di studio!"
+                t("Sei all'inizio del viaggio. Parti dalle nuove parole: ogni parola conta!")
+            sessioni.any { it.urgente } -> t("Oggi conviene concentrarsi sulle aree con il badge Priorità.")
+            daRipassare >= 20 -> t("Tante parole da ripassare. Inizia dal ripasso!")
+            daRipassare >= 10 -> t("Buon ritmo! Mantieni la costanza.")
+            progresso.streakGiorni >= 7 -> t("Streak di ${progresso.streakGiorni} giorni! Sei inarrestabile.")
+            competenze.grammatica >= 60f && daRipassare == 0 -> t("Prosegui così, stai facendo ottimi progressi.")
+            else -> t("Buona sessione di studio!")
         }
 
         return RisultatoGenerazione(
@@ -319,8 +320,8 @@ object AdaptiveSessionEngine {
         return SessioneAdattiva(
             id = "adapt_ripasso_debole",
             tipo = TipoSessione.RIPASSO,
-            titolo = "Ripasso parole deboli",
-            descrizione = "${paroleDeboli.size} parole deboli · ~$minuti min",
+            titolo = t("Ripasso parole deboli"),
+            descrizione = t("${paroleDeboli.size} parole deboli") + " · " + t("~$minuti min"),
             durataMinuti = minuti,
             priorita = 1,
             urgente = paroleDeboli.size >= 10,
@@ -345,8 +346,8 @@ object AdaptiveSessionEngine {
         return SessioneAdattiva(
             id = "adapt_grammatica_errori",
             tipo = TipoSessione.GRAMMATICA,
-            titolo = "Ripasso errori di grammatica",
-            descrizione = "${erroriGrammatica.size} errori da correggere · ~$minuti min",
+            titolo = t("Ripasso errori di grammatica"),
+            descrizione = t("${erroriGrammatica.size} errori da correggere") + " · " + t("~$minuti min"),
             durataMinuti = minuti,
             priorita = 1,
             urgente = erroriGrammatica.size >= 5,

@@ -211,8 +211,7 @@ fun PronunciaScreen(
             verticalArrangement = Arrangement.spacedBy(Spaziature.sm)
         ) {
             Text(
-                "Ascolta il modello (anche a 0,7x), ripeti e registrati. " +
-                    t("Il riconoscimento vocale non basta: l'orecchio va allenato sulle coppie minime."),
+                t("Ascolta il modello (anche a 0,7x), ripeti e registrati. Il riconoscimento vocale non basta: l'orecchio va allenato sulle coppie minime."),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -259,7 +258,7 @@ fun PronunciaScreen(
                                         style = MaterialTheme.typography.headlineSmall,
                                         fontWeight = FontWeight.Bold
                                     )
-                                    Text("  vs  ", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text(t("  vs  "), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     Text(
                                         coppia.b,
                                         style = MaterialTheme.typography.headlineSmall,
@@ -321,7 +320,7 @@ fun PronunciaScreen(
                                     OutlinedButton(onClick = { tts.speak(frase, velocita = 0.7f) }) {
                                         Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = null, modifier = Modifier.size(16.dp))
                                         Spacer(Modifier.width(4.dp))
-                                        Text("0,7x")
+                                        Text(t("0,7x"))
                                     }
                                     OutlinedButton(onClick = { tts.speak(frase, velocita = 1f) }) {
                                         Icon(Icons.Filled.PlayArrow, contentDescription = null, modifier = Modifier.size(16.dp))
@@ -351,16 +350,16 @@ fun PronunciaScreen(
                         ) {
                             Column(Modifier.fillMaxWidth().padding(Spaziature.md)) {
                                 Text(
-                                    consiglio.titolo,
+                                    t(consiglio.titolo),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.primary
                                 )
-                                Text(consiglio.testo, style = MaterialTheme.typography.bodyMedium)
+                                Text(t(consiglio.testo), style = MaterialTheme.typography.bodyMedium)
                                 Spacer(Modifier.height(4.dp))
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
-                                        "Esempio: ${consiglio.esempio}",
+                                        t("Esempio: ${consiglio.esempio}"),
                                         style = MaterialTheme.typography.bodySmall,
                                         fontWeight = FontWeight.SemiBold,
                                         modifier = Modifier.weight(1f)
@@ -399,7 +398,7 @@ private fun RegistrazioneRow(
             ) {
                 Icon(Icons.Filled.Stop, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(4.dp))
-                Text("Stop")
+                Text(t("Stop"))
             }
             Text(t("Registrazione in corso..."), style = MaterialTheme.typography.bodySmall)
         }

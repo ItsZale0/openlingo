@@ -87,8 +87,7 @@ fun ProduzioneAttivaScreen(
             verticalArrangement = Arrangement.spacedBy(Spaziature.sm)
         ) {
             Text(
-                "Qui non si indovina: si produce. Scrivi la frase, completa il buco, " +
-                    "riordina o scrivi sotto dettatura.",
+                t("Qui non si indovina: si produce. Scrivi la frase, completa il buco, riordina o scrivi sotto dettatura."),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -137,11 +136,11 @@ fun ProduzioneAttivaScreen(
             ) {
                 val ascolto = esercizio.daAscoltare
                 Column(Modifier.fillMaxWidth().padding(Spaziature.md)) {
-                    Text(esercizio.consegna, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(t(esercizio.consegna), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Spacer(Modifier.height(Spaziature.sm))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            esercizio.prompt,
+                            t(esercizio.prompt),
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.weight(1f)
                         )
@@ -257,7 +256,7 @@ fun ProduzioneAttivaScreen(
                             )
                             Spacer(Modifier.width(Spaziature.sm))
                             Text(
-                                if (esito == true) "Corretto! 🎉" else t("Non ancora"),
+                                if (esito == true) t("Corretto! 🎉") else t("Non ancora"),
                                 fontWeight = FontWeight.Bold,
                                 style = MaterialTheme.typography.titleSmall
                             )
@@ -275,7 +274,7 @@ fun ProduzioneAttivaScreen(
                         )
                         if (esercizio.spiegazione.isNotBlank()) {
                             Spacer(Modifier.height(4.dp))
-                            Text(esercizio.spiegazione, style = MaterialTheme.typography.bodySmall)
+                            Text(t(esercizio.spiegazione), style = MaterialTheme.typography.bodySmall)
                         }
                     }
                 }
@@ -298,8 +297,7 @@ fun ProduzioneAttivaScreen(
 
             Spacer(Modifier.height(Spaziature.sm))
             Text(
-                "Suggerimento: scrivi senza guardare la soluzione. " +
-                    t("Se sbagli, l'errore finisce nel Quaderno errori e torna al momento giusto."),
+                t("Suggerimento: scrivi senza guardare la soluzione. Se sbagli, l'errore finisce nel Quaderno errori e torna al momento giusto."),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,

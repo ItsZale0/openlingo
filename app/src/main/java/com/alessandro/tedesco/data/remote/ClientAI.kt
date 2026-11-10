@@ -341,7 +341,7 @@ class ClientAI(
          * null = "Automatico": il client usa il predefinito e la cascata.
          */
         fun modelliConsigliati(provider: ProviderAI): List<Pair<String?, String>> =
-            listOf(null to "Automatico (${provider.modelloPredefinito})") +
+            listOf(null to com.alessandro.tedesco.i18n.t("Automatico (${provider.modelloPredefinito})")) +
                 provider.modelliSuggeriti.map { it to it }
     }
 }

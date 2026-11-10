@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import com.alessandro.tedesco.data.CalcoloPercorsoGiornaliero
 import com.alessandro.tedesco.desktop.DesktopStore
 import com.alessandro.tedesco.desktop.Schermata
+import com.alessandro.tedesco.i18n.t
 
 @Composable
 fun SchermataHome(
@@ -55,15 +56,15 @@ fun SchermataHome(
     val progresso = store.progressoReale()
     val prossima = store.prossimaUnita()
 
-    val nome = profilo?.config?.nomeVisualizzato?.substringBefore(" ") ?: "studente"
+    val nome = profilo?.config?.nomeVisualizzato?.substringBefore(" ") ?: t("studente")
     val prossimoPasso = piano.prossimoPasso
 
     var mostraPiano by remember { mutableStateOf(false) }
 
     Pagina {
         Testata(
-            titolo = "Ciao, $nome",
-            sottotitolo = "Piano di oggi: ${piano.passiCompletati}/${piano.passiTotali} passi, circa ${piano.minutiTotali} minuti."
+            titolo = t("Ciao") + ", $nome",
+            sottotitolo = t("Piano di oggi") + ": ${piano.passiCompletati}/${piano.passiTotali} " + t("passi") + ", " + t("circa") + " ${piano.minutiTotali} " + t("minuti") + "."
         )
 
         // Hero compatto: solo il prossimo passo, il piano completo nel pannello.
@@ -81,21 +82,21 @@ fun SchermataHome(
                 ) {
                     Column(Modifier.weight(1f)) {
                         Text(
-                            "PIANO DI OGGI",
+                            t("PIANO DI OGGI"),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.65f)
                         )
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            prossimoPasso?.titolo ?: "Piano completato",
+                            prossimoPasso?.let { t(it.titolo) } ?: t("Piano completato"),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            prossimoPasso?.descrizione ?: piano.messaggioMotivazionale,
+                            prossimoPasso?.let { t(it.descrizione) } ?: t(piano.messaggioMotivazionale),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.82f)
                         )
@@ -109,7 +110,7 @@ fun SchermataHome(
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Text(
-                            "passi fatti",
+                            t("passi fatti"),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.75f)
                         )
@@ -128,24 +129,24 @@ fun SchermataHome(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        "${piano.minutiCompletati} di ${piano.minutiTotali} minuti",
+                        "${piano.minutiCompletati} " + t("di") + " ${piano.minutiTotali} " + t("minuti"),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.75f),
                         modifier = Modifier.weight(1f)
                     )
                     TextButton(onClick = { mostraPiano = true }) {
-                        Text("Vedi piano")
+                        Text(t("Vedi piano"))
                     }
                     Spacer(Modifier.width(4.dp))
                     if (prossimoPasso != null) {
                         Button(onClick = {
                             apriPasso(prossimoPasso, onVaiA, onApriUnita)
                         }) {
-                            Text(if (piano.passiCompletati == 0) "Inizia" else "Continua")
+                            Text(if (piano.passiCompletati == 0) t("Inizia") else t("Continua"))
                         }
                     } else {
                         OutlinedButton(onClick = { onVaiA(Schermata.RIPASSO) }) {
-                            Text("Ripasso")
+                            Text(t("Ripasso"))
                         }
                     }
                 }
@@ -159,25 +160,25 @@ fun SchermataHome(
         ) {
             AzioneRapidaDesktop(
                 icona = Icons.Filled.Refresh,
-                etichetta = "Ripasso",
+                etichetta = t("Ripasso"),
                 onClick = { onVaiA(Schermata.RIPASSO) },
                 modifier = Modifier.weight(1f)
             )
             AzioneRapidaDesktop(
                 icona = Icons.Filled.Translate,
-                etichetta = "Grammatica",
+                etichetta = t("Grammatica"),
                 onClick = { onVaiA(Schermata.ESERCIZI) },
                 modifier = Modifier.weight(1f)
             )
             AzioneRapidaDesktop(
                 icona = Icons.AutoMirrored.Filled.MenuBook,
-                etichetta = "Wortliste",
+                etichetta = t("Wortliste"),
                 onClick = { onVaiA(Schermata.WORTLISTE) },
                 modifier = Modifier.weight(1f)
             )
             AzioneRapidaDesktop(
                 icona = Icons.Filled.BarChart,
-                etichetta = "Progresso",
+                etichetta = t("Progresso"),
                 onClick = { onVaiA(Schermata.PROGRESSO) },
                 modifier = Modifier.weight(1f)
             )
@@ -187,8 +188,8 @@ fun SchermataHome(
         val unita = prossima
         if (unita != null) {
             CardSezione(
-                titolo = "Continua il percorso",
-                sottotitolo = "La prossima lezione consigliata per il tuo livello"
+                titolo = t("Continua il percorso"),
+                sottotitolo = t("La prossima lezione consigliata per il tuo livello")
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -199,15 +200,15 @@ fun SchermataHome(
                             Etichetta(unita.unita.livello)
                             Spacer(Modifier.width(8.dp))
                             Text(
-                                "${unita.unita.minuti} min",
+                                "${unita.unita.minuti} " + t("min"),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         Spacer(Modifier.height(6.dp))
-                        Text(unita.unita.titolo, style = MaterialTheme.typography.titleMedium)
+                        Text(t(unita.unita.titolo), style = MaterialTheme.typography.titleMedium)
                         Text(
-                            unita.unita.obiettivo,
+                            t(unita.unita.obiettivo),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -216,8 +217,8 @@ fun SchermataHome(
                             Spacer(Modifier.height(10.dp))
                             BarraProgresso(
                                 valore = padronanza.percentuale / 100f,
-                                etichetta = "Padronanza",
-                                dettaglio = "${padronanza.corrette}/${padronanza.totali} risposte corrette"
+                                etichetta = t("Padronanza"),
+                                dettaglio = "${padronanza.corrette}/${padronanza.totali} " + t("risposte corrette")
                             )
                         }
                     }
@@ -225,14 +226,14 @@ fun SchermataHome(
                     Button(onClick = { onApriUnita(unita.unita.id) }) {
                         Icon(Icons.Filled.PlayArrow, contentDescription = null)
                         Spacer(Modifier.width(6.dp))
-                        Text("Apri lezione")
+                        Text(t("Apri lezione"))
                     }
                 }
             }
         } else {
-            CardSezione(titolo = "Percorso completato", sottotitolo = "Tutte le unità sono state affrontate") {
+            CardSezione(titolo = t("Percorso completato"), sottotitolo = t("Tutte le unità sono state affrontate")) {
                 Text(
-                    "Ripassa le unità completate o lavora sul lessico: il percorso A0-B2 è finito.",
+                    t("Ripassa le unità completate o lavora sul lessico: il percorso A0-B2 è finito."),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -244,8 +245,7 @@ fun SchermataHome(
             Icon(Icons.Filled.BarChart, contentDescription = null)
             Spacer(Modifier.width(8.dp))
             Text(
-                "Livello ${progresso.livello.codiceBreve()} · " +
-                    "${progresso.traguardiRaggiunti}/${progresso.traguardi.size} traguardi · vedi progresso"
+                t("Livello") + " ${progresso.livello.codiceBreve()} · ${progresso.traguardiRaggiunti}/${progresso.traguardi.size} " + t("traguardi") + " · " + t("vedi progresso")
             )
         }
     }
@@ -254,9 +254,9 @@ fun SchermataHome(
         AlertDialog(
             onDismissRequest = { mostraPiano = false },
             confirmButton = {
-                TextButton(onClick = { mostraPiano = false }) { Text("Chiudi") }
+                TextButton(onClick = { mostraPiano = false }) { Text(t("Chiudi")) }
             },
-            title = { Text("Piano di oggi") },
+            title = { Text(t("Piano di oggi")) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     piano.passi.forEach { passo ->
@@ -271,7 +271,7 @@ fun SchermataHome(
                     }
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        piano.messaggioMotivazionale,
+                        t(piano.messaggioMotivazionale),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -342,22 +342,22 @@ private fun RigaPasso(
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(
-                    passo.titolo,
+                    t(passo.titolo),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    passo.descrizione,
+                    t(passo.descrizione),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             if (passo.completato) {
-                Etichetta("Fatto", MaterialTheme.colorScheme.tertiaryContainer, MaterialTheme.colorScheme.onTertiaryContainer)
+                Etichetta(t("Fatto"), MaterialTheme.colorScheme.tertiaryContainer, MaterialTheme.colorScheme.onTertiaryContainer)
             } else {
-                TextButton(onClick = onApri) { Text("Apri") }
+                TextButton(onClick = onApri) { Text(t("Apri")) }
                 Spacer(Modifier.width(4.dp))
-                OutlinedButton(onClick = onCompleta) { Text("Segna fatto") }
+                OutlinedButton(onClick = onCompleta) { Text(t("Segna fatto")) }
             }
         }
     }

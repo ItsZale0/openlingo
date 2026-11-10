@@ -104,7 +104,7 @@ fun PlacementTestCard(
             }
             Spacer(Modifier.height(6.dp))
             Text(
-                "12 domande, 2 minuti: capiamo da dove partire.",
+                t("12 domande, 2 minuti: capiamo da dove partire."),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -253,7 +253,7 @@ fun PlacementTestCard(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    esito.messaggio,
+                    t(esito.messaggio),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

@@ -213,9 +213,7 @@ private fun CardProfilo(
             title = { Text(t("Eliminare il profilo?")) },
             text = {
                 Text(
-                    "Verranno eliminati tutti i dati di \"${profilo.config.nomeVisualizzato}\": " +
-                        "parole, ripassi, lezioni, grammatica e conversazioni. " +
-                        t("L'operazione non è reversibile.")
+                    t("Verranno eliminati tutti i dati di \"${profilo.config.nomeVisualizzato}\": parole, ripassi, lezioni, grammatica e conversazioni. L'operazione non è reversibile.")
                 )
             },
             confirmButton = {
@@ -290,9 +288,7 @@ private fun FormNuovoProfilo(
         )
         Spacer(Modifier.height(4.dp))
         Text(
-            "L'AI usa questa descrizione per scegliere esempi, esercizi, lezioni e " +
-                "vocabolario adatti a te. Se lavori in ambito sanitario, scrivilo qui: " +
-                "è una personalizzazione come le altre. Puoi cambiarla quando vuoi.",
+            t("L'AI usa questa descrizione per scegliere esempi, esercizi, lezioni e vocabolario adatti a te. Se lavori in ambito sanitario, scrivilo qui: è una personalizzazione come le altre. Puoi cambiarla quando vuoi."),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -305,8 +301,7 @@ private fun FormNuovoProfilo(
         )
         Spacer(Modifier.height(4.dp))
         Text(
-            "Scegli un provider e incolla la chiave. Senza chiave l'app funziona lo stesso: " +
-                t("restano tutti i contenuti offline, ma niente tutor e generazione AI."),
+            t("Scegli un provider e incolla la chiave. Senza chiave l'app funziona lo stesso: restano tutti i contenuti offline, ma niente tutor e generazione AI."),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

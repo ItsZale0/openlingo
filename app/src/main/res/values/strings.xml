@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Deutsch</string>
+    <string name="app_name">OpenLingo</string>
 
-    <string name="welcome_title">Benvenuto</string>
-    <string name="welcome_subtitle">Crea il tuo profilo per iniziare. I dati restano sul dispositivo: l\'app funziona anche senza connessione.</string>
-    <string name="create_profile_and_start">Crea profilo e inizia</string>
+    <string name="welcome_title">Benvenuto in OpenLingo</string>
+    <string name="welcome_subtitle">Il tuo spazio personale per imparare il tedesco, con calma e continuità. I tuoi dati restano sul dispositivo e l\'app funziona anche offline.</string>
+    <string name="create_profile_and_start">Crea il tuo profilo</string>
     <string name="create_profile">Crea profilo</string>
     <string name="what_is_your_name">Come ti chiami?</string>
     <string name="starting_level">Livello di partenza</string>
-    <string name="description_label">Descrizione: chi sei e cosa vuoi imparare</string>
+    <string name="description_label">Il tuo profilo di studio</string>
     <string name="description_hint">Es. fisioterapista: voglio parlare con pazienti e colleghi in tedesco</string>
-    <string name="description_help">L\'AI usa questa descrizione per scegliere esempi, esercizi, lezioni e vocabolario adatti a te. Se lavori in ambito sanitario, scrivilo qui: è una personalizzazione come le altre. Puoi cambiarla quando vuoi.</string>
-    <string name="ai_optional">AI (facoltativa)</string>
-    <string name="ai_optional_help">Scegli un provider e incolla la chiave. Senza chiave l\'app funziona lo stesso: restano tutti i contenuti offline, ma niente tutor e generazione AI.</string>
-    <string name="add_other_keys">Aggiungi chiavi per altri provider</string>
-    <string name="hide_other_keys">Nascondi le altre chiavi</string>
-    <string name="enter">Entra</string>
+    <string name="description_help">Racconta chi sei e cosa vuoi imparare. OpenLingo userà questa descrizione per scegliere esempi, esercizi, lezioni e vocabolario più adatti a te. Puoi modificarla in qualsiasi momento.</string>
+    <string name="ai_optional">Assistente AI (facoltativo)</string>
+    <string name="ai_optional_help">Se vuoi, collega un provider e inserisci la tua chiave API. Senza chiave OpenLingo resta completo: tutti i contenuti offline, il ripasso e gli esercizi continuano a funzionare.</string>
+    <string name="add_other_keys">Aggiungi altre chiavi provider</string>
+    <string name="hide_other_keys">Nascondi altre chiavi</string>
+    <string name="enter">Inizia</string>
     <string name="who_is_studying">Chi sta studiando?</string>
-    <string name="profile_progress_separate">Ogni profilo ha i suoi progressi, separati dagli altri.</string>
-    <string name="create_new_profile">Crea un nuovo profilo</string>
+    <string name="profile_progress_separate">Ogni profilo ha progressi, impostazioni e percorso di studio separati.</string>
+    <string name="create_new_profile">Aggiungi un nuovo profilo</string>
 </resources>

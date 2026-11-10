@@ -82,7 +82,8 @@ fun UnitaGrammaticaScreen(
     vm: TedescoViewModel,
     unitaId: String,
     onIndietro: () -> Unit,
-    onCompletata: () -> Unit
+    onCompletata: () -> Unit,
+    onVaiAGenderTrainer: () -> Unit = {}
 ) {
     val unita = remember(unitaId) { GrammaticaSyllabus.perId(unitaId) }
     if (unita == null) {
@@ -209,7 +210,7 @@ fun UnitaGrammaticaScreen(
     }
 
     ScreenScaffold(
-        title = t("${unita.livello} - ${unita.titolo}"),
+        title = "${unita.livello} - " + t(unita.titolo),
         onBack = onIndietro
     ) {
         IntestazioneUnita(unita)
@@ -248,7 +249,8 @@ fun UnitaGrammaticaScreen(
                 onVaiEsercizi = {
                     if (finito) resetPratica(nuovaSessione = true)
                     scheda = 1
-                }
+                },
+                onVaiAGenderTrainer = onVaiAGenderTrainer
             )
         } else if (scheda == 2) {
             DettatoUnita(
@@ -322,25 +324,25 @@ private fun IntestazioneUnita(unita: UnitaGrammatica) {
             Spacer(Modifier.width(Spaziature.sm))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    unita.titolo,
+                    t(unita.titolo),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Text(
-                    unita.sottotitolo,
+                    t(unita.sottotitolo),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    unita.obiettivo,
+                    t(unita.obiettivo),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    t("${unita.minuti} minuti - ${unita.esercizi.size} esercizi"),
+                    "${unita.minuti} " + t("minuti") + " - ${unita.esercizi.size} " + t("esercizi"),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
@@ -353,7 +355,8 @@ private fun IntestazioneUnita(unita: UnitaGrammatica) {
 private fun TeoriaUnita(
     unita: UnitaGrammatica,
     onAscolta: (String) -> Unit,
-    onVaiEsercizi: () -> Unit
+    onVaiEsercizi: () -> Unit,
+    onVaiAGenderTrainer: () -> Unit = {}
 ) {
     Column {
         SezioneTitolo(t("Regola"), t("Leggi con calma: è il cuore della unità."))
@@ -380,7 +383,7 @@ private fun TeoriaUnita(
                         )
                         Spacer(Modifier.width(6.dp))
                         MarkdownText(
-                            markdown = regola,
+                            markdown = t(regola),
                             color = MaterialTheme.colorScheme.onSurface,
                             stile = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.weight(1f)
@@ -447,7 +450,7 @@ private fun TeoriaUnita(
                         }
                         Spacer(Modifier.height(2.dp))
                         Text(
-                            errore.spiegazione,
+                            t(errore.spiegazione),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -472,7 +475,7 @@ private fun TeoriaUnita(
                         color = MaterialTheme.colorScheme.onTertiaryContainer
                     )
                     Text(
-                        unita.teoria.merksatz,
+                        t(unita.teoria.merksatz),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onTertiaryContainer
@@ -538,12 +541,51 @@ private fun TeoriaUnita(
                                 )
                                 Spacer(Modifier.width(6.dp))
                                 Text(
-                                    testo,
+                                    t(testo),
                                     style = MaterialTheme.typography.bodyMedium,
                                     modifier = Modifier.weight(1f)
                                 )
                             }
                         }
+                    }
+                }
+            }
+        }
+
+        val eUnitArticoli = unita.id.contains("articol", ignoreCase = true) ||
+            unita.titolo.contains("articol", ignoreCase = true)
+        if (eUnitArticoli) {
+            Spacer(Modifier.height(Spaziature.md))
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                ),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+            ) {
+                Column(Modifier.padding(Spaziature.md), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        t("Allenati sugli articoli con il tuo lessico"),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                    Text(
+                        t("Indovina der, die o das usando le parole che hai già nel lessico, filtrate per livello."),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                    Button(
+                        onClick = onVaiAGenderTrainer,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(t("Apri allenatore articoli"))
+                        Spacer(Modifier.width(Spaziature.sm))
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowForward,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
                     }
                 }
             }
@@ -579,7 +621,7 @@ private fun TabellaCard(tabella: TabellaGrammatica) {
     ) {
         Column(Modifier.padding(Spaziature.sm)) {
             Text(
-                tabella.titolo,
+                t(tabella.titolo),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold
             )
@@ -630,7 +672,7 @@ private fun TabellaCard(tabella: TabellaGrammatica) {
             if (tabella.nota.isNotBlank()) {
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    tabella.nota,
+                    t(tabella.nota),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -657,7 +699,7 @@ private fun TabellaRiga(
                 Modifier.weight(1f)
             }
             Text(
-                cella,
+                t(cella),
                 modifier = modifier.padding(horizontal = 2.dp),
                 style = if (intestazione) {
                     MaterialTheme.typography.labelSmall
@@ -706,7 +748,7 @@ private fun EsempioCard(
                 )
                 if (esempio.nota.isNotBlank()) {
                     Text(
-                        esempio.nota,
+                        t(esempio.nota),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -772,13 +814,13 @@ internal fun EsercizioUnitaCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    t("Esercizio ${indice + 1} di $totale"),
+                    t("Esercizio") + " ${indice + 1} " + t("di") + " $totale",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.weight(1f)
                 )
                 Text(
-                    t("${unita.livello} - ${unita.titolo}"),
+                    "${unita.livello} - " + t(unita.titolo),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -793,14 +835,14 @@ internal fun EsercizioUnitaCard(
             )
             Spacer(Modifier.height(Spaziature.md))
             Text(
-                esercizio.domanda,
+                t(esercizio.domanda),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
             if (esercizio.suggerimento.isNotBlank() && !verificato) {
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    esercizio.suggerimento,
+                    t(esercizio.suggerimento),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -863,7 +905,7 @@ internal fun EsercizioUnitaCard(
                             }
                             Spacer(Modifier.width(Spaziature.sm))
                             Text(
-                                opzione,
+                                t(opzione),
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.weight(1f)
                             )
@@ -944,7 +986,7 @@ internal fun EsercizioUnitaCard(
                         if (esercizio.spiegazione.isNotBlank()) {
                             Spacer(Modifier.height(4.dp))
                             Text(
-                                esercizio.spiegazione,
+                                t(esercizio.spiegazione),
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
@@ -1031,7 +1073,7 @@ private fun DettatoUnita(
     ) {
         Column(Modifier.padding(Spaziature.md)) {
             Text(
-                t("Dettato ${indice + 1} di ${esempi.size}"),
+                t("Dettato") + " ${indice + 1} " + t("di") + " ${esempi.size}",
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -1042,7 +1084,7 @@ private fun DettatoUnita(
                 fontWeight = FontWeight.SemiBold
             )
             Text(
-                "Puoi riascoltare quante volte vuoi. Non contano maiuscole e punteggiatura.",
+                t("Puoi riascoltare quante volte vuoi. Non contano maiuscole e punteggiatura."),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -1177,7 +1219,7 @@ internal fun RiepilogoErrori(
                 HorizontalDivider(color = MaterialTheme.colorScheme.error.copy(alpha = 0.25f))
                 Spacer(Modifier.height(Spaziature.sm))
                 Text(
-                    t("${errore.posizione + 1}. ${esercizio.domanda}"),
+                    "${errore.posizione + 1}. " + t(esercizio.domanda),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -1241,7 +1283,7 @@ private fun RisultatoUnita(
             )
             Spacer(Modifier.height(Spaziature.sm))
             Text(
-                t("$corrette / ${esercizi.size}"),
+                "$corrette / ${esercizi.size}",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
