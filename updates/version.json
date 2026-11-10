@@ -1,8 +1,8 @@
 ﻿{
-    "versionCode":  335,
-    "versionName":  "1.51.12",
-    "changelog":  "Update About/branding strings to OpenLingo and refine EN localization.",
+    "versionCode":  336,
+    "versionName":  "1.51.13",
+    "changelog":  "Translate repository documentation and issue templates to English and update project docs.",
     "minVersionCode":  0,
-    "apkUrl":  "https://github.com/ItsZale0/tedesco-app/releases/download/v1.51.12/Deutsch-v1.51.12.apk",
+    "apkUrl":  "https://github.com/ItsZale0/tedesco-app/releases/download/v1.51.13/Deutsch-v1.51.13.apk",
     "apkSha256":  ""
 }
