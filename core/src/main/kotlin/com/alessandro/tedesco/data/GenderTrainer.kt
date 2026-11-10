@@ -42,13 +42,14 @@ object GenderTrainer {
 
     /**
      * Costruisce il pool da parole del profilo (priorità) + eventuali fonti
-     * curate, limitato al livello selezionato (e inferiori).
+     * curate, filtrato per livello selezionato (e inferiori).
+     * Se [limite] è null o <= 0 usa tutte le parole disponibili.
      */
     fun generaDomande(
         paroleProfilo: List<WordEntity>,
         livelloSelezionato: LivelloCEFR,
         fontiCurate: List<LessicoLivelli.Voce> = emptyList(),
-        limite: Int = 20
+        limite: Int? = null
     ): List<Domanda> {
         val maxOrd = livelloSelezionato.ordine
         val viste = HashSet<String>()
@@ -95,14 +96,15 @@ object GenderTrainer {
             }
         }
 
-        // Priorità alle parole del profilo, poi completamento con curate
-        return (daProfilo.shuffled() + daCurate.shuffled()).take(limite)
+        // Priorità alle parole del profilo, poi completamento con curate (tutte, mescolate)
+        val tutte = daProfilo.shuffled() + daCurate.shuffled()
+        return if (limite != null && limite > 0) tutte.take(limite) else tutte
     }
 
     /** Pool predefinito curato (LessicoLivelli + Wortliste) per fallback/generico. */
     fun domandeCurate(
         livelloSelezionato: LivelloCEFR,
-        limite: Int = 20
+        limite: Int? = null
     ): List<Domanda> {
         val curate = LessicoLivelli.tutte + WortlisteB1.tutte.map {
             LessicoLivelli.Voce(it.tedesco, it.italiano, it.esempio, it.tema, it.livello)
@@ -119,7 +121,7 @@ object GenderTrainer {
     fun domandeMiste(
         paroleProfilo: List<WordEntity>,
         livelloSelezionato: LivelloCEFR,
-        limite: Int = 20
+        limite: Int? = null
     ): List<Domanda> {
         val curate = LessicoLivelli.tutte + WortlisteB1.tutte.map {
             LessicoLivelli.Voce(it.tedesco, it.italiano, it.esempio, it.tema, it.livello)

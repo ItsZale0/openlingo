@@ -1,8 +1,8 @@
 ﻿{
-    "versionCode":  332,
-    "versionName":  "1.51.9",
-    "changelog":  "Add article gender trainer (der/die/das) with level-based vocabulary, grammar lesson links, and desktop parity; plus ongoing i18n/content improvements.",
+    "versionCode":  333,
+    "versionName":  "1.51.10",
+    "changelog":  "Use all available vocabulary words for the selected level in the article (der/die/das) trainer.",
     "minVersionCode":  0,
-    "apkUrl":  "https://github.com/ItsZale0/tedesco-app/releases/download/v1.51.9/Deutsch-v1.51.9.apk",
-    "apkSha256":  "4f69567114c3b322aaf3c5c273031083b3ffa5bf000a649cd801a81f5516476c"
+    "apkUrl":  "https://github.com/ItsZale0/tedesco-app/releases/download/v1.51.10/Deutsch-v1.51.10.apk",
+    "apkSha256":  "f07b4b4922115db2eb255328bcbe7a05639e0851c0b98b640a30cb0b8df34bf5"
 }

@@ -50,8 +50,8 @@ fun SchermataGenderTrainer(store: DesktopStore) {
     var risposte by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(sessioneId, livelloSelezionato, parole.size) {
-        val miste = GenderTrainer.domandeMiste(parole, livelloSelezionato, limite = 20)
-        domande = if (miste.isNotEmpty()) miste else GenderTrainer.domandeCurate(livelloSelezionato, limite = 20)
+        val miste = GenderTrainer.domandeMiste(parole, livelloSelezionato, limite = null)
+        domande = if (miste.isNotEmpty()) miste else GenderTrainer.domandeCurate(livelloSelezionato, limite = null)
         indice = 0
         scelta = null
         corrette = 0
