@@ -1,9 +1,9 @@
 # OpenLingo
 
-[![Latest release](https://img.shields.io/github/v/release/ItsZale0/tedesco-app?label=release)](https://github.com/ItsZale0/tedesco-app/releases/latest)
-[![Build APK](https://github.com/ItsZale0/tedesco-app/actions/workflows/build.yml/badge.svg)](https://github.com/ItsZale0/tedesco-app/actions/workflows/build.yml)
+[![Latest release](https://img.shields.io/github/v/release/ItsZale0/openlingo?label=release)](https://github.com/ItsZale0/openlingo/releases/latest)
+[![Build APK](https://github.com/ItsZale0/openlingo/actions/workflows/build.yml/badge.svg)](https://github.com/ItsZale0/openlingo/actions/workflows/build.yml)
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/license-GPL--3.0--or--later-blue)](LICENSE)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/ItsZale0/tedesco-app/badge)](https://securityscorecards.dev/viewer/?uri=github.com/ItsZale0/tedesco-app)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/ItsZale0/openlingo/badge)](https://securityscorecards.dev/viewer/?uri=github.com/ItsZale0/openlingo)
 
 **OpenLingo** is a free and open-source language learning app that aims to feel
 as approachable and engaging as Duolingo, while being grounded in real didactics
@@ -47,7 +47,7 @@ enable optional features. Built for learners starting from Italian or English.
 | **AI tutor** | Chat, explanations, exercises and lessons adapted to the user's personal context |
 | **Profiles** | Fully separate data per profile, with personal context (study, work, interests) |
 | **Backup** | Full export/import and optional GitHub backup |
-| **Desktop** | The same teaching core in a Compose Desktop app |
+| **Desktop** | Compose Desktop app (Kotlin, `:core`) and a from-scratch Rust/eframe rebuild (`desktop-rust/`) with compatible profile data, SRS persistence, vocabulary management, grammar mastery/progress views, and growing feature coverage |
 
 The interface uses Material 3, with selectable colour themes (teal, navy, indigo,
 green, rose, amber) on mobile and desktop. The UI is bilingual: Settings →
@@ -59,22 +59,24 @@ and the choice is stored on the device.
 | Platform | Requirements |
 |---|---|
 | Android | Android 8.0 or later (API 26+) |
-| Desktop | Windows, macOS or Linux with JVM 17+ |
+| Desktop (Compose/Kotlin) | Windows, macOS or Linux with JVM 17+ |
+| Desktop (Rust rebuild) | Rust toolchain (Cargo/rustc); builds natively (Windows/Linux/macOS where supported by dependencies) |
 
 The Android app is distributed as a signed APK through GitHub releases. The
-Windows desktop package is available as a portable archive and a single
-executable; for Linux and macOS you can build from source.
+Windows desktop package (Compose Desktop) is available as a portable archive and a single
+executable; for Linux and macOS you can build from source. The Rust desktop rebuild (`desktop-rust/`) is built from source with Cargo.
 
 ## Installation
 
-1. Open the [releases](https://github.com/ItsZale0/tedesco-app/releases/latest) page.
-2. Download:
-   - `Deutsch-v<version>.apk` for Android;
-   - `Deutsch-desktop-v<version>-windows.zip` or `Deutsch.exe` for Windows.
+1. Open the [releases](https://github.com/ItsZale0/openlingo/releases/latest) page.
+2. Download the asset for your platform:
+   - **Android:** `OpenLingo-v<version>.apk` (or `Deutsch-v<version>.apk` in older releases).
+   - **Windows desktop (Compose):** `OpenLingo-desktop-v<version>-windows.zip` / `OpenLingo.exe` if provided, or legacy `Deutsch-desktop-v<version>-windows.zip` / `Deutsch.exe` in older releases.
+   - **Rust desktop rebuild:** not currently distributed as a release asset; build from source (`desktop-rust/`, see [Development](#development)).
 3. On Android you may need to allow installation from unknown sources for the
    browser or file manager you used.
-4. The app automatically checks for updates and verifies the SHA-256 of the
-   downloaded APK before installing.
+4. Install/open the downloaded file. The app checks for updates and verifies the
+   SHA-256 of the downloaded APK before installing updates.
 
 ## First run
 
@@ -128,31 +130,40 @@ serialization, with manual dependency injection.
 # Android build
 ./gradlew :app:assembleDebug
 
-# Desktop build
+# Desktop (Compose/Kotlin)
 ./gradlew :desktop:run
+# or compile
+./gradlew :desktop:compileKotlin
 
-# Tests
+# Desktop (Rust rebuild)
+cd desktop-rust
+cargo test
+cargo build --release
+# binary: desktop-rust/target/release/openlingo-desktop(.exe)
+
+# Tests (Kotlin/Android/core)
 ./gradlew :app:testDebugUnitTest :core:test
 
-# Everything together
+# Everything together (Kotlin/Android/Desktop Compose)
 ./gradlew :core:jar :app:assembleDebug :desktop:compileKotlin
 ```
 
-For compilation you need `JAVA_HOME` (JDK 17) and `ANDROID_HOME` (Android SDK
+For the Kotlin/Android/Compose build you need `JAVA_HOME` (JDK 17) and `ANDROID_HOME` (Android SDK
 with platform 35 and build-tools 35.0.0). The project can also be built offline
-once dependencies are cached.
+once dependencies are cached. For the Rust desktop rebuild you need a Rust toolchain (Cargo/rustc).
 
-Tests cover the teaching engine, profiles, data migration, backup, updates and
-remote APIs; the suite contains over 570 unit tests.
+The Kotlin suite covers the teaching engine, profiles, data migration, backup, updates and
+remote APIs; the suite contains over 570 unit tests. The Rust desktop app includes its own unit tests (`cargo test`) for compatible data loading/preservation, SRS persistence, vocabulary management, and grammar mastery parsing.
 
 ## Repository structure
 
 ```
-core/      teaching engine and content, no Android dependencies
-app/       Android application (Compose, Material 3)
-desktop/   desktop application (Compose Desktop)
-docs/      user and technical documentation
-updates/   update manifest (version and APK SHA-256)
+core/         teaching engine and content, no Android dependencies
+app/          Android application (Compose, Material 3)
+desktop/      desktop application (Compose Desktop, Kotlin)
+desktop-rust/ Rust desktop rebuild (eframe/egui, from scratch; compatible data, SRS, vocab/grammar/progress views)
+docs/         user and technical documentation
+updates/      update manifest (version and APK SHA-256)
 ```
 
 ## Documentation
@@ -208,7 +219,7 @@ the code or documentation.
 
 ## Development note: a vibecoded project
 
-Openlingo is a **vibecoded** project: most of the code, tests and documentation
+OpenLingo is a **vibecoded** project: most of the code, tests and documentation
 were written in collaboration with AI agents, under human direction, review and
 verification.
 

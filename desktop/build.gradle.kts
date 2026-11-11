@@ -42,15 +42,15 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "com.alessandro.tedesco.desktop.MainKt"
+        mainClass = "com.alessandro.openlingo.desktop.MainKt"
         jvmArgs += listOf("-Dfile.encoding=UTF-8")
 
         nativeDistributions {
             targetFormats(TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Dmg)
-            packageName = "Deutsch"
+            packageName = "OpenLingo"
             packageVersion = appVersionName
-            description = "Deutsch - corso di tedesco A0-B2 con ripasso spaziato"
-            vendor = "Deutsch"
+            description = "OpenLingo - language learning with real didactics and spaced repetition"
+            vendor = "OpenLingo"
             modules("java.net.http", "jdk.crypto.ec")
         }
     }

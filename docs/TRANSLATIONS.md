@@ -14,7 +14,7 @@ grammar material meant to be shown in German) must remain in German.
 - **Source strings:** most UI and content literals are authored in Italian in
   Kotlin source.
 - **Runtime wrapper:** user-visible strings are wrapped with `t("...")`
-  (`core/src/main/kotlin/com/alessandro/tedesco/i18n/Traduttore.kt`). `t()` calls
+  (`core/src/main/kotlin/com/alessandro/openlingo/i18n/Traduttore.kt`). `t()` calls
   `Traduttore.traduci(...)`.
 - **Language state:** the active language is stored in `Traduttore.lingua` and
   selected/persisted via Android `sync/LinguaSettings` + Settings UI
@@ -33,16 +33,16 @@ grammar material meant to be shown in German) must remain in German.
 ### 1. Choose the target language
 - Decide the language code/name/locale (e.g. `en`, `es`, `fr`).
 - If the language is not yet selectable, add it end-to-end:
-  - Android: `app/src/main/java/com/alessandro/tedesco/sync/LinguaSettings.kt` (`OPZIONI`) and Settings UI behavior.
+  - Android: `app/src/main/java/com/alessandro/openlingo/sync/LinguaSettings.kt` (`OPZIONI`) and Settings UI behavior.
   - Desktop: `desktop/src/main/kotlin/.../DesktopStore.kt` preferences + desktop settings/UI.
   - `core/.../i18n/Traduttore.kt`: extend translation dispatch/storage so `t()` can serve the new language (do not assume only one non-default language if making it reusable).
   - Apply locale/resource handling where needed.
 
 ### 2. Audit what must be translated
 Audit **all** user-visible, non-German text in:
-- `app/src/main/java/com/alessandro/tedesco/ui/**`
+- `app/src/main/java/com/alessandro/openlingo/ui/**`
 - `desktop/src/main/kotlin/**` (UI/screens/shell)
-- `core/src/main/kotlin/com/alessandro/tedesco/data/**` (generators, datasets, lessons, quizzes, dialogs, scenarios, prompts, options, explanations, feedback, metadata)
+- `core/src/main/kotlin/com/alessandro/openlingo/data/**` (generators, datasets, lessons, quizzes, dialogs, scenarios, prompts, options, explanations, feedback, metadata)
 
 Look for hardcoded literals in `Text(...)`, labels, placeholders,
 `contentDescription`, dialogs/snackbars/notifications, and content fields such as

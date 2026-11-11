@@ -34,10 +34,19 @@ The manifest also contains `apkUrl` and `apkSha256`. `bumpVersion` does not know
 ./gradlew :app:testDebugUnitTest :core:test
 ```
 
-For the desktop package:
+For the Compose desktop package:
 
 ```bash
 ./gradlew :desktop:createDistributable
+```
+
+For the Rust desktop rebuild (`desktop-rust/`, from source / not currently a standard release asset):
+
+```bash
+cd desktop-rust
+cargo test
+cargo build --release
+# binary: desktop-rust/target/release/openlingo-desktop(.exe)
 ```
 
 Produced artifacts include:
@@ -48,17 +57,17 @@ Produced artifacts include:
 Rename assets using the release naming scheme:
 
 ```
-Deutsch-v<version>.apk
-Deutsch-desktop-v<version>-windows.zip
-Deutsch.exe
+OpenLingo-v<version>.apk
+OpenLingo-desktop-v<version>-windows.zip
+OpenLingo.exe
 ```
 
-> Note: artifact/file names may still include legacy `Deutsch` naming for compatibility with existing release/update conventions.
+> Note: older releases may use legacy `Deutsch-*` artifact names for compatibility; keep `updates/version.json` (`apkUrl`, `apkSha256`) aligned with the actual uploaded APK name and hash.
 
 ## 3. Compute SHA-256
 
 ```powershell
-Get-FileHash "Deutsch-v<version>.apk" -Algorithm SHA256
+Get-FileHash "OpenLingo-v<version>.apk" -Algorithm SHA256
 ```
 
 Insert the (lowercase) hash into `updates/version.json`:
@@ -90,9 +99,8 @@ The workflow does not publish the release: the maintainer creates it so the dist
 
 Create a GitHub release associated with the tag and upload the assets:
 
-- `Deutsch-v<version>.apk`;
-- `Deutsch-desktop-v<version>-windows.zip`;
-- `Deutsch.exe`.
+- `OpenLingo-v<version>.apk` (Android);
+- `OpenLingo-desktop-v<version>-windows.zip` / `OpenLingo.exe` (Windows desktop), if available (legacy `Deutsch-*` names in older releases).
 
 The description should include key changes and installation requirements. Before finishing, verify that:
 
@@ -118,9 +126,9 @@ Without these variables Gradle uses the local debug keystore.
 ## Pre-release checklist
 
 - [ ] `version.properties` and `updates/version.json` aligned.
-- [ ] Tests passing (`:app:testDebugUnitTest`, `:core:test`).
+- [ ] Tests passing (`:app:testDebugUnitTest`, `:core:test`; and `cargo test` in `desktop-rust/` if Rust desktop changed).
 - [ ] APK installable and updatable from the previous version.
 - [ ] `apkSha256` matches the uploaded APK.
-- [ ] Desktop assets runnable.
+- [ ] Desktop assets runnable (Compose; and Rust rebuild `cargo build --release` if included/changed).
 - [ ] Changelog and release notes updated.
 - [ ] Full data export performed before push (per project workflow).

@@ -14,6 +14,9 @@ OpenLingo is a free and open-source language learning app that aims to feel as a
 ```bash
 ./gradlew :core:jar :app:assembleDebug :desktop:compileKotlin
 ./gradlew :app:testDebugUnitTest :core:test
+
+# Rust desktop app (from-scratch rebuild)
+cd desktop-rust && cargo test && cargo build --release
 ```
 
 5. Open a pull request with a clear description of the change.
@@ -25,6 +28,7 @@ To understand the code organization, read [docs/ARCHITECTURE.md](docs/ARCHITECTU
 - **Offline first**: the core learning experience must not depend on a network connection.
 - **Privacy by design**: no user data is sent to third-party servers without explicit consent.
 - **FOSS**: changes to open-source code keep the GPL-3.0-or-later license.
+- **Modules**: `:core`/`:app`/`:desktop` are Kotlin/Compose (JDK 17); `desktop-rust/` is a Rust (Cargo) rebuild — keep data-format compatibility in mind when changing shared profile structures.
 - **Languages and localization**: the interface is localizable at runtime; intentional target-language learning content (e.g. German words/sentences in the German course) must remain in that target language. To contribute new languages or translations (UI and content), follow [docs/TRANSLATIONS.md](docs/TRANSLATIONS.md) and the reusable workflow in `.opencode/skills/app-translation/SKILL.md`.
 
 ## Versioning

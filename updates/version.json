@@ -3,6 +3,6 @@
     "versionName": "1.51.16",
     "changelog": "Add import from file for exported backups in Backup settings.",
     "minVersionCode": 0,
-    "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.51.16/OpenLingo-v1.51.16.apk",
+    "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.16/OpenLingo-v1.51.16.apk",
     "apkSha256": "a49c564b66f237daadc482b19248dce337d56ddbc5092f64cf9e226a19547c0e"
 }

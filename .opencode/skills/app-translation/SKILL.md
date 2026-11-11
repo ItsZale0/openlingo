@@ -13,15 +13,15 @@ Use this skill to make **all non-German, user-visible text** appear in a user-ch
 - Decide behavior for bilingual/help text (e.g. show translation alongside German when pedagogically intended) and for content that must remain language-neutral.
 
 ## 2) Understand the i18n architecture (this repo)
-- **Runtime translator:** `core/src/main/kotlin/com/alessandro/tedesco/i18n/Traduttore.kt`
+- **Runtime translator:** `core/src/main/kotlin/com/alessandro/openlingo/i18n/Traduttore.kt`
   - `Traduttore.lingua` holds active language; `t(testo)` / `Traduttore.traduci(...)` returns translated text for the active non-default language, otherwise original.
   - Exact-match dictionary is chunked (`esattoChunkN`) and aggregated lazily into `esatto`; `schemi` provides regex/pattern replacements for parameterized/dynamic strings.
 - **Language selection/persistence:** app `sync/LinguaSettings.kt` + `ui/MainActivity.kt`/`ImpostazioniScreen.kt`; desktop `DesktopStore` preferences (`lingua`) + `desktop/Main.kt`/settings UI. UI must recompute on language change.
 - **Rule:** wrap user-visible literals at **render/call time** with `t(...)`. Never freeze translations in top-level vals, object init, enums, or static data structures that outlive a language switch.
 
 ## 3) Audit (exhaustive, do not guess)
-- **UI:** `app/src/main/java/com/alessandro/tedesco/ui/**`, `desktop/src/main/kotlin/**/ui/**` (and desktop shell/screens). Find hardcoded user-facing strings in Compose/Text/labels/placeholders/contentDescription/snackbars/dialogs/tooltips.
-- **Data/content:** `core/src/main/kotlin/com/alessandro/tedesco/data/**` — exercise generators, static datasets, lessons, quizzes, dialogs, scenarios, titles/descriptions/instructions/prompts/options/explanations/feedback/metadata.
+- **UI:** `app/src/main/java/com/alessandro/openlingo/ui/**`, `desktop/src/main/kotlin/**/ui/**` (and desktop shell/screens). Find hardcoded user-facing strings in Compose/Text/labels/placeholders/contentDescription/snackbars/dialogs/tooltips.
+- **Data/content:** `core/src/main/kotlin/com/alessandro/openlingo/data/**` — exercise generators, static datasets, lessons, quizzes, dialogs, scenarios, titles/descriptions/instructions/prompts/options/explanations/feedback/metadata.
 - **Search tactics:** look for `Text("...")`, `label =`, `placeholder`, `contentDescription`, string fields like `titolo/domanda/spiegazione/opzioni/descrizione/istruzione/messaggio/testo/frase/nota`, and common source-language words. Cross-check that strings shown to users are either German-intent or passed through `t()`.
 - Distinguish: **German learning content** (keep) vs **UI/explanation/translation text** (translate). When mixed, translate only the non-German parts or provide mapped translations that preserve embedded German.
 

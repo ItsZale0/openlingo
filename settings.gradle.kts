@@ -16,7 +16,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Deutsch"
+rootProject.name = "OpenLingo"
 include(":app")
 include(":core")
 include(":desktop")

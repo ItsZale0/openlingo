@@ -18,7 +18,7 @@ val appVersionCode = versionProps.getProperty("VERSION_CODE", "203").toInt()
 val appVersionName = versionProps.getProperty("VERSION_NAME", "1.43.0")
 
 android {
-    namespace = "com.alessandro.tedesco"
+    namespace = "com.alessandro.openlingo"
     compileSdk = 35
 
     val freeApiKey: String = Properties().apply {
@@ -27,7 +27,7 @@ android {
     }.getProperty("FREE_API_KEY", "")
 
     defaultConfig {
-        applicationId = "com.alessandro.tedesco"
+        applicationId = "com.alessandro.openlingo"
         minSdk = 26
         targetSdk = 35
         versionCode = appVersionCode
@@ -163,7 +163,7 @@ tasks.register("bumpVersion") {
             .replace("\n", "\\n")
             .replace("\r", "\\r")
             .replace("\t", "\\t")
-        val apkUrl = "https://github.com/ItsZale0/tedesco-app/releases/download/v$newName/Deutsch-v$newName.apk"
+        val apkUrl = "https://github.com/ItsZale0/openlingo/releases/download/v$newName/OpenLingo-v$newName.apk"
         val json = """
             {
               "versionCode": $newCode,
@@ -192,7 +192,7 @@ tasks.register("generateVersionJson") {
         if (f.exists()) f.inputStream().use { props.load(it) }
         val vc = props.getProperty("VERSION_CODE", "0").toIntOrNull() ?: 0
         val vn = props.getProperty("VERSION_NAME", "0.0.0")
-        val apkUrl = "https://github.com/ItsZale0/tedesco-app/releases/download/v$vn/Deutsch-v$vn.apk"
+        val apkUrl = "https://github.com/ItsZale0/openlingo/releases/download/v$vn/OpenLingo-v$vn.apk"
         val json = """
             {
               "versionCode": $vc,
