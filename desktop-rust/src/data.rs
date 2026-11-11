@@ -968,7 +968,15 @@ pub struct GrammarUnitExercise {
 }
 
 pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
-    vec![unit_a0_articoli(), unit_a0_pronomi_sein(), unit_a0_frase(), unit_a1_akkusativ(), unit_a1_sein_haben()]
+    vec![
+        unit_a0_articoli(),
+        unit_a0_pronomi_sein(),
+        unit_a0_frase(),
+        unit_a1_akkusativ(),
+        unit_a1_sein_haben(),
+        unit_a1_modalverben(),
+        unit_a2_perfekt_intro(),
+    ]
 }
 
 pub fn embedded_grammar_unit_by_id(id: &str) -> Option<GrammarUnit> {
@@ -1141,6 +1149,74 @@ fn unit_a1_sein_haben() -> GrammarUnit {
             GrammarUnitExercise { prompt_it: "Completa: Du ___ müde. (sein)", prompt_en: "Complete: Du ___ müde. (sein)", options: &["bin", "bist", "ist"], correct_index: 1, answer_text: "", explanation_it: "Con du: du bist.", explanation_en: "With du: du bist." },
             GrammarUnitExercise { prompt_it: "Scrivi la forma corretta: Er ___ (haben) ein Auto.", prompt_en: "Type the correct form: Er ___ (haben) ein Auto.", options: &[], correct_index: 0, answer_text: "hat", explanation_it: "Con er/sie/es: er hat.", explanation_en: "With er/sie/es: er hat." },
             GrammarUnitExercise { prompt_it: "Scrivi la forma corretta: Wir ___ (sein) bereit.", prompt_en: "Type the correct form: Wir ___ (sein) bereit.", options: &[], correct_index: 0, answer_text: "sind", explanation_it: "Con wir: wir sind.", explanation_en: "With wir: wir sind." },
+        ],
+    }
+}
+
+fn unit_a1_modalverben() -> GrammarUnit {
+    GrammarUnit {
+        id: "a1-modalverben",
+        level: "A1",
+        title_it: "Verbi modali: können, müssen, wollen",
+        title_en: "Modal verbs: können, müssen, wollen",
+        subtitle_it: "Potere, dovere, volere",
+        subtitle_en: "Can, must, want",
+        objective_it: "Usare i modali principali con l'infinito in fondo.",
+        objective_en: "Use common modals with the infinitive at the end.",
+        theory_it: &[
+            "I modali cambiano la vocale/radice in alcune persone: ich kann, du kannst, er kann; ich muss, du musst; ich will, du willst.",
+            "Nella frase principale il modale è coniugato in posizione 2 e l'infinito va alla fine.",
+            "Esempio: Ich kann Deutsch sprechen. / Wir müssen heute lernen.",
+        ],
+        theory_en: &[
+            "Modals change stem in some forms: ich kann, du kannst, er kann; ich muss, du musst; ich will, du willst.",
+            "In a main clause the conjugated modal is in position 2 and the infinitive goes to the end.",
+            "Example: Ich kann Deutsch sprechen. / Wir müssen heute lernen.",
+        ],
+        examples: &[
+            ("Ich kann schwimmen.", "So nuotare."),
+            ("Du musst arbeiten.", "Devi lavorare."),
+            ("Wir wollen nach Hause gehen.", "Vogliamo andare a casa."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa: Ich ___ gut kochen. (können)", prompt_en: "Complete: Ich ___ gut kochen. (können)", options: &["kann", "kannst", "können"], correct_index: 0, answer_text: "", explanation_it: "Con ich: ich kann.", explanation_en: "With ich: ich kann." },
+            GrammarUnitExercise { prompt_it: "Completa: Du ___ heute lernen. (müssen)", prompt_en: "Complete: Du ___ heute lernen. (müssen)", options: &["muss", "musst", "müssen"], correct_index: 1, answer_text: "", explanation_it: "Con du: du musst.", explanation_en: "With du: du musst." },
+            GrammarUnitExercise { prompt_it: "Scegli la frase corretta.", prompt_en: "Choose the correct sentence.", options: &["Ich will spielen Fußball.", "Ich will Fußball spielen.", "Will ich Fußball spielen."], correct_index: 1, answer_text: "", explanation_it: "Il modale va in posizione 2 e l'infinito alla fine.", explanation_en: "Modal in position 2, infinitive at the end." },
+            GrammarUnitExercise { prompt_it: "Scrivi il modale corretto: Er ___ (können) helfen.", prompt_en: "Type the correct modal: Er ___ (können) helfen.", options: &[], correct_index: 0, answer_text: "kann", explanation_it: "Con er/sie/es: er kann.", explanation_en: "With er/sie/es: er kann." },
+        ],
+    }
+}
+
+fn unit_a2_perfekt_intro() -> GrammarUnit {
+    GrammarUnit {
+        id: "a2-perfekt-intro",
+        level: "A2",
+        title_it: "Perfekt (introduzione)",
+        title_en: "Perfekt tense (introduction)",
+        subtitle_it: "Passato parlato con haben/sein + Partizip II",
+        subtitle_en: "Spoken past with haben/sein + Partizip II",
+        objective_it: "Riconoscere e formare frasi base al Perfekt.",
+        objective_en: "Recognize and form basic Perfekt sentences.",
+        theory_it: &[
+            "Il Perfekt usa haben o sein come ausiliare + participio passato (Partizip II) alla fine.",
+            "Molti verbi usano haben (ich habe gemacht). Verbi di movimento/cambiamento di stato spesso usano sein (ich bin gegangen).",
+            "Partizip II regolare tipico: ge- + radice + -t (machen -> gemacht).",
+        ],
+        theory_en: &[
+            "Perfekt uses haben or sein as auxiliary + past participle (Partizip II) at the end.",
+            "Many verbs use haben (ich habe gemacht). Movement/state-change verbs often use sein (ich bin gegangen).",
+            "Typical regular Partizip II: ge- + stem + -t (machen -> gemacht).",
+        ],
+        examples: &[
+            ("Ich habe gelernt.", "Ho studiato / I studied."),
+            ("Sie hat gekocht.", "Lei ha cucinato."),
+            ("Wir sind nach Hause gegangen.", "Siamo andati a casa."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Quale ausiliare è tipico per 'machen'?", prompt_en: "Which auxiliary is typical for 'machen'?", options: &["sein", "haben", "werden"], correct_index: 1, answer_text: "", explanation_it: "machen forma il Perfekt con haben: ich habe gemacht.", explanation_en: "machen forms Perfekt with haben: ich habe gemacht." },
+            GrammarUnitExercise { prompt_it: "Completa: Ich ___ gestern gelernt. (haben)", prompt_en: "Complete: Ich ___ gestern gelernt. (haben)", options: &["habe", "bin", "hat"], correct_index: 0, answer_text: "", explanation_it: "Con ich + haben: ich habe gelernt.", explanation_en: "With ich + haben: ich habe gelernt." },
+            GrammarUnitExercise { prompt_it: "Scegli il participio corretto di machen.", prompt_en: "Choose the correct participle of machen.", options: &["gemacht", "gemachen", "gemachte"], correct_index: 0, answer_text: "", explanation_it: "Regolare: ge- + mach + -t = gemacht.", explanation_en: "Regular: ge- + mach + -t = gemacht." },
+            GrammarUnitExercise { prompt_it: "Scrivi il participio: lernen -> ___", prompt_en: "Type the participle: lernen -> ___", options: &[], correct_index: 0, answer_text: "gelernt", explanation_it: "lernen -> gelernt (ge- + lern + -t).", explanation_en: "lernen -> gelernt (ge- + lern + -t)." },
         ],
     }
 }
