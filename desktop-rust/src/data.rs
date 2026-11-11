@@ -737,6 +737,126 @@ pub struct StudyPlanSummary {
     pub next_actions: Vec<String>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CurriculumLesson {
+    pub number: i32,
+    pub topic_it: String,
+    pub topic_en: String,
+    pub is_current: bool,
+    pub is_completed: bool,
+}
+
+pub fn curriculum_topics_for_level(level: &str) -> &'static [(&'static str, &'static str)] {
+    let l = level.trim().to_uppercase();
+    let base = l.split_whitespace().next().unwrap_or(&l);
+    match base {
+        "A0" | "A1" => &A1_TOPICS,
+        "A2" => &A2_TOPICS,
+        "B1" | "B2" | "C1" | "C2" => &B1_TOPICS,
+        _ => &A1_TOPICS,
+    }
+}
+
+const A1_TOPICS: [(&str, &str); 20] = [
+    ("Saluti e presentazioni", "Greetings and introductions"),
+    ("Numeri 0-100, età e date", "Numbers 0-100, age and dates"),
+    ("La famiglia", "Family"),
+    ("Pronomi personali e verbi sein/haben", "Personal pronouns and sein/haben"),
+    ("Articoli der/die/das e plurali", "Articles der/die/das and plurals"),
+    ("Città e paese", "City and country"),
+    ("Cibo e bevande", "Food and drinks"),
+    ("La giornata e le ore", "Daily routine and time"),
+    ("Tempo libero e hobby", "Free time and hobbies"),
+    ("Casa e stanze", "Home and rooms"),
+    ("Vestiti e colori", "Clothes and colors"),
+    ("Salute e corpo", "Health and body"),
+    ("Viaggi e mezzi", "Travel and transport"),
+    ("Lavoro e professioni", "Work and professions"),
+    ("Tempo atmosferico", "Weather"),
+    ("Animali", "Animals"),
+    ("Soldi, negozi e prezzi", "Money, shops and prices"),
+    ("Al telefono", "On the phone"),
+    ("Al ristorante", "At the restaurant"),
+    ("In farmacia", "At the pharmacy"),
+];
+
+const A2_TOPICS: [(&str, &str); 20] = [
+    ("Perfetto (haben/sein + Partizip II)", "Perfect tense (haben/sein + Partizip II)"),
+    ("Accusativo", "Accusative case"),
+    ("Dativo", "Dative case"),
+    ("Verbi modali", "Modal verbs"),
+    ("Frasi subordinate con weil e dass", "Subordinate clauses with weil and dass"),
+    ("Comparativi e superlativi", "Comparatives and superlatives"),
+    ("Preposizioni con dativo", "Prepositions with dative"),
+    ("Preposizioni con accusativo", "Prepositions with accusative"),
+    ("Imperativo", "Imperative"),
+    ("Pronomi relativi", "Relative pronouns"),
+    ("Verbi separabili", "Separable verbs"),
+    ("Präteritum di sein e haben", "Präteritum of sein and haben"),
+    ("Lessico: lavoro e carriera", "Vocabulary: work and career"),
+    ("Lessico: viaggi e turismo", "Vocabulary: travel and tourism"),
+    ("Lessico: salute e medicina", "Vocabulary: health and medicine"),
+    ("Lessico: tempo libero e sport", "Vocabulary: leisure and sport"),
+    ("Lessico: cibo e ristorante", "Vocabulary: food and restaurant"),
+    ("Lessico: casa e arredamento", "Vocabulary: home and furniture"),
+    ("Lessico: tecnologia e media", "Vocabulary: technology and media"),
+    ("Lessico: ambiente e natura", "Vocabulary: environment and nature"),
+];
+
+const B1_TOPICS: [(&str, &str); 20] = [
+    ("Adjektivdeklination", "Adjective declension"),
+    ("Genitivo", "Genitive case"),
+    ("Frasi relative", "Relative clauses"),
+    ("Connettori", "Connectors"),
+    ("Verbi con preposizione", "Verbs with prepositions"),
+    ("Preposizioni a doppio caso", "Two-way prepositions"),
+    ("Verbi riflessivi", "Reflexive verbs"),
+    ("Domande indirette", "Indirect questions"),
+    ("Passivo con verbi modali", "Passive with modal verbs"),
+    ("Präteritum vs Perfetto", "Präteritum vs Perfekt"),
+    ("Konjunktiv II", "Konjunktiv II"),
+    ("Lessico: lavoro e professione sanitaria", "Vocabulary: healthcare work"),
+    ("Lessico: salute, corpo e sintomi", "Vocabulary: health, body and symptoms"),
+    ("Lessico: relazioni e conflitti", "Vocabulary: relationships and conflicts"),
+    ("Lessico: istruzione e formazione", "Vocabulary: education and training"),
+    ("Lessico: ambiente e sostenibilità", "Vocabulary: environment and sustainability"),
+    ("Lessico: tecnologia e innovazione", "Vocabulary: technology and innovation"),
+    ("Lessico: cultura e tradizione", "Vocabulary: culture and tradition"),
+    ("Lessico: economia e business", "Vocabulary: economy and business"),
+    ("Lessico: emozioni e sentimenti", "Vocabulary: emotions and feelings"),
+];
+
+pub fn lesson_topic(level: &str, number: i32) -> (String, String) {
+    let topics = curriculum_topics_for_level(level);
+    if topics.is_empty() { return ("-".into(), "-".into()); }
+    let n = number.max(1);
+    let idx = ((n - 1) as usize) % topics.len();
+    let giro = ((n - 1) as usize) / topics.len();
+    let (it, en) = topics[idx];
+    if giro == 0 {
+        (it.to_string(), en.to_string())
+    } else {
+        (
+            format!("{it} — approfondimento {}: nuove parole e strutture", giro + 1),
+            format!("{en} — deepening {}: new words and structures", giro + 1),
+        )
+    }
+}
+
+pub fn curriculum_lessons(level: &str, current_lesson: i32, count: i32) -> Vec<CurriculumLesson> {
+    let max_n = count.max(1);
+    (1..=max_n).map(|n| {
+        let (topic_it, topic_en) = lesson_topic(level, n);
+        CurriculumLesson {
+            number: n,
+            topic_it,
+            topic_en,
+            is_current: n == current_lesson,
+            is_completed: n < current_lesson,
+        }
+    }).collect()
+}
+
 impl Store {
     pub fn study_plan_summary(&self) -> StudyPlanSummary {
         let mut out = StudyPlanSummary::default();
@@ -768,6 +888,20 @@ impl Store {
             out.next_actions.push("Keep practicing: start a mixed exercise session".to_string());
         }
         out
+    }
+
+    pub fn set_lesson_progress(&mut self, lesson: i32) -> Result<(), String> {
+        let p = self.active_profile_mut().ok_or_else(|| "No active profile".to_string())?;
+        p.stato.progresso.lezione_corrente = lesson.max(1);
+        self.save()
+    }
+
+    pub fn advance_lesson_progress(&mut self) -> Result<i32, String> {
+        let p = self.active_profile_mut().ok_or_else(|| "No active profile".to_string())?;
+        let next = p.stato.progresso.lezione_corrente.max(0) + 1;
+        p.stato.progresso.lezione_corrente = next;
+        self.save()?;
+        Ok(next)
     }
 }
 
