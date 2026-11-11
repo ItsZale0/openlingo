@@ -4,6 +4,82 @@ use chrono::Local;
 use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, check_typing_answer};
 use eframe::egui;
 
+fn hex(c: u32) -> egui::Color32 {
+    egui::Color32::from_rgb(((c >> 16) & 0xFF) as u8, ((c >> 8) & 0xFF) as u8, (c & 0xFF) as u8)
+}
+
+fn effective_dark(store: &Store, system_dark: bool) -> bool {
+    match store.prefs.tema_modalita.trim().to_lowercase().as_str() {
+        "light" | "chiaro" => false,
+        "dark" | "scuro" => true,
+        _ => system_dark || store.prefs.tema_scuro,
+    }
+}
+
+fn apply_theme(ctx: &egui::Context, store: &Store, system_dark: bool) {
+    let dark = effective_dark(store, system_dark);
+    let id = store.prefs.tema_colore.trim().to_lowercase();
+    let (primary, on_primary, primary_container, on_primary_container, secondary_container, on_secondary_container, background, on_background, surface, on_surface, surface_variant, on_surface_variant, outline) = if dark {
+        match id.as_str() {
+            "navy" => (hex(0xB4C5FF), hex(0x002A78), hex(0x003F9F), hex(0xDCE4FF), hex(0x3E4659), hex(0xDAE2F9), hex(0x0D1220), hex(0xE1E2EC), hex(0x11162A), hex(0xE1E2EC), hex(0x44464F), hex(0xC4C6D0), hex(0x8E9099)),
+            "indigo" => (hex(0xC4B5FD), hex(0x2E1065), hex(0x4C1D95), hex(0xEDE9FE), hex(0x474060), hex(0xE7E0FF), hex(0x0F0D1A), hex(0xE6E1F4), hex(0x13111F), hex(0xE6E1F4), hex(0x49454F), hex(0xCBC4CF), hex(0x948F99)),
+            "forest" => (hex(0x86EFAC), hex(0x052E16), hex(0x14532D), hex(0xDCFCE7), hex(0x344E3C), hex(0xD0E8D6), hex(0x0A120D), hex(0xDEE5E0), hex(0x0E1611), hex(0xDEE5E0), hex(0x3F4942), hex(0xBFC9C2), hex(0x89948C)),
+            "rose" => (hex(0xFDA4AF), hex(0x4C0519), hex(0x881337), hex(0xFFE4E6), hex(0x53393D), hex(0xF5DCE0), hex(0x130A0D), hex(0xEEE0E3), hex(0x170E11), hex(0xEEE0E3), hex(0x524347), hex(0xD7C1C5), hex(0xA08C90)),
+            "amber" => (hex(0xFCD34D), hex(0x451A03), hex(0x78350F), hex(0xFEF3C7), hex(0x4D4330), hex(0xF1E5CC), hex(0x12100A), hex(0xEAE4D8), hex(0x16140E), hex(0xEAE4D8), hex(0x4F493D), hex(0xD2C9B8), hex(0x9B9384)),
+            _ => (hex(0x8FD6CD), hex(0x003733), hex(0x17433F), hex(0xB8F0E8), hex(0x334B45), hex(0xD0E8E0), hex(0x0D1413), hex(0xDEE5E1), hex(0x111817), hex(0xDEE5E1), hex(0x3F4946), hex(0xBFC9C4), hex(0x89948F)), // teal
+        }
+    } else {
+        match id.as_str() {
+            "navy" => (hex(0x003F9F), hex(0xFFFFFF), hex(0xDCE4FF), hex(0x00174B), hex(0xDAE2F9), hex(0x131B2C), hex(0xF8F9FC), hex(0x1A1C20), hex(0xFDFDFF), hex(0x1A1C20), hex(0xE1E2EC), hex(0x44474E), hex(0x74777F)),
+            "indigo" => (hex(0x4C1D95), hex(0xFFFFFF), hex(0xEDE9FE), hex(0x2E1065), hex(0xE7E0FF), hex(0x1B1628), hex(0xF9F7FC), hex(0x1C1A20), hex(0xFDFBFF), hex(0x1C1A20), hex(0xE8E3EE), hex(0x49454F), hex(0x7A757F)),
+            "forest" => (hex(0x14532D), hex(0xFFFFFF), hex(0xDCFCE7), hex(0x052E16), hex(0xD0E8D6), hex(0x0F2015), hex(0xF6FAF7), hex(0x191C1A), hex(0xFBFDFA), hex(0x191C1A), hex(0xDFE5E0), hex(0x444A44), hex(0x757B75)),
+            "rose" => (hex(0x881337), hex(0xFFFFFF), hex(0xFFE4E6), hex(0x4C0519), hex(0xF5DCE0), hex(0x241517), hex(0xFBF6F7), hex(0x1D191A), hex(0xFDF9FA), hex(0x1D191A), hex(0xEDDFE2), hex(0x524347), hex(0x857377)),
+            "amber" => (hex(0x78350F), hex(0xFFFFFF), hex(0xFEF3C7), hex(0x451A03), hex(0xF1E5CC), hex(0x201B10), hex(0xFBF9F4), hex(0x1C1A16), hex(0xFDFBF6), hex(0x1C1A16), hex(0xECE5D8), hex(0x4F493D), hex(0x807869)),
+            _ => (hex(0x1F5F5B), hex(0xFFFFFF), hex(0xD6EFEA), hex(0x0A2522), hex(0xE2EBE7), hex(0x15201D), hex(0xF7FAF8), hex(0x191C1B), hex(0xFBFDFB), hex(0x191C1B), hex(0xE1E8E4), hex(0x44504C), hex(0x70807A)), // teal
+        }
+    };
+    let mut visuals = if dark { egui::Visuals::dark() } else { egui::Visuals::light() };
+    visuals.override_text_color = Some(on_background);
+    visuals.panel_fill = background;
+    visuals.window_fill = surface;
+    visuals.extreme_bg_color = surface_variant;
+    visuals.faint_bg_color = secondary_container;
+    visuals.code_bg_color = surface_variant;
+    visuals.hyperlink_color = primary;
+    visuals.selection.bg_fill = primary_container;
+    visuals.selection.stroke = egui::Stroke::new(1.0_f32, primary);
+    visuals.widgets.noninteractive.bg_fill = surface;
+    visuals.widgets.noninteractive.fg_stroke = egui::Stroke::new(1.0_f32, on_surface);
+    visuals.widgets.noninteractive.bg_stroke = egui::Stroke::new(1.0_f32, outline);
+    visuals.widgets.inactive.bg_fill = secondary_container;
+    visuals.widgets.inactive.fg_stroke = egui::Stroke::new(1.0_f32, on_secondary_container);
+    visuals.widgets.inactive.bg_stroke = egui::Stroke::new(1.0_f32, outline);
+    visuals.widgets.hovered.bg_fill = primary_container;
+    visuals.widgets.hovered.fg_stroke = egui::Stroke::new(1.0_f32, on_primary_container);
+    visuals.widgets.hovered.bg_stroke = egui::Stroke::new(1.0_f32, primary);
+    visuals.widgets.active.bg_fill = primary;
+    visuals.widgets.active.fg_stroke = egui::Stroke::new(1.0_f32, on_primary);
+    visuals.widgets.active.bg_stroke = egui::Stroke::new(1.0_f32, primary);
+    visuals.widgets.open.bg_fill = secondary_container;
+    visuals.widgets.open.fg_stroke = egui::Stroke::new(1.0_f32, on_secondary_container);
+    visuals.widgets.open.bg_stroke = egui::Stroke::new(1.0_f32, primary);
+    let rounding = egui::CornerRadius::same(12);
+    visuals.widgets.noninteractive.corner_radius = rounding;
+    visuals.widgets.inactive.corner_radius = rounding;
+    visuals.widgets.hovered.corner_radius = rounding;
+    visuals.widgets.active.corner_radius = rounding;
+    visuals.widgets.open.corner_radius = rounding;
+    visuals.window_corner_radius = egui::CornerRadius::same(18);
+    visuals.menu_corner_radius = egui::CornerRadius::same(12);
+    ctx.set_visuals(visuals);
+
+    let mut style = (*ctx.style()).clone();
+    style.spacing.item_spacing = egui::vec2(8.0, 8.0);
+    style.spacing.button_padding = egui::vec2(10.0, 6.0);
+    style.spacing.interact_size = egui::vec2(40.0, 28.0);
+    ctx.set_style(style);
+}
+
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Screen {
     Home,
@@ -607,6 +683,37 @@ impl OpenLingoApp {
 
         ui.add_space(8.0);
         ui.group(|ui| {
+            ui.label(tr(lang, "Theme", "Tema"));
+            let mut mode = self.store.prefs.tema_modalita.trim().to_lowercase();
+            if mode.is_empty() { mode = "system".into(); }
+            ui.horizontal_wrapped(|ui| {
+                ui.label(tr(lang, "Mode:", "Modalità:"));
+                for (id, en, it) in [("system", "System", "Sistema"), ("light", "Light", "Chiaro"), ("dark", "Dark", "Scuro")] {
+                    if ui.selectable_label(mode == id, tr(lang, en, it)).clicked() {
+                        self.store.prefs.tema_modalita = id.to_string();
+                        self.store.prefs.tema_scuro = id == "dark";
+                        let _ = self.store.save();
+                    }
+                }
+            });
+            let mut colore = self.store.prefs.tema_colore.trim().to_lowercase();
+            if colore.is_empty() { colore = "teal".into(); }
+            ui.horizontal_wrapped(|ui| {
+                ui.label(tr(lang, "Color:", "Colore:"));
+                for (id, en, it) in [("teal","Teal","Teal"), ("navy","Navy blue","Blu navy"), ("indigo","Indigo","Indaco"), ("forest","Forest","Verde"), ("rose","Rose","Rosa"), ("amber","Amber","Ambra")] {
+                    if ui.selectable_label(colore == id, tr(lang, en, it)).clicked() {
+                        self.store.prefs.tema_colore = id.to_string();
+                        let _ = self.store.save();
+                    }
+                }
+            });
+            ui.small(tr(lang,
+                "Matches the Compose desktop/Android color themes (teal, navy, indigo, forest, rose, amber) and light/dark modes.",
+                "Corrisponde ai temi colore di Compose desktop/Android (teal, navy, indigo, forest, rose, amber) e alle modalità chiaro/scuro."));
+        });
+
+        ui.add_space(8.0);
+        ui.group(|ui| {
             ui.label(tr(lang, "Profiles", "Profili"));
             let ids: Vec<(String, String)> = self.store.repo.profili.values()
                 .map(|p| (p.id.clone(), p.config.nome_visualizzato.clone()))
@@ -695,6 +802,8 @@ impl OpenLingoApp {
 
 impl eframe::App for OpenLingoApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        let system_dark = ctx.style().visuals.dark_mode; // best-effort; system theme may be reflected by eframe
+        apply_theme(ctx, &self.store, system_dark);
         egui::TopBottomPanel::top("top").show(ctx, |ui| self.top_bar(ui));
         egui::CentralPanel::default().show(ctx, |ui| match self.screen {
             Screen::Home => self.screen_home(ui),
