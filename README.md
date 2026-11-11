@@ -47,7 +47,7 @@ enable optional features. Built for learners starting from Italian or English.
 | **AI tutor** | Chat, explanations, exercises and lessons adapted to the user's personal context |
 | **Profiles** | Fully separate data per profile, with personal context (study, work, interests) |
 | **Backup** | Full export/import and optional GitHub backup |
-| **Desktop** | Compose Desktop app (Kotlin, `:core`) and a from-scratch Rust/eframe rebuild (`desktop-rust/`) with compatible profile data and growing feature coverage |
+| **Desktop** | Compose Desktop app (Kotlin, `:core`) and a from-scratch Rust/eframe rebuild (`desktop-rust/`) with compatible profile data, SRS persistence, vocabulary management, grammar mastery/progress views, and growing feature coverage |
 
 The interface uses Material 3, with selectable colour themes (teal, navy, indigo,
 green, rose, amber) on mobile and desktop. The UI is bilingual: Settings →
@@ -153,7 +153,7 @@ with platform 35 and build-tools 35.0.0). The project can also be built offline
 once dependencies are cached. For the Rust desktop rebuild you need a Rust toolchain (Cargo/rustc).
 
 The Kotlin suite covers the teaching engine, profiles, data migration, backup, updates and
-remote APIs; the suite contains over 570 unit tests. The Rust desktop app includes its own unit tests (`cargo test`) for compatible data loading and SRS persistence.
+remote APIs; the suite contains over 570 unit tests. The Rust desktop app includes its own unit tests (`cargo test`) for compatible data loading/preservation, SRS persistence, vocabulary management, and grammar mastery parsing.
 
 ## Repository structure
 
@@ -161,7 +161,7 @@ remote APIs; the suite contains over 570 unit tests. The Rust desktop app includ
 core/         teaching engine and content, no Android dependencies
 app/          Android application (Compose, Material 3)
 desktop/      desktop application (Compose Desktop, Kotlin)
-desktop-rust/ Rust desktop rebuild (eframe/egui, from scratch; compatible data + SRS)
+desktop-rust/ Rust desktop rebuild (eframe/egui, from scratch; compatible data, SRS, vocab/grammar/progress views)
 docs/         user and technical documentation
 updates/      update manifest (version and APK SHA-256)
 ```

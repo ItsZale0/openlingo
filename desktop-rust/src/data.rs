@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, HashSet};
+use serde_json::Value;
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::fs;
 use std::path::PathBuf;
 
@@ -25,6 +26,8 @@ pub struct Preferenze {
     #[serde(alias = "ultimaSincronizzazioneCloud")]
     pub ultima_sincronizzazione_cloud: i64,
     pub lingua: String,
+    #[serde(flatten)]
+    pub extra: HashMap<String, Value>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -35,6 +38,8 @@ pub struct ProfiliRepository {
     pub profili: HashMap<String, ProfiloUtente>,
     #[serde(alias = "profiliEliminati")]
     pub profili_eliminati: Vec<String>,
+    #[serde(flatten)]
+    pub extra: HashMap<String, Value>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -43,6 +48,8 @@ pub struct ProfiloUtente {
     pub id: String,
     pub config: ProfiloConfig,
     pub stato: ProfiloStato,
+    #[serde(flatten)]
+    pub extra: HashMap<String, Value>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -58,6 +65,8 @@ pub struct ProfiloConfig {
     pub mostra_contesto_medico: bool,
     #[serde(alias = "feedUrl")]
     pub feed_url: String,
+    #[serde(flatten)]
+    pub extra: HashMap<String, Value>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -68,7 +77,7 @@ pub struct ProfiloStato {
     #[serde(alias = "ripassiLog")]
     pub ripassi_log: Vec<RipassoLog>,
     #[serde(alias = "padronanzaGrammatica")]
-    pub padronanza_grammatica: HashMap<String, serde_json::Value>,
+    pub padronanza_grammatica: HashMap<String, Value>,
     #[serde(alias = "streakGiorni")]
     pub streak_giorni: i32,
     #[serde(alias = "streakRecord")]
@@ -76,6 +85,8 @@ pub struct ProfiloStato {
     #[serde(alias = "ultimoGiornoStudio")]
     pub ultimo_giorno_studio: Option<String>,
     pub progresso: Progresso,
+    #[serde(flatten)]
+    pub extra: HashMap<String, Value>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -95,6 +106,8 @@ pub struct WordEntity {
     pub archived: bool,
     #[serde(alias = "createdAt", default)]
     pub created_at: i64,
+    #[serde(flatten)]
+    pub extra: HashMap<String, Value>,
 }
 
 impl WordEntity {
@@ -103,6 +116,16 @@ impl WordEntity {
             Some(a) if !a.trim().is_empty() => format!("{} {}", a.trim(), self.german),
             _ => self.german.clone(),
         }
+    }
+
+    pub fn matches_query(&self, q: &str) -> bool {
+        let q = q.trim().to_lowercase();
+        if q.is_empty() { return true; }
+        self.german.to_lowercase().contains(&q)
+            || self.italian.to_lowercase().contains(&q)
+            || self.example.to_lowercase().contains(&q)
+            || self.tags.to_lowercase().contains(&q)
+            || self.article.as_deref().unwrap_or("").to_lowercase().contains(&q)
     }
 }
 
@@ -121,6 +144,8 @@ pub struct ReviewEntity {
     pub due_at: i64,
     #[serde(alias = "lastReviewedAt")]
     pub last_reviewed_at: Option<i64>,
+    #[serde(flatten)]
+    pub extra: HashMap<String, Value>,
 }
 
 impl Default for ReviewEntity {
@@ -133,6 +158,7 @@ impl Default for ReviewEntity {
             lapses: 0,
             due_at: 0,
             last_reviewed_at: None,
+            extra: HashMap::new(),
         }
     }
 }
@@ -147,6 +173,8 @@ pub struct RipassoLog {
     pub corretta: bool,
     #[serde(default)]
     pub verifica: bool,
+    #[serde(flatten)]
+    pub extra: HashMap<String, Value>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -160,6 +188,8 @@ pub struct Progresso {
     pub lezione_corrente: i32,
     #[serde(alias = "ultimaAttivita", default)]
     pub ultima_attivita: i64,
+    #[serde(flatten)]
+    pub extra: HashMap<String, Value>,
 }
 
 fn default_livello() -> String { "A1".into() }
@@ -273,8 +303,10 @@ impl Store {
                 contesto_utente: String::new(),
                 mostra_contesto_medico: false,
                 feed_url: String::new(),
+                extra: HashMap::new(),
             },
             stato: ProfiloStato::default(),
+            extra: HashMap::new(),
         };
         self.repo.profili.insert(id.clone(), p);
         self.set_active_profile(&id);
@@ -320,6 +352,74 @@ impl Store {
         (total, reviewed, due, p.stato.streak_giorni)
     }
 
+    pub fn mature_count(&self) -> usize {
+        let Some(p) = self.active_profile() else { return 0; };
+        p.stato.reviews.values().filter(|r| r.interval_days >= 21 || r.repetitions >= 5).count()
+    }
+
+    pub fn word_level_counts(&self) -> BTreeMap<String, usize> {
+        let mut out: BTreeMap<String, usize> = BTreeMap::new();
+        let Some(p) = self.active_profile() else { return out; };
+        for w in p.stato.parole.iter().filter(|w| !w.archived) {
+            let lvl = if w.level.trim().is_empty() { "—".to_string() } else { w.level.trim().to_uppercase() };
+            *out.entry(lvl).or_insert(0) += 1;
+        }
+        out
+    }
+
+    pub fn search_words(&self, query: &str, level: Option<&str>, include_archived: bool, limit: usize) -> Vec<WordEntity> {
+        let Some(p) = self.active_profile() else { return vec![]; };
+        let lvl = level.map(|s| s.trim().to_uppercase()).filter(|s| !s.is_empty() && s != "ALL" && s != "—");
+        let mut words: Vec<_> = p.stato.parole.iter()
+            .filter(|w| include_archived || !w.archived)
+            .filter(|w| lvl.as_ref().map(|l| w.level.trim().to_uppercase() == *l).unwrap_or(true))
+            .filter(|w| w.matches_query(query))
+            .cloned()
+            .collect();
+        words.sort_by(|a, b| a.german.to_lowercase().cmp(&b.german.to_lowercase()));
+        words.truncate(limit);
+        words
+    }
+
+    pub fn add_word(&mut self, german: &str, italian: &str, article: Option<String>, level: &str, example: &str) -> Result<String, String> {
+        let german = german.trim();
+        let italian = italian.trim();
+        if german.is_empty() { return Err("German word is required".into()); }
+        if italian.is_empty() { return Err("Translation is required".into()); }
+        let now = chrono::Utc::now().timestamp_millis();
+        let id = format!("custom_{}_{}", now, german.chars().filter(|c| c.is_alphanumeric()).take(8).collect::<String>().to_lowercase());
+        let mut extra = HashMap::new();
+        extra.insert("source".to_string(), Value::String("CUSTOM".into()));
+        let w = WordEntity {
+            id: id.clone(),
+            german: german.to_string(),
+            italian: italian.to_string(),
+            example: example.trim().to_string(),
+            article: article.map(|a| a.trim().to_string()).filter(|a| !a.is_empty()),
+            level: level.trim().to_uppercase(),
+            tags: "custom".to_string(),
+            archived: false,
+            created_at: now,
+            extra,
+        };
+        let p = self.active_profile_mut().ok_or_else(|| "No active profile".to_string())?;
+        if p.stato.parole.iter().any(|x| x.german.eq_ignore_ascii_case(german) && x.article.as_deref().unwrap_or("") == w.article.as_deref().unwrap_or("")) {
+            return Err("Word already exists".into());
+        }
+        p.stato.parole.push(w);
+        self.save()?;
+        Ok(id)
+    }
+
+    pub fn set_word_archived(&mut self, word_id: &str, archived: bool) -> Result<(), String> {
+        let p = self.active_profile_mut().ok_or_else(|| "No active profile".to_string())?;
+        let Some(w) = p.stato.parole.iter_mut().find(|w| w.id == word_id) else {
+            return Err("Word not found".into());
+        };
+        w.archived = archived;
+        self.save()
+    }
+
     pub fn answer_review(&mut self, word_id: &str, saputa: bool) -> Result<(), String> {
         let now = chrono::Utc::now().timestamp_millis();
         let p = self.active_profile_mut().ok_or_else(|| "No active profile".to_string())?;
@@ -331,6 +431,7 @@ impl Store {
             timestamp: now,
             corretta: saputa,
             verifica: false,
+            extra: HashMap::new(),
         });
         if p.stato.ripassi_log.len() > 5000 {
             let drop_n = p.stato.ripassi_log.len() - 5000;
@@ -338,6 +439,41 @@ impl Store {
         }
         registra_studio(&mut p.stato, now);
         self.save()
+    }
+
+    pub fn grammar_mastery_summaries(&self) -> Vec<GrammarMasterySummary> {
+        let Some(p) = self.active_profile() else { return vec![]; };
+        let mut out: Vec<_> = p.stato.padronanza_grammatica.iter().map(|(id, v)| {
+            GrammarMasterySummary::from_value(id, v)
+        }).collect();
+        out.sort_by(|a, b| b.percentuale.cmp(&a.percentuale).then_with(|| b.tentativi.cmp(&a.tentativi)).then_with(|| a.id.cmp(&b.id)));
+        out
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct GrammarMasterySummary {
+    pub id: String,
+    pub percentuale: i64,
+    pub tentativi: i64,
+    pub corrette: i64,
+    pub completata: bool,
+    pub ultima_volta: i64,
+}
+
+impl GrammarMasterySummary {
+    pub fn from_value(id: &str, v: &Value) -> Self {
+        let obj = v.as_object();
+        let num = |k: &str| obj.and_then(|o| o.get(k)).and_then(|x| x.as_i64().or_else(|| x.as_f64().map(|f| f as i64))).unwrap_or(0);
+        let boolv = |k: &str| obj.and_then(|o| o.get(k)).and_then(|x| x.as_bool()).unwrap_or(false);
+        Self {
+            id: id.to_string(),
+            percentuale: num("percentuale"),
+            tentativi: num("tentativi").max(num("totali")),
+            corrette: num("corrette"),
+            completata: boolv("completata"),
+            ultima_volta: num("ultimaVolta").max(num("ultimoUso")).max(num("ultimaPratica")),
+        }
     }
 }
 

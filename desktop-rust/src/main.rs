@@ -9,6 +9,7 @@ enum Screen {
     Home,
     Review,
     Vocabulary,
+    Grammar,
     Progress,
     Settings,
 }
@@ -21,6 +22,14 @@ struct OpenLingoApp {
     review_index: usize,
     review_queue: Vec<WordEntity>,
     show_answer: bool,
+    vocab_query: String,
+    vocab_level: String,
+    show_archived_vocab: bool,
+    add_german: String,
+    add_italian: String,
+    add_article: String,
+    add_level: String,
+    add_example: String,
 }
 
 impl OpenLingoApp {
@@ -34,6 +43,14 @@ impl OpenLingoApp {
             review_index: 0,
             review_queue: Vec::new(),
             show_answer: false,
+            vocab_query: String::new(),
+            vocab_level: "ALL".into(),
+            show_archived_vocab: false,
+            add_german: String::new(),
+            add_italian: String::new(),
+            add_article: String::new(),
+            add_level: "A1".into(),
+            add_example: String::new(),
         };
         app.refresh_review_queue();
         app
@@ -51,12 +68,13 @@ impl OpenLingoApp {
     }
 
     fn top_bar(&mut self, ui: &mut egui::Ui) {
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             ui.heading("OpenLingo");
             ui.separator();
             ui.selectable_value(&mut self.screen, Screen::Home, "Home");
             ui.selectable_value(&mut self.screen, Screen::Review, "Review");
             ui.selectable_value(&mut self.screen, Screen::Vocabulary, "Vocabulary");
+            ui.selectable_value(&mut self.screen, Screen::Grammar, "Grammar");
             ui.selectable_value(&mut self.screen, Screen::Progress, "Progress");
             ui.selectable_value(&mut self.screen, Screen::Settings, "Settings");
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
@@ -182,14 +200,67 @@ impl OpenLingoApp {
 
     fn screen_vocabulary(&mut self, ui: &mut egui::Ui) {
         ui.heading("Vocabulary");
-        let Some(p) = self.store.active_profile() else {
+        if self.store.active_profile().is_none() {
             ui.label("No active profile.");
             return;
-        };
-        ui.label(format!("{} words in profile", p.stato.parole.len()));
+        }
+
+        ui.collapsing("Add word", |ui| {
+            ui.horizontal(|ui| {
+                ui.label("Article");
+                ui.add(egui::TextEdit::singleline(&mut self.add_article).desired_width(50.0));
+                ui.label("German*");
+                ui.add(egui::TextEdit::singleline(&mut self.add_german).desired_width(140.0));
+                ui.label("Meaning*");
+                ui.add(egui::TextEdit::singleline(&mut self.add_italian).desired_width(140.0));
+                ui.label("Level");
+                ui.add(egui::TextEdit::singleline(&mut self.add_level).desired_width(50.0));
+            });
+            ui.horizontal(|ui| {
+                ui.label("Example");
+                ui.add(egui::TextEdit::singleline(&mut self.add_example).desired_width(320.0));
+                if ui.button("Add").clicked() {
+                    let article = if self.add_article.trim().is_empty() { None } else { Some(self.add_article.clone()) };
+                    match self.store.add_word(&self.add_german, &self.add_italian, article, &self.add_level, &self.add_example) {
+                        Ok(_) => {
+                            self.status = "Word added.".into();
+                            self.add_german.clear();
+                            self.add_italian.clear();
+                            self.add_article.clear();
+                            self.add_example.clear();
+                        }
+                        Err(e) => self.status = format!("Add word failed: {e}"),
+                    }
+                }
+            });
+        });
         ui.add_space(6.0);
+
+        ui.horizontal(|ui| {
+            ui.label("Search");
+            ui.add(egui::TextEdit::singleline(&mut self.vocab_query).desired_width(220.0).hint_text("German, meaning, example, tags"));
+            ui.label("Level");
+            egui::ComboBox::from_id_salt("vocab_level")
+                .selected_text(self.vocab_level.clone())
+                .show_ui(ui, |ui| {
+                    for opt in ["ALL", "A1", "A2", "B1", "B2", "C1", "C2", "—"] {
+                        ui.selectable_value(&mut self.vocab_level, opt.to_string(), opt);
+                    }
+                });
+            ui.checkbox(&mut self.show_archived_vocab, "Show archived");
+        });
+
+        let words = self.store.search_words(&self.vocab_query, Some(&self.vocab_level), self.show_archived_vocab, 500);
+        let total = self.store.active_profile().map(|p| p.stato.parole.len()).unwrap_or(0);
+        ui.label(format!("Showing {} of {} words", words.len(), total));
+        if !self.status.is_empty() {
+            ui.small(&self.status);
+        }
+        ui.add_space(4.0);
+
+        let mut archive_toggle: Option<(String, bool)> = None;
         egui::ScrollArea::vertical().auto_shrink([false, false]).show(ui, |ui| {
-            for w in p.stato.parole.iter().take(500) {
+            for w in &words {
                 ui.horizontal(|ui| {
                     ui.strong(w.label());
                     ui.label("—");
@@ -197,14 +268,62 @@ impl OpenLingoApp {
                     if !w.level.is_empty() {
                         ui.small(format!("[{}]", w.level));
                     }
+                    if w.archived {
+                        ui.colored_label(egui::Color32::GRAY, "(archived)");
+                    }
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        let label = if w.archived { "Restore" } else { "Archive" };
+                        if ui.small_button(label).clicked() {
+                            archive_toggle = Some((w.id.clone(), !w.archived));
+                        }
+                    });
                 });
                 if !w.example.trim().is_empty() {
                     ui.small(format!("  {}", w.example));
                 }
                 ui.separator();
             }
-            if p.stato.parole.len() > 500 {
-                ui.label(format!("… and {} more", p.stato.parole.len() - 500));
+            if words.is_empty() {
+                ui.label("No words match the current filters.");
+            }
+        });
+        if let Some((id, archived)) = archive_toggle {
+            match self.store.set_word_archived(&id, archived) {
+                Ok(_) => self.status = if archived { "Word archived.".into() } else { "Word restored.".into() },
+                Err(e) => self.status = format!("Update failed: {e}"),
+            }
+        }
+    }
+
+    fn screen_grammar(&mut self, ui: &mut egui::Ui) {
+        ui.heading("Grammar mastery");
+        if self.store.active_profile().is_none() {
+            ui.label("No active profile.");
+            return;
+        }
+        let summaries = self.store.grammar_mastery_summaries();
+        ui.label(format!("Tracked units: {}", summaries.len()));
+        ui.add_space(6.0);
+        if summaries.is_empty() {
+            ui.label("No grammar mastery data yet. Complete grammar exercises in the main app to populate this view.");
+            return;
+        }
+        egui::ScrollArea::vertical().auto_shrink([false, false]).show(ui, |ui| {
+            for s in &summaries {
+                ui.group(|ui| {
+                    ui.horizontal(|ui| {
+                        ui.strong(&s.id);
+                        let state = if s.completata { "completed" } else if s.percentuale >= 80 { "mastered" } else if s.tentativi > 0 { "in progress" } else { "new" };
+                        ui.label(format!("• {state}"));
+                    });
+                    ui.label(format!("Score: {}%  •  Attempts: {}  •  Correct: {}", s.percentuale, s.tentativi, s.corrette));
+                    if s.ultima_volta > 0 {
+                        if let Some(dt) = chrono::DateTime::<chrono::Utc>::from_timestamp_millis(s.ultima_volta) {
+                            ui.small(format!("Last activity: {}", dt.with_timezone(&chrono::Local).format("%Y-%m-%d %H:%M")));
+                        }
+                    }
+                });
+                ui.add_space(4.0);
             }
         });
     }
@@ -216,20 +335,33 @@ impl OpenLingoApp {
             return;
         };
         let (total, reviewed, due, streak) = self.store.stats();
+        let mature = self.store.mature_count();
+        let levels = self.store.word_level_counts();
+        let grammar_total = p.stato.padronanza_grammatica.len();
+        let grammar_done = self.store.grammar_mastery_summaries().iter().filter(|s| s.completata || s.percentuale >= 80).count();
         ui.label(format!("Profile: {}", p.config.nome_visualizzato));
         ui.label(format!("Level: {}  •  Goal: {}", p.stato.progresso.livello_corrente, p.stato.progresso.obiettivo_livello));
         ui.add_space(6.0);
         ui.group(|ui| {
-            ui.label(format!("Total words: {total}"));
-            ui.label(format!("Reviewed words: {reviewed}"));
+            ui.label(format!("Total active words: {total}"));
+            ui.label(format!("Reviewed words: {reviewed}  •  Mature/strong: {mature}"));
             ui.label(format!("Due now: {due}"));
             ui.label(format!("Streak: {streak} days (record: {})", p.stato.streak_record));
-            ui.label(format!("Grammar units tracked: {}", p.stato.padronanza_grammatica.len()));
+            ui.label(format!("Grammar units tracked: {grammar_total}  •  Completed/mastered: {grammar_done}"));
             ui.label(format!("Review log entries: {}", p.stato.ripassi_log.len()));
             if let Some(day) = &p.stato.ultimo_giorno_studio {
                 ui.label(format!("Last study day: {day}"));
             }
         });
+        ui.add_space(8.0);
+        ui.heading("Words by level");
+        if levels.is_empty() {
+            ui.label("No words yet.");
+        } else {
+            for (lvl, count) in levels {
+                ui.label(format!("{lvl}: {count}"));
+            }
+        }
         ui.add_space(6.0);
         ui.label(format!("Data folder: {}", self.store.base_dir.display()));
     }
@@ -289,7 +421,7 @@ impl OpenLingoApp {
 
         ui.add_space(10.0);
         ui.separator();
-        ui.small("OpenLingo Rust desktop rebuild: compatible profile data, SRS answer persistence (intervals/streak/log), Home/Review/Vocabulary/Progress/Settings.");
+        ui.small("OpenLingo Rust desktop rebuild: compatible profile data, SRS persistence, vocabulary search/add/archive, grammar mastery view, progress stats (Home/Review/Vocabulary/Grammar/Progress/Settings).");
         if !self.status.is_empty() {
             ui.add_space(6.0);
             ui.label(&self.status);
@@ -304,6 +436,7 @@ impl eframe::App for OpenLingoApp {
             Screen::Home => self.screen_home(ui),
             Screen::Review => self.screen_review(ui),
             Screen::Vocabulary => self.screen_vocabulary(ui),
+            Screen::Grammar => self.screen_grammar(ui),
             Screen::Progress => self.screen_progress(ui),
             Screen::Settings => self.screen_settings(ui),
         });
@@ -427,6 +560,92 @@ mod tests {
         // reload persists
         let store2 = Store::load_from(dir.clone());
         assert!(store2.repo.profili.get(&id).unwrap().stato.reviews.contains_key("w1"));
+        let _ = fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn vocab_search_add_and_archive() {
+        let dir = temp_dir("vocab");
+        let mut store = Store::load_from(dir.clone());
+        let id = store.create_profile("Vera");
+        let wid = store.add_word("Hund", "cane", Some("der".into()), "a1", "Der Hund bellt.").unwrap();
+        {
+            let p = store.repo.profili.get(&id).unwrap();
+            assert!(p.stato.parole.iter().any(|w| w.id == wid));
+        }
+        let found = store.search_words("hund", Some("A1"), false, 10);
+        assert_eq!(found.len(), 1);
+        assert_eq!(found[0].label(), "der Hund");
+        let none = store.search_words("katze", Some("ALL"), false, 10);
+        assert!(none.is_empty());
+        store.set_word_archived(&wid, true).unwrap();
+        assert!(store.search_words("hund", Some("ALL"), false, 10).is_empty());
+        assert_eq!(store.search_words("hund", Some("ALL"), true, 10).len(), 1);
+        let store2 = Store::load_from(dir.clone());
+        assert_eq!(store2.search_words("hund", Some("ALL"), true, 10).len(), 1);
+        let _ = fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn grammar_mastery_summary_parses_values() {
+        let v = serde_json::json!({
+            "unitaId": "praesens",
+            "percentuale": 85,
+            "completata": true,
+            "tentativi": 4,
+            "corrette": 17,
+            "ultimaVolta": 1710000000000i64
+        });
+        let s = GrammarMasterySummary::from_value("praesens", &v);
+        assert_eq!(s.id, "praesens");
+        assert_eq!(s.percentuale, 85);
+        assert!(s.completata);
+        assert_eq!(s.tentativi, 4);
+        assert_eq!(s.corrette, 17);
+        assert_eq!(s.ultima_volta, 1710000000000);
+    }
+
+    #[test]
+    fn preserves_unknown_profile_fields_on_roundtrip() {
+        let dir = temp_dir("compat");
+        let json = serde_json::json!({
+            "profiloAttivoId": "p1",
+            "profili": {
+                "p1": {
+                    "id": "p1",
+                    "config": {
+                        "nomeVisualizzato": "Test",
+                        "livelloIniziale": "A1",
+                        "futureConfigField": "keep-me"
+                    },
+                    "stato": {
+                        "parole": [{"id":"w1","german":"Haus","italian":"casa","source":"SYNCED"}],
+                        "reviews": {},
+                        "ripassiLog": [],
+                        "padronanzaGrammatica": {"u1": {"percentuale": 50, "completata": false}},
+                        "streakGiorni": 2,
+                        "streakRecord": 3,
+                        "ultimoGiornoStudio": null,
+                        "progresso": {"livelloCorrente":"A1","obiettivoLivello":"B2","lezioneCorrente":1,"ultimaAttivita":0},
+                        "lezioni": [{"id":"lez1","special":"must-keep"}],
+                        "testGrammatica": [{"id":"t1"}]
+                    },
+                    "futureProfileField": 123
+                }
+            },
+            "profiliEliminati": []
+        });
+        fs::write(dir.join("profili.json"), serde_json::to_string_pretty(&json).unwrap()).unwrap();
+        fs::write(dir.join("preferenze.json"), "{}").unwrap();
+        let store = Store::load_from(dir.clone());
+        store.save().unwrap();
+        let saved: serde_json::Value = serde_json::from_str(&fs::read_to_string(dir.join("profili.json")).unwrap()).unwrap();
+        let stato = &saved["profili"]["p1"]["stato"];
+        assert_eq!(stato["lezioni"][0]["special"], "must-keep");
+        assert_eq!(stato["testGrammatica"][0]["id"], "t1");
+        assert_eq!(saved["profili"]["p1"]["config"]["futureConfigField"], "keep-me");
+        assert_eq!(saved["profili"]["p1"]["futureProfileField"], 123);
+        assert_eq!(stato["parole"][0]["source"], "SYNCED");
         let _ = fs::remove_dir_all(dir);
     }
 }
