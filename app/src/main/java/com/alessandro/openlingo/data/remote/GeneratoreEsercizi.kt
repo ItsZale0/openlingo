@@ -129,11 +129,16 @@ class GeneratoreEsercizi(
     }
 
     /**
-     * Secondo passaggio "revisore": chiede al modello di rileggere il batch e
-     * scartare gli esercizi ambigui, sbagliati o con più di una risposta
-     * plausibile. È best-effort: se la chiamata fallisce, o scarta tutto, si
-     * tengono gli esercizi originali. Costa una sola chiamata in più per
-     * generazione, ma evita di mostrare esercizi senza senso.
+     * Secondo passaggio "revisore": chiede al modello di provare OGNI opzione
+     * nel buco e di indicare quali producono una frase corretta. La decisione
+     * finale (tenere l'esercizio solo se c'è esattamente una risposta corretta
+     * e coincide con la chiave dichiarata) la prende il codice, non il modello:
+     * un giudizio globale "scarta questi" si è rivelato troppo fragile (ha
+     * lasciato passare "Wir besuchen ___ Patienten" con "euren" e "eure"
+     * entrambe corrette).
+     *
+     * È best-effort: se la chiamata fallisce o la risposta non è interpretabile,
+     * si tengono gli esercizi originali.
      */
     private suspend fun revisiona(
         config: ConfigurazioneAI,
@@ -141,48 +146,92 @@ class GeneratoreEsercizi(
         tipo: TipoEsercizio,
         livello: String
     ): List<EsercizioGenerato> {
-        if (esercizi.size <= 1) return esercizi
+        if (esercizi.isEmpty()) return esercizi
         val elenco = esercizi.mapIndexed { i, e ->
             buildString {
                 append("$i) DOMANDA: ${e.domanda}")
                 if (e.fraseTedesca != null) append(" | FRASE: ${e.fraseTedesca}")
                 append(" | OPZIONI: ${e.opzioni.joinToString(" / ")}")
-                append(" | RISPOSTA CORRETTA: ${e.opzioni[e.rispostaCorretta]}")
+                append(" | RISPOSTA CORRETTA DICHIARATA: ${e.opzioni[e.rispostaCorretta]}")
                 append(" | SPIEGAZIONE: ${e.spiegazione}")
             }
         }.joinToString("\n")
         val prompt = """
-            Sei un revisore severo di esercizi di tedesco per studenti italiani (livello $livello).
-            Rileggi questi esercizi (${tipo.etichetta}) e individua SOLO quelli PROBLEMATICI:
-            - più di una risposta plausibile o corretta (ambiguo);
-            - risposta corretta sbagliata per la regola indicata;
-            - frase tedesca innaturale o senza senso;
-            - domanda che non si capisce cosa chiede;
-            - distrattori che rendono la risposta ovvia;
-            - spiegazione che non giustifica la risposta.
-            NON scartare esercizi solo perché difficili o perché non ti piacciono.
-            Rispondi SOLO con JSON: {"scarta":[indici 0-based]}.
-            Se vanno tutti bene: {"scarta":[]}.
+            Sei un revisore severo di esercizi di tedesco (${tipo.etichetta}) per studenti italiani (livello $livello).
+            Per OGNI esercizio qui sotto, inserisci ciascuna delle 4 opzioni al posto di ___ (o come risposta alla domanda) e stabilisci quali opzioni producono una frase/risposta INTERAMENTE corretta.
+            Un'opzione è corretta solo se supera TUTTI questi criteri:
+            - accordo di genere, numero e caso tra articolo/possessivo/aggettivo e nome;
+            - il caso richiesto dal verbo o dalla preposizione della frase;
+            - significato naturale e coerente, anche col soggetto (con "Wir ..." normalmente "unsere", non "eure");
+            - per la comprensione: la risposta è deducibile SOLO dal testo.
+            ATTENZIONE ai nomi in -en (N-Deklination): Patient, Student, Kollege, Mensch, Junge, Kunde, Nachbar. La forma "Patienten" è identica all'accusativo/dativo singolare maschile E al plurale: se la frase non chiarisce numero e caso, sia "euren Patienten" sia "eure Patienten" sono corrette e l'esercizio ha DUE risposte.
+            NON correggere le spiegazioni: valuta solo quali opzioni sono corrette.
+            Rispondi SOLO con JSON, senza testo prima o dopo:
+            {"valutazioni":[{"indice":0,"corrette":[2]},{"indice":1,"corrette":[0,3]}]}
+            - un oggetto per OGNI esercizio, con l'indice 0-based;
+            - "corrette": indici 0-3 di TUTTE le opzioni corrette (una sola se l'esercizio è ben fatto, lista vuota se nessuna è corretta).
 
             $elenco
         """.trimIndent()
-        val messaggi = listOf(MessaggioAI("user", "Restituisci il JSON con gli indici da scartare."))
+        val messaggi = listOf(MessaggioAI("user", "Restituisci il JSON con le valutazioni."))
         return try {
             val risposta = clientAI.chat(
                 config = config,
                 system = prompt,
                 cronologia = messaggi,
-                maxTokens = 1024,
+                maxTokens = 1536,
                 temperature = 0.0
             )
-            val jsonPulito = estraiJson(risposta) ?: return esercizi
-            val revisione = json.decodeFromString(RevisioneAi.serializer(), jsonPulito)
-            val scarta = revisione.scarta.toSet()
-            val filtrati = esercizi.filterIndexed { i, _ -> i !in scarta }
-            // Se il revisore scarta tutto, meglio tenere l'originale che nulla.
-            if (filtrati.isEmpty()) esercizi else filtrati
+            val valutazioni = valutazioniDaRisposta(risposta, esercizi.size)
+            if (valutazioni.isEmpty()) esercizi
+            else applicaRevisione(esercizi, valutazioni)
         } catch (_: Exception) {
             esercizi
+        }
+    }
+
+    /**
+     * Interpreta la risposta del revisore: mappa indice esercizio -> indici
+     * delle opzioni corrette. Ogni verdetto malformato viene ignorato, così
+     * un errore del modello non fa sparire esercizi validi.
+     */
+    internal fun valutazioniDaRisposta(
+        risposta: String,
+        quantiEsercizi: Int
+    ): Map<Int, List<Int>> {
+        val jsonPulito = estraiJson(risposta) ?: return emptyMap()
+        val revisione = runCatching {
+            json.decodeFromString(RevisioneAi.serializer(), jsonPulito)
+        }.getOrNull() ?: return emptyMap()
+        if (revisione.valutazioni.isEmpty()) return emptyMap()
+        val mappa = LinkedHashMap<Int, List<Int>>()
+        revisione.valutazioni.forEach { v ->
+            val indice = v.indice ?: return@forEach
+            if (indice !in 0 until quantiEsercizi) return@forEach
+            val corrette = v.corrette ?: return@forEach
+            // Un indice fuori 0-3 rende il verdetto inaffidabile: si ignora.
+            if (corrette.any { it !in 0..3 }) return@forEach
+            mappa[indice] = corrette.distinct()
+        }
+        return mappa
+    }
+
+    /**
+     * Tiene un esercizio solo se il revisore ha trovato ESATTAMENTE una
+     * opzione corretta e coincide con la chiave dichiarata. Gli esercizi senza
+     * verdetto restano (best effort: il revisore può non averli valutati).
+     */
+    internal fun applicaRevisione(
+        esercizi: List<EsercizioGenerato>,
+        valutazioni: Map<Int, List<Int>>
+    ): List<EsercizioGenerato> {
+        if (valutazioni.isEmpty()) return esercizi
+        return esercizi.mapIndexedNotNull { i, e ->
+            val corrette = valutazioni[i] ?: return@mapIndexedNotNull e
+            when {
+                corrette.size == 1 && corrette[0] == e.rispostaCorretta -> e
+                else -> null
+            }
         }
     }
 
@@ -374,6 +423,18 @@ class GeneratoreEsercizi(
               se due opzioni producono frasi tedesche corrette, l'esercizio è ambiguo:
               cambia la frase o le opzioni. Una sola opzione deve essere grammaticalmente
               corretta E coerente col senso della frase.
+            - NOMI IN -EN (N-Deklination): Patient, Student, Kollege, Mensch, Junge, Kunde,
+              Nachbar hanno l'accusativo/dativo singolare IDENTICO al plurale ("Patienten",
+              "Studenten", "Kollegen"). Se il buco sta davanti a uno di questi nomi, senza
+              altri indizi sia "euren Patienten" (singolare) sia "eure Patienten" (plurale)
+              sarebbero corretti: l'esercizio è ambiguo. In quel caso usa un altro nome,
+              oppure aggiungi un elemento che fissi numero e caso (un aggettivo con
+              desinenza, un numerale, "diesen", "alle") e verifica che resti UNA sola
+              risposta corretta.
+            - POSSESSIVO COERENTE: il possessivo deve suonare naturale rispetto al soggetto
+              e al contesto: con "Wir ..." normalmente "unsere", con "Ihr ..." "eure",
+              con "Ich ..." "meine". Non usare un possessivo che confonde lo studente
+              (es. "Wir besuchen eure Patienten" senza un motivo chiaro).
             - CHIAREZZA: la domanda deve dire in modo esplicito cosa scegliere (articolo,
               caso, tempo verbale, traduzione). Vietato lasciare il criterio implicito o
               basarsi su sfumature di significato, opinioni o preferenze personali.
@@ -539,4 +600,12 @@ class GeneratoreEsercizi(
 // ── Modelli interni del generatore ──
 
 @Serializable
-private data class RevisioneAi(val scarta: List<Int> = emptyList())
+private data class ValutazioneAi(
+    val indice: Int? = null,
+    val corrette: List<Int>? = null
+)
+
+@Serializable
+private data class RevisioneAi(
+    val valutazioni: List<ValutazioneAi> = emptyList()
+)

@@ -1422,11 +1422,16 @@ class OpenLingoViewModel(application: Application) : AndroidViewModel(applicatio
         }
 
     private fun setGenFlow(tipo: TipoEsercizio, lista: List<EsercizioGenEntity>) {
+        // Difesa in profondità: scarta anche gli esercizi ambigui/sbagliati già
+        // salvati nei profili da versioni precedenti, così non ricompaiono.
+        val visibili = lista.filter {
+            ControlloGrammatica.problemi(it.domanda, it.opzioni, it.rispostaCorretta).isEmpty()
+        }
         when (tipo) {
-            TipoEsercizio.COMPRENSIONE -> _eserciziGenComprensione.value = lista
-            TipoEsercizio.PRODUZIONE -> _eserciziGenProduzione.value = lista
-            TipoEsercizio.ASCOLTO -> _eserciziGenAscolto.value = lista
-            TipoEsercizio.GRAMMATICA -> _eserciziGenGrammatica.value = lista
+            TipoEsercizio.COMPRENSIONE -> _eserciziGenComprensione.value = visibili
+            TipoEsercizio.PRODUZIONE -> _eserciziGenProduzione.value = visibili
+            TipoEsercizio.ASCOLTO -> _eserciziGenAscolto.value = visibili
+            TipoEsercizio.GRAMMATICA -> _eserciziGenGrammatica.value = visibili
         }
     }
 

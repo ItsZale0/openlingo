@@ -75,10 +75,12 @@ Covers (among others): SRS/persistence, forward-compatible data round-trip prese
 
 ### Kotlin/Android (offline) — latest observed
 ```text
-.\gradle-temp\gradle-8.11.1\bin\gradle.bat --offline :app:testDebugUnitTest :core:test
-BUILD SUCCESSFUL in 41s (30 actionable tasks: 1 executed, 29 up-to-date)
+.\gradle-temp\gradle-8.11.1\bin\gradle.bat --offline :app:testDebugUnitTest :desktop:compileKotlin
+BUILD SUCCESSFUL in 34s (31 actionable tasks: 6 executed, 25 up-to-date)
+app unit tests: 600 tests, 0 failures, 0 errors
 ```
-Note: an earlier same-session full run reported `585 tests completed, 1 failed, 1 skipped` (`PianoProgressoSessioniRegressionTest > feed con sessioni vuote aggiorna la lista sessioni`) while an isolated run and a subsequent full rerun succeeded; no app/core Kotlin source was modified by Rust/doc/merge increments in this session.
+AI exercise correctness (v1.51.17): ambiguous generated items are now rejected deterministically. `ControlloGrammatica` detects weak-noun number ambiguity (`Wir besuchen ___ Patienten` accepts both `euren` and `eure`) only when the case is determinable and the number is not forced; `GeneratoreEsercizi` asks the reviewer to judge every option and keeps an item only when exactly one option is correct and matches the key; the generation prompt warns about N-Deklination and possessive/subject coherence. Covered by `ControlloGrammaticaTest` (18 tests) and `GeneratoreEserciziTest` (12 tests), including the exact screenshot case.
+Note: an earlier same-session run reported `585 tests completed, 1 failed, 1 skipped` (`PianoProgressoSessioniRegressionTest > feed con sessioni vuote aggiorna la lista sessioni`) while isolated and subsequent full reruns succeeded; the latest full run is 600/0.
 
 ## 3) Manual / runtime-blocked (cannot be exhaustively verified in this environment)
 
