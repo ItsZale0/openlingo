@@ -12,8 +12,8 @@ A from-scratch Rust rebuild of the OpenLingo desktop application.
 - **SRS-compatible review answers:** "Knew it / Didn't know" persists review cards (intervals/repetitions/ease/lapses/due), review log, and study streak/record to profile data
 - **Practice/exercise modes:** article/gender quiz (der/die/das) using all active vocabulary words for selected level and below (deduped, shuffled), meaning multiple-choice quiz, German-choice quiz, typing quiz, cloze (from word examples), and mixed sessions; answers update SRS/review progress
 - **Vocabulary management:** search/filter (by text and level), add custom words, archive/restore words
-- **Grammar mastery view:** lists tracked grammar units from profile `padronanzaGrammatica` with parsed score/attempts/completion/last activity
-- **Progress stats:** active/reviewed/mature words, due count, streak/record, grammar completion summary, words by level, review log entries
+- **Grammar mastery & unit progression view:** lists tracked grammar units from profile `padronanzaGrammatica` with parsed score/attempts/correct/reviews, completion/mastery state, next-review and last-activity timestamps (sorted with due units first)
+- **Progress / study plan:** active/reviewed/mature words, due/new counts, streak/record, grammar tracked/completed/due, suggested next actions, lesson/level/goal progression, words by level, review log entries
 - **Backup:** export/import compatible profile+preferences JSON bundle from Settings (path-based)
 
 ## Build
@@ -28,7 +28,7 @@ Binary: `target/release/openlingo-desktop.exe` (on Windows)
 cargo test
 ```
 
-Current tests cover data compatibility/round-trip preservation, SRS behavior and persistence, vocabulary search/add/archive, grammar mastery parsing, article-quiz/typing exercise logic, and core store operations.
+Current tests cover data compatibility/round-trip preservation, SRS behavior and persistence, vocabulary search/add/archive, grammar mastery/progression parsing, exercise builders (article/meaning/german/typing/cloze), study plan summaries, backup bundle round-trip, and core store operations.
 
 ## Notes
 - This is a from-scratch Rust rebuild with growing feature coverage (data compatibility, SRS persistence, vocabulary/exercise practice, grammar mastery inspection, core screens). Full parity with `:core`/Compose desktop (complete grammar syllabus/unit flows and all original exercise/content systems, feed/cloud sync & backup, AI tutor/generation, listening/pronunciation/TTS, comprehension/production, etc.) remains incremental work in progress.
