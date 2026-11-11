@@ -52,7 +52,7 @@ jobs:
             "build-tools;35.0.0"
 
       - name: Build
-        run: gradle :app:compileDebugKotlin --no-daemon --stacktrace
+        run: gradle :core:compileKotlin :app:compileDebugKotlin --no-daemon --stacktrace --rerun-tasks -Dorg.gradle.caching=false
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
