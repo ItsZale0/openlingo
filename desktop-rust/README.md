@@ -9,7 +9,7 @@ A from-scratch Rust rebuild of the OpenLingo desktop application.
 - Screens: Home, Review, Exercises, Vocabulary, Grammar, Progress, Settings
 - Profile selection/creation, reload/save
 - **SRS-compatible review answers:** "Knew it / Didn't know" persists review cards (intervals/repetitions/ease/lapses/due), review log, and study streak/record to profile data
-- **Practice/exercise modes:** article/gender quiz (der/die/das) using all active vocabulary words for selected level and below (deduped, shuffled), meaning multiple-choice quiz, and typing quiz; answers update SRS/review progress
+- **Practice/exercise modes:** article/gender quiz (der/die/das) using all active vocabulary words for selected level and below (deduped, shuffled), meaning multiple-choice quiz, typing quiz, cloze (from word examples), and mixed sessions; answers update SRS/review progress
 - **Vocabulary management:** search/filter (by text and level), add custom words, archive/restore words
 - **Grammar mastery view:** lists tracked grammar units from profile `padronanzaGrammatica` with parsed score/attempts/completion/last activity
 - **Progress stats:** active/reviewed/mature words, due count, streak/record, grammar completion summary, words by level, review log entries
