@@ -137,6 +137,7 @@ struct OpenLingoApp {
     grammar_practice_input: String,
     grammar_practice_done: Option<(i32, bool)>, // (percent, completed)
     lesson_practice_pending: bool,
+    grammar_unit_level_filter: String,
 }
 
 fn ui_lang(store: &Store) -> &str {
@@ -199,6 +200,7 @@ impl OpenLingoApp {
             grammar_practice_input: String::new(),
             grammar_practice_done: None,
             lesson_practice_pending: false,
+            grammar_unit_level_filter: "ALL".into(),
         };
         app.backup_path = app.store.base_dir.join("openlingo-backup.json").to_string_lossy().to_string();
         app.refresh_review_queue();
@@ -822,30 +824,43 @@ impl OpenLingoApp {
 
         // list embedded units (when not deep in unrelated state; always show as entry point)
         if self.grammar_unit_id.is_none() {
-            let units = self.store.embedded_grammar_units();
+            let units_all = self.store.embedded_grammar_units();
             let summaries = self.store.grammar_mastery_summaries();
             let now_ms = chrono::Utc::now().timestamp_millis();
             // recommend: first due unit, else first not-completed/mastered, else first
-            let recommended_id = units.iter().find_map(|u| {
+            let recommended_id = units_all.iter().find_map(|u| {
                 let s = summaries.iter().find(|x| x.id == u.id);
                 if s.map(|m| m.is_due(now_ms)).unwrap_or(false) { Some(u.id.to_string()) } else { None }
             }).or_else(|| {
-                units.iter().find_map(|u| {
+                units_all.iter().find_map(|u| {
                     let s = summaries.iter().find(|x| x.id == u.id);
                     let done = s.map(|m| m.completata || m.percentuale >= 80).unwrap_or(false);
                     if !done { Some(u.id.to_string()) } else { None }
                 })
-            }).or_else(|| units.first().map(|u| u.id.to_string()));
+            }).or_else(|| units_all.first().map(|u| u.id.to_string()));
 
             if let Some(rid) = &recommended_id {
-                if let Some(u) = units.iter().find(|x| &x.id.to_string() == rid) {
+                if let Some(u) = units_all.iter().find(|x| &x.id.to_string() == rid) {
                     let title = if lang == "it" { u.title_it } else { u.title_en };
                     ui.label(if lang == "it" { format!("Consigliata: [{}] {title}", u.level) } else { format!("Recommended: [{}] {title}", u.level) });
                 }
             }
             ui.add_space(4.0);
+            ui.horizontal(|ui| {
+                ui.label(tr(lang, "Filter level:", "Filtra livello:"));
+                egui::ComboBox::from_id_salt("gunit_level_filter")
+                    .selected_text(self.grammar_unit_level_filter.clone())
+                    .show_ui(ui, |ui| {
+                        for opt in ["ALL", "A0", "A1", "A2", "B1"] {
+                            ui.selectable_value(&mut self.grammar_unit_level_filter, opt.to_string(), opt);
+                        }
+                    });
+                ui.label(if lang == "it" { format!("Unità: {}", units_all.len()) } else { format!("Units: {}", units_all.len()) });
+            });
+            ui.add_space(4.0);
 
-            for u in &units {
+            for u in &units_all {
+                if self.grammar_unit_level_filter != "ALL" && u.level != self.grammar_unit_level_filter { continue; }
                 let title = if lang == "it" { u.title_it } else { u.title_en };
                 let mastery = summaries.iter().find(|s| s.id == u.id);
                 let state = if let Some(m) = mastery {
@@ -1551,7 +1566,7 @@ mod tests {
     fn embedded_grammar_units_practice_saves_mastery() {
         use crate::data::embedded_grammar_units;
         let units = embedded_grammar_units();
-        assert!(units.len() >= 6);
+        assert!(units.len() >= 10);
         let u = &units[0];
         assert!(!u.id.is_empty() && !u.exercises.is_empty());
         // ensure at least one typing/completion exercise exists in embedded units
