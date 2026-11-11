@@ -340,6 +340,27 @@ pub fn build_mixed_quiz(words: &[WordEntity], max_level: &str, seed: u64, limit:
     qs
 }
 
+/// Guided session: prioritizes due/new words (from provided selection) and builds a mixed
+/// set of recognition + production exercises (meaning, German choice, typing, cloze; plus
+/// article quiz when applicable). Profile-compatible: callers pass words derived from
+/// due reviews/new words/active pool.
+pub fn build_guided_session(words: &[WordEntity], max_level: &str, seed: u64, limit: usize) -> Vec<ExerciseQuestion> {
+    if words.is_empty() || limit == 0 { return vec![]; }
+    let mut qs = Vec::new();
+    let n = (limit / 5).max(1);
+    qs.extend(build_meaning_quiz(words, seed ^ 0x11, (n + 2).min(limit)));
+    qs.extend(build_german_choice_quiz(words, seed ^ 0x22, (n + 1).min(limit)));
+    qs.extend(build_typing_quiz(words, seed ^ 0x33, (n + 1).min(limit)));
+    qs.extend(build_cloze_quiz(words, seed ^ 0x44, (n + 1).min(limit)));
+    qs.extend(build_article_quiz(words, max_level, seed ^ 0x55, (n + 1).min(limit)));
+    // stable-ish dedupe by (prompt, answer)
+    let mut seen = std::collections::HashSet::new();
+    qs.retain(|q| seen.insert(format!("{}||{}", q.prompt, q.answer)));
+    simple_shuffle(&mut qs, seed ^ 0xA11CE);
+    qs.truncate(limit);
+    qs
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ReviewEntity {
