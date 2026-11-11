@@ -793,9 +793,44 @@ impl OpenLingoApp {
         // list embedded units (when not deep in unrelated state; always show as entry point)
         if self.grammar_unit_id.is_none() {
             let units = self.store.embedded_grammar_units();
+            let summaries = self.store.grammar_mastery_summaries();
+            let now_ms = chrono::Utc::now().timestamp_millis();
+            // recommend: first due unit, else first not-completed/mastered, else first
+            let recommended_id = units.iter().find_map(|u| {
+                let s = summaries.iter().find(|x| x.id == u.id);
+                if s.map(|m| m.is_due(now_ms)).unwrap_or(false) { Some(u.id.to_string()) } else { None }
+            }).or_else(|| {
+                units.iter().find_map(|u| {
+                    let s = summaries.iter().find(|x| x.id == u.id);
+                    let done = s.map(|m| m.completata || m.percentuale >= 80).unwrap_or(false);
+                    if !done { Some(u.id.to_string()) } else { None }
+                })
+            }).or_else(|| units.first().map(|u| u.id.to_string()));
+
+            if let Some(rid) = &recommended_id {
+                if let Some(u) = units.iter().find(|x| &x.id.to_string() == rid) {
+                    let title = if lang == "it" { u.title_it } else { u.title_en };
+                    ui.label(if lang == "it" { format!("Consigliata: [{}] {title}", u.level) } else { format!("Recommended: [{}] {title}", u.level) });
+                }
+            }
+            ui.add_space(4.0);
+
             for u in &units {
                 let title = if lang == "it" { u.title_it } else { u.title_en };
-                let mastery = self.store.grammar_mastery_summaries().into_iter().find(|s| s.id == u.id);
+                let mastery = summaries.iter().find(|s| s.id == u.id);
+                let state = if let Some(m) = mastery {
+                    if m.is_due(now_ms) {
+                        tr(lang, "due", "da ripassare")
+                    } else if m.completata || m.percentuale >= 80 {
+                        tr(lang, "mastered", "padroneggiata")
+                    } else if m.tentativi > 0 {
+                        tr(lang, "in progress", "in corso")
+                    } else {
+                        tr(lang, "new", "nuova")
+                    }
+                } else {
+                    tr(lang, "new", "nuova")
+                };
                 ui.horizontal(|ui| {
                     if ui.button(tr(lang, "Open", "Apri")).clicked() {
                         let order = shuffled_indices(u.exercises.len(), chrono::Utc::now().timestamp_millis() as u64);
@@ -809,8 +844,9 @@ impl OpenLingoApp {
                         self.grammar_practice_done = None;
                     }
                     ui.label(format!("[{}] {title}", u.level));
+                    ui.small(format!("• {state}"));
                     if let Some(m) = mastery {
-                        ui.small(if lang == "it" { format!("— {}% • tentativi {}", m.percentuale, m.tentativi) } else { format!("— {}% • attempts {}", m.percentuale, m.tentativi) });
+                        ui.small(if lang == "it" { format!("({}% • tent. {})", m.percentuale, m.tentativi) } else { format!("({}% • att. {})", m.percentuale, m.tentativi) });
                     }
                 });
             }

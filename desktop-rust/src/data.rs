@@ -976,6 +976,8 @@ pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
         unit_a1_sein_haben(),
         unit_a1_modalverben(),
         unit_a2_perfekt_intro(),
+        unit_a2_dativ(),
+        unit_a2_weil_dass(),
     ]
 }
 
@@ -1217,6 +1219,73 @@ fn unit_a2_perfekt_intro() -> GrammarUnit {
             GrammarUnitExercise { prompt_it: "Completa: Ich ___ gestern gelernt. (haben)", prompt_en: "Complete: Ich ___ gestern gelernt. (haben)", options: &["habe", "bin", "hat"], correct_index: 0, answer_text: "", explanation_it: "Con ich + haben: ich habe gelernt.", explanation_en: "With ich + haben: ich habe gelernt." },
             GrammarUnitExercise { prompt_it: "Scegli il participio corretto di machen.", prompt_en: "Choose the correct participle of machen.", options: &["gemacht", "gemachen", "gemachte"], correct_index: 0, answer_text: "", explanation_it: "Regolare: ge- + mach + -t = gemacht.", explanation_en: "Regular: ge- + mach + -t = gemacht." },
             GrammarUnitExercise { prompt_it: "Scrivi il participio: lernen -> ___", prompt_en: "Type the participle: lernen -> ___", options: &[], correct_index: 0, answer_text: "gelernt", explanation_it: "lernen -> gelernt (ge- + lern + -t).", explanation_en: "lernen -> gelernt (ge- + lern + -t)." },
+        ],
+    }
+}
+
+fn unit_a2_dativ() -> GrammarUnit {
+    GrammarUnit {
+        id: "a2-dativ",
+        level: "A2",
+        title_it: "Dativo (introduzione)",
+        title_en: "Dative case (introduction)",
+        subtitle_it: "Oggetto indiretto e articoli al dativo",
+        subtitle_en: "Indirect object and dative articles",
+        objective_it: "Riconoscere e usare le forme base del dativo.",
+        objective_en: "Recognize and use basic dative forms.",
+        theory_it: &[
+            "Il dativo risponde a 'a chi?' (wem?). Spesso indica il destinatario.",
+            "Articoli determinativi: dem (m/n), der (f), den (+n al plurale in molti nomi). Indeterminativi: einem (m/n), einer (f).",
+            "Verbi/preposizioni comuni con dativo: helfen, danken, mit, von, zu, bei.",
+        ],
+        theory_en: &[
+            "The dative answers 'to whom?' (wem?). It often marks the recipient.",
+            "Definite articles: dem (m/n), der (f), den (plural, often +n on noun). Indefinite: einem (m/n), einer (f).",
+            "Common dative verbs/prepositions: helfen, danken, mit, von, zu, bei.",
+        ],
+        examples: &[
+            ("Ich helfe dem Mann.", "Aiuto l'uomo."),
+            ("Sie gibt der Frau ein Buch.", "Dà un libro alla donna."),
+            ("Wir fahren mit dem Bus.", "Andiamo in autobus."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa: Ich helfe ___ Mann. (der)", prompt_en: "Complete: Ich helfe ___ Mann. (der)", options: &["den", "dem", "der"], correct_index: 1, answer_text: "", explanation_it: "Dativo maschile: der -> dem.", explanation_en: "Masculine dative: der -> dem." },
+            GrammarUnitExercise { prompt_it: "Completa: Sie dankt ___ Frau. (die)", prompt_en: "Complete: Sie dankt ___ Frau. (die)", options: &["die", "der", "den"], correct_index: 1, answer_text: "", explanation_it: "Dativo femminile: die -> der.", explanation_en: "Feminine dative: die -> der." },
+            GrammarUnitExercise { prompt_it: "Scegli la preposizione che regge il dativo.", prompt_en: "Choose the preposition that takes dative.", options: &["für", "ohne", "mit"], correct_index: 2, answer_text: "", explanation_it: "mit richiede il dativo (es. mit dem Bus).", explanation_en: "mit takes the dative (e.g. mit dem Bus)." },
+            GrammarUnitExercise { prompt_it: "Scrivi l'articolo: Ich spreche mit ___ Kind. (das)", prompt_en: "Type the article: Ich spreche mit ___ Kind. (das)", options: &[], correct_index: 0, answer_text: "dem", explanation_it: "Neutro al dativo: das -> dem.", explanation_en: "Neuter dative: das -> dem." },
+        ],
+    }
+}
+
+fn unit_a2_weil_dass() -> GrammarUnit {
+    GrammarUnit {
+        id: "a2-weil-dass",
+        level: "A2",
+        title_it: "Subordinate con weil e dass",
+        title_en: "Subordinate clauses with weil and dass",
+        subtitle_it: "Il verbo va alla fine della subordinata",
+        subtitle_en: "Verb goes to the end in subordinate clauses",
+        objective_it: "Costruire frasi con weil (perché) e dass (che).",
+        objective_en: "Build sentences with weil (because) and dass (that).",
+        theory_it: &[
+            "Nelle subordinate introdotte da weil/dass il verbo coniugato va alla fine.",
+            "La subordinata può stare dopo o prima della principale: Ich bleibe zu Hause, weil ich krank bin. / Weil ich krank bin, bleibe ich zu Hause.",
+            "Con modale: ... weil ich heute arbeiten muss.",
+        ],
+        theory_en: &[
+            "In subordinate clauses introduced by weil/dass the conjugated verb goes to the end.",
+            "The clause can come after or before the main clause: Ich bleibe zu Hause, weil ich krank bin. / Weil ich krank bin, bleibe ich zu Hause.",
+            "With modal: ... weil ich heute arbeiten muss.",
+        ],
+        examples: &[
+            ("Ich lerne Deutsch, weil ich in Wien arbeite.", "Studio tedesco perché lavoro a Vienna."),
+            ("Ich weiß, dass du müde bist.", "So che sei stanco/a."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Quale frase è corretta?", prompt_en: "Which sentence is correct?", options: &["Ich bleibe, weil ich bin krank.", "Ich bleibe, weil ich krank bin.", "Weil ich krank bin, ich bleibe."], correct_index: 1, answer_text: "", explanation_it: "In subordinata il verbo va alla fine: weil ich krank bin.", explanation_en: "In subordinate clause the verb goes to the end: weil ich krank bin." },
+            GrammarUnitExercise { prompt_it: "Completa: Ich denke, dass er heute ___ . (kommen)", prompt_en: "Complete: Ich denke, dass er heute ___ . (kommen)", options: &["kommt", "kommen", "kam"], correct_index: 0, answer_text: "", explanation_it: "Verbo coniugato alla fine della subordinata: dass er heute kommt.", explanation_en: "Conjugated verb at the end: dass er heute kommt." },
+            GrammarUnitExercise { prompt_it: "Scegli la congiunzione: Ich lerne, ___ ich die Prüfung habe.", prompt_en: "Choose the conjunction: Ich lerne, ___ ich die Prüfung habe.", options: &["dass", "weil", "ob"], correct_index: 1, answer_text: "", explanation_it: "weil esprime causa: perché ho l'esame.", explanation_en: "weil expresses reason/cause." },
+            GrammarUnitExercise { prompt_it: "Scrivi l'ultima parola: Ich weiß, dass du Recht ___ . (haben)", prompt_en: "Type the last word: Ich weiß, dass du Recht ___ . (haben)", options: &[], correct_index: 0, answer_text: "hast", explanation_it: "In subordinata il verbo coniugato va alla fine: dass du Recht hast.", explanation_en: "Conjugated verb at the end of subordinate clause: dass du Recht hast." },
         ],
     }
 }
