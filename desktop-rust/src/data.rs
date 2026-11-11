@@ -1012,6 +1012,7 @@ pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
         unit_a2_weil_dass(),
         unit_a2_komparativ(),
         unit_a2_praepositionen_dativ(),
+        unit_a2_wechselpraepositionen(),
         unit_a2_passiv_intro(),
         unit_b1_adjektivdeklination_intro(),
         unit_b1_relativsaetze_intro(),
@@ -1019,6 +1020,7 @@ pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
         unit_b1_reflexive_verben(),
         unit_b1_praeteritum_perfekt(),
         unit_b1_genitiv_intro(),
+        unit_b1_konjunktiv2_intro(),
     ]
 }
 
@@ -1667,6 +1669,74 @@ fn unit_b1_genitiv_intro() -> GrammarUnit {
             GrammarUnitExercise { prompt_it: "Completa: die Tasche ___ Frau (die)", prompt_en: "Complete: die Tasche ___ Frau (die)", options: &["die", "der", "den"], correct_index: 1, answer_text: "", explanation_it: "Genitivo femminile: die -> der (der Frau).", explanation_en: "Feminine genitive: die -> der (der Frau)." },
             GrammarUnitExercise { prompt_it: "Quale preposizione richiede tipicamente il genitivo (standard)?", prompt_en: "Which preposition typically takes the genitive (standard)?", options: &["mit", "wegen", "fuer"], correct_index: 1, answer_text: "", explanation_it: "wegen regge il genitivo nello standard (wegen des Wetters).", explanation_en: "wegen takes the genitive in standard usage (wegen des Wetters)." },
             GrammarUnitExercise { prompt_it: "Scrivi l'articolo: das Zimmer ___ Kindes (das)", prompt_en: "Type the article: das Zimmer ___ Kindes (das)", options: &[], correct_index: 0, answer_text: "des", explanation_it: "Genitivo neutro: das -> des (des Kindes).", explanation_en: "Neuter genitive: das -> des (des Kindes)." },
+        ],
+    }
+}
+
+fn unit_a2_wechselpraepositionen() -> GrammarUnit {
+    GrammarUnit {
+        id: "a2-wechselpraepositionen",
+        level: "A2",
+        title_it: "Preposizioni a doppio caso (Wechselpräpositionen)",
+        title_en: "Two-way prepositions (Wechselpräpositionen)",
+        subtitle_it: "Dativo (dove?) o accusativo (verso dove?)",
+        subtitle_en: "Dative (where?) or accusative (where to?)",
+        objective_it: "Scegliere dativo o accusativo con an, auf, in, neben, über, unter, vor, zwischen, hinter.",
+        objective_en: "Choose dative or accusative with an, auf, in, neben, über, unter, vor, zwischen, hinter.",
+        theory_it: &[
+            "Le Wechselpräpositionen reggono il dativo per indicare posizione/stato (Wo?) e l'accusativo per direzione/movimento (Wohin?).",
+            "Preposizioni: an, auf, hinter, in, neben, über, unter, vor, zwischen.",
+            "Esempio: Ich bin in der Küche. (Wo? dativo) / Ich gehe in die Küche. (Wohin? accusativo).",
+        ],
+        theory_en: &[
+            "Two-way prepositions take the dative for location/state (Wo?) and the accusative for direction/movement (Wohin?).",
+            "Prepositions: an, auf, hinter, in, neben, über, unter, vor, zwischen.",
+            "Example: Ich bin in der Küche. (Where? dative) / Ich gehe in die Küche. (Where to? accusative).",
+        ],
+        examples: &[
+            ("Das Buch liegt auf dem Tisch.", "Il libro è sul tavolo. (posizione)"),
+            ("Ich lege das Buch auf den Tisch.", "Metto il libro sul tavolo. (direzione)"),
+            ("Wir sitzen im (in dem) Garten.", "Siamo seduti in giardino."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa (posizione, Wo?): Ich bin in ___ Küche. (die)", prompt_en: "Complete (location, Wo?): Ich bin in ___ Küche. (die)", options: &["die", "der", "den"], correct_index: 1, answer_text: "", explanation_it: "Posizione -> dativo femminile: in der Küche.", explanation_en: "Location -> dative feminine: in der Küche." },
+            GrammarUnitExercise { prompt_it: "Completa (direzione, Wohin?): Ich gehe in ___ Küche. (die)", prompt_en: "Complete (direction, Wohin?): Ich gehe in ___ Küche. (die)", options: &["der", "die", "den"], correct_index: 1, answer_text: "", explanation_it: "Direzione -> accusativo femminile (uguale forma): in die Küche.", explanation_en: "Direction -> accusative feminine: in die Küche." },
+            GrammarUnitExercise { prompt_it: "Scegli: Das Buch liegt auf ___ Tisch. (der, posizione)", prompt_en: "Choose: Das Buch liegt auf ___ Tisch. (der, location)", options: &["der", "den", "dem"], correct_index: 2, answer_text: "", explanation_it: "liegen = posizione -> dativo maschile: auf dem Tisch.", explanation_en: "liegen = location -> dative masculine: auf dem Tisch." },
+            GrammarUnitExercise { prompt_it: "Scrivi l'articolo: Ich stelle die Lampe auf ___ Tisch. (der, direzione)", prompt_en: "Type the article: Ich stelle die Lampe auf ___ Tisch. (der, direction)", options: &[], correct_index: 0, answer_text: "den", explanation_it: "stellen = direzione -> accusativo maschile: auf den Tisch.", explanation_en: "stellen = direction -> accusative masculine: auf den Tisch." },
+        ],
+    }
+}
+
+fn unit_b1_konjunktiv2_intro() -> GrammarUnit {
+    GrammarUnit {
+        id: "b1-konjunktiv2-intro",
+        level: "B1",
+        title_it: "Konjunktiv II (introduzione)",
+        title_en: "Konjunktiv II (introduction)",
+        subtitle_it: "Desideri, richieste cortesi e situazioni irreali",
+        subtitle_en: "Wishes, polite requests, and unreal situations",
+        objective_it: "Usare forme base del Konjunktiv II (würde, hätte, wäre, könnte).",
+        objective_en: "Use basic Konjunktiv II forms (würde, hätte, wäre, könnte).",
+        theory_it: &[
+            "Il Konjunktiv II esprime desideri, ipotesi irreali e richieste cortesi.",
+            "Forme comuni: ich wäre (sarei), ich hätte (avrei), ich könnte (potrei), ich würde + infinito (farei).",
+            "Esempi: Ich hätte gern einen Kaffee. / Könntest du mir helfen? / Wenn ich Zeit hätte, würde ich reisen.",
+        ],
+        theory_en: &[
+            "Konjunktiv II expresses wishes, unreal hypotheses, and polite requests.",
+            "Common forms: ich wäre (would be), ich hätte (would have), ich könnte (could), ich würde + infinitive (would).",
+            "Examples: Ich hätte gern einen Kaffee. / Könntest du mir helfen? / Wenn ich Zeit hätte, würde ich reisen.",
+        ],
+        examples: &[
+            ("Ich hätte gern ein Wasser.", "Vorrei un'acqua."),
+            ("Könnten Sie das bitte wiederholen?", "Potrebbe ripeterlo, per favore?"),
+            ("Wenn ich reich wäre, würde ich viel reisen.", "Se fossi ricco, viaggerei molto."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa (richiesta cortese): ___ Sie mir helfen?", prompt_en: "Complete (polite request): ___ Sie mir helfen?", options: &["Können", "Könnten", "Konnten"], correct_index: 1, answer_text: "", explanation_it: "Richiesta cortese: Konjunktiv II -> Könnten Sie...?", explanation_en: "Polite request: Konjunktiv II -> Könnten Sie...?" },
+            GrammarUnitExercise { prompt_it: "Scegli la forma corretta: Ich ___ gern einen Tee. (haben)", prompt_en: "Choose the correct form: Ich ___ gern einen Tee. (haben)", options: &["habe", "hatte", "hätte"], correct_index: 2, answer_text: "", explanation_it: "Desiderio cortese: ich hätte gern...", explanation_en: "Polite wish: ich hätte gern..." },
+            GrammarUnitExercise { prompt_it: "Completa: Wenn ich frei ___, würde ich kommen. (sein)", prompt_en: "Complete: Wenn ich frei ___, würde ich kommen. (sein)", options: &["bin", "war", "wäre"], correct_index: 2, answer_text: "", explanation_it: "Irreale/condizionale con sein: ich wäre.", explanation_en: "Unreal/conditional with sein: ich wäre." },
+            GrammarUnitExercise { prompt_it: "Scrivi la forma: ich ___ (sein, Konjunktiv II)", prompt_en: "Type the form: ich ___ (sein, Konjunktiv II)", options: &[], correct_index: 0, answer_text: "wäre", explanation_it: "Konjunktiv II di sein: ich wäre.", explanation_en: "Konjunktiv II of sein: ich wäre." },
         ],
     }
 }
