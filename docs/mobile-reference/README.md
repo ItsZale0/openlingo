@@ -5,7 +5,7 @@ Captured from connected Android device via `adb` to support "same as mobile app,
 - **Device:** 2511FPC34G (Xiaomi, `klee`), 1268x2756 @ 520dpi
 - **Package on device:** `com.alessandro.tedesco` (legacy installed build; launcher `.ui.MainActivity`)
 - **Capture date:** 2026-11-11
-- **Artifacts:** screenshots (`*.png`) and UI hierarchy dumps (`*.xml`) for key screens: `home`, `esercizi`, `ripasso`, `grammatica`, `progresso`, `scegli_lezione`
+- **Artifacts:** screenshots (`*.png`) and UI hierarchy dumps (`*.xml`) for key screens: `home`, `esercizi`, `ripasso`, `grammatica`, `progresso`, `scegli_lezione`, `lezioni_sheet`, `lessico` (vocabulary/levels A1-B2 view), `piano` (study plan)
 
 Notes:
 - Captures reflect the installed device build/state (Italian UI observed on home) and are used as visual/flow/structure reference for Rust/Compose parity.

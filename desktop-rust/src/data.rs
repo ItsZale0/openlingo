@@ -1005,6 +1005,7 @@ pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
         unit_a0_frase(),
         unit_a1_akkusativ(),
         unit_a1_sein_haben(),
+        unit_a1_possessivi_negazione(),
         unit_a1_modalverben(),
         unit_a2_trennbare_verben(),
         unit_a2_perfekt_intro(),
@@ -2022,6 +2023,41 @@ fn unit_a2_relative() -> GrammarUnit {
             GrammarUnitExercise { prompt_it: "Completa (oggetto neutro): Das Buch, ___ ich lese, ist spannend.", prompt_en: "Complete (neuter object): Das Buch, ___ ich lese, ist spannend.", options: &["der", "das", "dem"], correct_index: 1, answer_text: "", explanation_it: "Neutro all'accusativo nella relativa: das.", explanation_en: "Neuter accusative in the relative clause: das." },
             GrammarUnitExercise { prompt_it: "Completa (dativo): Die Frau, ___ ich helfe, ist nett.", prompt_en: "Complete (dative): Die Frau, ___ ich helfe, is nice.", options: &["die", "der", "denen"], correct_index: 1, answer_text: "", explanation_it: "helfen regge il dativo femminile: der.", explanation_en: "helfen takes dative feminine: der." },
             GrammarUnitExercise { prompt_it: "Scrivi il pronome: Die Kinder, mit ___ ich spiele, sind nett. (plurale dativo)", prompt_en: "Type the pronoun: Die Kinder, mit ___ ich spiele, sind nett. (plural dative)", options: &[], correct_index: 0, answer_text: "denen", explanation_it: "Plurale al dativo nella relativa: denen.", explanation_en: "Plural dative in the relative clause: denen." },
+        ],
+    }
+}
+
+
+fn unit_a1_possessivi_negazione() -> GrammarUnit {
+    GrammarUnit {
+        id: "a1-possessivi",
+        level: "A1",
+        title_it: "Possessivi e negazione",
+        title_en: "Possessives and negation",
+        subtitle_it: "Mio, tuo, suo… e come dire «non»",
+        subtitle_en: "My, your, his… and how to say “not/no”",
+        objective_it: "Usare i possessivi e distinguere kein da nicht.",
+        objective_en: "Use possessives and distinguish kein from nicht.",
+        theory_it: &[
+            "I possessivi (mein, dein, sein, ihr, unser, euer, ihr/Ihr) prendono desinenze: nominativo maschile/neutro senza -e, femminile/plurale con -e.",
+            "All'accusativo cambia solo il maschile: meinen Vater; femminile/neutro/plurale restano come al nominativo.",
+            "kein nega un nome (come ein): kein/keine/keinen. nicht nega verbi, aggettivi o nomi propri.",
+        ],
+        theory_en: &[
+            "Possessives (mein, dein, sein, ihr, unser, euer, ihr/Ihr) take endings: masculine/neuter nominative no -e, feminine/plural take -e.",
+            "In the accusative only masculine changes: meinen Vater; feminine/neuter/plural stay the same.",
+            "kein negates a noun (like ein): kein/keine/keinen. nicht negates verbs, adjectives, or proper names.",
+        ],
+        examples: &[
+            ("Mein Vater arbeitet hier.", "Mio padre lavora qui."),
+            ("Ich sehe meinen Bruder.", "Vedo mio fratello."),
+            ("Ich habe keine Zeit.", "Non ho tempo."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa (nominativo maschile): ___ Vater arbeitet hier. (ich)", prompt_en: "Complete (masculine nominative): ___ Vater arbeitet hier. (ich)", options: &["Mein", "Meine", "Meinen"], correct_index: 0, answer_text: "", explanation_it: "Maschile al nominativo: mein Vater.", explanation_en: "Masculine nominative: mein Vater." },
+            GrammarUnitExercise { prompt_it: "Completa (accusativo maschile): Ich sehe ___ Bruder. (ich)", prompt_en: "Complete (masculine accusative): Ich sehe ___ Bruder. (ich)", options: &["mein", "meine", "meinen"], correct_index: 2, answer_text: "", explanation_it: "Accusativo maschile: meinen Bruder.", explanation_en: "Masculine accusative: meinen Bruder." },
+            GrammarUnitExercise { prompt_it: "Scegli la negazione corretta: Ich habe ___ Zeit.", prompt_en: "Choose the correct negation: Ich habe ___ Zeit.", options: &["kein", "keine", "nicht"], correct_index: 1, answer_text: "", explanation_it: "Zeit è femminile: keine Zeit.", explanation_en: "Zeit is feminine: keine Zeit." },
+            GrammarUnitExercise { prompt_it: "Scrivi il possessivo: Das ist ___ Schwester. (er)", prompt_en: "Type the possessive: Das ist ___ Schwester. (er)", options: &[], correct_index: 0, answer_text: "seine", explanation_it: "Femminile al nominativo: seine Schwester.", explanation_en: "Feminine nominative: seine Schwester." },
         ],
     }
 }
