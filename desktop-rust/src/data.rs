@@ -71,6 +71,8 @@ pub struct ProfiloStato {
     pub padronanza_grammatica: HashMap<String, serde_json::Value>,
     #[serde(alias = "streakGiorni")]
     pub streak_giorni: i32,
+    #[serde(alias = "streakRecord")]
+    pub streak_record: i32,
     #[serde(alias = "ultimoGiornoStudio")]
     pub ultimo_giorno_studio: Option<String>,
     pub progresso: Progresso,
@@ -104,19 +106,35 @@ impl WordEntity {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ReviewEntity {
     #[serde(alias = "wordId")]
     pub word_id: String,
+    #[serde(alias = "easeFactor")]
+    pub ease_factor: f32,
+    #[serde(alias = "intervalDays")]
+    pub interval_days: i32,
+    pub repetitions: i32,
+    pub lapses: i32,
     #[serde(alias = "dueAt")]
     pub due_at: i64,
-    #[serde(default)]
-    pub repetitions: i32,
-    #[serde(default)]
-    pub interval: i32,
-    #[serde(alias = "easeFactor", default)]
-    pub ease_factor: f32,
+    #[serde(alias = "lastReviewedAt")]
+    pub last_reviewed_at: Option<i64>,
+}
+
+impl Default for ReviewEntity {
+    fn default() -> Self {
+        Self {
+            word_id: String::new(),
+            ease_factor: 2.5,
+            interval_days: 0,
+            repetitions: 0,
+            lapses: 0,
+            due_at: 0,
+            last_reviewed_at: None,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -124,10 +142,11 @@ pub struct ReviewEntity {
 pub struct RipassoLog {
     #[serde(alias = "wordId")]
     pub word_id: String,
+    pub timestamp: i64,
+    #[serde(alias = "corretta")]
+    pub corretta: bool,
     #[serde(default)]
-    pub at: i64,
-    #[serde(default)]
-    pub correct: bool,
+    pub verifica: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -139,10 +158,61 @@ pub struct Progresso {
     pub obiettivo_livello: String,
     #[serde(alias = "lezioneCorrente", default)]
     pub lezione_corrente: i32,
+    #[serde(alias = "ultimaAttivita", default)]
+    pub ultima_attivita: i64,
 }
 
 fn default_livello() -> String { "A1".into() }
 fn default_obiettivo() -> String { "B2".into() }
+
+pub const SRS_INTERVALS: [i32; 8] = [1, 3, 7, 16, 35, 75, 150, 300];
+pub const DAY_MS: i64 = 24 * 60 * 60 * 1000;
+
+pub fn nuova_review(word_id: &str, now: i64) -> ReviewEntity {
+    ReviewEntity { word_id: word_id.to_string(), due_at: now, ..Default::default() }
+}
+
+pub fn review_con_risposta(mut review: ReviewEntity, saputa: bool, now: i64) -> ReviewEntity {
+    if saputa {
+        let idx = review.repetitions.max(0) as usize;
+        let next = *SRS_INTERVALS.get(idx).unwrap_or(SRS_INTERVALS.last().unwrap());
+        review.repetitions += 1;
+        review.interval_days = next;
+        review.ease_factor = (review.ease_factor + 0.05).min(3.0);
+        review.due_at = now + next as i64 * DAY_MS;
+        review.last_reviewed_at = Some(now);
+    } else {
+        review.repetitions = 0;
+        review.interval_days = 1;
+        review.lapses += 1;
+        review.ease_factor = (review.ease_factor - 0.2).max(1.3);
+        review.due_at = now + DAY_MS;
+        review.last_reviewed_at = Some(now);
+    }
+    review
+}
+
+fn today_str() -> String {
+    chrono::Local::now().format("%Y-%m-%d").to_string()
+}
+
+pub fn registra_studio(stato: &mut ProfiloStato, now: i64) {
+    let oggi = today_str();
+    if stato.ultimo_giorno_studio.as_deref() == Some(&oggi) {
+        stato.progresso.ultima_attivita = now;
+        return;
+    }
+    let ieri = (chrono::Local::now() - chrono::Duration::days(1)).format("%Y-%m-%d").to_string();
+    let nuovo = if stato.ultimo_giorno_studio.as_deref() == Some(&ieri) {
+        stato.streak_giorni + 1
+    } else {
+        1
+    };
+    stato.streak_giorni = nuovo;
+    if nuovo > stato.streak_record { stato.streak_record = nuovo; }
+    stato.ultimo_giorno_studio = Some(oggi);
+    stato.progresso.ultima_attivita = now;
+}
 
 #[derive(Debug, Clone)]
 pub struct Store {
@@ -248,6 +318,26 @@ impl Store {
         let now = chrono::Utc::now().timestamp_millis();
         let due = p.stato.reviews.values().filter(|r| r.due_at <= now).count();
         (total, reviewed, due, p.stato.streak_giorni)
+    }
+
+    pub fn answer_review(&mut self, word_id: &str, saputa: bool) -> Result<(), String> {
+        let now = chrono::Utc::now().timestamp_millis();
+        let p = self.active_profile_mut().ok_or_else(|| "No active profile".to_string())?;
+        let existing = p.stato.reviews.get(word_id).cloned().unwrap_or_else(|| nuova_review(word_id, now));
+        let updated = review_con_risposta(existing, saputa, now);
+        p.stato.reviews.insert(word_id.to_string(), updated);
+        p.stato.ripassi_log.push(RipassoLog {
+            word_id: word_id.to_string(),
+            timestamp: now,
+            corretta: saputa,
+            verifica: false,
+        });
+        if p.stato.ripassi_log.len() > 5000 {
+            let drop_n = p.stato.ripassi_log.len() - 5000;
+            p.stato.ripassi_log.drain(0..drop_n);
+        }
+        registra_studio(&mut p.stato, now);
+        self.save()
     }
 }
 

@@ -5,8 +5,10 @@ A from-scratch Rust rebuild of the OpenLingo desktop application.
 ## Features
 - Native GUI built with `eframe`/`egui`
 - Reads/writes compatible profile data from `~/.tedesco-desktop/` (`profili.json`, `preferenze.json`)
-- Screens: Home, Review (due/new word browser), Vocabulary, Progress, Settings
-- Profile selection/creation, reload/save, basic stats (words, reviewed, due, streak)
+- Screens: Home, Review, Vocabulary, Progress, Settings
+- Profile selection/creation, reload/save
+- **SRS-compatible review answers:** "Knew it / Didn't know" persists review cards (intervals/repetitions/ease/lapses/due), review log, and study streak/record to profile data
+- Stats/progress: words, reviewed, due, streak, grammar units tracked, review log entries
 
 ## Build
 ```bash
@@ -21,5 +23,5 @@ cargo test
 ```
 
 ## Notes
-- This rebuild focuses on a working desktop shell and compatible data access. Advanced SRS scheduling, grammar syllabus flows, sync, and AI features from the original Kotlin/Compose desktop app and `:core` can be ported incrementally.
+- This is a from-scratch Rust rebuild with growing feature coverage (data compatibility, SRS persistence, core screens). Full parity with `:core`/Compose desktop (complete grammar syllabus/exercise flows, feed/cloud sync, backup, AI tutor/generation, listening/pronunciation, etc.) is incremental work in progress.
 - Data directory: `%USERPROFILE%\.tedesco-desktop\`

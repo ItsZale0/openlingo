@@ -101,6 +101,26 @@ impl OpenLingoApp {
         }
     }
 
+    fn answer_current(&mut self, saputa: bool) {
+        if self.review_queue.is_empty() { return; }
+        let idx = self.review_index.min(self.review_queue.len().saturating_sub(1));
+        let word_id = self.review_queue[idx].id.clone();
+        match self.store.answer_review(&word_id, saputa) {
+            Ok(_) => {
+                self.status = if saputa { "Saved: knew it".into() } else { "Saved: didn't know".into() };
+                self.review_queue.remove(idx);
+                if self.review_index >= self.review_queue.len() && self.review_index > 0 {
+                    self.review_index -= 1;
+                }
+                self.show_answer = false;
+                if self.review_queue.is_empty() {
+                    self.refresh_review_queue();
+                }
+            }
+            Err(e) => self.status = format!("Save error: {e}"),
+        }
+    }
+
     fn screen_review(&mut self, ui: &mut egui::Ui) {
         ui.heading("Review");
         if self.review_queue.is_empty() {
@@ -134,7 +154,13 @@ impl OpenLingoApp {
             if ui.button(if self.show_answer { "Hide answer" } else { "Show answer" }).clicked() {
                 self.show_answer = !self.show_answer;
             }
-            if ui.button("Next").clicked() {
+            if ui.button("Knew it").clicked() {
+                self.answer_current(true);
+            }
+            if ui.button("Didn't know").clicked() {
+                self.answer_current(false);
+            }
+            if ui.button("Skip").clicked() {
                 if self.review_index + 1 < self.review_queue.len() {
                     self.review_index += 1;
                 } else {
@@ -147,7 +173,11 @@ impl OpenLingoApp {
             }
         });
         ui.add_space(6.0);
-        ui.small("Note: this Rust rebuild reads compatible profile data and provides a review browser; SRS updates are handled in the original core/app flows.");
+        ui.small("SRS-compatible answers: saves review card, log, streak and due date (compatible with existing profile data).");
+        if !self.status.is_empty() {
+            ui.add_space(4.0);
+            ui.label(&self.status);
+        }
     }
 
     fn screen_vocabulary(&mut self, ui: &mut egui::Ui) {
@@ -193,9 +223,12 @@ impl OpenLingoApp {
             ui.label(format!("Total words: {total}"));
             ui.label(format!("Reviewed words: {reviewed}"));
             ui.label(format!("Due now: {due}"));
-            ui.label(format!("Streak: {streak} days"));
+            ui.label(format!("Streak: {streak} days (record: {})", p.stato.streak_record));
             ui.label(format!("Grammar units tracked: {}", p.stato.padronanza_grammatica.len()));
             ui.label(format!("Review log entries: {}", p.stato.ripassi_log.len()));
+            if let Some(day) = &p.stato.ultimo_giorno_studio {
+                ui.label(format!("Last study day: {day}"));
+            }
         });
         ui.add_space(6.0);
         ui.label(format!("Data folder: {}", self.store.base_dir.display()));
@@ -256,7 +289,7 @@ impl OpenLingoApp {
 
         ui.add_space(10.0);
         ui.separator();
-        ui.small("OpenLingo Rust desktop rebuild: reads/writes compatible ~/.tedesco-desktop profile data, with Home/Review/Vocabulary/Progress/Settings screens.");
+        ui.small("OpenLingo Rust desktop rebuild: compatible profile data, SRS answer persistence (intervals/streak/log), Home/Review/Vocabulary/Progress/Settings.");
         if !self.status.is_empty() {
             ui.add_space(6.0);
             ui.label(&self.status);
@@ -363,6 +396,37 @@ mod tests {
         assert_eq!(store.prefs.tema_modalita, "dark");
         assert_eq!(store.prefs.tema_colore, "navy");
         assert_eq!(store.prefs.lingua, "en");
+        let _ = fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn srs_answer_advances_and_saves() {
+        let dir = temp_dir("srs");
+        let mut store = Store::load_from(dir.clone());
+        let id = store.create_profile("Cara");
+        {
+            let p = store.repo.profili.get_mut(&id).unwrap();
+            p.stato.parole = vec![WordEntity { id: "w1".into(), german: "Haus".into(), italian: "casa".into(), ..Default::default() }];
+        }
+        store.answer_review("w1", true).unwrap();
+        {
+            let p = store.repo.profili.get(&id).unwrap();
+            let r = p.stato.reviews.get("w1").unwrap();
+            assert_eq!(r.repetitions, 1);
+            assert_eq!(r.interval_days, 1);
+            assert_eq!(p.stato.ripassi_log.len(), 1);
+            assert!(p.stato.ripassi_log[0].corretta);
+            assert!(p.stato.streak_giorni >= 1);
+        }
+        store.answer_review("w1", false).unwrap();
+        let p = store.repo.profili.get(&id).unwrap();
+        let r = p.stato.reviews.get("w1").unwrap();
+        assert_eq!(r.repetitions, 0);
+        assert_eq!(r.lapses, 1);
+        assert_eq!(p.stato.ripassi_log.len(), 2);
+        // reload persists
+        let store2 = Store::load_from(dir.clone());
+        assert!(store2.repo.profili.get(&id).unwrap().stato.reviews.contains_key("w1"));
         let _ = fs::remove_dir_all(dir);
     }
 }
