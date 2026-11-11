@@ -575,6 +575,37 @@ impl Store {
         words
     }
 
+    /// Words that need extra practice: reviewed words with lapses/low ease and/or recent incorrect answers.
+    /// Profile-compatible (derived from saved reviews and ripassi_log).
+    pub fn difficult_words(&self, limit: usize) -> Vec<WordEntity> {
+        let Some(p) = self.active_profile() else { return vec![]; };
+        let mut score: HashMap<String, i64> = HashMap::new();
+        for (id, r) in &p.stato.reviews {
+            let mut s = 0i64;
+            if r.lapses > 0 { s += (r.lapses as i64) * 3; }
+            if r.ease_factor < 2.3 { s += 2; }
+            if r.repetitions == 0 { s += 1; }
+            if r.interval_days <= 1 { s += 1; }
+            if s > 0 { score.insert(id.clone(), s); }
+        }
+        let start = p.stato.ripassi_log.len().saturating_sub(200);
+        for e in &p.stato.ripassi_log[start..] {
+            if !e.corretta {
+                *score.entry(e.word_id.clone()).or_insert(0) += 2;
+            }
+        }
+        let mut ids: Vec<(String, i64)> = score.into_iter().collect();
+        ids.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
+        let wanted: HashSet<String> = ids.into_iter().take(limit).map(|(id, _)| id).collect();
+        let mut out: Vec<WordEntity> = p.stato.parole.iter()
+            .filter(|w| !w.archived && wanted.contains(&w.id))
+            .cloned()
+            .collect();
+        out.sort_by_key(|w| -(p.stato.reviews.get(&w.id).map(|r| r.lapses as i64).unwrap_or(0)));
+        out.truncate(limit);
+        out
+    }
+
     pub fn stats(&self) -> (usize, usize, usize, i32) {
         let Some(p) = self.active_profile() else { return (0,0,0,0); };
         let total = p.stato.parole.iter().filter(|w| !w.archived).count();

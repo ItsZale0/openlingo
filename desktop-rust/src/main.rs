@@ -100,6 +100,7 @@ enum ExerciseMode {
     ClozeQuiz,
     Mixed,
     GuidedSession,
+    WeakWords,
 }
 
 struct OpenLingoApp {
@@ -389,6 +390,11 @@ impl OpenLingoApp {
                 if pool.is_empty() { pool = words.clone(); }
                 build_guided_session(&pool, &self.exercise_level, seed, 24)
             }
+            ExerciseMode::WeakWords => {
+                let mut pool = self.store.difficult_words(40);
+                if pool.is_empty() { pool = words.clone(); }
+                build_guided_session(&pool, &self.exercise_level, seed, 24)
+            }
         };
         self.exercise_index = 0;
         self.exercise_answer.clear();
@@ -440,7 +446,8 @@ impl OpenLingoApp {
             ui.selectable_value(&mut self.exercise_mode, ExerciseMode::ClozeQuiz, "Cloze (from examples)");
             ui.selectable_value(&mut self.exercise_mode, ExerciseMode::Mixed, "Mixed session");
             ui.selectable_value(&mut self.exercise_mode, ExerciseMode::GuidedSession, "Guided session (due + new)");
-            if matches!(self.exercise_mode, ExerciseMode::ArticleQuiz | ExerciseMode::Mixed | ExerciseMode::GuidedSession) {
+            ui.selectable_value(&mut self.exercise_mode, ExerciseMode::WeakWords, "Weak words review");
+            if matches!(self.exercise_mode, ExerciseMode::ArticleQuiz | ExerciseMode::Mixed | ExerciseMode::GuidedSession | ExerciseMode::WeakWords) {
                 ui.label("Level ≤");
                 egui::ComboBox::from_id_salt("ex_level")
                     .selected_text(self.exercise_level.clone())
@@ -1491,6 +1498,30 @@ mod tests {
         assert!(!qs.is_empty());
         assert!(qs.len() <= 12);
         assert!(qs.iter().any(|q| !q.word.id.is_empty()));
+    }
+
+    #[test]
+    fn difficult_words_selects_lapses_and_errors() {
+        let dir = temp_dir("weak");
+        let mut store = Store::load_from(dir.clone());
+        let id = store.create_profile("Noa");
+        {
+            let p = store.repo.profili.get_mut(&id).unwrap();
+            p.stato.parole = vec![
+                WordEntity { id:"w1".into(), german:"eins".into(), italian:"uno".into(), ..Default::default() },
+                WordEntity { id:"w2".into(), german:"zwei".into(), italian:"due".into(), ..Default::default() },
+            ];
+            let mut reviews = HashMap::new();
+            reviews.insert("w1".into(), ReviewEntity { word_id:"w1".into(), due_at: 1, repetitions: 1, lapses: 3, ease_factor: 1.8, interval_days: 1, ..Default::default() });
+            reviews.insert("w2".into(), ReviewEntity { word_id:"w2".into(), due_at: 1, repetitions: 5, lapses: 0, ease_factor: 2.6, interval_days: 10, ..Default::default() });
+            p.stato.reviews = reviews;
+            p.stato.ripassi_log.push(RipassoLog { word_id:"w2".into(), timestamp: 1, corretta: false, verifica: false, extra: HashMap::new() });
+        }
+        let weak = store.difficult_words(10);
+        assert!(!weak.is_empty());
+        assert_eq!(weak[0].id, "w1"); // higher lapse score should rank first
+        assert!(weak.iter().any(|w| w.id == "w2")); // recent error included
+        let _ = fs::remove_dir_all(dir);
     }
 
     #[test]
