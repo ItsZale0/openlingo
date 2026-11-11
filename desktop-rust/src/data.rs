@@ -1010,7 +1010,9 @@ pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
         unit_a2_perfekt_intro(),
         unit_a2_dativ(),
         unit_a2_praeteritum(),
+        unit_a2_riflessivi(),
         unit_a2_weil_dass(),
+        unit_a2_subordinate(),
         unit_a2_komparativ(),
         unit_a2_praepositionen_dativ(),
         unit_a2_praepositionen_akkusativ(),
@@ -1913,6 +1915,75 @@ fn unit_b1_nominalisierung() -> GrammarUnit {
             GrammarUnitExercise { prompt_it: "Completa: Die ___ war schwierig. (prüfen)", prompt_en: "Complete: Die ___ war schwierig. (prüfen)", options: &["Prüfen", "Prüfung", "Prüfheit"], correct_index: 1, answer_text: "", explanation_it: "Da prüfen: die Prüfung (-ung).", explanation_en: "From prüfen: die Prüfung (-ung)." },
             GrammarUnitExercise { prompt_it: "Completa: Die ___ ist wichtig. (frei)", prompt_en: "Complete: Die ___ ist wichtig. (frei)", options: &["Frei", "Freiheit", "Freikeit"], correct_index: 1, answer_text: "", explanation_it: "Da frei: die Freiheit (-heit).", explanation_en: "From frei: die Freiheit (-heit)." },
             GrammarUnitExercise { prompt_it: "Scrivi la forma: Ich gehe zum ___ (essen).", prompt_en: "Type the form: Ich gehe zum ___ (essen).", options: &[], correct_index: 0, answer_text: "Essen", explanation_it: "Nominalizzazione: zum Essen.", explanation_en: "Nominalization: zum Essen." },
+        ],
+    }
+}
+
+
+fn unit_a2_riflessivi() -> GrammarUnit {
+    GrammarUnit {
+        id: "a2-riflessivi",
+        level: "A2",
+        title_it: "I verbi riflessivi",
+        title_en: "Reflexive verbs",
+        subtitle_it: "sich freuen, sich interessieren, sich beeilen",
+        subtitle_en: "sich freuen, sich interessieren, sich beeilen",
+        objective_it: "Usare i pronomi riflessivi e i verbi riflessivi più comuni.",
+        objective_en: "Use reflexive pronouns and common reflexive verbs.",
+        theory_it: &[
+            "I verbi riflessivi hanno un pronome che rimanda al soggetto: mich, dich, sich, uns, euch, sich.",
+            "La maggior parte usa l'accusativo; con parti del corpo si usa spesso il dativo: Ich wasche mir die Hände.",
+            "Verbi frequenti: sich freuen, sich interessieren für, sich treffen, sich beeilen, sich erholen, sich setzen.",
+        ],
+        theory_en: &[
+            "Reflexive verbs have a pronoun referring back to the subject: mich, dich, sich, uns, euch, sich.",
+            "Most use the accusative; with body parts the dative is often used: Ich wasche mir die Hände.",
+            "Common verbs: sich freuen, sich interessieren für, sich treffen, sich beeilen, sich erholen, sich setzen.",
+        ],
+        examples: &[
+            ("Ich freue mich auf den Urlaub.", "Non vedo l'ora che arrivino le vacanze."),
+            ("Wir treffen uns um 8 Uhr.", "Ci incontriamo alle 8."),
+            ("Ich wasche mir die Hände.", "Mi lavo le mani."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa: Ich freue ___ auf den Urlaub.", prompt_en: "Complete: Ich freue ___ auf den Urlaub.", options: &["mich", "mir", "dich"], correct_index: 0, answer_text: "", explanation_it: "sich freuen all'accusativo: ich freue mich.", explanation_en: "sich freuen takes accusative: ich freue mich." },
+            GrammarUnitExercise { prompt_it: "Completa: Wir treffen ___ um 8 Uhr.", prompt_en: "Complete: Wir treffen ___ um 8 Uhr.", options: &["uns", "euch", "sich"], correct_index: 0, answer_text: "", explanation_it: "Con wir il pronome riflessivo è uns.", explanation_en: "With wir the reflexive pronoun is uns." },
+            GrammarUnitExercise { prompt_it: "Completa: Er beeilt ___.", prompt_en: "Complete: Er beeilt ___.", options: &["mich", "dich", "sich"], correct_index: 2, answer_text: "", explanation_it: "Con er/sie/es il pronome è sich.", explanation_en: "With er/sie/es the pronoun is sich." },
+            GrammarUnitExercise { prompt_it: "Scrivi il pronome: Ich wasche ___ die Hände. (dativo)", prompt_en: "Type the pronoun: Ich wasche ___ die Hände. (dative)", options: &[], correct_index: 0, answer_text: "mir", explanation_it: "Con una parte del corpo il riflessivo è al dativo: mir.", explanation_en: "With a body part the reflexive pronoun is dative: mir." },
+        ],
+    }
+}
+
+fn unit_a2_subordinate() -> GrammarUnit {
+    GrammarUnit {
+        id: "a2-subordinate",
+        level: "A2",
+        title_it: "Le frasi subordinate",
+        title_en: "Subordinate clauses",
+        subtitle_it: "weil, dass, wenn, als, obwohl, ob: verbo alla fine",
+        subtitle_en: "weil, dass, wenn, als, obwohl, ob: verb at the end",
+        objective_it: "Collegare frasi con congiunzioni subordinate e mettere il verbo alla fine.",
+        objective_en: "Link clauses with subordinating conjunctions and put the verb at the end.",
+        theory_it: &[
+            "Nella frase subordinata il verbo coniugato va alla fine: Ich bleibe zu Hause, weil ich krank bin.",
+            "Congiunzioni comuni: weil (perché), dass (che), wenn (se/quando), als (quando, passato singolo), obwohl (sebbene), ob (se, domande indirette).",
+            "Se la subordinata viene prima, la principale inizia con il verbo: Weil ich krank bin, bleibe ich zu Hause.",
+        ],
+        theory_en: &[
+            "In a subordinate clause the conjugated verb goes to the end: Ich bleibe zu Hause, weil ich krank bin.",
+            "Common conjunctions: weil (because), dass (that), wenn (if/when), als (when, single past event), obwohl (although), ob (whether).",
+            "If the subordinate clause comes first, the main clause starts with the verb: Weil ich krank bin, bleibe ich zu Hause.",
+        ],
+        examples: &[
+            ("Ich bleibe zu Hause, weil ich krank bin.", "Resto a casa perché sono malato."),
+            ("Er sagt, dass er keine Zeit hat.", "Dice che non ha tempo."),
+            ("Als ich klein war, wohnte ich in Rom.", "Quando ero piccolo, abitavo a Roma."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa: Ich bleibe zu Hause, ___ ich krank bin.", prompt_en: "Complete: Ich bleibe zu Hause, ___ ich krank bin.", options: &["weil", "denn", "aber"], correct_index: 0, answer_text: "", explanation_it: "weil introduce una subordinata con verbo alla fine.", explanation_en: "weil introduces a subordinate clause with the verb at the end." },
+            GrammarUnitExercise { prompt_it: "Completa: Er sagt, ___ er keine Zeit hat.", prompt_en: "Complete: Er sagt, ___ he has no time.", options: &["weil", "dass", "wenn"], correct_index: 1, answer_text: "", explanation_it: "dass introduce una frase completiva.", explanation_en: "dass introduces a complement clause." },
+            GrammarUnitExercise { prompt_it: "Evento passato singolo: ___ ich klein war, wohnte ich in Rom.", prompt_en: "Single past event: ___ ich klein war, wohnte ich in Rom.", options: &["Wenn", "Als", "Ob"], correct_index: 1, answer_text: "", explanation_it: "Per un singolo evento nel passato si usa als.", explanation_en: "For a single event in the past use als." },
+            GrammarUnitExercise { prompt_it: "Scrivi la congiunzione: Ich weiß nicht, ___ er kommt. (domanda indiretta sì/no)", prompt_en: "Type the conjunction: Ich weiß nicht, ___ er kommt. (indirect yes/no question)", options: &[], correct_index: 0, answer_text: "ob", explanation_it: "Le domande indirette sì/no usano ob.", explanation_en: "Indirect yes/no questions use ob." },
         ],
     }
 }
