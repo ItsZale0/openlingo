@@ -1,8 +1,7 @@
 {
-    "versionCode": 339,
-    "versionName": "1.51.16",
-    "changelog": "Add import from file for exported backups in Backup settings.",
-    "minVersionCode": 0,
-    "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.16/OpenLingo-v1.51.16.apk",
-    "apkSha256": "a49c564b66f237daadc482b19248dce337d56ddbc5092f64cf9e226a19547c0e"
+  "versionCode": 340,
+  "versionName": "1.51.17",
+  "changelog": "Fixed ambiguous AI-generated exercises: the reviewer now evaluates every option and keeps an exercise only when exactly one option is correct and matches the key. Added a deterministic check for weak-noun number ambiguity (e.g. Patienten can be singular and plural) and hardened generation prompts (N-Deklination, possessive coherence).",
+  "minVersionCode": 0,
+  "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.17/OpenLingo-v1.51.17.apk"
 }

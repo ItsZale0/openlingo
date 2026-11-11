@@ -80,6 +80,100 @@ class ControlloGrammaticaTest {
         assertTrue(problemi.joinToString().contains("Buch"))
     }
 
+    // ── Ambiguità di numero sui nomi deboli (N-Deklination) ──
+
+    @Test
+    fun `l'esercizio ambiguo su Patienten viene segnalato`() {
+        // Caso reale: "Patienten" è accusativo singolare e plurale; sia "euren"
+        // sia "eure" sono corrette, ma l'app ne accettava una sola.
+        val problemi = ControlloGrammatica.problemi(
+            domanda = "Wir besuchen ___ Patienten im Zimmer.",
+            opzioni = listOf("euer", "eurer", "euren", "eure"),
+            rispostaCorretta = 3
+        )
+        assertFalse(problemi.isEmpty())
+        assertTrue(problemi.joinToString().contains("singolare"))
+        assertTrue(problemi.joinToString().contains("plurale"))
+    }
+
+    @Test
+    fun `con una sola opzione valida il controllo tace`() {
+        // Stessa frase, ma solo "euren" è una forma accusativa possibile:
+        // "eurem"/"eures"/"euer" non reggono un accusativo maschile.
+        val problemi = ControlloGrammatica.problemi(
+            domanda = "Wir besuchen ___ Patienten im Zimmer.",
+            opzioni = listOf("euren", "eurem", "eures", "euer"),
+            rispostaCorretta = 0
+        )
+        assertTrue(problemi.isEmpty())
+    }
+
+    @Test
+    fun `l'articolo determinativo ambiguo su un nome debole viene segnalato`() {
+        val problemi = ControlloGrammatica.problemi(
+            domanda = "Wir besuchen ___ Patienten.",
+            opzioni = listOf("der", "den", "die", "das"),
+            rispostaCorretta = 1
+        )
+        assertFalse(problemi.isEmpty())
+    }
+
+    @Test
+    fun `il dativo ambiguo su un nome debole viene segnalato`() {
+        val problemi = ControlloGrammatica.problemi(
+            domanda = "Der Arzt hilft ___ Patienten.",
+            opzioni = listOf("dem", "den", "der", "des"),
+            rispostaCorretta = 0
+        )
+        assertFalse(problemi.isEmpty())
+    }
+
+    @Test
+    fun `un quantificatore plurale toglie l'ambiguita`() {
+        // "alle" fissa il plurale: con "euren" (plurale dativo) la frase di
+        // partenza non è più ambigua come nel caso senza quantificatore.
+        val problemi = ControlloGrammatica.problemi(
+            domanda = "Wir besuchen alle ___ Patienten.",
+            opzioni = listOf("euer", "eurer", "euren", "eure"),
+            rispostaCorretta = 3
+        )
+        assertTrue(problemi.isEmpty())
+    }
+
+    @Test
+    fun `un verbo che segue il nome fissa il numero`() {
+        // "sind" rende il nome necessariamente plurale: niente ambiguità.
+        val problemi = ControlloGrammatica.problemi(
+            domanda = "___ Patienten sind im Zimmer.",
+            opzioni = listOf("der", "den", "die", "das"),
+            rispostaCorretta = 2
+        )
+        assertTrue(problemi.isEmpty())
+    }
+
+    @Test
+    fun `senza contesto di caso il controllo non si pronuncia`() {
+        // Nessun verbo/preposizione prima del buco: il controllo preferisce
+        // tacere piuttosto che rischiare un falso allarme.
+        val problemi = ControlloGrammatica.problemi(
+            domanda = "___ Patienten im Zimmer.",
+            opzioni = listOf("euer", "eurer", "euren", "eure"),
+            rispostaCorretta = 3
+        )
+        assertTrue(problemi.isEmpty())
+    }
+
+    @Test
+    fun `il buco che non è un determinante non attiva il controllo`() {
+        // Il buco è il nome (n-Deklination), non l'articolo: ambito diverso.
+        val problemi = ControlloGrammatica.problemi(
+            domanda = "Ich sehe den ___.",
+            opzioni = listOf("Student", "Studenten", "Studente", "Studentes"),
+            rispostaCorretta = 1
+        )
+        assertTrue(problemi.isEmpty())
+    }
+
     @Test
     fun `tutti gli esercizi del percorso sono grammaticalmente corretti`() {
         val problemi = mutableListOf<String>()

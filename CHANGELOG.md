@@ -2,6 +2,14 @@
 
 All notable changes to OpenLingo are documented here. Release tags: https://github.com/ItsZale0/openlingo/tags
 
+## v1.51.17 — 2026-11-11
+
+### AI exercises
+- Fixed ambiguous AI-generated exercises: the reviewer now evaluates every option and the app keeps an exercise only when exactly one option is correct and matches the declared key.
+- Added a deterministic check for weak-noun number ambiguity (e.g. `Patienten` can be accusative singular *and* plural, so `euren Patienten` and `eure Patienten` are both correct).
+- Hardened the generation prompt: N-Deklination warning and possessive coherence with the subject (e.g. `Wir ...` → `unsere`).
+- Already-saved ambiguous exercises are filtered out at display time.
+
 ## v1.51.16 — 2026-11-11
 
 ### Backup

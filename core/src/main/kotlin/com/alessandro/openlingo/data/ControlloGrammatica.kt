@@ -216,6 +216,276 @@ object ControlloGrammatica {
         )
     }
 
+    // ── Ambiguità numero/caso sui nomi deboli (N-Deklination) ──
+
+    /**
+     * Nomi maschili deboli la cui forma di accusativo/dativo singolare è
+     * IDENTICA al plurale ("Patienten", "Studenten", "Kollegen"...).
+     *
+     * Se il buco sta proprio davanti a una di queste forme, la parola da sola
+     * non dice il numero: "Wir besuchen ___ Patienten" ammette sia "euren
+     * Patienten" (singolare) sia "eure Patienten" (plurale). Il generatore AI
+     * produce spesso esercizi così, che hanno DUE risposte corrette: è il caso
+     * dello screenshot "Wir besuchen ___ Patienten im Zimmer." con opzioni
+     * euer/eurer/euren/eure, dove l'app accettava solo "eure".
+     *
+     * Il controllo si pronuncia solo quando il numero è davvero libero: se un
+     * quantificatore ("alle", "viele") o un verbo che segue il nome lo fissa,
+     * l'esercizio non è ambiguo e non viene toccato.
+     */
+    private val nomiDeboliAmbigui: Set<String> = setOf(
+        "patienten", "studenten", "kollegen", "menschen", "jungen", "kunden",
+        "nachbarn", "bauern", "experten", "polizisten", "praktikanten",
+        "assistenten", "therapeuten", "physiotherapeuten", "psychotherapeuten",
+        "touristen", "journalisten", "helden", "baeren", "affen", "loewen",
+        "neffen", "riesen", "zeugen", "praesidenten", "soldaten", "kameraden",
+        "astronauten", "namen", "gedanken", "glauben", "willen"
+    )
+
+    /** Quantificatori che rendono obbligatorio il plurale. */
+    private val quantificatoriPlurali: Set<String> = setOf(
+        "alle", "beide", "beiden", "viele", "vielen", "einige", "einigen",
+        "wenige", "wenigen", "mehrere", "manche", "manchen", "zahlreiche",
+        "zahlreichen", "zwei", "drei", "vier", "fuenf", "sechs", "sieben",
+        "acht", "neun", "zehn", "hundert", "tausend"
+    )
+
+    /** Verbi che, subito dopo il nome, fissano il numero (plurale/singolare). */
+    private val verbiPluraliDopoNome: Set<String> = setOf(
+        "sind", "waren", "haben", "hatten", "werden", "wurden", "koennen",
+        "muessen", "wollen", "sollen", "duerfen", "moegen", "moechten"
+    )
+    private val verbiSingolariDopoNome: Set<String> = setOf(
+        "ist", "war", "hat", "hatte", "wird", "wurde", "kann", "muss", "will",
+        "soll", "darf", "mag", "moechte"
+    )
+
+    /** Preposizioni con caso fisso (quelle a doppio caso non vengono usate). */
+    private val preposizioniAccusativo: Set<String> = setOf(
+        "fuer", "um", "durch", "ohne", "gegen", "bis", "entlang"
+    )
+    private val preposizioniDativo: Set<String> = setOf(
+        "mit", "nach", "aus", "bei", "von", "zu", "seit", "gegenueber"
+    )
+
+    /** Avverbi che possono stare tra il verbo e il buco. */
+    private val avverbiTraVerboEBuco: Set<String> = setOf(
+        "heute", "gestern", "morgen", "oft", "immer", "gern", "gerne",
+        "manchmal", "jetzt", "hier", "dort", "auch", "nur", "sehr", "wieder",
+        "bald", "schon", "noch", "dann", "so", "zusammen", "zuerst", "danach",
+        "leider", "natuerlich", "eigentlich", "schnell", "langsam", "meistens"
+    )
+
+    /** Radici dei verbi che reggono l'accusativo. */
+    private val radiciAccusativo: List<String> = listOf(
+        "besuch", "seh", "hab", "kauf", "les", "ess", "trink", "nehm", "find",
+        "brauch", "such", "behandel", "untersuch", "frag", "kenn", "lieb",
+        "moeg", "versteh", "lern", "schreib", "hoer", "mach", "geb", "bring",
+        "zeig", "oeffn", "schliess", "bezahl", "bestell", "buch", "plan",
+        "organisier", "besprech", "erklaer", "wiederhol", "vergess", "treff",
+        "ruf", "hol", "lad", "pruef", "wieg", "mess", "impf", "verbind",
+        "verordn", "pfleg", "wasch", "putz", "reparier", "miet", "reservier",
+        "empfehl", "bekomm", "besitz", "geniess"
+    )
+
+    /** Radici dei verbi che reggono il dativo. */
+    private val radiciDativo: List<String> = listOf(
+        "helf", "dank", "gehoer", "gefall", "pass", "antwort", "folg",
+        "schmeck", "glaub", "vertrau", "gratulier", "begegn", "widersprech",
+        "rat", "schad", "fehl", "geling"
+    )
+
+    private fun formeVerbo(radice: String): List<String> = listOf(
+        radice + "en", radice + "e", radice + "st", radice + "t",
+        radice + "et", radice + "est",
+        radice + "te", radice + "test", radice + "tet", radice + "ten",
+        radice + "ete", radice + "eten"
+    )
+
+    /** Forme irregolari (presente e passato) dei verbi accusativi frequenti. */
+    private val formeAccusativoIrregolari: Set<String> = setOf(
+        "hat", "habe", "hast", "haben", "habt", "hatte", "hatten",
+        "sieht", "siehst", "sehen", "seht", "sah", "sahen",
+        "liest", "lese", "lesen", "lest", "las", "lasen",
+        "isst", "esse", "essen", "esst", "ass", "assen",
+        "nimmt", "nehme", "nehmen", "nehmt", "nahm", "nahmen",
+        "gibt", "gebe", "geben", "gebt", "gab", "gaben",
+        "trifft", "treffe", "treffen", "trefft", "traf", "trafen",
+        "empfiehlt", "empfehle", "empfehlen", "empfahl",
+        "bekommt", "bekomme", "bekommen", "bekam", "bekamen",
+        "vergisst", "vergesse", "vergessen", "vergesst", "vergass",
+        "findet", "finde", "finden", "fand", "fanden",
+        "bringt", "bringe", "bringen", "brachte", "brachten",
+        "kennt", "kenne", "kennen", "kannte", "kannten",
+        "mag", "magst", "moegen", "moegt", "mochte", "mochten"
+    )
+
+    /** Forme irregolari (presente e passato) dei verbi dativi frequenti. */
+    private val formeDativoIrregolari: Set<String> = setOf(
+        "hilft", "helfe", "helfen", "helft", "half", "halfen",
+        "dankt", "danke", "danken", "dankte",
+        "gehoert", "gehoere", "gehoeren", "gehoerte",
+        "gefaellt", "gefalle", "gefallen", "gefiel", "gefielen",
+        "passt", "passe", "passen", "passte",
+        "antwortet", "antworte", "antworten", "antwortete",
+        "folgt", "folge", "folgen", "folgte",
+        "schmeckt", "schmecke", "schmecken", "schmeckte",
+        "glaubt", "glaube", "glauben", "glaubte",
+        "vertraut", "vertraue", "vertrauen", "vertraute",
+        "gratuliert", "gratuliere", "gratulieren", "gratulierte",
+        "begegnet", "begegne", "begegnen", "begegnete",
+        "widerspricht", "widerspreche", "widersprechen", "widersprach",
+        "raet", "rate", "raten", "riet", "rieten",
+        "schadet", "schade", "schaden", "schadete",
+        "fehlt", "fehle", "fehlen", "fehlte",
+        "gelingt", "gelinge", "gelingen", "gelang"
+    )
+
+    private val formeAccusativo: Set<String> = buildSet {
+        radiciAccusativo.forEach { addAll(formeVerbo(it)) }
+        addAll(formeAccusativoIrregolari)
+    }
+
+    private val formeDativo: Set<String> = buildSet {
+        radiciDativo.forEach { addAll(formeVerbo(it)) }
+        addAll(formeDativoIrregolari)
+    }
+
+    /** Una forma di determinante (articolo/possessivo/dimostrativo) per caso. */
+    private data class Determinante(
+        val lemma: String,
+        val caso: String,
+        val singolare: String,
+        val plurale: String
+    )
+
+    /**
+     * Forme di accusativo/dativo per un nome maschile, usate per capire se due
+     * opzioni sono entrambe corrette a causa del numero non chiarito.
+     */
+    private val determinanti: List<Determinante> = buildList {
+        fun acc(lemma: String, sg: String, pl: String) =
+            add(Determinante(lemma, "acc", sg, pl))
+        fun dat(lemma: String, sg: String, pl: String) =
+            add(Determinante(lemma, "dat", sg, pl))
+
+        acc("der", "den", "die")
+        dat("der", "dem", "den")
+        // "ein" non ha plurale: nessuna ambiguità possibile con esso.
+        acc("ein", "einen", "")
+        dat("ein", "einem", "")
+        acc("kein", "keinen", "keine")
+        dat("kein", "keinem", "keinen")
+        acc("dieser", "diesen", "diese")
+        dat("dieser", "diesem", "diesen")
+        acc("welcher", "welchen", "welche")
+        dat("welcher", "welchem", "welchen")
+        acc("solcher", "solchen", "solche")
+        dat("solcher", "solchem", "solchen")
+        acc("mancher", "manchen", "manche")
+        dat("mancher", "manchem", "manchen")
+        listOf("mein", "dein", "sein", "ihr", "unser", "euer").forEach { p ->
+            // "euer" perde la -e- nelle forme flesse: euren/eurem/eure.
+            val radice = if (p == "euer") "eur" else p
+            acc(p, radice + "en", radice + "e")
+            dat(p, radice + "em", radice + "en")
+        }
+    }
+
+    private val regexBuco = Regex("_+")
+
+    private fun casoDaPreposizione(token: String): String? = when (token) {
+        in preposizioniAccusativo -> "acc"
+        in preposizioniDativo -> "dat"
+        else -> null
+    }
+
+    /**
+     * Caso retto dal verbo/preposizione che precede il buco.
+     * Ritorna null quando il contesto non è riconoscibile: in quel caso il
+     * controllo preferisce tacere (meglio un controllo in meno che un falso
+     * allarme su un esercizio corretto).
+     */
+    private fun casoPrimaDelBuco(parole: List<String>, buco: Int): String? {
+        var i = buco - 1
+        while (i >= 0) {
+            val token = chiave(parole[i])
+            if (token.isEmpty()) {
+                i--
+                continue
+            }
+            casoDaPreposizione(token)?.let { return it }
+            if (token in quantificatoriPlurali) return null
+            if (token in avverbiTraVerboEBuco) {
+                i--
+                continue
+            }
+            val acc = token in formeAccusativo
+            val dat = token in formeDativo
+            return when {
+                acc && !dat -> "acc"
+                dat && !acc -> "dat"
+                else -> null
+            }
+        }
+        return null
+    }
+
+    /**
+     * Riconosce gli esercizi con due risposte corrette a causa di un nome
+     * debole ambiguo. Esempio reale: "Wir besuchen ___ Patienten im Zimmer."
+     * con opzioni euer/eurer/euren/eure — "euren Patienten" (singolare) e
+     * "eure Patienten" (plurale) sono entrambe corrette.
+     *
+     * Ritorna una lista vuota quando l'esercizio non rientra nel caso, così
+     * il resto dei controlli resta invariato.
+     */
+    fun problemiAmbiguitaNumero(domanda: String, opzioni: List<String>): List<String> {
+        if (!domanda.contains("___")) return emptyList()
+        val opzioniNorm = opzioni.map { chiave(it) }
+        // Il controllo vale solo per buchi che sono determinanti (articoli,
+        // possessivi, dimostrativi): se le opzioni sono nomi, verbi o frasi
+        // intere, il caso non si applica.
+        if (opzioniNorm.any { it.isEmpty() || it !in articoli }) return emptyList()
+
+        val parole = domanda.trim().split(Regex("\\s+"))
+        val buco = parole.indexOfFirst { it.matches(regexBuco) }
+        if (buco < 0) return emptyList()
+
+        // Il nome debole deve seguire il buco (al massimo due aggettivi).
+        var j = buco + 1
+        var aggettivi = 0
+        while (j < parole.size && aggettivi < 2 && sembraAggettivo(parole[j])) {
+            j++
+            aggettivi++
+        }
+        if (j >= parole.size) return emptyList()
+        val nome = chiave(parole[j])
+        if (nome !in nomiDeboliAmbigui) return emptyList()
+
+        // Se dopo il nome c'è un verbo che fissa il numero, non è ambiguo.
+        val dopo = (j + 1 until minOf(parole.size, j + 3)).map { chiave(parole[it]) }
+        if (dopo.any {
+                it in verbiPluraliDopoNome || it in verbiSingolariDopoNome || it == "die"
+            }
+        ) {
+            return emptyList()
+        }
+
+        val caso = casoPrimaDelBuco(parole, buco) ?: return emptyList()
+        val insieme = opzioniNorm.toSet()
+        val doppia = determinanti.firstOrNull { d ->
+            d.caso == caso && d.plurale.isNotEmpty() &&
+                chiave(d.singolare) in insieme && chiave(d.plurale) in insieme
+        } ?: return emptyList()
+
+        return listOf(
+            "«___ ${parole[j]}»: con un nome in -en possono essere corrette sia " +
+                "«${doppia.singolare}» (singolare) sia «${doppia.plurale}» (plurale): " +
+                "la frase non chiarisce il numero."
+        )
+    }
+
     /**
      * Controllo completo di un esercizio a scelta multipla.
      * [rispostaCorretta] è l'indice dell'opzione giusta.
@@ -245,6 +515,9 @@ object ControlloGrammatica {
             corretta
         }
         problemi += problemiFrase(frase)
+        // Ambiguità di numero sui nomi deboli: due opzioni possono essere
+        // entrambe corrette anche quando l'accordo della singola frase è giusto.
+        problemi += problemiAmbiguitaNumero(domanda, opzioni)
         return problemi
     }
 
