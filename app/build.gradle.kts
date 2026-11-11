@@ -18,7 +18,7 @@ val appVersionCode = versionProps.getProperty("VERSION_CODE", "203").toInt()
 val appVersionName = versionProps.getProperty("VERSION_NAME", "1.43.0")
 
 android {
-    namespace = "com.alessandro.tedesco"
+    namespace = "com.alessandro.openlingo"
     compileSdk = 35
 
     val freeApiKey: String = Properties().apply {
@@ -27,7 +27,7 @@ android {
     }.getProperty("FREE_API_KEY", "")
 
     defaultConfig {
-        applicationId = "com.alessandro.tedesco"
+        applicationId = "com.alessandro.openlingo"
         minSdk = 26
         targetSdk = 35
         versionCode = appVersionCode

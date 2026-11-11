@@ -42,7 +42,7 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "com.alessandro.tedesco.desktop.MainKt"
+        mainClass = "com.alessandro.openlingo.desktop.MainKt"
         jvmArgs += listOf("-Dfile.encoding=UTF-8")
 
         nativeDistributions {

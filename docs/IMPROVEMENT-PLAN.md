@@ -16,7 +16,7 @@ architecture and observability.
 - End-to-end/integration tests for profile, backup, mocked AI
 
 ## Tranche 3 - Architecture
-- Split large view models (e.g. `TedescoViewModel`) by feature
+- Split large view models (e.g. `OpenLingoViewModel`) by feature
 - Reduce UI/logic coupling
 - Extract repositories/use-cases
 - Generalize from single-target-language assumptions toward multi-course/target-language support
