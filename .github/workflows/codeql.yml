@@ -33,7 +33,7 @@ jobs:
           languages: java-kotlin
 
       - name: Set up JDK 17
-        uses: actions/setup-java@3a4977f0a2a8e541563945153585292344c5a05f # v4
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           java-version: '17'
           distribution: 'temurin'
