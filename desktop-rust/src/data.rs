@@ -1024,6 +1024,7 @@ pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
         unit_b1_adjektivdeklination_intro(),
         unit_b1_relativsaetze_intro(),
         unit_b1_konnektoren(),
+        unit_b1_doppelkonnektoren(),
         unit_b1_reflexive_verben(),
         unit_b1_praeteritum_perfekt(),
         unit_b1_genitiv_intro(),
@@ -1031,6 +1032,7 @@ pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
         unit_b1_futur_intro(),
         unit_b1_indirekte_rede(),
         unit_b1_nominalisierung(),
+        unit_b1_partizipien(),
         unit_b1_passiv_modalverben_intro(),
     ]
 }
@@ -2133,6 +2135,75 @@ fn unit_b1_futur_intro() -> GrammarUnit {
             GrammarUnitExercise { prompt_it: "Completa: Er ___ die Prüfung bestehen. (werden)", prompt_en: "Complete: Er ___ die Prüfung bestehen. (werden)", options: &["werde", "wird", "werden"], correct_index: 1, answer_text: "", explanation_it: "er + werden = wird.", explanation_en: "er + werden = wird." },
             GrammarUnitExercise { prompt_it: "Scegli: Ich habe vergessen, die Rechnung ___ bezahlen.", prompt_en: "Choose: Ich habe vergessen, die Rechnung ___ bezahlen.", options: &["zu", "um", "ohne"], correct_index: 0, answer_text: "", explanation_it: "vergessen regge l'infinito con zu.", explanation_en: "vergessen takes the infinitive with zu." },
             GrammarUnitExercise { prompt_it: "Scrivi la forma: Wir ___ im Sommer reisen. (werden)", prompt_en: "Type the form: Wir ___ im Sommer reisen. (werden)", options: &[], correct_index: 0, answer_text: "werden", explanation_it: "wir + werden = werden.", explanation_en: "wir + werden = werden." },
+        ],
+    }
+}
+
+
+fn unit_b1_doppelkonnektoren() -> GrammarUnit {
+    GrammarUnit {
+        id: "b1-doppelkonnektoren",
+        level: "B1",
+        title_it: "I connettori doppi",
+        title_en: "Double connectors",
+        subtitle_it: "entweder…oder, weder…noch, je…desto",
+        subtitle_en: "entweder…oder, weder…noch, je…desto",
+        objective_it: "Usare connettori doppi per collegare alternative, negazioni e confronti.",
+        objective_en: "Use double connectors to link alternatives, negations, and comparisons.",
+        theory_it: &[
+            "entweder ... oder = o ... o; weder ... noch = né ... né; sowohl ... als auch = sia ... sia.",
+            "nicht nur ... sondern auch = non solo ... ma anche; zwar ... aber = certo ... ma.",
+            "je ... desto/umso = quanto più ... tanto più. Nella parte con je il verbo va in fondo; con desto il verbo resta al secondo posto.",
+        ],
+        theory_en: &[
+            "entweder ... oder = either ... or; weder ... noch = neither ... nor; sowohl ... als auch = both ... and.",
+            "nicht nur ... sondern auch = not only ... but also; zwar ... aber = admittedly ... but.",
+            "je ... desto/umso = the more ... the more. In the je-clause the verb goes to the end; in the desto-clause the verb stays in second position.",
+        ],
+        examples: &[
+            ("Entweder komme ich heute oder am Freitag.", "O vengo oggi o venerdì."),
+            ("Ich habe weder Zeit noch Geld.", "Non ho né tempo né soldi."),
+            ("Je mehr ich lerne, desto besser verstehe ich.", "Più imparo, meglio capisco."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa: Ich habe ___ Zeit ___ Geld.", prompt_en: "Complete: Ich habe ___ Zeit ___ Geld.", options: &["weder ... noch", "sowohl ... als auch", "entweder ... oder"], correct_index: 0, answer_text: "", explanation_it: "Due negazioni: weder ... noch.", explanation_en: "Two negations: weder ... noch." },
+            GrammarUnitExercise { prompt_it: "Completa: Sie spricht ___ Deutsch ___ Englisch.", prompt_en: "Complete: Sie spricht ___ Deutsch ___ Englisch.", options: &["weder ... noch", "sowohl ... als auch", "entweder ... oder"], correct_index: 1, answer_text: "", explanation_it: "Entrambi presenti: sowohl ... als auch.", explanation_en: "Both present: sowohl ... als auch." },
+            GrammarUnitExercise { prompt_it: "Scegli: ___ mehr ich lerne, desto besser verstehe ich.", prompt_en: "Choose: ___ mehr ich lerne, desto besser verstehe ich.", options: &["Je", "Wenn", "Weil"], correct_index: 0, answer_text: "", explanation_it: "Correlazione comparativa: je ... desto.", explanation_en: "Comparative correlation: je ... desto." },
+            GrammarUnitExercise { prompt_it: "Scrivi il connettore mancante: Er ist ___ jung, aber sehr erfahren.", prompt_en: "Type the missing connector: Er ist ___ jung, aber sehr erfahren.", options: &[], correct_index: 0, answer_text: "zwar", explanation_it: "Contrasto con concessione: zwar ... aber.", explanation_en: "Contrast with concession: zwar ... aber." },
+        ],
+    }
+}
+
+fn unit_b1_partizipien() -> GrammarUnit {
+    GrammarUnit {
+        id: "b1-partizipien",
+        level: "B1",
+        title_it: "Participi e frasi ridotte",
+        title_en: "Participles and reduced clauses",
+        subtitle_it: "lachend, gelesen, geöffnet",
+        subtitle_en: "lachend, gelesen, geöffnet",
+        objective_it: "Riconoscere e usare il Partizip I e il Partizip II come aggettivi.",
+        objective_en: "Recognize and use Partizip I and Partizip II as adjectives.",
+        theory_it: &[
+            "Partizip I: infinito + d (lachen -> lachend), azione contemporanea/attiva: der lachende Mann.",
+            "Partizip II: ge-...-t/en (lesen -> gelesen), spesso risultato/passivo: das gelesene Buch.",
+            "Come aggettivi i participi prendono le normali desinenze: der lachende Mann, die geöffnete Tür.",
+        ],
+        theory_en: &[
+            "Partizip I: infinitive + d (lachen -> lachend), simultaneous/active action: der lachende Mann.",
+            "Partizip II: ge-...-t/en (lesen -> gelesen), often result/passive: das gelesene Buch.",
+            "As adjectives, participles take normal adjective endings: der lachende Mann, die geöffnete Tür.",
+        ],
+        examples: &[
+            ("Der lachende Mann ist mein Lehrer.", "L'uomo che ride è il mio insegnante."),
+            ("Das gelesene Buch liegt auf dem Tisch.", "Il libro letto è sul tavolo."),
+            ("Die geöffnete Tür ist kaputt.", "La porta aperta è rotta."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Partizip I di lachen:", prompt_en: "Partizip I of lachen:", options: &["lachend", "gelacht", "lachende"], correct_index: 0, answer_text: "", explanation_it: "Partizip I: infinito + d -> lachend.", explanation_en: "Partizip I: infinitive + d -> lachend." },
+            GrammarUnitExercise { prompt_it: "Partizip II di lesen:", prompt_en: "Partizip II of lesen:", options: &["lesend", "gelesen", "gelesene"], correct_index: 1, answer_text: "", explanation_it: "lesen è forte: gelesen.", explanation_en: "lesen is strong: gelesen." },
+            GrammarUnitExercise { prompt_it: "Completa (aggettivo, maschile): Der ___ Mann ist mein Lehrer. (lachen)", prompt_en: "Complete (adjective, masculine): Der ___ Mann ist mein Lehrer. (lachen)", options: &["lachend", "lachende", "gelachte"], correct_index: 1, answer_text: "", explanation_it: "Der + maschile: lachend + e -> lachende.", explanation_en: "Der + masculine: lachend + e -> lachende." },
+            GrammarUnitExercise { prompt_it: "Scrivi la forma: Das ___ Buch liegt auf dem Tisch. (lesen, Partizip II, neutro)", prompt_en: "Type the form: Das ___ Buch liegt auf dem Tisch. (lesen, Partizip II, neuter)", options: &[], correct_index: 0, answer_text: "gelesene", explanation_it: "Das + neutro: gelesen + e -> gelesene.", explanation_en: "Das + neuter: gelesen + e -> gelesene." },
         ],
     }
 }
