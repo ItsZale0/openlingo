@@ -1009,6 +1009,7 @@ pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
         unit_a1_imperativo(),
         unit_a1_preposizioni_luogo(),
         unit_a1_preposizioni_tempo(),
+        unit_a1_separabili(),
         unit_a1_modalverben(),
         unit_a2_trennbare_verben(),
         unit_a2_perfekt_intro(),
@@ -2280,6 +2281,44 @@ fn unit_a1_preposizioni_tempo() -> GrammarUnit {
             GrammarUnitExercise { prompt_it: "Completa: Der Kurs beginnt ___ 9 Uhr.", prompt_en: "Complete: Der Kurs beginnt ___ 9 Uhr.", options: &["am", "im", "um"], correct_index: 2, answer_text: "", explanation_it: "L'ora vuole um: um 9 Uhr.", explanation_en: "Clock time takes um: um 9 Uhr." },
             GrammarUnitExercise { prompt_it: "Scegli: Ich wohne ___ einem Jahr in Berlin.", prompt_en: "Choose: Ich wohne ___ einem Jahr in Berlin.", options: &["seit", "vor", "nach"], correct_index: 0, answer_text: "", explanation_it: "Periodo che continua: seit + dativo.", explanation_en: "Ongoing period: seit + dative." },
             GrammarUnitExercise { prompt_it: "Scrivi la preposizione: ___ Sommer fahren wir ans Meer.", prompt_en: "Type the preposition: ___ Sommer fahren wir ans Meer.", options: &[], correct_index: 0, answer_text: "Im", explanation_it: "Le stagioni vogliono im: im Sommer.", explanation_en: "Seasons take im: im Sommer." },
+        ],
+    }
+}
+
+
+fn unit_a1_separabili() -> GrammarUnit {
+    GrammarUnit {
+        id: "a1-separabili",
+        level: "A1",
+        title_it: "I verbi separabili",
+        title_en: "Separable verbs",
+        subtitle_it: "Il prefisso che va in fondo alla frase",
+        subtitle_en: "The prefix that goes to the end of the clause",
+        objective_it: "Riconoscere e usare i verbi con prefisso separabile nelle frasi principali.",
+        objective_en: "Recognize and use separable-prefix verbs in main clauses.",
+        theory_it: &[
+            "Prefissi separabili comuni: auf-, an-, aus-, ein-, mit-, zu-, ab-, vor-, zurück-, fern-.",
+            "Nella frase principale il verbo coniugato sta in seconda posizione e il prefisso va alla fine: Ich stehe um 6 Uhr auf.",
+            "All'infinito il prefisso resta unito (aufstehen). Nel participio passato ge entra tra prefisso e verbo: aufgestanden.",
+            "Prefissi inseparabili (be-, ge-, er-, ver-, ent-, emp-, miss-) non si separano.",
+        ],
+        theory_en: &[
+            "Common separable prefixes: auf-, an-, aus-, ein-, mit-, zu-, ab-, vor-, zurück-, fern-.",
+            "In main clauses the conjugated verb is in second position and the prefix goes to the end: Ich stehe um 6 Uhr auf.",
+            "In the infinitive the prefix stays attached (aufstehen). In the past participle ge comes between prefix and verb: aufgestanden.",
+            "Inseparable prefixes (be-, ge-, er-, ver-, ent-, emp-, miss-) do not separate.",
+        ],
+        examples: &[
+            ("Ich stehe um 6 Uhr auf.", "Mi alzo alle 6."),
+            ("Der Kurs fängt um 10 Uhr an.", "Il corso inizia alle 10."),
+            ("Wir kaufen im Supermarkt ein.", "Facciamo la spesa al supermercato."),
+            ("Kommst du mit?", "Vieni con noi?"),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa: Ich ___ um 7 Uhr ___. (aufstehen)", prompt_en: "Complete: Ich ___ um 7 Uhr ___. (aufstehen)", options: &["stehe ... auf", "auf ... stehe", "aufstehe ... -"], correct_index: 0, answer_text: "", explanation_it: "Verbo in seconda posizione, prefisso in fondo: stehe ... auf.", explanation_en: "Verb in second position, prefix at the end: stehe ... auf." },
+            GrammarUnitExercise { prompt_it: "Completa: Wir ___ heute im Supermarkt ___. (einkaufen)", prompt_en: "Complete: Wir ___ heute im Supermarkt ___. (einkaufen)", options: &["kaufen ... ein", "ein ... kaufen", "einkaufen ... -"], correct_index: 0, answer_text: "", explanation_it: "einkaufen: kaufen ... ein.", explanation_en: "einkaufen: kaufen ... ein." },
+            GrammarUnitExercise { prompt_it: "Scegli: ___ du ___? (mitkommen)", prompt_en: "Choose: ___ du ___? (mitkommen)", options: &["Kommst ... mit", "Mit ... kommst", "Kommt ... mit"], correct_index: 0, answer_text: "", explanation_it: "Domanda: Kommst du mit?", explanation_en: "Question: Kommst du mit?" },
+            GrammarUnitExercise { prompt_it: "Scrivi il prefisso: Er sieht abends ___. (fernsehen)", prompt_en: "Type the prefix: Er sieht abends ___. (fernsehen)", options: &[], correct_index: 0, answer_text: "fern", explanation_it: "fernsehen: sieht ... fern.", explanation_en: "fernsehen: sieht ... fern." },
         ],
     }
 }
