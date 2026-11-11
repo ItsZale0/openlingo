@@ -20,14 +20,37 @@
 - `rg -n "sanitario|contestoSanitarioRichiesto|senza chiave|no-key|fallback" core/src app/src desktop/src` (sample hits) shows healthcare-context/personalization strings and fallback-related logic/tests exist (e.g. `Traduttore` healthcare strings, `AdaptiveTestEngine` fallback rounds, tests asserting no inflated fallback without real tests, preset/profile tests for medical context). This confirms **code paths exist**; it does **not** prove runtime behavior across all flows.
 
 ### Rust desktop (`desktop-rust/`) i18n/status (static + tested)
-- Runtime EN/IT toggle implemented (persisted in `preferenze.json` `lingua`): `ui_lang`, language selector/save in Settings, localized key nav/home/settings labels; Review screen and core status/feedback messages localized (EN/IT).  
+- Runtime EN/IT toggle implemented (persisted in `preferenze.json` `lingua`): `ui_lang`, language selector/save in Settings, localized key nav/home/settings labels; Review screen and core status/feedback messages localized (EN/IT); Grammar & lessons screen includes localized labels/progression actions (incremental).  
   `rg -n "ui_lang|prefs\.lingua" desktop-rust/src` shows usage in `src/main.rs` (including `tests::ui_translation_helper_respects_language`).
 - Prior hardcoded `Ciao` greeting replaced by localized greeting in Rust UI (incremental EN/IT parity; verified by merged/tested changes).
+- **Grammar/lesson parity increment (automated+tested):** CEFR syllabus topics (A1/A2/B1) and lesson progression controls (advance/reset) persisted to `progresso.lezione_corrente` (profile-compatible), with unit mastery/due view retained. Verified by `tests::curriculum_lessons_and_progression_update` (`cargo test`: 16 passed). Not full parity with Compose `GrammaticaPercorso`/unit theory-exercise/content flows.
 - **Limitation:** Rust UI localization is incremental (not all screens/prompts/content fully localized) and not full parity with Kotlin `Traduttore` coverage; Rust app does not execute AI personalization/provider flows.
 
 ## 2) Exercisable automated checks (verified)
 
-### Rust (`desktop-rust/`) — latest verified run
+### Rust (`desktop-rust/`) — latest verified run (this increment)
+```text
+cargo test
+running 16 tests
+...
+test tests::curriculum_lessons_and_progression_update ... ok
+...
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+---TEST:0---
+
+cargo build --release
+Finished `release` profile [optimized] target(s)
+---BUILD:0---
+
+Binary: desktop-rust/target/release/openlingo-desktop.exe
+Name                   Length LastWriteTime
+openlingo-desktop.exe 5885952 11/11/2026 11:14:10
+SHA256: 630317C1F0711D1C5D16DA35FF766BEFB3B3EA0FE12C0A7BC82C04A17FF190F3
+
+Runtime smoke (this PC): openlingo-desktop launched and Responding: True (PID 6636, 2026-11-11 11:14:xx).
+```
+
+### Rust (`desktop-rust/`) — previous verified run
 ```text
 cargo test
 running 15 tests

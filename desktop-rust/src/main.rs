@@ -1,7 +1,7 @@
 mod data;
 
 use chrono::Local;
-use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, check_typing_answer};
+use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, check_typing_answer, curriculum_lessons, lesson_topic};
 use eframe::egui;
 
 fn hex(c: u32) -> egui::Color32 {
@@ -565,50 +565,121 @@ impl OpenLingoApp {
     }
 
     fn screen_grammar(&mut self, ui: &mut egui::Ui) {
-        ui.heading("Grammar mastery & unit progression");
+        let lang = ui_lang(&self.store).to_string();
+        let lang = lang.as_str();
+        ui.heading(tr(lang, "Grammar & lessons", "Grammatica e lezioni"));
         if self.store.active_profile().is_none() {
-            ui.label("No active profile.");
+            ui.label(tr(lang, "No active profile.", "Nessun profilo attivo."));
             return;
         }
+        let plan = self.store.study_plan_summary();
+        let (cur_topic_it, cur_topic_en) = lesson_topic(&plan.livello_corrente, plan.lezione_corrente.max(1));
+        let cur_topic = if lang == "it" { cur_topic_it } else { cur_topic_en };
+
+        ui.group(|ui| {
+            ui.strong(tr(lang, "Syllabus & lesson progression", "Programma e progressione lezioni"));
+            ui.label(if lang == "it" {
+                format!("Livello: {}  •  Obiettivo: {}  •  Lezione corrente: {}", plan.livello_corrente, plan.obiettivo_livello, plan.lezione_corrente.max(1))
+            } else {
+                format!("Level: {}  •  Goal: {}  •  Current lesson: {}", plan.livello_corrente, plan.obiettivo_livello, plan.lezione_corrente.max(1))
+            });
+            ui.label(if lang == "it" { format!("Argomento: {cur_topic}") } else { format!("Topic: {cur_topic}") });
+            ui.horizontal(|ui| {
+                if ui.button(tr(lang, "Mark lesson complete / Next", "Segna lezione completata / Avanti")).clicked() {
+                    match self.store.advance_lesson_progress() {
+                        Ok(n) => {
+                            self.status = if lang == "it" { format!("Lezione aggiornata: {n}") } else { format!("Lesson updated: {n}") };
+                        }
+                        Err(e) => self.status = format!("{}: {e}", tr(lang, "Update failed", "Aggiornamento fallito")),
+                    }
+                }
+                if ui.button(tr(lang, "Reset to lesson 1", "Reimposta a lezione 1")).clicked() {
+                    match self.store.set_lesson_progress(1) {
+                        Ok(_) => self.status = tr(lang, "Lesson set to 1.", "Lezione impostata a 1.").into(),
+                        Err(e) => self.status = format!("{}: {e}", tr(lang, "Update failed", "Aggiornamento fallito")),
+                    }
+                }
+            });
+            ui.add_space(4.0);
+            let lessons = curriculum_lessons(&plan.livello_corrente, plan.lezione_corrente.max(1), 20);
+            egui::ScrollArea::vertical().id_salt("grammar_syllabus").max_height(220.0).show(ui, |ui| {
+                for l in &lessons {
+                    let topic = if lang == "it" { &l.topic_it } else { &l.topic_en };
+                    let marker = if l.is_current { "▶" } else if l.is_completed { "✓" } else { "•" };
+                    let line = format!("{marker} {}. {topic}", l.number);
+                    if l.is_current {
+                        ui.strong(line);
+                    } else {
+                        ui.label(line);
+                    }
+                }
+            });
+            ui.small(tr(lang,
+                "Syllabus topics follow the CEFR curriculum (A1/A2/B1) and are stored via lesson progress in the profile (compatible).",
+                "Gli argomenti seguono il curriculum CEFR (A1/A2/B1) e sono salvati tramite la progressione lezione nel profilo (compatibile)."));
+        });
+
+        ui.add_space(8.0);
+        ui.heading(tr(lang, "Grammar mastery & unit progression", "Padronanza grammaticale e unità"));
         let mut summaries = self.store.grammar_mastery_summaries();
         let now = chrono::Utc::now().timestamp_millis();
-        ui.label(format!("Tracked units: {}", summaries.len()));
+        ui.label(if lang == "it" { format!("Unità tracciate: {}", summaries.len()) } else { format!("Tracked units: {}", summaries.len()) });
         ui.add_space(6.0);
         if summaries.is_empty() {
-            ui.label("No grammar mastery data yet. Complete grammar exercises in the main app to populate this view.");
-            return;
-        }
-        summaries.sort_by(|a, b| {
-            let ad = a.is_due(now);
-            let bd = b.is_due(now);
-            bd.cmp(&ad)
-                .then_with(|| a.completata.cmp(&b.completata))
-                .then_with(|| b.percentuale.cmp(&a.percentuale))
-                .then_with(|| a.id.cmp(&b.id))
-        });
-        egui::ScrollArea::vertical().auto_shrink([false, false]).show(ui, |ui| {
-            for s in &summaries {
-                ui.group(|ui| {
-                    ui.horizontal(|ui| {
-                        ui.strong(&s.id);
-                        let state = if s.is_due(now) { "due for review" } else if s.completata { "completed" } else if s.percentuale >= 80 { "mastered" } else if s.tentativi > 0 { "in progress" } else { "new" };
-                        ui.label(format!("• {state}"));
+            ui.label(tr(lang,
+                "No grammar mastery data yet. Complete grammar exercises in the main app to populate this view.",
+                "Nessun dato di padronanza grammaticale. Completa esercizi di grammatica nell'app principale per popolare questa vista."));
+        } else {
+            summaries.sort_by(|a, b| {
+                let ad = a.is_due(now);
+                let bd = b.is_due(now);
+                bd.cmp(&ad)
+                    .then_with(|| a.completata.cmp(&b.completata))
+                    .then_with(|| b.percentuale.cmp(&a.percentuale))
+                    .then_with(|| a.id.cmp(&b.id))
+            });
+            egui::ScrollArea::vertical().id_salt("grammar_mastery").auto_shrink([false, false]).show(ui, |ui| {
+                for s in &summaries {
+                    ui.group(|ui| {
+                        ui.horizontal(|ui| {
+                            ui.strong(&s.id);
+                            let state = if s.is_due(now) {
+                                tr(lang, "due for review", "da ripassare")
+                            } else if s.completata {
+                                tr(lang, "completed", "completata")
+                            } else if s.percentuale >= 80 {
+                                tr(lang, "mastered", "padroneggiata")
+                            } else if s.tentativi > 0 {
+                                tr(lang, "in progress", "in corso")
+                            } else {
+                                tr(lang, "new", "nuova")
+                            };
+                            ui.label(format!("• {state}"));
+                        });
+                        ui.label(if lang == "it" {
+                            format!("Punteggio: {}%  •  Tentativi: {}  •  Corrette: {}  •  Ripassi: {}", s.percentuale, s.tentativi, s.corrette, s.ripassi)
+                        } else {
+                            format!("Score: {}%  •  Attempts: {}  •  Correct: {}  •  Reviews: {}", s.percentuale, s.tentativi, s.corrette, s.ripassi)
+                        });
+                        if s.prossima_ripasso > 0 {
+                            if let Some(dt) = chrono::DateTime::<chrono::Utc>::from_timestamp_millis(s.prossima_ripasso) {
+                                ui.small(format!("{}: {}", tr(lang, "Next review", "Prossimo ripasso"), dt.with_timezone(&chrono::Local).format("%Y-%m-%d %H:%M")));
+                            }
+                        }
+                        if s.ultima_volta > 0 {
+                            if let Some(dt) = chrono::DateTime::<chrono::Utc>::from_timestamp_millis(s.ultima_volta) {
+                                ui.small(format!("{}: {}", tr(lang, "Last activity", "Ultima attività"), dt.with_timezone(&chrono::Local).format("%Y-%m-%d %H:%M")));
+                            }
+                        }
                     });
-                    ui.label(format!("Score: {}%  •  Attempts: {}  •  Correct: {}  •  Reviews: {}", s.percentuale, s.tentativi, s.corrette, s.ripassi));
-                    if s.prossima_ripasso > 0 {
-                        if let Some(dt) = chrono::DateTime::<chrono::Utc>::from_timestamp_millis(s.prossima_ripasso) {
-                            ui.small(format!("Next review: {}", dt.with_timezone(&chrono::Local).format("%Y-%m-%d %H:%M")));
-                        }
-                    }
-                    if s.ultima_volta > 0 {
-                        if let Some(dt) = chrono::DateTime::<chrono::Utc>::from_timestamp_millis(s.ultima_volta) {
-                            ui.small(format!("Last activity: {}", dt.with_timezone(&chrono::Local).format("%Y-%m-%d %H:%M")));
-                        }
-                    }
-                });
-                ui.add_space(4.0);
-            }
-        });
+                    ui.add_space(4.0);
+                }
+            });
+        }
+        if !self.status.is_empty() {
+            ui.add_space(4.0);
+            ui.label(&self.status);
+        }
     }
 
     fn screen_progress(&mut self, ui: &mut egui::Ui) {
@@ -1144,6 +1215,33 @@ mod tests {
         let u1 = gs.iter().find(|g| g.id == "u1").unwrap();
         assert!(u1.is_due(100));
         assert_eq!(u1.ripassi, 2);
+        let _ = fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn curriculum_lessons_and_progression_update() {
+        use crate::data::{curriculum_lessons, lesson_topic};
+        let (it1, en1) = lesson_topic("A1", 1);
+        assert!(!it1.is_empty() && !en1.is_empty());
+        let lessons = curriculum_lessons("A2", 3, 20);
+        assert_eq!(lessons.len(), 20);
+        assert!(lessons[2].is_current);
+        assert!(lessons[1].is_completed);
+        let (it21, _) = lesson_topic("A1", 21);
+        assert!(it21.contains("approfondimento") || it21.to_lowercase().contains("deepening"));
+
+        let dir = temp_dir("syllabus");
+        let mut store = Store::load_from(dir.clone());
+        store.create_profile("Leo");
+        let n = store.advance_lesson_progress().expect("advance");
+        assert_eq!(n, 1);
+        let n2 = store.advance_lesson_progress().expect("advance2");
+        assert_eq!(n2, 2);
+        store.set_lesson_progress(5).expect("set");
+        assert_eq!(store.study_plan_summary().lezione_corrente, 5);
+        // persistence round-trip
+        let store2 = Store::load_from(dir.clone());
+        assert_eq!(store2.study_plan_summary().lezione_corrente, 5);
         let _ = fs::remove_dir_all(dir);
     }
 }
