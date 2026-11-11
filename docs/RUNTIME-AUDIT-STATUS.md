@@ -38,19 +38,19 @@ test tests::guided_session_builds_mixed_questions ... ok
 test tests::difficult_words_selects_lapses_and_errors ... ok
 test tests::embedded_grammar_units_practice_saves_mastery ... ok
 ...
-test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
 ---TEST:0---
 
 cargo build --release
-Finished `release` profile [optimized] target(s) in 9.04s
+Finished `release` profile [optimized] target(s) in 6.21s
 ---BUILD:0---
 
 Binary: desktop-rust/target/release/openlingo-desktop.exe
 Name                   Length LastWriteTime
-openlingo-desktop.exe 6011904 11/11/2026 12:11:21
-SHA256: 517ED3D23D9A93D5FD7360F31F137C01699D37CB9B37886B60B1BB21BEC3FBEA
+openlingo-desktop.exe 6025728 11/11/2026 12:22:47
+SHA256: F9BD516CBB0461BFD551406EEA30531117FDFF2D02B7F26552D924611DB25A41
 
-Runtime smoke (this PC): openlingo-desktop launched and Responding: True (PID 20272, 2026-11-11 12:11:38).
+Runtime smoke (this PC): openlingo-desktop launched and Responding: True (PID 10288, 2026-11-11 12:23:05).
 ```
 
 ### Rust (`desktop-rust/`) — previous verified run
