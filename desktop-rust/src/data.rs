@@ -1028,6 +1028,7 @@ pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
         unit_b1_praeteritum_perfekt(),
         unit_b1_genitiv_intro(),
         unit_b1_konjunktiv2_intro(),
+        unit_b1_futur_intro(),
         unit_b1_indirekte_rede(),
         unit_b1_nominalisierung(),
         unit_b1_passiv_modalverben_intro(),
@@ -2095,6 +2096,43 @@ fn unit_a1_imperativo() -> GrammarUnit {
             GrammarUnitExercise { prompt_it: "Imperativo ihr di gehen:", prompt_en: "ihr imperative of gehen:", options: &["Geh!", "Geht!", "Gehen!"], correct_index: 1, answer_text: "", explanation_it: "Forma ihr: radice + -t -> Geht!", explanation_en: "ihr form: stem + -t -> Geht!" },
             GrammarUnitExercise { prompt_it: "Imperativo Sie di warten:", prompt_en: "Sie imperative of warten:", options: &["Warte!", "Wartet!", "Warten Sie!"], correct_index: 2, answer_text: "", explanation_it: "Forma Sie: infinito + Sie -> Warten Sie!", explanation_en: "Sie form: infinitive + Sie -> Warten Sie!" },
             GrammarUnitExercise { prompt_it: "Scrivi l'imperativo du di sein:", prompt_en: "Type the du imperative of sein:", options: &[], correct_index: 0, answer_text: "Sei", explanation_it: "Imperativo irregolare di sein (du): Sei!", explanation_en: "Irregular du imperative of sein: Sei!" },
+        ],
+    }
+}
+
+
+fn unit_b1_futur_intro() -> GrammarUnit {
+    GrammarUnit {
+        id: "b1-futur",
+        level: "B1",
+        title_it: "Futuro e infinito con zu",
+        title_en: "Future and infinitive with zu",
+        subtitle_it: "Piani, previsioni e verbi che reggono zu",
+        subtitle_en: "Plans, predictions, and verbs that take zu",
+        objective_it: "Formare il Futur I e usare l'infinito con zu nei casi comuni.",
+        objective_en: "Form Futur I and use the infinitive with zu in common cases.",
+        theory_it: &[
+            "Il Futur I si forma con werden + infinito in fondo: Ich werde morgen lernen.",
+            "Coniugazione: ich werde, du wirst, er/sie/es wird, wir werden, ihr werdet, sie/Sie werden.",
+            "Molti verbi reggono zu + infinito (versuchen, vergessen, vorhaben, hoffen). Con prefissi separabili: anzurufen.",
+            "I verbi modali e lassen usano l'infinito senza zu: Ich muss lernen.",
+        ],
+        theory_en: &[
+            "Futur I is formed with werden + infinitive at the end: Ich werde morgen lernen.",
+            "Conjugation: ich werde, du wirst, er/sie/es wird, wir werden, ihr werdet, sie/Sie werden.",
+            "Many verbs take zu + infinitive (versuchen, vergessen, vorhaben, hoffen). With separable prefixes: anzurufen.",
+            "Modal verbs and lassen take the infinitive without zu: Ich muss lernen.",
+        ],
+        examples: &[
+            ("Ich werde morgen nach Bozen fahren.", "Domani andrò a Bolzano."),
+            ("Ich versuche, pünktlich zu kommen.", "Cerco di arrivare puntuale."),
+            ("Ich habe vor, Deutsch zu lernen.", "Ho intenzione di imparare il tedesco."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa: Ich ___ morgen nach Bozen fahren. (werden)", prompt_en: "Complete: Ich ___ morgen nach Bozen fahren. (werden)", options: &["werde", "wirst", "wird"], correct_index: 0, answer_text: "", explanation_it: "ich + werden = werde.", explanation_en: "ich + werden = werde." },
+            GrammarUnitExercise { prompt_it: "Completa: Er ___ die Prüfung bestehen. (werden)", prompt_en: "Complete: Er ___ die Prüfung bestehen. (werden)", options: &["werde", "wird", "werden"], correct_index: 1, answer_text: "", explanation_it: "er + werden = wird.", explanation_en: "er + werden = wird." },
+            GrammarUnitExercise { prompt_it: "Scegli: Ich habe vergessen, die Rechnung ___ bezahlen.", prompt_en: "Choose: Ich habe vergessen, die Rechnung ___ bezahlen.", options: &["zu", "um", "ohne"], correct_index: 0, answer_text: "", explanation_it: "vergessen regge l'infinito con zu.", explanation_en: "vergessen takes the infinitive with zu." },
+            GrammarUnitExercise { prompt_it: "Scrivi la forma: Wir ___ im Sommer reisen. (werden)", prompt_en: "Type the form: Wir ___ im Sommer reisen. (werden)", options: &[], correct_index: 0, answer_text: "werden", explanation_it: "wir + werden = werden.", explanation_en: "wir + werden = werden." },
         ],
     }
 }
