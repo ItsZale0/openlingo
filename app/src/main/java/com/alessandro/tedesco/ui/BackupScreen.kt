@@ -218,13 +218,13 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                         value = repoInput,
                         onValueChange = { repoInput = it },
                         label = { Text(t("Repo di backup")) },
-                        placeholder = { Text("ItsZale0/tedesco-backup") },
+                        placeholder = { Text("ItsZale0/openlingo-backup") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        t("Formato: utente/nome-repo (es. ItsZale0/tedesco-backup)."),
+                        t("Formato: utente/nome-repo (es. ItsZale0/openlingo-backup)."),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -248,7 +248,7 @@ fun BackupScreen(vm: BackupViewModel, onIndietro: () -> Unit) {
                     )
                     Spacer(Modifier.height(6.dp))
                     TutorialGrigioBackup(
-                        t("PASSI:\n1. Crea un repo privato su github.com/new (es. tedesco-backup).\n2. Vai su github.com/settings/personal-access-tokens/new\n3. In \"Repository access\" scegli SOLO il repo di backup.\n4. In \"Permissions\" → Repository permissions → Contents: Read and write.\n5. Genera il token (inizia con github_pat_) e incollalo qui sopra.\nIl token resta solo sul telefono: non viene inviato da nessuna parte tranne a GitHub.")
+                        t("PASSI:\n1. Crea un repo privato su github.com/new (es. openlingo-backup).\n2. Vai su github.com/settings/personal-access-tokens/new\n3. In \"Repository access\" scegli SOLO il repo di backup.\n4. In \"Permissions\" → Repository permissions → Contents: Read and write.\n5. Genera il token (inizia con github_pat_) e incollalo qui sopra.\nIl token resta solo sul telefono: non viene inviato da nessuna parte tranne a GitHub.")
                     )
                     Spacer(Modifier.height(12.dp))
                     Button(

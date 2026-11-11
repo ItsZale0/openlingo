@@ -63,9 +63,9 @@ class UpdaterViewModel(application: Application) : AndroidViewModel(application)
         // diversa, quindi Android non può installarne sopra una build firmata con la
         // chiave attuale. Tenerlo fermo evita un download che fallirebbe alla firma.
         const val URL_RAW =
-            "https://raw.githubusercontent.com/ItsZale0/tedesco-app/master/updates/version.json"
+            "https://raw.githubusercontent.com/ItsZale0/openlingo/master/updates/version.json"
         const val URL_API_CONTENTS =
-            "https://api.github.com/repos/ItsZale0/tedesco-app/contents/updates/version.json"
+            "https://api.github.com/repos/ItsZale0/openlingo/contents/updates/version.json"
     }
 
     val versioneCorrente: String = runCatching {

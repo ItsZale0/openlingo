@@ -1,9 +1,9 @@
 # OpenLingo
 
-[![Latest release](https://img.shields.io/github/v/release/ItsZale0/tedesco-app?label=release)](https://github.com/ItsZale0/tedesco-app/releases/latest)
-[![Build APK](https://github.com/ItsZale0/tedesco-app/actions/workflows/build.yml/badge.svg)](https://github.com/ItsZale0/tedesco-app/actions/workflows/build.yml)
+[![Latest release](https://img.shields.io/github/v/release/ItsZale0/openlingo?label=release)](https://github.com/ItsZale0/openlingo/releases/latest)
+[![Build APK](https://github.com/ItsZale0/openlingo/actions/workflows/build.yml/badge.svg)](https://github.com/ItsZale0/openlingo/actions/workflows/build.yml)
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/license-GPL--3.0--or--later-blue)](LICENSE)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/ItsZale0/tedesco-app/badge)](https://securityscorecards.dev/viewer/?uri=github.com/ItsZale0/tedesco-app)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/ItsZale0/openlingo/badge)](https://securityscorecards.dev/viewer/?uri=github.com/ItsZale0/openlingo)
 
 **OpenLingo** is a free and open-source language learning app that aims to feel
 as approachable and engaging as Duolingo, while being grounded in real didactics
@@ -67,14 +67,14 @@ executable; for Linux and macOS you can build from source.
 
 ## Installation
 
-1. Open the [releases](https://github.com/ItsZale0/tedesco-app/releases/latest) page.
-2. Download:
-   - `Deutsch-v<version>.apk` for Android;
-   - `Deutsch-desktop-v<version>-windows.zip` or `Deutsch.exe` for Windows.
+1. Open the [releases](https://github.com/ItsZale0/openlingo/releases/latest) page.
+2. Download the asset for your platform:
+   - **Android:** `OpenLingo-v<version>.apk` (or `Deutsch-v<version>.apk` in older releases).
+   - **Windows desktop:** `OpenLingo-desktop-v<version>-windows.zip` / `OpenLingo.exe` if provided, or legacy `Deutsch-desktop-v<version>-windows.zip` / `Deutsch.exe` in older releases.
 3. On Android you may need to allow installation from unknown sources for the
    browser or file manager you used.
-4. The app automatically checks for updates and verifies the SHA-256 of the
-   downloaded APK before installing.
+4. Install/open the downloaded file. The app checks for updates and verifies the
+   SHA-256 of the downloaded APK before installing updates.
 
 ## First run
 
@@ -208,7 +208,7 @@ the code or documentation.
 
 ## Development note: a vibecoded project
 
-Deutsch is a **vibecoded** project: most of the code, tests and documentation
+OpenLingo is a **vibecoded** project: most of the code, tests and documentation
 were written in collaboration with AI agents, under human direction, review and
 verification.
 

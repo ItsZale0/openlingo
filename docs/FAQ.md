@@ -24,9 +24,9 @@ Yes. Each profile has separate data: progress, reviews, conversations and lesson
 
 No. Updates keep the same application identifier and signing identity, so profiles and progress remain available. Before changing devices, still export all data.
 
-## How does the app update?
+## How do I install or update the app?
 
-The app checks `updates/version.json` in the repository and offers a new version when available. Before installation it verifies the SHA-256 of the downloaded APK. You can also manually download the latest release from the GitHub releases page.
+Download the latest release from the [GitHub releases page](https://github.com/ItsZale0/openlingo/releases/latest): install `OpenLingo-v<version>.apk` on Android (or the legacy `Deutsch-v<version>.apk` in older releases). For updates, the app checks `updates/version.json`, offers a new version when available, and verifies the SHA-256 of the downloaded APK before installation.
 
 ## I saved a backup to GitHub but can’t find it
 

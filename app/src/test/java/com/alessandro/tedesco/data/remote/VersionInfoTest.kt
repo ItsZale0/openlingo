@@ -16,7 +16,7 @@ class VersionInfoTest {
             {
                 "versionCode": 8,
                 "versionName": "1.6.1",
-                "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.6.1/Tedesco-v1.6.1.apk",
+                "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.6.1/Tedesco-v1.6.1.apk",
                 "changelog": "Bugfix e miglioramenti",
                 "minVersionCode": 1
             }
@@ -27,7 +27,7 @@ class VersionInfoTest {
         assertEquals(8, info.versionCode)
         assertEquals("1.6.1", info.versionName)
         assertEquals(
-            "https://github.com/ItsZale0/tedesco-app/releases/download/v1.6.1/Tedesco-v1.6.1.apk",
+            "https://github.com/ItsZale0/openlingo/releases/download/v1.6.1/Tedesco-v1.6.1.apk",
             info.apkUrl
         )
         assertEquals(1, info.minVersionCode)
@@ -124,7 +124,7 @@ class VersionInfoTest {
             {
                 "versionCode": 109,
                 "versionName": "1.35.1",
-                "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.35.1/Tedesco-v1.35.1.apk"
+                "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.35.1/Tedesco-v1.35.1.apk"
             }
         """.trimIndent()
 

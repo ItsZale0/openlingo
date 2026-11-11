@@ -24,7 +24,7 @@ class VersioniFallbackTest {
             {
                 "versionCode": $versionCode,
                 "versionName": "1.9.9",
-                "apkUrl": "https://github.com/ItsZale0/tedesco-app/releases/download/v1.9.9/Tedesco-v1.9.9.apk",
+                "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.9.9/Tedesco-v1.9.9.apk",
                 "changelog": "Fix",
                 "minVersionCode": 1
             }
@@ -41,7 +41,7 @@ class VersioniFallbackTest {
         assertEquals(182, info.versionCode)
         assertEquals("1.9.9", info.versionName)
         assertEquals(
-            "https://github.com/ItsZale0/tedesco-app/releases/download/v1.9.9/Tedesco-v1.9.9.apk",
+            "https://github.com/ItsZale0/openlingo/releases/download/v1.9.9/Tedesco-v1.9.9.apk",
             info.apkUrl
         )
     }

@@ -9,7 +9,7 @@
 
 Please report suspected vulnerabilities **privately**:
 
-- **Preferred:** [GitHub Private Vulnerability Reporting / Security Advisories](https://github.com/ItsZale0/tedesco-app/security/advisories/new) for this repository.
+- **Preferred:** [GitHub Private Vulnerability Reporting / Security Advisories](https://github.com/ItsZale0/openlingo/security/advisories/new) for this repository.
 - **Alternative:** if private reporting is unavailable, open a minimal issue without exploit details and ask maintainers for a private contact channel.
 
 When reporting, include:

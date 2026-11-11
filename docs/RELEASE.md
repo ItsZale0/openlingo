@@ -48,17 +48,17 @@ Produced artifacts include:
 Rename assets using the release naming scheme:
 
 ```
-Deutsch-v<version>.apk
-Deutsch-desktop-v<version>-windows.zip
-Deutsch.exe
+OpenLingo-v<version>.apk
+OpenLingo-desktop-v<version>-windows.zip
+OpenLingo.exe
 ```
 
-> Note: artifact/file names may still include legacy `Deutsch` naming for compatibility with existing release/update conventions.
+> Note: older releases may use legacy `Deutsch-*` artifact names for compatibility; keep `updates/version.json` (`apkUrl`, `apkSha256`) aligned with the actual uploaded APK name and hash.
 
 ## 3. Compute SHA-256
 
 ```powershell
-Get-FileHash "Deutsch-v<version>.apk" -Algorithm SHA256
+Get-FileHash "OpenLingo-v<version>.apk" -Algorithm SHA256
 ```
 
 Insert the (lowercase) hash into `updates/version.json`:
@@ -90,9 +90,8 @@ The workflow does not publish the release: the maintainer creates it so the dist
 
 Create a GitHub release associated with the tag and upload the assets:
 
-- `Deutsch-v<version>.apk`;
-- `Deutsch-desktop-v<version>-windows.zip`;
-- `Deutsch.exe`.
+- `OpenLingo-v<version>.apk` (Android);
+- `OpenLingo-desktop-v<version>-windows.zip` / `OpenLingo.exe` (Windows desktop), if available (legacy `Deutsch-*` names in older releases).
 
 The description should include key changes and installation requirements. Before finishing, verify that:
 

@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to OpenLingo are documented here. Release tags: https://github.com/ItsZale0/tedesco-app/tags
+All notable changes to OpenLingo are documented here. Release tags: https://github.com/ItsZale0/openlingo/tags
 
 ## v1.51.16 — 2026-11-11
 
@@ -51,4 +51,4 @@ All notable changes to OpenLingo are documented here. Release tags: https://gith
 ## v1.51.9
 - Added article gender trainer and i18n/content updates.
 
-> For full commit history, see: https://github.com/ItsZale0/tedesco-app/commits/master
+> For full commit history, see: https://github.com/ItsZale0/openlingo/commits/master

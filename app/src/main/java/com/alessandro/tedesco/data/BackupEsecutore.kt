@@ -118,7 +118,7 @@ object BackupEsecutore {
                 return Esito.NessunCambiamento
             }
 
-            client.carica(json, t("Backup automatico Deutsch"))
+            client.carica(json, t("Backup automatico OpenLingo"))
             settings.salvaHash(hash)
             settings.registraBackup(System.currentTimeMillis())
             if (!forza) settings.registraAuto(System.currentTimeMillis())

@@ -38,7 +38,7 @@ object FeedGithub {
                 setRequestProperty("Accept", "application/json")
                 setRequestProperty(
                     "User-Agent",
-                    "DeutschApp/1.0 (+https://github.com/ItsZale0/tedesco-app)"
+                    "DeutschApp/1.0 (+https://github.com/ItsZale0/openlingo)"
                 )
                 if (etag.isNotBlank()) setRequestProperty("If-None-Match", etag)
             }

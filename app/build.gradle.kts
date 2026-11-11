@@ -163,7 +163,7 @@ tasks.register("bumpVersion") {
             .replace("\n", "\\n")
             .replace("\r", "\\r")
             .replace("\t", "\\t")
-        val apkUrl = "https://github.com/ItsZale0/tedesco-app/releases/download/v$newName/Deutsch-v$newName.apk"
+        val apkUrl = "https://github.com/ItsZale0/openlingo/releases/download/v$newName/OpenLingo-v$newName.apk"
         val json = """
             {
               "versionCode": $newCode,
@@ -192,7 +192,7 @@ tasks.register("generateVersionJson") {
         if (f.exists()) f.inputStream().use { props.load(it) }
         val vc = props.getProperty("VERSION_CODE", "0").toIntOrNull() ?: 0
         val vn = props.getProperty("VERSION_NAME", "0.0.0")
-        val apkUrl = "https://github.com/ItsZale0/tedesco-app/releases/download/v$vn/Deutsch-v$vn.apk"
+        val apkUrl = "https://github.com/ItsZale0/openlingo/releases/download/v$vn/OpenLingo-v$vn.apk"
         val json = """
             {
               "versionCode": $vc,
