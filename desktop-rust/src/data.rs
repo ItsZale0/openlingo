@@ -1007,6 +1007,7 @@ pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
         unit_a1_sein_haben(),
         unit_a1_possessivi_negazione(),
         unit_a1_imperativo(),
+        unit_a1_preposizioni_luogo(),
         unit_a1_modalverben(),
         unit_a2_trennbare_verben(),
         unit_a2_perfekt_intro(),
@@ -2204,6 +2205,44 @@ fn unit_b1_partizipien() -> GrammarUnit {
             GrammarUnitExercise { prompt_it: "Partizip II di lesen:", prompt_en: "Partizip II of lesen:", options: &["lesend", "gelesen", "gelesene"], correct_index: 1, answer_text: "", explanation_it: "lesen è forte: gelesen.", explanation_en: "lesen is strong: gelesen." },
             GrammarUnitExercise { prompt_it: "Completa (aggettivo, maschile): Der ___ Mann ist mein Lehrer. (lachen)", prompt_en: "Complete (adjective, masculine): Der ___ Mann ist mein Lehrer. (lachen)", options: &["lachend", "lachende", "gelachte"], correct_index: 1, answer_text: "", explanation_it: "Der + maschile: lachend + e -> lachende.", explanation_en: "Der + masculine: lachend + e -> lachende." },
             GrammarUnitExercise { prompt_it: "Scrivi la forma: Das ___ Buch liegt auf dem Tisch. (lesen, Partizip II, neutro)", prompt_en: "Type the form: Das ___ Buch liegt auf dem Tisch. (lesen, Partizip II, neuter)", options: &[], correct_index: 0, answer_text: "gelesene", explanation_it: "Das + neutro: gelesen + e -> gelesene.", explanation_en: "Das + neuter: gelesen + e -> gelesene." },
+        ],
+    }
+}
+
+
+fn unit_a1_preposizioni_luogo() -> GrammarUnit {
+    GrammarUnit {
+        id: "a1-preposizioni-luogo",
+        level: "A1",
+        title_it: "Preposizioni di luogo",
+        title_en: "Prepositions of place",
+        subtitle_it: "Wo? e Wohin? tra dativo e accusativo",
+        subtitle_en: "Wo? and Wohin? with dative and accusative",
+        objective_it: "Scegliere la preposizione e il caso giusto per stato in luogo e moto a luogo.",
+        objective_en: "Choose the right preposition and case for location and direction.",
+        theory_it: &[
+            "Con Wo? (dove?, stato in luogo) si usa spesso il dativo: Ich bin in der Küche.",
+            "Con Wohin? (dove vai?, moto a luogo) si usa spesso l'accusativo: Ich gehe in die Schule.",
+            "Preposizioni miste: in, an, auf, unter, über, vor, hinter, neben, zwischen. Contrazioni comuni: im, am, ins, ans, zum, zur.",
+            "Con città/paesi spesso nach (nach Berlin), con persone/istituzioni spesso zu (zum Arzt, zur Schule).",
+        ],
+        theory_en: &[
+            "With Wo? (where?, location) dative is often used: Ich bin in der Küche.",
+            "With Wohin? (where to?, direction) accusative is often used: Ich gehe in die Schule.",
+            "Two-way prepositions: in, an, auf, unter, über, vor, hinter, neben, zwischen. Common contractions: im, am, ins, ans, zum, zur.",
+            "With cities/countries often nach (nach Berlin), with people/institutions often zu (zum Arzt, zur Schule).",
+        ],
+        examples: &[
+            ("Ich bin in der Schule.", "Sono a scuola."),
+            ("Ich gehe in die Schule.", "Vado a scuola."),
+            ("Das Buch liegt auf dem Tisch.", "Il libro è sul tavolo."),
+            ("Wir fahren nach Berlin.", "Andiamo a Berlino."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa (Wohin?): Ich gehe ___ Schule.", prompt_en: "Complete (Wohin?): Ich gehe ___ Schule.", options: &["in die", "in der", "im"], correct_index: 0, answer_text: "", explanation_it: "Moto a luogo: accusativo -> in die Schule.", explanation_en: "Direction: accusative -> in die Schule." },
+            GrammarUnitExercise { prompt_it: "Completa (Wo?): Ich bin ___ Schule.", prompt_en: "Complete (Wo?): Ich bin ___ Schule.", options: &["in die", "in der", "ins"], correct_index: 1, answer_text: "", explanation_it: "Stato in luogo: dativo -> in der Schule.", explanation_en: "Location: dative -> in der Schule." },
+            GrammarUnitExercise { prompt_it: "Scegli: Das Buch liegt ___ Tisch. (Wo?)", prompt_en: "Choose: Das Buch liegt ___ Tisch. (Wo?)", options: &["auf den", "auf dem", "auf das"], correct_index: 1, answer_text: "", explanation_it: "Posizione: auf + dativo maschile -> auf dem Tisch.", explanation_en: "Location: auf + dative masculine -> auf dem Tisch." },
+            GrammarUnitExercise { prompt_it: "Scrivi la contrazione: Ich gehe ___ Kino. (in + das)", prompt_en: "Type the contraction: Ich gehe ___ Kino. (in + das)", options: &[], correct_index: 0, answer_text: "ins", explanation_it: "in + das = ins.", explanation_en: "in + das = ins." },
         ],
     }
 }
