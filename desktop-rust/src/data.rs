@@ -1008,6 +1008,7 @@ pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
         unit_a1_possessivi_negazione(),
         unit_a1_imperativo(),
         unit_a1_preposizioni_luogo(),
+        unit_a1_preposizioni_tempo(),
         unit_a1_modalverben(),
         unit_a2_trennbare_verben(),
         unit_a2_perfekt_intro(),
@@ -2243,6 +2244,42 @@ fn unit_a1_preposizioni_luogo() -> GrammarUnit {
             GrammarUnitExercise { prompt_it: "Completa (Wo?): Ich bin ___ Schule.", prompt_en: "Complete (Wo?): Ich bin ___ Schule.", options: &["in die", "in der", "ins"], correct_index: 1, answer_text: "", explanation_it: "Stato in luogo: dativo -> in der Schule.", explanation_en: "Location: dative -> in der Schule." },
             GrammarUnitExercise { prompt_it: "Scegli: Das Buch liegt ___ Tisch. (Wo?)", prompt_en: "Choose: Das Buch liegt ___ Tisch. (Wo?)", options: &["auf den", "auf dem", "auf das"], correct_index: 1, answer_text: "", explanation_it: "Posizione: auf + dativo maschile -> auf dem Tisch.", explanation_en: "Location: auf + dative masculine -> auf dem Tisch." },
             GrammarUnitExercise { prompt_it: "Scrivi la contrazione: Ich gehe ___ Kino. (in + das)", prompt_en: "Type the contraction: Ich gehe ___ Kino. (in + das)", options: &[], correct_index: 0, answer_text: "ins", explanation_it: "in + das = ins.", explanation_en: "in + das = ins." },
+        ],
+    }
+}
+
+
+fn unit_a1_preposizioni_tempo() -> GrammarUnit {
+    GrammarUnit {
+        id: "a1-preposizioni-tempo",
+        level: "A1",
+        title_it: "Preposizioni di tempo",
+        title_en: "Prepositions of time",
+        subtitle_it: "um, am, im, seit, vor, nach, in",
+        subtitle_en: "um, am, im, seit, vor, nach, in",
+        objective_it: "Collocare azioni nel tempo con le preposizioni più frequenti.",
+        objective_en: "Place actions in time with the most common prepositions.",
+        theory_it: &[
+            "um + ora (um 8 Uhr), am + giorno/data (am Montag), im + mese/stagione (im Januar, im Sommer).",
+            "in + periodo futuro (in einer Woche); seit + dativo = da/per un periodo che continua (seit einem Jahr).",
+            "vor + dativo = fa (vor einer Woche); nach + dativo = dopo (nach dem Essen).",
+        ],
+        theory_en: &[
+            "um + time (um 8 Uhr), am + day/date (am Montag), im + month/season (im Januar, im Sommer).",
+            "in + future period (in einer Woche); seit + dative = since/for an ongoing period (seit einem Jahr).",
+            "vor + dative = ago (vor einer Woche); nach + dative = after (nach dem Essen).",
+        ],
+        examples: &[
+            ("Am Montag habe ich frei.", "Lunedì sono libero."),
+            ("Der Kurs beginnt um 9 Uhr.", "Il corso inizia alle 9."),
+            ("Ich wohne seit einem Jahr in Berlin.", "Vivo a Berlino da un anno."),
+            ("Nach dem Essen gehen wir spazieren.", "Dopo mangiato andiamo a passeggiare."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa: ___ Montag habe ich frei.", prompt_en: "Complete: ___ Montag habe ich frei.", options: &["Am", "Im", "Um"], correct_index: 0, answer_text: "", explanation_it: "I giorni vogliono am: am Montag.", explanation_en: "Days take am: am Montag." },
+            GrammarUnitExercise { prompt_it: "Completa: Der Kurs beginnt ___ 9 Uhr.", prompt_en: "Complete: Der Kurs beginnt ___ 9 Uhr.", options: &["am", "im", "um"], correct_index: 2, answer_text: "", explanation_it: "L'ora vuole um: um 9 Uhr.", explanation_en: "Clock time takes um: um 9 Uhr." },
+            GrammarUnitExercise { prompt_it: "Scegli: Ich wohne ___ einem Jahr in Berlin.", prompt_en: "Choose: Ich wohne ___ einem Jahr in Berlin.", options: &["seit", "vor", "nach"], correct_index: 0, answer_text: "", explanation_it: "Periodo che continua: seit + dativo.", explanation_en: "Ongoing period: seit + dative." },
+            GrammarUnitExercise { prompt_it: "Scrivi la preposizione: ___ Sommer fahren wir ans Meer.", prompt_en: "Type the preposition: ___ Sommer fahren wir ans Meer.", options: &[], correct_index: 0, answer_text: "Im", explanation_it: "Le stagioni vogliono im: im Sommer.", explanation_en: "Seasons take im: im Sommer." },
         ],
     }
 }
