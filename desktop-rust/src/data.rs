@@ -960,14 +960,15 @@ pub struct GrammarUnit {
 pub struct GrammarUnitExercise {
     pub prompt_it: &'static str,
     pub prompt_en: &'static str,
-    pub options: &'static [&'static str],
+    pub options: &'static [&'static str], // empty => typing/completion answer
     pub correct_index: usize,
+    pub answer_text: &'static str, // expected text for typing exercises (case-insensitive trim)
     pub explanation_it: &'static str,
     pub explanation_en: &'static str,
 }
 
 pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
-    vec![unit_a0_articoli(), unit_a0_pronomi_sein(), unit_a0_frase(), unit_a1_akkusativ()]
+    vec![unit_a0_articoli(), unit_a0_pronomi_sein(), unit_a0_frase(), unit_a1_akkusativ(), unit_a1_sein_haben()]
 }
 
 pub fn embedded_grammar_unit_by_id(id: &str) -> Option<GrammarUnit> {
@@ -1001,10 +1002,10 @@ fn unit_a0_articoli() -> GrammarUnit {
             ("die Bücher", "i libri / the books"),
         ],
         exercises: &[
-            GrammarUnitExercise { prompt_it: "Scegli l'articolo: ___ Mann", prompt_en: "Choose the article: ___ Mann", options: &["der", "die", "das"], correct_index: 0, explanation_it: "Mann è maschile: der Mann.", explanation_en: "Mann is masculine: der Mann." },
-            GrammarUnitExercise { prompt_it: "Scegli l'articolo: ___ Frau", prompt_en: "Choose the article: ___ Frau", options: &["der", "die", "das"], correct_index: 1, explanation_it: "Frau è femminile: die Frau.", explanation_en: "Frau is feminine: die Frau." },
-            GrammarUnitExercise { prompt_it: "Scegli l'articolo: ___ Kind", prompt_en: "Choose the article: ___ Kind", options: &["der", "die", "das"], correct_index: 2, explanation_it: "Kind è neutro: das Kind.", explanation_en: "Kind is neuter: das Kind." },
-            GrammarUnitExercise { prompt_it: "Scegli l'articolo (plurale): ___ Kinder", prompt_en: "Choose the article (plural): ___ Kinder", options: &["der", "die", "das"], correct_index: 1, explanation_it: "Il plurale al nominativo usa die.", explanation_en: "Plural nominative uses die." },
+            GrammarUnitExercise { prompt_it: "Scegli l'articolo: ___ Mann", prompt_en: "Choose the article: ___ Mann", options: &["der", "die", "das"], correct_index: 0, answer_text: "", explanation_it: "Mann è maschile: der Mann.", explanation_en: "Mann is masculine: der Mann." },
+            GrammarUnitExercise { prompt_it: "Scegli l'articolo: ___ Frau", prompt_en: "Choose the article: ___ Frau", options: &["der", "die", "das"], correct_index: 1, answer_text: "", explanation_it: "Frau è femminile: die Frau.", explanation_en: "Frau is feminine: die Frau." },
+            GrammarUnitExercise { prompt_it: "Scegli l'articolo: ___ Kind", prompt_en: "Choose the article: ___ Kind", options: &["der", "die", "das"], correct_index: 2, answer_text: "", explanation_it: "Kind è neutro: das Kind.", explanation_en: "Kind is neuter: das Kind." },
+            GrammarUnitExercise { prompt_it: "Scegli l'articolo (plurale): ___ Kinder", prompt_en: "Choose the article (plural): ___ Kinder", options: &["der", "die", "das"], correct_index: 1, answer_text: "", explanation_it: "Il plurale al nominativo usa die.", explanation_en: "Plural nominative uses die." },
         ],
     }
 }
@@ -1035,10 +1036,10 @@ fn unit_a0_pronomi_sein() -> GrammarUnit {
             ("Wir sind in Berlin.", "Siamo a Berlino."),
         ],
         exercises: &[
-            GrammarUnitExercise { prompt_it: "Completa: Ich ___ Student.", prompt_en: "Complete: Ich ___ Student.", options: &["bin", "bist", "ist"], correct_index: 0, explanation_it: "Con ich si usa bin.", explanation_en: "With ich use bin." },
-            GrammarUnitExercise { prompt_it: "Completa: Du ___ nett.", prompt_en: "Complete: Du ___ nett.", options: &["bin", "bist", "sind"], correct_index: 1, explanation_it: "Con du si usa bist.", explanation_en: "With du use bist." },
-            GrammarUnitExercise { prompt_it: "Completa: Er ___ Arzt.", prompt_en: "Complete: Er ___ Arzt.", options: &["ist", "bist", "seid"], correct_index: 0, explanation_it: "Con er/sie/es si usa ist.", explanation_en: "With er/sie/es use ist." },
-            GrammarUnitExercise { prompt_it: "Completa: Wir ___ Freunde.", prompt_en: "Complete: Wir ___ Freunde.", options: &["seid", "sind", "ist"], correct_index: 1, explanation_it: "Con wir si usa sind.", explanation_en: "With wir use sind." },
+            GrammarUnitExercise { prompt_it: "Completa: Ich ___ Student.", prompt_en: "Complete: Ich ___ Student.", options: &["bin", "bist", "ist"], correct_index: 0, answer_text: "", explanation_it: "Con ich si usa bin.", explanation_en: "With ich use bin." },
+            GrammarUnitExercise { prompt_it: "Completa: Du ___ nett.", prompt_en: "Complete: Du ___ nett.", options: &["bin", "bist", "sind"], correct_index: 1, answer_text: "", explanation_it: "Con du si usa bist.", explanation_en: "With du use bist." },
+            GrammarUnitExercise { prompt_it: "Completa: Er ___ Arzt.", prompt_en: "Complete: Er ___ Arzt.", options: &["ist", "bist", "seid"], correct_index: 0, answer_text: "", explanation_it: "Con er/sie/es si usa ist.", explanation_en: "With er/sie/es use ist." },
+            GrammarUnitExercise { prompt_it: "Completa: Wir ___ Freunde.", prompt_en: "Complete: Wir ___ Freunde.", options: &["seid", "sind", "ist"], correct_index: 1, answer_text: "", explanation_it: "Con wir si usa sind.", explanation_en: "With wir use sind." },
         ],
     }
 }
@@ -1069,9 +1070,9 @@ fn unit_a0_frase() -> GrammarUnit {
             ("Wohnst du in Wien?", "Abiti a Vienna?"),
         ],
         exercises: &[
-            GrammarUnitExercise { prompt_it: "Quale frase è corretta?", prompt_en: "Which sentence is correct?", options: &["Ich heute lerne Deutsch.", "Heute lerne ich Deutsch.", "Heute ich lerne Deutsch."], correct_index: 1, explanation_it: "Il verbo resta in seconda posizione: Heute (1) lerne (2) ich (3)...", explanation_en: "Verb stays in position 2: Heute (1) lerne (2) ich (3)..." },
-            GrammarUnitExercise { prompt_it: "Completa l'ordine corretto: ___ du Deutsch? (lernen)", prompt_en: "Complete the correct order: ___ du Deutsch? (lernen)", options: &["Du lernst", "Lernst", "Deutsch lernst"], correct_index: 1, explanation_it: "Nelle domande sì/no il verbo va all'inizio.", explanation_en: "In yes/no questions the verb comes first." },
-            GrammarUnitExercise { prompt_it: "Quale frase è corretta?", prompt_en: "Which sentence is correct?", options: &["Wir spielen heute Fußball.", "Wir heute spielen Fußball.", "Spielen wir heute Fußball."], correct_index: 0, explanation_it: "Frase affermativa: soggetto (1), verbo (2), resto.", explanation_en: "Statement: subject (1), verb (2), rest." },
+            GrammarUnitExercise { prompt_it: "Quale frase è corretta?", prompt_en: "Which sentence is correct?", options: &["Ich heute lerne Deutsch.", "Heute lerne ich Deutsch.", "Heute ich lerne Deutsch."], correct_index: 1, answer_text: "", explanation_it: "Il verbo resta in seconda posizione: Heute (1) lerne (2) ich (3)...", explanation_en: "Verb stays in position 2: Heute (1) lerne (2) ich (3)..." },
+            GrammarUnitExercise { prompt_it: "Completa l'ordine corretto: ___ du Deutsch? (lernen)", prompt_en: "Complete the correct order: ___ du Deutsch? (lernen)", options: &["Du lernst", "Lernst", "Deutsch lernst"], correct_index: 1, answer_text: "", explanation_it: "Nelle domande sì/no il verbo va all'inizio.", explanation_en: "In yes/no questions the verb comes first." },
+            GrammarUnitExercise { prompt_it: "Quale frase è corretta?", prompt_en: "Which sentence is correct?", options: &["Wir spielen heute Fußball.", "Wir heute spielen Fußball.", "Spielen wir heute Fußball."], correct_index: 0, answer_text: "", explanation_it: "Frase affermativa: soggetto (1), verbo (2), resto.", explanation_en: "Statement: subject (1), verb (2), rest." },
         ],
     }
 }
@@ -1102,10 +1103,44 @@ fn unit_a1_akkusativ() -> GrammarUnit {
             ("Wir sehen das Haus.", "Vediamo la casa."),
         ],
         exercises: &[
-            GrammarUnitExercise { prompt_it: "Completa: Ich sehe ___ Mann. (der)", prompt_en: "Complete: Ich sehe ___ Mann. (der)", options: &["der", "den", "dem"], correct_index: 1, explanation_it: "Maschile all'accusativo: der -> den.", explanation_en: "Masculine accusative: der -> den." },
-            GrammarUnitExercise { prompt_it: "Completa: Ich habe ___ Katze. (eine)", prompt_en: "Complete: Ich habe ___ Katze. (eine)", options: &["eine", "einen", "einer"], correct_index: 0, explanation_it: "Femminile non cambia all'accusativo: eine.", explanation_en: "Feminine does not change in accusative: eine." },
-            GrammarUnitExercise { prompt_it: "Completa: Er kauft ___ Buch. (ein)", prompt_en: "Complete: Er kauft ___ Buch. (ein)", options: &["ein", "einen", "einem"], correct_index: 0, explanation_it: "Neutro non cambia all'accusativo: ein.", explanation_en: "Neuter does not change in accusative: ein." },
-            GrammarUnitExercise { prompt_it: "Completa: Wir brauchen ___ Tisch. (der)", prompt_en: "Complete: Wir brauchen ___ Tisch. (der)", options: &["der", "den", "des"], correct_index: 1, explanation_it: "Oggetto diretto maschile: den Tisch.", explanation_en: "Masculine direct object: den Tisch." },
+            GrammarUnitExercise { prompt_it: "Completa: Ich sehe ___ Mann. (der)", prompt_en: "Complete: Ich sehe ___ Mann. (der)", options: &["der", "den", "dem"], correct_index: 1, answer_text: "", explanation_it: "Maschile all'accusativo: der -> den.", explanation_en: "Masculine accusative: der -> den." },
+            GrammarUnitExercise { prompt_it: "Completa: Ich habe ___ Katze. (eine)", prompt_en: "Complete: Ich habe ___ Katze. (eine)", options: &["eine", "einen", "einer"], correct_index: 0, answer_text: "", explanation_it: "Femminile non cambia all'accusativo: eine.", explanation_en: "Feminine does not change in accusative: eine." },
+            GrammarUnitExercise { prompt_it: "Completa: Er kauft ___ Buch. (ein)", prompt_en: "Complete: Er kauft ___ Buch. (ein)", options: &["ein", "einen", "einem"], correct_index: 0, answer_text: "", explanation_it: "Neutro non cambia all'accusativo: ein.", explanation_en: "Neuter does not change in accusative: ein." },
+            GrammarUnitExercise { prompt_it: "Completa: Wir brauchen ___ Tisch. (der)", prompt_en: "Complete: Wir brauchen ___ Tisch. (der)", options: &["der", "den", "des"], correct_index: 1, answer_text: "", explanation_it: "Oggetto diretto maschile: den Tisch.", explanation_en: "Masculine direct object: den Tisch." },
+        ],
+    }
+}
+
+fn unit_a1_sein_haben() -> GrammarUnit {
+    GrammarUnit {
+        id: "a1-sein-haben",
+        level: "A1",
+        title_it: "sein e haben al presente",
+        title_en: "sein and haben in the present",
+        subtitle_it: "Due verbi fondamentali: essere e avere",
+        subtitle_en: "Two essential verbs: to be and to have",
+        objective_it: "Coniugare e usare sein/haben in frasi semplici.",
+        objective_en: "Conjugate and use sein/haben in simple sentences.",
+        theory_it: &[
+            "sein: ich bin, du bist, er/sie/es ist, wir sind, ihr seid, sie/Sie sind.",
+            "haben: ich habe, du hast, er/sie/es hat, wir haben, ihr habt, sie/Sie haben.",
+            "haben si usa spesso per possesso ed espressioni (Ich habe Hunger).",
+        ],
+        theory_en: &[
+            "sein: ich bin, du bist, er/sie/es ist, wir sind, ihr seid, sie/Sie sind.",
+            "haben: ich habe, du hast, er/sie/es hat, wir haben, ihr habt, sie/Sie haben.",
+            "haben is often used for possession and expressions (Ich habe Hunger).",
+        ],
+        examples: &[
+            ("Ich habe einen Bruder.", "Ho un fratello."),
+            ("Sie hat Zeit.", "Lei ha tempo."),
+            ("Wir sind zu Hause.", "Siamo a casa."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa: Ich ___ eine Schwester. (haben)", prompt_en: "Complete: Ich ___ eine Schwester. (haben)", options: &["habe", "hast", "hat"], correct_index: 0, answer_text: "", explanation_it: "Con ich: ich habe.", explanation_en: "With ich: ich habe." },
+            GrammarUnitExercise { prompt_it: "Completa: Du ___ müde. (sein)", prompt_en: "Complete: Du ___ müde. (sein)", options: &["bin", "bist", "ist"], correct_index: 1, answer_text: "", explanation_it: "Con du: du bist.", explanation_en: "With du: du bist." },
+            GrammarUnitExercise { prompt_it: "Scrivi la forma corretta: Er ___ (haben) ein Auto.", prompt_en: "Type the correct form: Er ___ (haben) ein Auto.", options: &[], correct_index: 0, answer_text: "hat", explanation_it: "Con er/sie/es: er hat.", explanation_en: "With er/sie/es: er hat." },
+            GrammarUnitExercise { prompt_it: "Scrivi la forma corretta: Wir ___ (sein) bereit.", prompt_en: "Type the correct form: Wir ___ (sein) bereit.", options: &[], correct_index: 0, answer_text: "sind", explanation_it: "Con wir: wir sind.", explanation_en: "With wir: wir sind." },
         ],
     }
 }

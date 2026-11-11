@@ -132,6 +132,7 @@ struct OpenLingoApp {
     grammar_practice_correct: usize,
     grammar_practice_answered: bool,
     grammar_practice_feedback: String,
+    grammar_practice_input: String,
     grammar_practice_done: Option<(i32, bool)>, // (percent, completed)
 }
 
@@ -177,6 +178,7 @@ impl OpenLingoApp {
             grammar_practice_correct: 0,
             grammar_practice_answered: false,
             grammar_practice_feedback: String::new(),
+            grammar_practice_input: String::new(),
             grammar_practice_done: None,
         };
         app.backup_path = app.store.base_dir.join("openlingo-backup.json").to_string_lossy().to_string();
@@ -655,6 +657,7 @@ impl OpenLingoApp {
                         self.grammar_practice_correct = 0;
                         self.grammar_practice_answered = false;
                         self.grammar_practice_feedback.clear();
+                        self.grammar_practice_input.clear();
                         self.grammar_practice_done = None;
                     }
                 });
@@ -688,6 +691,7 @@ impl OpenLingoApp {
                             self.grammar_practice_correct = 0;
                             self.grammar_practice_answered = false;
                             self.grammar_practice_feedback.clear();
+                            self.grammar_practice_input.clear();
                             self.grammar_practice_done = None;
                         }
                     });
@@ -712,21 +716,40 @@ impl OpenLingoApp {
                         let prompt = if lang == "it" { ex.prompt_it } else { ex.prompt_en };
                         ui.strong(prompt);
                         if !self.grammar_practice_answered {
-                            let mut picked: Option<usize> = None;
-                            for (i, opt) in ex.options.iter().enumerate() {
-                                if ui.button(*opt).clicked() { picked = Some(i); }
-                            }
-                            if let Some(i) = picked {
-                                self.grammar_practice_answered = true;
-                                let correct = i == ex.correct_index;
-                                if correct { self.grammar_practice_correct += 1; }
-                                let expl = if lang == "it" { ex.explanation_it } else { ex.explanation_en };
-                                self.grammar_practice_feedback = if correct {
-                                    if lang == "it" { format!("Corretto! {expl}") } else { format!("Correct! {expl}") }
-                                } else {
+                            if ex.options.is_empty() {
+                                ui.horizontal(|ui| {
+                                    ui.add(egui::TextEdit::singleline(&mut self.grammar_practice_input).hint_text(tr(lang, "Type answer...", "Scrivi la risposta...")));
+                                    if ui.button(tr(lang, "Check", "Controlla")).clicked() {
+                                        let given = self.grammar_practice_input.trim().to_lowercase();
+                                        let expected = ex.answer_text.trim().to_lowercase();
+                                        let correct = !expected.is_empty() && given == expected;
+                                        self.grammar_practice_answered = true;
+                                        if correct { self.grammar_practice_correct += 1; }
+                                        let expl = if lang == "it" { ex.explanation_it } else { ex.explanation_en };
+                                        self.grammar_practice_feedback = if correct {
+                                            if lang == "it" { format!("Corretto! {expl}") } else { format!("Correct! {expl}") }
+                                        } else {
+                                            if lang == "it" { format!("Sbagliato. Risposta: {}. {expl}", ex.answer_text) } else { format!("Incorrect. Answer: {}. {expl}", ex.answer_text) }
+                                        };
+                                    }
+                                });
+                            } else {
+                                let mut picked: Option<usize> = None;
+                                for (i, opt) in ex.options.iter().enumerate() {
+                                    if ui.button(*opt).clicked() { picked = Some(i); }
+                                }
+                                if let Some(i) = picked {
+                                    self.grammar_practice_answered = true;
+                                    let correct = i == ex.correct_index;
+                                    if correct { self.grammar_practice_correct += 1; }
+                                    let expl = if lang == "it" { ex.explanation_it } else { ex.explanation_en };
                                     let ans = ex.options.get(ex.correct_index).copied().unwrap_or("");
-                                    if lang == "it" { format!("Sbagliato. Risposta: {ans}. {expl}") } else { format!("Incorrect. Answer: {ans}. {expl}") }
-                                };
+                                    self.grammar_practice_feedback = if correct {
+                                        if lang == "it" { format!("Corretto! {expl}") } else { format!("Correct! {expl}") }
+                                    } else {
+                                        if lang == "it" { format!("Sbagliato. Risposta: {ans}. {expl}") } else { format!("Incorrect. Answer: {ans}. {expl}") }
+                                    };
+                                }
                             }
                         } else {
                             ui.label(&self.grammar_practice_feedback);
@@ -734,6 +757,7 @@ impl OpenLingoApp {
                                 self.grammar_practice_index += 1;
                                 self.grammar_practice_answered = false;
                                 self.grammar_practice_feedback.clear();
+                                self.grammar_practice_input.clear();
                             }
                         }
                     });
@@ -757,6 +781,7 @@ impl OpenLingoApp {
                         self.grammar_practice_correct = 0;
                         self.grammar_practice_answered = false;
                         self.grammar_practice_feedback.clear();
+                        self.grammar_practice_input.clear();
                         self.grammar_practice_done = None;
                     }
                     ui.label(format!("[{}] {title}", u.level));
@@ -1412,9 +1437,11 @@ mod tests {
     fn embedded_grammar_units_practice_saves_mastery() {
         use crate::data::embedded_grammar_units;
         let units = embedded_grammar_units();
-        assert!(units.len() >= 3);
+        assert!(units.len() >= 4);
         let u = &units[0];
         assert!(!u.id.is_empty() && !u.exercises.is_empty());
+        // ensure at least one typing/completion exercise exists in embedded units
+        assert!(units.iter().any(|uu| uu.exercises.iter().any(|ex| ex.options.is_empty() && !ex.answer_text.is_empty())));
 
         let dir = temp_dir("gunit");
         let mut store = Store::load_from(dir.clone());
