@@ -232,6 +232,36 @@ pub fn build_meaning_quiz(words: &[WordEntity], seed: u64, limit: usize) -> Vec<
     }).collect()
 }
 
+pub fn build_german_choice_quiz(words: &[WordEntity], seed: u64, limit: usize) -> Vec<ExerciseQuestion> {
+    let mut pool: Vec<_> = words.iter().filter(|w| !w.archived && !w.italian.trim().is_empty() && !w.german.trim().is_empty()).cloned().collect();
+    simple_shuffle(&mut pool, seed ^ 0x6E7243);
+    pool.truncate(limit.max(4));
+    let all = pool.clone();
+    if all.len() < 2 { return vec![]; }
+    pool.into_iter().take(limit).map(|w| {
+        let correct = w.label();
+        let mut opts = vec![correct.clone()];
+        let mut i = 0u64;
+        while opts.len() < 4 && opts.len() < all.len() {
+            let pick = &all[((seed.wrapping_add(i).wrapping_mul(2654435761) as usize) + w.id.len() + opts.len()) % all.len()];
+            let cand = pick.label();
+            if !opts.iter().any(|o| o.eq_ignore_ascii_case(&cand)) {
+                opts.push(cand);
+            }
+            i += 1;
+            if i > 50 { break; }
+        }
+        simple_shuffle(&mut opts, seed ^ (w.italian.len() as u64));
+        ExerciseQuestion {
+            prompt: format!("Choose the German for: {}", w.italian),
+            options: opts,
+            answer: correct,
+            word: w,
+            kind: ExerciseKind::GermanChoice,
+        }
+    }).collect()
+}
+
 pub fn build_typing_quiz(words: &[WordEntity], seed: u64, limit: usize) -> Vec<ExerciseQuestion> {
     let mut pool: Vec<_> = words.iter().filter(|w| !w.archived && !w.italian.trim().is_empty()).cloned().collect();
     simple_shuffle(&mut pool, seed ^ 0xC0FFEE);
@@ -299,11 +329,12 @@ pub fn build_cloze_quiz(words: &[WordEntity], seed: u64, limit: usize) -> Vec<Ex
 
 pub fn build_mixed_quiz(words: &[WordEntity], max_level: &str, seed: u64, limit: usize) -> Vec<ExerciseQuestion> {
     let mut qs = Vec::new();
-    let n = (limit / 3).max(1);
-    qs.extend(build_article_quiz(words, max_level, seed, n + 2));
-    qs.extend(build_meaning_quiz(words, seed ^ 1, n + 2));
-    qs.extend(build_cloze_quiz(words, seed ^ 2, n + 2));
-    qs.extend(build_typing_quiz(words, seed ^ 3, n + 2));
+    let n = (limit / 4).max(1);
+    qs.extend(build_article_quiz(words, max_level, seed, n + 1));
+    qs.extend(build_meaning_quiz(words, seed ^ 1, n + 1));
+    qs.extend(build_german_choice_quiz(words, seed ^ 4, n + 1));
+    qs.extend(build_cloze_quiz(words, seed ^ 2, n + 1));
+    qs.extend(build_typing_quiz(words, seed ^ 3, n + 1));
     simple_shuffle(&mut qs, seed ^ 0x51EED);
     qs.truncate(limit);
     qs
