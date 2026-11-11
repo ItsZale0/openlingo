@@ -1011,6 +1011,8 @@ pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
         unit_a2_weil_dass(),
         unit_a2_komparativ(),
         unit_b1_adjektivdeklination_intro(),
+        unit_a2_praepositionen_dativ(),
+        unit_b1_relativsaetze_intro(),
     ]
 }
 
@@ -1387,6 +1389,74 @@ fn unit_b1_adjektivdeklination_intro() -> GrammarUnit {
             GrammarUnitExercise { prompt_it: "Completa: ein ___ Mann (gut)", prompt_en: "Complete: ein ___ Mann (gut)", options: &["gute", "guter", "guten"], correct_index: 1, answer_text: "", explanation_it: "Maschile nominativo con articolo indeterminativo: ein guter Mann.", explanation_en: "Masculine nominative with indefinite article: ein guter Mann." },
             GrammarUnitExercise { prompt_it: "Completa: eine ___ Frau (neu)", prompt_en: "Complete: eine ___ Frau (neu)", options: &["neue", "neuer", "neuen"], correct_index: 0, answer_text: "", explanation_it: "Femminile nominativo con eine: eine neue Frau.", explanation_en: "Feminine nominative with eine: eine neue Frau." },
             GrammarUnitExercise { prompt_it: "Scrivi la desinenza: das ___ Kind (klein)", prompt_en: "Type the ending/form: das ___ Kind (klein)", options: &[], correct_index: 0, answer_text: "kleine", explanation_it: "Neutro nominativo con articolo determinativo: das kleine Kind.", explanation_en: "Neuter nominative with definite article: das kleine Kind." },
+        ],
+    }
+}
+
+fn unit_a2_praepositionen_dativ() -> GrammarUnit {
+    GrammarUnit {
+        id: "a2-praepositionen-dativ",
+        level: "A2",
+        title_it: "Preposizioni con dativo",
+        title_en: "Prepositions with dative",
+        subtitle_it: "mit, nach, bei, von, zu, aus, seit, gegenüber",
+        subtitle_en: "mit, nach, bei, von, zu, aus, seit, gegenüber",
+        objective_it: "Usare le preposizioni più comuni che richiedono il dativo.",
+        objective_en: "Use common prepositions that take the dative.",
+        theory_it: &[
+            "Alcune preposizioni reggono sempre il dativo: aus, bei, mit, nach, seit, von, zu, gegenüber.",
+            "Dopo queste preposizioni l'articolo maschile/neutro diventa dem, il femminile der.",
+            "Esempio: mit dem Freund, bei der Ärztin, zu dem -> zum, zu der -> zur.",
+        ],
+        theory_en: &[
+            "Some prepositions always take the dative: aus, bei, mit, nach, seit, von, zu, gegenüber.",
+            "After these, masculine/neuter article becomes dem, feminine becomes der.",
+            "Example: mit dem Freund, bei der Ärztin, zu dem -> zum, zu der -> zur.",
+        ],
+        examples: &[
+            ("Ich fahre mit dem Bus.", "Vado in autobus."),
+            ("Sie kommt aus der Schweiz.", "Lei viene dalla Svizzera."),
+            ("Wir gehen zu dem/zum Arzt.", "Andiamo dal medico."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa: Ich fahre mit ___ Auto. (das)", prompt_en: "Complete: Ich fahre mit ___ Auto. (das)", options: &["das", "dem", "den"], correct_index: 1, answer_text: "", explanation_it: "mit + dativo neutro: dem Auto.", explanation_en: "mit + dative neuter: dem Auto." },
+            GrammarUnitExercise { prompt_it: "Completa: Er wohnt bei ___ Tante. (die)", prompt_en: "Complete: Er wohnt bei ___ Tante. (die)", options: &["die", "der", "den"], correct_index: 1, answer_text: "", explanation_it: "bei + dativo femminile: der Tante.", explanation_en: "bei + dative feminine: der Tante." },
+            GrammarUnitExercise { prompt_it: "Scegli la preposizione che regge il dativo.", prompt_en: "Choose the preposition that takes dative.", options: &["durch", "für", "von"], correct_index: 2, answer_text: "", explanation_it: "von richiede il dativo; durch/für l'accusativo.", explanation_en: "von takes dative; durch/für take accusative." },
+            GrammarUnitExercise { prompt_it: "Scrivi la forma contratta: zu + dem = ___", prompt_en: "Type the contraction: zu + dem = ___", options: &[], correct_index: 0, answer_text: "zum", explanation_it: "zu + dem si contrae in zum.", explanation_en: "zu + dem contracts to zum." },
+        ],
+    }
+}
+
+fn unit_b1_relativsaetze_intro() -> GrammarUnit {
+    GrammarUnit {
+        id: "b1-relativsaetze-intro",
+        level: "B1",
+        title_it: "Frasi relative (introduzione)",
+        title_en: "Relative clauses (introduction)",
+        subtitle_it: "Pronomi relativi al nominativo e accusativo",
+        subtitle_en: "Relative pronouns in nominative and accusative",
+        objective_it: "Collegare frasi con pronomi relativi di base (der/die/das/den).",
+        objective_en: "Connect clauses with basic relative pronouns (der/die/das/den).",
+        theory_it: &[
+            "Il pronome relativo concorda in genere e numero con il nome a cui si riferisce.",
+            "Nominativo: der (m), die (f/pl), das (n). Accusativo maschile: den; femm/neutro/plurale come nominativo (die/das/die).",
+            "Nella frase relativa il verbo coniugato va alla fine.",
+        ],
+        theory_en: &[
+            "The relative pronoun agrees in gender and number with the noun it refers to.",
+            "Nominative: der (m), die (f/pl), das (n). Accusative masculine: den; fem/neut/pl same as nominative forms in these cases (die/das/die).",
+            "In a relative clause the conjugated verb goes to the end.",
+        ],
+        examples: &[
+            ("Das ist der Mann, der hier wohnt.", "Questo è l'uomo che abita qui."),
+            ("Ich kenne die Frau, die du meinst.", "Conosco la donna che intendi."),
+            ("Das ist das Buch, das ich lese.", "Questo è il libro che leggo."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa: Der Mann, ___ dort steht, ist mein Lehrer.", prompt_en: "Complete: Der Mann, ___ dort steht, ist mein Lehrer.", options: &["der", "den", "dem"], correct_index: 0, answer_text: "", explanation_it: "Soggetto maschile nella relativa: der.", explanation_en: "Masculine subject in relative clause: der." },
+            GrammarUnitExercise { prompt_it: "Completa: Das Kind, ___ ich sehe, spielt.", prompt_en: "Complete: Das Kind, ___ ich sehe, spielt.", options: &["der", "das", "dem"], correct_index: 1, answer_text: "", explanation_it: "Neutro, oggetto in relativa (accusativo = nominativo qui): das.", explanation_en: "Neuter object in relative clause: das." },
+            GrammarUnitExercise { prompt_it: "Completa: Die Frau, ___ du kennst, ist Ärztin. (accusativo)", prompt_en: "Complete: Die Frau, ___ du kennst, ist Ärztin. (accusative)", options: &["der", "die", "den"], correct_index: 1, answer_text: "", explanation_it: "Femminile accusativo nella relativa: die.", explanation_en: "Feminine accusative in relative clause: die." },
+            GrammarUnitExercise { prompt_it: "Scrivi il pronome: Der Hund, ___ ich habe, ist klein. (accusativo maschile)", prompt_en: "Type the pronoun: Der Hund, ___ ich habe, ist klein. (masc. accusative)", options: &[], correct_index: 0, answer_text: "den", explanation_it: "Maschile accusativo nella relativa: den.", explanation_en: "Masculine accusative relative pronoun: den." },
         ],
     }
 }
