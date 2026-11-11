@@ -935,3 +935,221 @@ fn write_json<T: Serialize>(path: &PathBuf, value: &T) -> Result<(), String> {
     let data = serde_json::to_string_pretty(value).map_err(|e| e.to_string())?;
     fs::write(path, data).map_err(|e| e.to_string())
 }
+
+// -----------------------------------------------------------------------------
+// Embedded grammar units (subset, profile-compatible practice/mastery flow)
+// -----------------------------------------------------------------------------
+
+#[derive(Debug, Clone)]
+pub struct GrammarUnit {
+    pub id: &'static str,
+    pub level: &'static str,
+    pub title_it: &'static str,
+    pub title_en: &'static str,
+    pub subtitle_it: &'static str,
+    pub subtitle_en: &'static str,
+    pub objective_it: &'static str,
+    pub objective_en: &'static str,
+    pub theory_it: &'static [&'static str],
+    pub theory_en: &'static [&'static str],
+    pub examples: &'static [(&'static str, &'static str)], // (de, translation it/en-neutral)
+    pub exercises: &'static [GrammarUnitExercise],
+}
+
+#[derive(Debug, Clone)]
+pub struct GrammarUnitExercise {
+    pub prompt_it: &'static str,
+    pub prompt_en: &'static str,
+    pub options: &'static [&'static str],
+    pub correct_index: usize,
+    pub explanation_it: &'static str,
+    pub explanation_en: &'static str,
+}
+
+pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
+    vec![unit_a0_articoli(), unit_a0_pronomi_sein(), unit_a0_frase(), unit_a1_akkusativ()]
+}
+
+pub fn embedded_grammar_unit_by_id(id: &str) -> Option<GrammarUnit> {
+    embedded_grammar_units().into_iter().find(|u| u.id == id)
+}
+
+fn unit_a0_articoli() -> GrammarUnit {
+    GrammarUnit {
+        id: "a0-articoli",
+        level: "A0",
+        title_it: "Articoli determinativi: der, die, das",
+        title_en: "Definite articles: der, die, das",
+        subtitle_it: "Il genere dei sostantivi al nominativo",
+        subtitle_en: "Noun gender in the nominative",
+        objective_it: "Riconoscere e usare der/die/das con i sostantivi base.",
+        objective_en: "Recognize and use der/die/das with basic nouns.",
+        theory_it: &[
+            "In tedesco ogni sostantivo ha un genere: maschile (der), femminile (die), neutro (das).",
+            "Il plurale usa sempre die al nominativo (die Tische, die Frauen, die Kinder).",
+            "Il genere non segue sempre l'italiano: va imparato con la parola.",
+        ],
+        theory_en: &[
+            "In German every noun has a gender: masculine (der), feminine (die), neuter (das).",
+            "The plural always uses die in the nominative (die Tische, die Frauen, die Kinder).",
+            "Gender does not always match Italian/English: learn it with the word.",
+        ],
+        examples: &[
+            ("der Mann", "l'uomo / the man"),
+            ("die Frau", "la donna / the woman"),
+            ("das Kind", "il bambino / the child"),
+            ("die Bücher", "i libri / the books"),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Scegli l'articolo: ___ Mann", prompt_en: "Choose the article: ___ Mann", options: &["der", "die", "das"], correct_index: 0, explanation_it: "Mann è maschile: der Mann.", explanation_en: "Mann is masculine: der Mann." },
+            GrammarUnitExercise { prompt_it: "Scegli l'articolo: ___ Frau", prompt_en: "Choose the article: ___ Frau", options: &["der", "die", "das"], correct_index: 1, explanation_it: "Frau è femminile: die Frau.", explanation_en: "Frau is feminine: die Frau." },
+            GrammarUnitExercise { prompt_it: "Scegli l'articolo: ___ Kind", prompt_en: "Choose the article: ___ Kind", options: &["der", "die", "das"], correct_index: 2, explanation_it: "Kind è neutro: das Kind.", explanation_en: "Kind is neuter: das Kind." },
+            GrammarUnitExercise { prompt_it: "Scegli l'articolo (plurale): ___ Kinder", prompt_en: "Choose the article (plural): ___ Kinder", options: &["der", "die", "das"], correct_index: 1, explanation_it: "Il plurale al nominativo usa die.", explanation_en: "Plural nominative uses die." },
+        ],
+    }
+}
+
+fn unit_a0_pronomi_sein() -> GrammarUnit {
+    GrammarUnit {
+        id: "a0-pronomi-sein",
+        level: "A0",
+        title_it: "Pronomi personali e sein",
+        title_en: "Personal pronouns and sein",
+        subtitle_it: "Presentarsi e descrivere",
+        subtitle_en: "Introduce and describe yourself",
+        objective_it: "Usare i pronomi e coniugare sein al presente.",
+        objective_en: "Use pronouns and conjugate sein in the present.",
+        theory_it: &[
+            "Pronomi: ich, du, er/sie/es, wir, ihr, sie/Sie.",
+            "sein (essere): ich bin, du bist, er/sie/es ist, wir sind, ihr seid, sie/Sie sind.",
+            "Il verbo sta in seconda posizione nella frase principale.",
+        ],
+        theory_en: &[
+            "Pronouns: ich, du, er/sie/es, wir, ihr, sie/Sie.",
+            "sein (to be): ich bin, du bist, er/sie/es ist, wir sind, ihr seid, sie/Sie sind.",
+            "The verb stays in second position in main clauses.",
+        ],
+        examples: &[
+            ("Ich bin Anna.", "Io sono Anna."),
+            ("Du bist müde.", "Tu sei stanco/a."),
+            ("Wir sind in Berlin.", "Siamo a Berlino."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa: Ich ___ Student.", prompt_en: "Complete: Ich ___ Student.", options: &["bin", "bist", "ist"], correct_index: 0, explanation_it: "Con ich si usa bin.", explanation_en: "With ich use bin." },
+            GrammarUnitExercise { prompt_it: "Completa: Du ___ nett.", prompt_en: "Complete: Du ___ nett.", options: &["bin", "bist", "sind"], correct_index: 1, explanation_it: "Con du si usa bist.", explanation_en: "With du use bist." },
+            GrammarUnitExercise { prompt_it: "Completa: Er ___ Arzt.", prompt_en: "Complete: Er ___ Arzt.", options: &["ist", "bist", "seid"], correct_index: 0, explanation_it: "Con er/sie/es si usa ist.", explanation_en: "With er/sie/es use ist." },
+            GrammarUnitExercise { prompt_it: "Completa: Wir ___ Freunde.", prompt_en: "Complete: Wir ___ Freunde.", options: &["seid", "sind", "ist"], correct_index: 1, explanation_it: "Con wir si usa sind.", explanation_en: "With wir use sind." },
+        ],
+    }
+}
+
+fn unit_a0_frase() -> GrammarUnit {
+    GrammarUnit {
+        id: "a0-frase",
+        level: "A0",
+        title_it: "Ordine delle parole (frase principale)",
+        title_en: "Word order (main clause)",
+        subtitle_it: "Il verbo in seconda posizione",
+        subtitle_en: "Verb in second position",
+        objective_it: "Costruire frasi semplici con il verbo al secondo posto.",
+        objective_en: "Build simple sentences with the verb in second position.",
+        theory_it: &[
+            "Nella frase principale il verbo coniugato è sempre in posizione 2.",
+            "Il soggetto può stare in posizione 1 o 3: Ich lerne Deutsch. / Heute lerne ich Deutsch.",
+            "Le domande sì/no iniziano con il verbo: Lernst du Deutsch?",
+        ],
+        theory_en: &[
+            "In a main clause the conjugated verb is always in position 2.",
+            "The subject can be in position 1 or 3: Ich lerne Deutsch. / Heute lerne ich Deutsch.",
+            "Yes/no questions start with the verb: Lernst du Deutsch?",
+        ],
+        examples: &[
+            ("Ich komme aus Italien.", "Vengo dall'Italia."),
+            ("Heute arbeite ich.", "Oggi lavoro."),
+            ("Wohnst du in Wien?", "Abiti a Vienna?"),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Quale frase è corretta?", prompt_en: "Which sentence is correct?", options: &["Ich heute lerne Deutsch.", "Heute lerne ich Deutsch.", "Heute ich lerne Deutsch."], correct_index: 1, explanation_it: "Il verbo resta in seconda posizione: Heute (1) lerne (2) ich (3)...", explanation_en: "Verb stays in position 2: Heute (1) lerne (2) ich (3)..." },
+            GrammarUnitExercise { prompt_it: "Completa l'ordine corretto: ___ du Deutsch? (lernen)", prompt_en: "Complete the correct order: ___ du Deutsch? (lernen)", options: &["Du lernst", "Lernst", "Deutsch lernst"], correct_index: 1, explanation_it: "Nelle domande sì/no il verbo va all'inizio.", explanation_en: "In yes/no questions the verb comes first." },
+            GrammarUnitExercise { prompt_it: "Quale frase è corretta?", prompt_en: "Which sentence is correct?", options: &["Wir spielen heute Fußball.", "Wir heute spielen Fußball.", "Spielen wir heute Fußball."], correct_index: 0, explanation_it: "Frase affermativa: soggetto (1), verbo (2), resto.", explanation_en: "Statement: subject (1), verb (2), rest." },
+        ],
+    }
+}
+
+fn unit_a1_akkusativ() -> GrammarUnit {
+    GrammarUnit {
+        id: "a1-akkusativ",
+        level: "A1",
+        title_it: "Accusativo (introduzione)",
+        title_en: "Accusative case (introduction)",
+        subtitle_it: "L'oggetto diretto: den/die/das/einen/eine/ein",
+        subtitle_en: "Direct object: den/die/das/einen/eine/ein",
+        objective_it: "Riconoscere l'accusativo con articoli determinativi e indeterminativi.",
+        objective_en: "Recognize accusative with definite and indefinite articles.",
+        theory_it: &[
+            "L'accusativo indica l'oggetto diretto (chi/che cosa?).",
+            "Solo il maschile cambia: der -> den, ein -> einen. Femminile e neutro restano uguali al nominativo.",
+            "Esempio: Ich sehe den Mann. / Ich habe einen Hund.",
+        ],
+        theory_en: &[
+            "The accusative marks the direct object (whom/what?).",
+            "Only masculine changes: der -> den, ein -> einen. Feminine and neuter stay the same as nominative.",
+            "Example: Ich sehe den Mann. / Ich habe einen Hund.",
+        ],
+        examples: &[
+            ("Ich habe den Stift.", "Ho la penna."),
+            ("Sie kauft eine Tasche.", "Lei compra una borsa."),
+            ("Wir sehen das Haus.", "Vediamo la casa."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa: Ich sehe ___ Mann. (der)", prompt_en: "Complete: Ich sehe ___ Mann. (der)", options: &["der", "den", "dem"], correct_index: 1, explanation_it: "Maschile all'accusativo: der -> den.", explanation_en: "Masculine accusative: der -> den." },
+            GrammarUnitExercise { prompt_it: "Completa: Ich habe ___ Katze. (eine)", prompt_en: "Complete: Ich habe ___ Katze. (eine)", options: &["eine", "einen", "einer"], correct_index: 0, explanation_it: "Femminile non cambia all'accusativo: eine.", explanation_en: "Feminine does not change in accusative: eine." },
+            GrammarUnitExercise { prompt_it: "Completa: Er kauft ___ Buch. (ein)", prompt_en: "Complete: Er kauft ___ Buch. (ein)", options: &["ein", "einen", "einem"], correct_index: 0, explanation_it: "Neutro non cambia all'accusativo: ein.", explanation_en: "Neuter does not change in accusative: ein." },
+            GrammarUnitExercise { prompt_it: "Completa: Wir brauchen ___ Tisch. (der)", prompt_en: "Complete: Wir brauchen ___ Tisch. (der)", options: &["der", "den", "des"], correct_index: 1, explanation_it: "Oggetto diretto maschile: den Tisch.", explanation_en: "Masculine direct object: den Tisch." },
+        ],
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct GrammarUnitPracticeResult {
+    pub correct: usize,
+    pub total: usize,
+    pub percent: i32,
+    pub completed: bool,
+}
+
+impl Store {
+    pub fn embedded_grammar_units(&self) -> Vec<GrammarUnit> {
+        embedded_grammar_units()
+    }
+
+    pub fn record_grammar_unit_practice(&mut self, unit_id: &str, correct: usize, total: usize) -> Result<GrammarUnitPracticeResult, String> {
+        if total == 0 { return Err("No exercises in unit practice".into()); }
+        let now = chrono::Utc::now().timestamp_millis();
+        let percent = ((correct as f64 / total as f64) * 100.0).round() as i32;
+        let completed = percent >= 80;
+        let p = self.active_profile_mut().ok_or_else(|| "No active profile".to_string())?;
+        let entry = p.stato.padronanza_grammatica.entry(unit_id.to_string()).or_insert_with(|| serde_json::json!({}));
+        let prev_attempts = entry.get("tentativi").and_then(|v| v.as_i64()).or_else(|| entry.get("totali").and_then(|v| v.as_i64())).unwrap_or(0);
+        let prev_correct = entry.get("corrette").and_then(|v| v.as_i64()).unwrap_or(0);
+        let prev_ripassi = entry.get("ripassi").and_then(|v| v.as_i64()).unwrap_or(0);
+        let next_review = if completed {
+            now + 3 * 24 * 60 * 60 * 1000
+        } else {
+            now + 12 * 60 * 60 * 1000
+        };
+        *entry = serde_json::json!({
+            "unitaId": unit_id,
+            "percentuale": percent,
+            "tentativi": prev_attempts + 1,
+            "corrette": prev_correct + correct as i64,
+            "totali": prev_attempts + 1,
+            "completata": completed || entry.get("completata").and_then(|v| v.as_bool()).unwrap_or(false),
+            "ultimaVolta": now,
+            "prossimaRipasso": next_review,
+            "ripassi": prev_ripassi + 1,
+        });
+        self.save()?;
+        Ok(GrammarUnitPracticeResult { correct, total, percent, completed })
+    }
+}
