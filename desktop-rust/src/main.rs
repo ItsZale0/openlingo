@@ -129,6 +129,7 @@ struct OpenLingoApp {
     backup_path: String,
     grammar_unit_id: Option<String>,
     grammar_practice_index: usize,
+    grammar_practice_order: Vec<usize>,
     grammar_practice_correct: usize,
     grammar_practice_answered: bool,
     grammar_practice_feedback: String,
@@ -143,6 +144,20 @@ fn ui_lang(store: &Store) -> &str {
 
 fn tr<'a>(lang: &str, en: &'a str, it: &'a str) -> &'a str {
     if lang == "it" { it } else { en }
+}
+
+fn shuffled_indices(n: usize, seed: u64) -> Vec<usize> {
+    let mut v: Vec<usize> = (0..n).collect();
+    if n <= 1 { return v; }
+    let mut s = seed ^ 0x9E3779B97F4A7C15;
+    for i in (1..v.len()).rev() {
+        s ^= s << 13;
+        s ^= s >> 7;
+        s ^= s << 17;
+        let j = (s as usize) % (i + 1);
+        v.swap(i, j);
+    }
+    v
 }
 
 impl OpenLingoApp {
@@ -175,6 +190,7 @@ impl OpenLingoApp {
             backup_path: String::new(),
             grammar_unit_id: None,
             grammar_practice_index: 0,
+            grammar_practice_order: Vec::new(),
             grammar_practice_correct: 0,
             grammar_practice_answered: false,
             grammar_practice_feedback: String::new(),
@@ -654,6 +670,7 @@ impl OpenLingoApp {
                     if ui.button(tr(lang, "← Back to units", "← Torna alle unità")).clicked() {
                         self.grammar_unit_id = None;
                         self.grammar_practice_index = 0;
+                        self.grammar_practice_order.clear();
                         self.grammar_practice_correct = 0;
                         self.grammar_practice_answered = false;
                         self.grammar_practice_feedback.clear();
@@ -688,6 +705,7 @@ impl OpenLingoApp {
                         ui.label(if completed { tr(lang, "Mastery: completed (>=80%)", "Padronanza: completata (>=80%)") } else { tr(lang, "Keep practicing to reach 80%", "Continua a esercitarti per raggiungere 80%") });
                         if ui.button(tr(lang, "Practice again", "Esercitati di nuovo")).clicked() {
                             self.grammar_practice_index = 0;
+                            self.grammar_practice_order = shuffled_indices(unit.exercises.len(), chrono::Utc::now().timestamp_millis() as u64);
                             self.grammar_practice_correct = 0;
                             self.grammar_practice_answered = false;
                             self.grammar_practice_feedback.clear();
@@ -709,8 +727,12 @@ impl OpenLingoApp {
                 } else if unit.exercises.is_empty() {
                     ui.label(tr(lang, "No exercises available for this unit.", "Nessun esercizio disponibile per questa unità."));
                 } else {
-                    let idx = self.grammar_practice_index.min(unit.exercises.len().saturating_sub(1));
-                    let ex = &unit.exercises[idx];
+                    if self.grammar_practice_order.len() != unit.exercises.len() {
+                        self.grammar_practice_order = shuffled_indices(unit.exercises.len(), chrono::Utc::now().timestamp_millis() as u64);
+                    }
+                    let ex_idx = *self.grammar_practice_order.get(self.grammar_practice_index).unwrap_or(&0);
+                    let ex = &unit.exercises[ex_idx.min(unit.exercises.len().saturating_sub(1))];
+                    let idx = self.grammar_practice_index;
                     ui.group(|ui| {
                         ui.label(if lang == "it" { format!("Esercizio {}/{}", idx + 1, unit.exercises.len()) } else { format!("Exercise {}/{}", idx + 1, unit.exercises.len()) });
                         let prompt = if lang == "it" { ex.prompt_it } else { ex.prompt_en };
@@ -776,8 +798,10 @@ impl OpenLingoApp {
                 let mastery = self.store.grammar_mastery_summaries().into_iter().find(|s| s.id == u.id);
                 ui.horizontal(|ui| {
                     if ui.button(tr(lang, "Open", "Apri")).clicked() {
+                        let order = shuffled_indices(u.exercises.len(), chrono::Utc::now().timestamp_millis() as u64);
                         self.grammar_unit_id = Some(u.id.to_string());
                         self.grammar_practice_index = 0;
+                        self.grammar_practice_order = order;
                         self.grammar_practice_correct = 0;
                         self.grammar_practice_answered = false;
                         self.grammar_practice_feedback.clear();
@@ -1437,7 +1461,7 @@ mod tests {
     fn embedded_grammar_units_practice_saves_mastery() {
         use crate::data::embedded_grammar_units;
         let units = embedded_grammar_units();
-        assert!(units.len() >= 4);
+        assert!(units.len() >= 6);
         let u = &units[0];
         assert!(!u.id.is_empty() && !u.exercises.is_empty());
         // ensure at least one typing/completion exercise exists in embedded units
