@@ -629,6 +629,34 @@ impl Store {
         out.sort_by(|a, b| b.percentuale.cmp(&a.percentuale).then_with(|| b.tentativi.cmp(&a.tentativi)).then_with(|| a.id.cmp(&b.id)));
         out
     }
+
+    pub fn export_bundle_to(&self, path: &PathBuf) -> Result<(), String> {
+        let bundle = serde_json::json!({
+            "format": "openlingo-rust-backup",
+            "version": 1,
+            "profili": self.repo,
+            "preferenze": self.prefs,
+        });
+        write_json(path, &bundle)
+    }
+
+    pub fn import_bundle_from(&mut self, path: &PathBuf) -> Result<(), String> {
+        let data = fs::read_to_string(path).map_err(|e| e.to_string())?;
+        let v: Value = serde_json::from_str(&data).map_err(|e| e.to_string())?;
+        if let Some(p) = v.get("profili") {
+            self.repo = serde_json::from_value(p.clone()).map_err(|e| e.to_string())?;
+        } else if v.get("profiliAttivoId").is_some() || v.get("profiloAttivoId").is_some() || v.get("profili").is_some() {
+            self.repo = serde_json::from_value(v.clone()).map_err(|e| e.to_string())?;
+        }
+        if let Some(pref) = v.get("preferenze") {
+            self.prefs = serde_json::from_value(pref.clone()).map_err(|e| e.to_string())?;
+        }
+        self.save()
+    }
+
+    pub fn export_profiles_json_to(&self, path: &PathBuf) -> Result<(), String> {
+        write_json(path, &self.repo)
+    }
 }
 
 #[derive(Debug, Clone, Default)]

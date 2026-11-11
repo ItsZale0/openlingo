@@ -48,6 +48,7 @@ struct OpenLingoApp {
     exercise_feedback: String,
     exercise_correct: usize,
     exercise_total: usize,
+    backup_path: String,
 }
 
 impl OpenLingoApp {
@@ -77,7 +78,9 @@ impl OpenLingoApp {
             exercise_feedback: String::new(),
             exercise_correct: 0,
             exercise_total: 0,
+            backup_path: String::new(),
         };
+        app.backup_path = app.store.base_dir.join("openlingo-backup.json").to_string_lossy().to_string();
         app.refresh_review_queue();
         app
     }
@@ -573,9 +576,38 @@ impl OpenLingoApp {
             }
         });
 
+        ui.add_space(8.0);
+        ui.group(|ui| {
+            ui.label("Backup (compatible profile data bundle)");
+            ui.horizontal(|ui| {
+                ui.label("Path");
+                ui.add(egui::TextEdit::singleline(&mut self.backup_path).desired_width(420.0));
+            });
+            ui.horizontal(|ui| {
+                if ui.button("Export backup").clicked() {
+                    let path = std::path::PathBuf::from(self.backup_path.trim());
+                    match self.store.export_bundle_to(&path) {
+                        Ok(_) => self.status = format!("Exported backup to {}", path.display()),
+                        Err(e) => self.status = format!("Export failed: {e}"),
+                    }
+                }
+                if ui.button("Import backup").clicked() {
+                    let path = std::path::PathBuf::from(self.backup_path.trim());
+                    match self.store.import_bundle_from(&path) {
+                        Ok(_) => {
+                            self.refresh_review_queue();
+                            self.status = format!("Imported backup from {}", path.display());
+                        }
+                        Err(e) => self.status = format!("Import failed: {e}"),
+                    }
+                }
+            });
+            ui.small("Export/import includes profiles and preferences in a JSON bundle (also accepts profili-shaped JSON on import).");
+        });
+
         ui.add_space(10.0);
         ui.separator();
-        ui.small("OpenLingo Rust desktop rebuild: compatible profile data, SRS persistence, vocabulary search/add/archive, grammar mastery view, progress stats (Home/Review/Vocabulary/Grammar/Progress/Settings).");
+        ui.small("OpenLingo Rust desktop rebuild: compatible profile data, SRS persistence, exercises/practice, vocabulary search/add/archive, grammar mastery view, progress/backup (Home/Review/Exercises/Vocabulary/Grammar/Progress/Settings).");
         if !self.status.is_empty() {
             ui.add_space(6.0);
             ui.label(&self.status);
@@ -838,5 +870,29 @@ mod tests {
         assert_eq!(qs.len(), 1);
         assert!(qs[0].prompt.contains("_____"));
         assert_eq!(qs[0].answer, "Hund");
+    }
+
+    #[test]
+    fn export_import_bundle_roundtrip() {
+        let dir = temp_dir("bundle");
+        let mut store = Store::load_from(dir.clone());
+        let id = store.create_profile("Dana");
+        {
+            let p = store.repo.profili.get_mut(&id).unwrap();
+            p.stato.parole.push(WordEntity { id:"w1".into(), german:"Buch".into(), italian:"libro".into(), ..Default::default() });
+        }
+        store.save().unwrap();
+        let out = dir.join("backup.json");
+        store.export_bundle_to(&out).unwrap();
+        assert!(out.exists());
+
+        let dir2 = temp_dir("bundle2");
+        let mut store2 = Store::load_from(dir2.clone());
+        store2.import_bundle_from(&out).unwrap();
+        assert_eq!(store2.repo.profilo_attivo_id.as_deref(), Some(id.as_str()));
+        assert_eq!(store2.active_profile().unwrap().config.nome_visualizzato, "Dana");
+        assert_eq!(store2.active_profile().unwrap().stato.parole.len(), 1);
+        let _ = fs::remove_dir_all(dir);
+        let _ = fs::remove_dir_all(dir2);
     }
 }

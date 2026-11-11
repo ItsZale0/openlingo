@@ -13,6 +13,7 @@ A from-scratch Rust rebuild of the OpenLingo desktop application.
 - **Vocabulary management:** search/filter (by text and level), add custom words, archive/restore words
 - **Grammar mastery view:** lists tracked grammar units from profile `padronanzaGrammatica` with parsed score/attempts/completion/last activity
 - **Progress stats:** active/reviewed/mature words, due count, streak/record, grammar completion summary, words by level, review log entries
+- **Backup:** export/import compatible profile+preferences JSON bundle from Settings (path-based)
 
 ## Build
 ```bash
