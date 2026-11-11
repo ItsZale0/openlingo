@@ -127,6 +127,12 @@ struct OpenLingoApp {
     exercise_correct: usize,
     exercise_total: usize,
     backup_path: String,
+    grammar_unit_id: Option<String>,
+    grammar_practice_index: usize,
+    grammar_practice_correct: usize,
+    grammar_practice_answered: bool,
+    grammar_practice_feedback: String,
+    grammar_practice_done: Option<(i32, bool)>, // (percent, completed)
 }
 
 fn ui_lang(store: &Store) -> &str {
@@ -166,6 +172,12 @@ impl OpenLingoApp {
             exercise_correct: 0,
             exercise_total: 0,
             backup_path: String::new(),
+            grammar_unit_id: None,
+            grammar_practice_index: 0,
+            grammar_practice_correct: 0,
+            grammar_practice_answered: false,
+            grammar_practice_feedback: String::new(),
+            grammar_practice_done: None,
         };
         app.backup_path = app.store.base_dir.join("openlingo-backup.json").to_string_lossy().to_string();
         app.refresh_review_queue();
@@ -612,16 +624,12 @@ impl OpenLingoApp {
             });
             ui.add_space(4.0);
             let lessons = curriculum_lessons(&plan.livello_corrente, plan.lezione_corrente.max(1), 20);
-            egui::ScrollArea::vertical().id_salt("grammar_syllabus").max_height(220.0).show(ui, |ui| {
+            egui::ScrollArea::vertical().id_salt("grammar_syllabus").max_height(180.0).show(ui, |ui| {
                 for l in &lessons {
                     let topic = if lang == "it" { &l.topic_it } else { &l.topic_en };
                     let marker = if l.is_current { "▶" } else if l.is_completed { "✓" } else { "•" };
                     let line = format!("{marker} {}. {topic}", l.number);
-                    if l.is_current {
-                        ui.strong(line);
-                    } else {
-                        ui.label(line);
-                    }
+                    if l.is_current { ui.strong(line); } else { ui.label(line); }
                 }
             });
             ui.small(tr(lang,
@@ -630,6 +638,136 @@ impl OpenLingoApp {
         });
 
         ui.add_space(8.0);
+        ui.heading(tr(lang, "Grammar units (embedded practice)", "Unità grammaticali (pratica integrata)"));
+        ui.small(tr(lang,
+            "Representative embedded units with theory and interactive exercises. Completing practice saves mastery to profile data (compatible). Full GrammaticaPercorso content remains incremental.",
+            "Unità integrate rappresentative con teoria ed esercizi interattivi. Il completamento salva la padronanza nei dati profilo (compatibile). Il contenuto completo GrammaticaPercorso resta incrementale."));
+        ui.add_space(4.0);
+
+        // Handle selected unit: detail/practice flow
+        if let Some(unit_id) = self.grammar_unit_id.clone() {
+            let unit_opt = crate::data::embedded_grammar_unit_by_id(&unit_id);
+            if let Some(unit) = unit_opt {
+                ui.horizontal(|ui| {
+                    if ui.button(tr(lang, "← Back to units", "← Torna alle unità")).clicked() {
+                        self.grammar_unit_id = None;
+                        self.grammar_practice_index = 0;
+                        self.grammar_practice_correct = 0;
+                        self.grammar_practice_answered = false;
+                        self.grammar_practice_feedback.clear();
+                        self.grammar_practice_done = None;
+                    }
+                });
+                ui.group(|ui| {
+                    let title = if lang == "it" { unit.title_it } else { unit.title_en };
+                    let subtitle = if lang == "it" { unit.subtitle_it } else { unit.subtitle_en };
+                    let objective = if lang == "it" { unit.objective_it } else { unit.objective_en };
+                    ui.strong(format!("{} — {}", unit.level, title));
+                    ui.label(subtitle);
+                    ui.label(format!("{}: {}", tr(lang, "Objective", "Obiettivo"), objective));
+                    ui.add_space(4.0);
+                    ui.label(tr(lang, "Theory", "Teoria"));
+                    let theory = if lang == "it" { unit.theory_it } else { unit.theory_en };
+                    for t in theory { ui.label(format!("• {t}")); }
+                    if !unit.examples.is_empty() {
+                        ui.add_space(4.0);
+                        ui.label(tr(lang, "Examples", "Esempi"));
+                        for (de, trn) in unit.examples { ui.label(format!("• {de} — {trn}")); }
+                    }
+                });
+
+                // practice
+                ui.add_space(6.0);
+                if let Some((pct, completed)) = self.grammar_practice_done {
+                    ui.group(|ui| {
+                        ui.strong(tr(lang, "Practice completed", "Pratica completata"));
+                        ui.label(if lang == "it" { format!("Punteggio: {pct}% ({}/{})", self.grammar_practice_correct, unit.exercises.len()) } else { format!("Score: {pct}% ({}/{})", self.grammar_practice_correct, unit.exercises.len()) });
+                        ui.label(if completed { tr(lang, "Mastery: completed (>=80%)", "Padronanza: completata (>=80%)") } else { tr(lang, "Keep practicing to reach 80%", "Continua a esercitarti per raggiungere 80%") });
+                        if ui.button(tr(lang, "Practice again", "Esercitati di nuovo")).clicked() {
+                            self.grammar_practice_index = 0;
+                            self.grammar_practice_correct = 0;
+                            self.grammar_practice_answered = false;
+                            self.grammar_practice_feedback.clear();
+                            self.grammar_practice_done = None;
+                        }
+                    });
+                } else if self.grammar_practice_index >= unit.exercises.len() && !unit.exercises.is_empty() {
+                    // finalize and save mastery
+                    let correct = self.grammar_practice_correct;
+                    let total = unit.exercises.len();
+                    match self.store.record_grammar_unit_practice(unit.id, correct, total) {
+                        Ok(r) => {
+                            self.grammar_practice_done = Some((r.percent, r.completed));
+                            self.status = if lang == "it" { format!("Padronanza salvata: {}%", r.percent) } else { format!("Mastery saved: {}%", r.percent) };
+                        }
+                        Err(e) => self.status = format!("{}: {e}", tr(lang, "Save failed", "Salvataggio fallito")),
+                    }
+                } else if unit.exercises.is_empty() {
+                    ui.label(tr(lang, "No exercises available for this unit.", "Nessun esercizio disponibile per questa unità."));
+                } else {
+                    let idx = self.grammar_practice_index.min(unit.exercises.len().saturating_sub(1));
+                    let ex = &unit.exercises[idx];
+                    ui.group(|ui| {
+                        ui.label(if lang == "it" { format!("Esercizio {}/{}", idx + 1, unit.exercises.len()) } else { format!("Exercise {}/{}", idx + 1, unit.exercises.len()) });
+                        let prompt = if lang == "it" { ex.prompt_it } else { ex.prompt_en };
+                        ui.strong(prompt);
+                        if !self.grammar_practice_answered {
+                            let mut picked: Option<usize> = None;
+                            for (i, opt) in ex.options.iter().enumerate() {
+                                if ui.button(*opt).clicked() { picked = Some(i); }
+                            }
+                            if let Some(i) = picked {
+                                self.grammar_practice_answered = true;
+                                let correct = i == ex.correct_index;
+                                if correct { self.grammar_practice_correct += 1; }
+                                let expl = if lang == "it" { ex.explanation_it } else { ex.explanation_en };
+                                self.grammar_practice_feedback = if correct {
+                                    if lang == "it" { format!("Corretto! {expl}") } else { format!("Correct! {expl}") }
+                                } else {
+                                    let ans = ex.options.get(ex.correct_index).copied().unwrap_or("");
+                                    if lang == "it" { format!("Sbagliato. Risposta: {ans}. {expl}") } else { format!("Incorrect. Answer: {ans}. {expl}") }
+                                };
+                            }
+                        } else {
+                            ui.label(&self.grammar_practice_feedback);
+                            if ui.button(tr(lang, "Next", "Avanti")).clicked() {
+                                self.grammar_practice_index += 1;
+                                self.grammar_practice_answered = false;
+                                self.grammar_practice_feedback.clear();
+                            }
+                        }
+                    });
+                }
+            } else {
+                self.grammar_unit_id = None;
+            }
+            ui.add_space(8.0);
+        }
+
+        // list embedded units (when not deep in unrelated state; always show as entry point)
+        if self.grammar_unit_id.is_none() {
+            let units = self.store.embedded_grammar_units();
+            for u in &units {
+                let title = if lang == "it" { u.title_it } else { u.title_en };
+                let mastery = self.store.grammar_mastery_summaries().into_iter().find(|s| s.id == u.id);
+                ui.horizontal(|ui| {
+                    if ui.button(tr(lang, "Open", "Apri")).clicked() {
+                        self.grammar_unit_id = Some(u.id.to_string());
+                        self.grammar_practice_index = 0;
+                        self.grammar_practice_correct = 0;
+                        self.grammar_practice_answered = false;
+                        self.grammar_practice_feedback.clear();
+                        self.grammar_practice_done = None;
+                    }
+                    ui.label(format!("[{}] {title}", u.level));
+                    if let Some(m) = mastery {
+                        ui.small(if lang == "it" { format!("— {}% • tentativi {}", m.percentuale, m.tentativi) } else { format!("— {}% • attempts {}", m.percentuale, m.tentativi) });
+                    }
+                });
+            }
+            ui.add_space(8.0);
+        }
+
         ui.heading(tr(lang, "Grammar mastery & unit progression", "Padronanza grammaticale e unità"));
         let mut summaries = self.store.grammar_mastery_summaries();
         let now = chrono::Utc::now().timestamp_millis();
@@ -637,8 +775,8 @@ impl OpenLingoApp {
         ui.add_space(6.0);
         if summaries.is_empty() {
             ui.label(tr(lang,
-                "No grammar mastery data yet. Complete grammar exercises in the main app to populate this view.",
-                "Nessun dato di padronanza grammaticale. Completa esercizi di grammatica nell'app principale per popolare questa vista."));
+                "No grammar mastery data yet. Complete grammar/unit practice to populate this view.",
+                "Nessun dato di padronanza grammaticale. Completa pratica grammaticale/unità per popolare questa vista."));
         } else {
             summaries.sort_by(|a, b| {
                 let ad = a.is_due(now);
@@ -648,7 +786,7 @@ impl OpenLingoApp {
                     .then_with(|| b.percentuale.cmp(&a.percentuale))
                     .then_with(|| a.id.cmp(&b.id))
             });
-            egui::ScrollArea::vertical().id_salt("grammar_mastery").auto_shrink([false, false]).show(ui, |ui| {
+            egui::ScrollArea::vertical().id_salt("grammar_mastery").max_height(260.0).show(ui, |ui| {
                 for s in &summaries {
                     ui.group(|ui| {
                         ui.horizontal(|ui| {
@@ -1268,5 +1406,30 @@ mod tests {
         assert!(!qs.is_empty());
         assert!(qs.len() <= 12);
         assert!(qs.iter().any(|q| !q.word.id.is_empty()));
+    }
+
+    #[test]
+    fn embedded_grammar_units_practice_saves_mastery() {
+        use crate::data::embedded_grammar_units;
+        let units = embedded_grammar_units();
+        assert!(units.len() >= 3);
+        let u = &units[0];
+        assert!(!u.id.is_empty() && !u.exercises.is_empty());
+
+        let dir = temp_dir("gunit");
+        let mut store = Store::load_from(dir.clone());
+        store.create_profile("Mia");
+        let res = store.record_grammar_unit_practice(u.id, u.exercises.len(), u.exercises.len()).expect("record");
+        assert_eq!(res.percent, 100);
+        assert!(res.completed);
+        let summaries = store.grammar_mastery_summaries();
+        let s = summaries.iter().find(|x| x.id == u.id).expect("summary");
+        assert!(s.percentuale >= 80);
+        assert!(s.tentativi >= 1);
+        // persistence
+        let store2 = Store::load_from(dir.clone());
+        let s2 = store2.grammar_mastery_summaries().into_iter().find(|x| x.id == u.id).expect("persisted");
+        assert_eq!(s2.percentuale, s.percentuale);
+        let _ = fs::remove_dir_all(dir);
     }
 }
