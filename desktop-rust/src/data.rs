@@ -1006,6 +1006,7 @@ pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
         unit_a1_akkusativ(),
         unit_a1_sein_haben(),
         unit_a1_modalverben(),
+        unit_a2_trennbare_verben(),
         unit_a2_perfekt_intro(),
         unit_a2_dativ(),
         unit_a2_weil_dass(),
@@ -1015,6 +1016,7 @@ pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
         unit_b1_relativsaetze_intro(),
         unit_b1_konnektoren(),
         unit_b1_reflexive_verben(),
+        unit_b1_praeteritum_perfekt(),
     ]
 }
 
@@ -1527,6 +1529,74 @@ fn unit_b1_reflexive_verben() -> GrammarUnit {
             GrammarUnitExercise { prompt_it: "Completa: Du wäschst ___ .", prompt_en: "Complete: Du wäschst ___ .", options: &["mich", "dich", "sich"], correct_index: 1, answer_text: "", explanation_it: "Con du si usa dich.", explanation_en: "With du use dich." },
             GrammarUnitExercise { prompt_it: "Completa: Sie (lei) beeilt ___ .", prompt_en: "Complete: Sie (she) beeilt ___ .", options: &["mich", "dich", "sich"], correct_index: 2, answer_text: "", explanation_it: "Con er/sie/es si usa sich.", explanation_en: "With er/sie/es use sich." },
             GrammarUnitExercise { prompt_it: "Scrivi il pronome: Wir freuen ___ auf das Wochenende.", prompt_en: "Type the pronoun: Wir freuen ___ auf das Wochenende.", options: &[], correct_index: 0, answer_text: "uns", explanation_it: "Con wir si usa uns.", explanation_en: "With wir use uns." },
+        ],
+    }
+}
+
+fn unit_a2_trennbare_verben() -> GrammarUnit {
+    GrammarUnit {
+        id: "a2-trennbare-verben",
+        level: "A2",
+        title_it: "Verbi separabili",
+        title_en: "Separable verbs",
+        subtitle_it: "Prefisso alla fine nella frase principale",
+        subtitle_en: "Prefix moves to the end in main clauses",
+        objective_it: "Riconoscere e usare i verbi separabili al presente e nel Perfekt.",
+        objective_en: "Recognize and use separable verbs in the present and Perfekt.",
+        theory_it: &[
+            "Nei verbi separabili il prefisso si stacca e va alla fine della frase principale: aufstehen -> Ich stehe frueh auf.",
+            "Nelle subordinate (weil, dass...) e con modali il verbo resta unito all'infinito: weil ich frueh aufstehe / ich muss frueh aufstehen.",
+            "Nel Perfekt il ge- si inserisce tra prefisso e radice: aufgestanden, eingekauft.",
+        ],
+        theory_en: &[
+            "In separable verbs the prefix separates and moves to the end of the main clause: aufstehen -> Ich stehe frueh auf.",
+            "In subordinate clauses (weil, dass...) and with modals the verb stays together: weil ich frueh aufstehe / ich muss frueh aufstehen.",
+            "In the Perfekt, ge- is inserted between prefix and stem: aufgestanden, eingekauft.",
+        ],
+        examples: &[
+            ("Ich stehe jeden Tag um 7 Uhr auf.", "Mi alzo ogni giorno alle 7."),
+            ("Er ruft seine Mutter an.", "Lui chiama sua madre."),
+            ("Wir haben gestern eingekauft.", "Ieri abbiamo fatto la spesa."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Scegli la frase corretta (aufstehen).", prompt_en: "Choose the correct sentence (aufstehen).", options: &["Ich aufstehe frueh.", "Ich stehe frueh auf.", "Ich stehe auf frueh."], correct_index: 1, answer_text: "", explanation_it: "Nella frase principale il prefisso va alla fine: Ich stehe frueh auf.", explanation_en: "In a main clause the prefix goes to the end." },
+            GrammarUnitExercise { prompt_it: "Completa: Er ___ seine Freundin ___ . (anrufen)", prompt_en: "Complete: Er ___ seine Freundin ___ . (anrufen)", options: &["ruft ... an", "anruft ...", "ruft ... auf"], correct_index: 0, answer_text: "", explanation_it: "anrufen si separa: Er ruft ... an.", explanation_en: "anrufen separates: Er ruft ... an." },
+            GrammarUnitExercise { prompt_it: "Scrivi il participio di einkaufen.", prompt_en: "Type the participle of einkaufen.", options: &[], correct_index: 0, answer_text: "eingekauft", explanation_it: "Verbi separabili: prefisso + ge + radice + t -> eingekauft.", explanation_en: "Separable verbs: prefix + ge + stem + t -> eingekauft." },
+            GrammarUnitExercise { prompt_it: "Quale e' corretta con weil? (aufstehen)", prompt_en: "Which is correct with weil? (aufstehen)", options: &["..., weil ich stehe frueh auf.", "..., weil ich frueh aufstehe.", "..., weil ich auf frueh stehe."], correct_index: 1, answer_text: "", explanation_it: "In subordinata il verbo separabile resta unito alla fine: weil ich frueh aufstehe.", explanation_en: "In a subordinate clause the separable verb stays together at the end." },
+        ],
+    }
+}
+
+fn unit_b1_praeteritum_perfekt() -> GrammarUnit {
+    GrammarUnit {
+        id: "b1-praeteritum-vs-perfekt",
+        level: "B1",
+        title_it: "Präteritum vs Perfekt (uso)",
+        title_en: "Präteritum vs Perfekt (usage)",
+        subtitle_it: "Quando usare il passato scritto o parlato",
+        subtitle_en: "When to use written vs spoken past",
+        objective_it: "Distinguere l'uso tipico di Praeteritum e Perfekt in tedesco.",
+        objective_en: "Distinguish typical usage of Präteritum and Perfekt in German.",
+        theory_it: &[
+            "Nel parlato quotidiano il Perfekt e' il tempo passato piu' comune per raccontare eventi.",
+            "Il Praeteritum e' frequente nella lingua scritta, nei racconti e con alcuni verbi (sein, haben, modali) anche nel parlato.",
+            "Esempio parlato: Ich habe gestern gearbeitet. / Scritto/narrativo: Er ging nach Hause.",
+        ],
+        theory_en: &[
+            "In everyday speech, Perfekt is the most common past tense for narrating events.",
+            "Präteritum is common in writing, narratives, and with some verbs (sein, haben, modals) even in speech.",
+            "Spoken example: Ich habe gestern gearbeitet. / Written/narrative: Er ging nach Hause.",
+        ],
+        examples: &[
+            ("Ich war krank.", "Ero malato."),
+            ("Wir haben einen Film gesehen.", "Abbiamo visto un film."),
+            ("Sie hatte keine Zeit.", "Lei non aveva tempo."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Quale forma e' tipicamente piu' comune nel parlato per 'lavorare ieri'?", prompt_en: "Which form is typically more common in speech for 'worked yesterday'?", options: &["Ich arbeitete gestern.", "Ich habe gestern gearbeitet.", "Ich hatte gestern gearbeitet."], correct_index: 1, answer_text: "", explanation_it: "Nel parlato quotidiano si preferisce spesso il Perfekt.", explanation_en: "In everyday speech Perfekt is often preferred." },
+            GrammarUnitExercise { prompt_it: "Quale verbo e' spesso usato al Praeteritum anche nel parlato?", prompt_en: "Which verb is often used in Präteritum even in speech?", options: &["kaufen", "sein", "spielen"], correct_index: 1, answer_text: "", explanation_it: "sein, haben e i modali compaiono spesso al Praeteritum anche nel parlato.", explanation_en: "sein, haben and modals often appear in Präteritum even in speech." },
+            GrammarUnitExercise { prompt_it: "Completa (Perfekt): Wir ___ einen Film ___ . (sehen)", prompt_en: "Complete (Perfekt): Wir ___ einen Film ___ . (sehen)", options: &["haben ... gesehen", "sind ... gesehen", "haben ... sahen"], correct_index: 0, answer_text: "", explanation_it: "Perfekt di sehen: haben + gesehen.", explanation_en: "Perfekt of sehen: haben + gesehen." },
+            GrammarUnitExercise { prompt_it: "Scrivi la forma Praeteritum di 'haben' (ich).", prompt_en: "Type the Präteritum form of 'haben' (ich).", options: &[], correct_index: 0, answer_text: "hatte", explanation_it: "Praeteritum: ich hatte.", explanation_en: "Präteritum: ich hatte." },
         ],
     }
 }

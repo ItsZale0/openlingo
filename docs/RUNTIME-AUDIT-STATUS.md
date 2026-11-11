@@ -23,7 +23,7 @@
 - Runtime EN/IT toggle implemented (persisted in `preferenze.json` `lingua`): `ui_lang`, language selector/save in Settings, localized key nav/home/settings labels; Review screen and core status/feedback messages localized (EN/IT); Grammar & lessons screen includes localized labels/progression actions (incremental).  
   `rg -n "ui_lang|prefs\.lingua" desktop-rust/src` shows usage in `src/main.rs` (including `tests::ui_translation_helper_respects_language`).
 - Prior hardcoded `Ciao` greeting replaced by localized greeting in Rust UI (incremental EN/IT parity; verified by merged/tested changes).
-- **Grammar/lesson/unit parity increment (automated+tested):** CEFR syllabus topics (A1/A2/B1) and lesson progression controls (advance/reset) persisted to `progresso.lezione_corrente`; **lesson-practice flow** (start guided session from grammar and mark lesson complete on session completion); **embedded grammar units** (expanded A0–B1 representative subset incl. dative, weil/dass, comparatives, adjective declension intro, dative prepositions, relative clauses intro, connectors, reflexive verbs) with theory/examples and interactive practice flow (MCQ + typing/completion), **rotated/shuffled exercise order per session**, unit-list level filter (ALL/A0/A1/A2/B1), mastery/progression status and recommended-next selection, recording mastery to `padronanzaGrammatica` (percent, attempts/correct, completion, timestamps/next review) compatibly; unit mastery/due view retained. Verified by `tests::curriculum_lessons_and_progression_update`, `tests::embedded_grammar_units_practice_saves_mastery`. Not full `GrammaticaPercorso` content/unit banks, unlock/gating/rotation rules, or complete theory/exercise systems.
+- **Grammar/lesson/unit parity increment (automated+tested):** CEFR syllabus topics (A1/A2/B1) and lesson progression controls (advance/reset) persisted to `progresso.lezione_corrente`; **lesson-practice flow** (start guided session from grammar and mark lesson complete on session completion); **embedded grammar units** (expanded A0–B1 representative subset incl. dative, weil/dass, comparatives, adjective declension intro, dative prepositions, relative clauses intro, connectors, reflexive verbs, separable verbs, Präteritum vs Perfekt) with theory/examples and interactive practice flow (MCQ + typing/completion), **rotated/shuffled exercise order per session**, unit-list level filter (ALL/A0/A1/A2/B1), mastery/progression status and recommended-next selection, recording mastery to `padronanzaGrammatica` (percent, attempts/correct, completion, timestamps/next review) compatibly; unit mastery/due view retained. Verified by `tests::curriculum_lessons_and_progression_update`, `tests::embedded_grammar_units_practice_saves_mastery`. Not full `GrammaticaPercorso` content/unit banks, unlock/gating/rotation rules, or complete theory/exercise systems.
 - **Exercise/session parity increment (automated+tested):** added **Guided session** and **Weak words review** exercise flows (guided prioritizes due + new words; weak-words targets lapses/low ease/recent incorrect answers from saved reviews/logs), mixed question types, SRS-updating answers. Verified by `tests::guided_session_builds_mixed_questions`, `tests::difficult_words_selects_lapses_and_errors` (`cargo test`: 19 passed total). Not all original exercise types/session flows or full lesson/content systems.
 - **Limitation:** Rust UI localization is incremental (not all screens/prompts/content fully localized) and not full parity with Kotlin `Traduttore` coverage; Rust app does not execute AI personalization/provider flows.
 
@@ -42,15 +42,15 @@ test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fin
 ---TEST:0---
 
 cargo build --release
-Finished `release` profile [optimized] target(s) in 7.75s
+Finished `release` profile [optimized] target(s) in 8.79s
 ---BUILD:0---
 
 Binary: desktop-rust/target/release/openlingo-desktop.exe
 Name                   Length LastWriteTime
-openlingo-desktop.exe 5993984 11/11/2026 11:57:51
-SHA256: A0D512D64AE3F0628875FE1FA88460EDB5F5A489DE3F4AE20AF3D39610213A0A
+openlingo-desktop.exe 5999616 11/11/2026 12:02:43
+SHA256: A360FA2C09095D4B43628B3766F4C2E2FC7BCFD79D66EAD1A88CE29428A332AA
 
-Runtime smoke (this PC): openlingo-desktop launched and Responding: True (PID 20628, 2026-11-11 11:57:42).
+Runtime smoke (this PC): openlingo-desktop launched and Responding: True (PID 5776, 2026-11-11 12:02:52).
 ```
 
 ### Rust (`desktop-rust/`) — previous verified run

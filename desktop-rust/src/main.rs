@@ -1566,7 +1566,7 @@ mod tests {
     fn embedded_grammar_units_practice_saves_mastery() {
         use crate::data::embedded_grammar_units;
         let units = embedded_grammar_units();
-        assert!(units.len() >= 10);
+        assert!(units.len() >= 15);
         let u = &units[0];
         assert!(!u.id.is_empty() && !u.exercises.is_empty());
         // ensure at least one typing/completion exercise exists in embedded units
