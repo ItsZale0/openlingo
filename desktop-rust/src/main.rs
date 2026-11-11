@@ -477,27 +477,41 @@ impl OpenLingoApp {
     }
 
     fn screen_grammar(&mut self, ui: &mut egui::Ui) {
-        ui.heading("Grammar mastery");
+        ui.heading("Grammar mastery & unit progression");
         if self.store.active_profile().is_none() {
             ui.label("No active profile.");
             return;
         }
-        let summaries = self.store.grammar_mastery_summaries();
+        let mut summaries = self.store.grammar_mastery_summaries();
+        let now = chrono::Utc::now().timestamp_millis();
         ui.label(format!("Tracked units: {}", summaries.len()));
         ui.add_space(6.0);
         if summaries.is_empty() {
             ui.label("No grammar mastery data yet. Complete grammar exercises in the main app to populate this view.");
             return;
         }
+        summaries.sort_by(|a, b| {
+            let ad = a.is_due(now);
+            let bd = b.is_due(now);
+            bd.cmp(&ad)
+                .then_with(|| a.completata.cmp(&b.completata))
+                .then_with(|| b.percentuale.cmp(&a.percentuale))
+                .then_with(|| a.id.cmp(&b.id))
+        });
         egui::ScrollArea::vertical().auto_shrink([false, false]).show(ui, |ui| {
             for s in &summaries {
                 ui.group(|ui| {
                     ui.horizontal(|ui| {
                         ui.strong(&s.id);
-                        let state = if s.completata { "completed" } else if s.percentuale >= 80 { "mastered" } else if s.tentativi > 0 { "in progress" } else { "new" };
+                        let state = if s.is_due(now) { "due for review" } else if s.completata { "completed" } else if s.percentuale >= 80 { "mastered" } else if s.tentativi > 0 { "in progress" } else { "new" };
                         ui.label(format!("• {state}"));
                     });
-                    ui.label(format!("Score: {}%  •  Attempts: {}  •  Correct: {}", s.percentuale, s.tentativi, s.corrette));
+                    ui.label(format!("Score: {}%  •  Attempts: {}  •  Correct: {}  •  Reviews: {}", s.percentuale, s.tentativi, s.corrette, s.ripassi));
+                    if s.prossima_ripasso > 0 {
+                        if let Some(dt) = chrono::DateTime::<chrono::Utc>::from_timestamp_millis(s.prossima_ripasso) {
+                            ui.small(format!("Next review: {}", dt.with_timezone(&chrono::Local).format("%Y-%m-%d %H:%M")));
+                        }
+                    }
                     if s.ultima_volta > 0 {
                         if let Some(dt) = chrono::DateTime::<chrono::Utc>::from_timestamp_millis(s.ultima_volta) {
                             ui.small(format!("Last activity: {}", dt.with_timezone(&chrono::Local).format("%Y-%m-%d %H:%M")));
@@ -518,17 +532,26 @@ impl OpenLingoApp {
         let (total, reviewed, due, streak) = self.store.stats();
         let mature = self.store.mature_count();
         let levels = self.store.word_level_counts();
-        let grammar_total = p.stato.padronanza_grammatica.len();
-        let grammar_done = self.store.grammar_mastery_summaries().iter().filter(|s| s.completata || s.percentuale >= 80).count();
+        let plan = self.store.study_plan_summary();
         ui.label(format!("Profile: {}", p.config.nome_visualizzato));
-        ui.label(format!("Level: {}  •  Goal: {}", p.stato.progresso.livello_corrente, p.stato.progresso.obiettivo_livello));
+        ui.label(format!("Level: {}  •  Goal: {}  •  Lesson: {}", plan.livello_corrente, plan.obiettivo_livello, plan.lezione_corrente));
+        ui.add_space(6.0);
+
+        ui.group(|ui| {
+            ui.strong("Study plan / next actions");
+            ui.label(format!("Due words: {}  •  New words: {}", plan.due_words, plan.new_words));
+            ui.label(format!("Grammar tracked: {}  •  Completed/mastered: {}  •  Due: {}", plan.grammar_tracked, plan.grammar_completed, plan.grammar_due));
+            for a in &plan.next_actions {
+                ui.label(format!("• {a}"));
+            }
+        });
+
         ui.add_space(6.0);
         ui.group(|ui| {
             ui.label(format!("Total active words: {total}"));
             ui.label(format!("Reviewed words: {reviewed}  •  Mature/strong: {mature}"));
             ui.label(format!("Due now: {due}"));
             ui.label(format!("Streak: {streak} days (record: {})", p.stato.streak_record));
-            ui.label(format!("Grammar units tracked: {grammar_total}  •  Completed/mastered: {grammar_done}"));
             ui.label(format!("Review log entries: {}", p.stato.ripassi_log.len()));
             if let Some(day) = &p.stato.ultimo_giorno_studio {
                 ui.label(format!("Last study day: {day}"));
@@ -964,5 +987,42 @@ mod tests {
         assert!(!qs.is_empty());
         assert!(qs.iter().all(|q| q.options.iter().any(|o| o == &q.answer)));
         assert!(qs.iter().all(|q| q.prompt.contains("German")));
+    }
+
+    #[test]
+    fn study_plan_and_grammar_due_summary() {
+        let dir = temp_dir("plan");
+        let mut store = Store::load_from(dir.clone());
+        let id = store.create_profile("Eli");
+        {
+            let p = store.repo.profili.get_mut(&id).unwrap();
+            p.stato.progresso.lezione_corrente = 7;
+            p.stato.parole = vec![
+                WordEntity { id:"w1".into(), german:"eins".into(), italian:"uno".into(), ..Default::default() },
+                WordEntity { id:"w2".into(), german:"zwei".into(), italian:"due".into(), ..Default::default() },
+            ];
+            let mut reviews = HashMap::new();
+            reviews.insert("w1".into(), ReviewEntity { word_id:"w1".into(), due_at: 1, repetitions: 1, ..Default::default() });
+            p.stato.reviews = reviews;
+            p.stato.padronanza_grammatica.insert("u1".into(), serde_json::json!({
+                "percentuale": 85, "completata": true, "tentativi": 3, "corrette": 9, "prossimaRipasso": 1, "ripassi": 2
+            }));
+            p.stato.padronanza_grammatica.insert("u2".into(), serde_json::json!({
+                "percentuale": 40, "completata": false, "tentativi": 1, "corrette": 2, "prossimaRipasso": 9999999999999i64
+            }));
+        }
+        let plan = store.study_plan_summary();
+        assert_eq!(plan.lezione_corrente, 7);
+        assert_eq!(plan.due_words, 1);
+        assert_eq!(plan.new_words, 1); // w2 not reviewed
+        assert_eq!(plan.grammar_tracked, 2);
+        assert_eq!(plan.grammar_completed, 1);
+        assert_eq!(plan.grammar_due, 1);
+        assert!(!plan.next_actions.is_empty());
+        let gs = store.grammar_mastery_summaries();
+        let u1 = gs.iter().find(|g| g.id == "u1").unwrap();
+        assert!(u1.is_due(100));
+        assert_eq!(u1.ripassi, 2);
+        let _ = fs::remove_dir_all(dir);
     }
 }

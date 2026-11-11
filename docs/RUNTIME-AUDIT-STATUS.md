@@ -30,22 +30,22 @@
 ### Rust (`desktop-rust/`) — latest verified run
 ```text
 cargo test
-running 14 tests
+running 15 tests
 ...
-test tests::ui_translation_helper_respects_language ... ok
 test tests::german_choice_quiz_builds_options ... ok
-test tests::export_import_bundle_roundtrip ... ok
+test tests::study_plan_and_grammar_due_summary ... ok
+test tests::ui_translation_helper_respects_language ... ok
 ...
-test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
 ---TEST:0---
 
 cargo build --release
-Finished `release` profile [optimized] target(s)
+Finished `release` profile [optimized] target(s) in 7.79s
 ---BUILD:0---
-openlingo-desktop.exe 5,826,048 bytes (2026-11-11 10:54:36)
-SHA256: 813AB4A7C9A33E7BC92CA566848E7CF118A924B48C56C25D2EE301296F4EF968
+openlingo-desktop.exe 5,837,312 bytes (2026-11-11 10:58:46)
+SHA256: 28EF8F24A72581F8B0FDD52032A0071C15169044BBF4CA4AC40245E7E78615D7
 ```
-Covers (among others): SRS/persistence, forward-compatible data round-trip preservation, vocab search/add/archive, exercise builders (article/meaning/german/typing/cloze), backup bundle export/import, EN/IT translation helper behavior.
+Covers (among others): SRS/persistence, forward-compatible data round-trip preservation, vocab search/add/archive, exercise builders (article/meaning/german/typing/cloze), grammar mastery/progression parsing and due-state, study plan summary, backup bundle export/import, EN/IT translation helper behavior.
 
 ### Kotlin/Android (offline) — latest observed
 ```text
@@ -66,7 +66,7 @@ The following require interactive runtime execution and/or external credentials/
 - **Full Rust feature parity with `:core`/Compose desktop:** large implementation scope remains (complete grammar syllabus/unit & exercise flows, all original exercise/content/lesson systems, feed/cloud sync & backup network flows, AI tutor/generation, TTS/listening, comprehension/production, etc.).
 
 ## 4) Publication status
-- PRs merged to `master` during this continuation: **#30, #32, #33, #34, #35** (subsequent increments, including this audit artifact/code, should be published via PRs merged per repo rules/checks/review when created).
+- PRs merged to `master` during this continuation: **#30, #32, #33, #34, #35, #36** (subsequent increments should be published via PRs merged per repo rules/checks/review).
 - Local temp/untracked artifacts and `desktop-rust/target/` are not committed.
 
 ## 5) Recommended manual verification checklist (for user/runtime)

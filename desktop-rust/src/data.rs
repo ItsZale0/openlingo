@@ -698,6 +698,8 @@ pub struct GrammarMasterySummary {
     pub corrette: i64,
     pub completata: bool,
     pub ultima_volta: i64,
+    pub prossima_ripasso: i64,
+    pub ripassi: i64,
 }
 
 impl GrammarMasterySummary {
@@ -712,7 +714,60 @@ impl GrammarMasterySummary {
             corrette: num("corrette"),
             completata: boolv("completata"),
             ultima_volta: num("ultimaVolta").max(num("ultimoUso")).max(num("ultimaPratica")),
+            prossima_ripasso: num("prossimaRipasso"),
+            ripassi: num("ripassi"),
         }
+    }
+
+    pub fn is_due(&self, now_ms: i64) -> bool {
+        self.prossima_ripasso > 0 && self.prossima_ripasso <= now_ms && self.tentativi > 0
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct StudyPlanSummary {
+    pub livello_corrente: String,
+    pub obiettivo_livello: String,
+    pub lezione_corrente: i32,
+    pub due_words: usize,
+    pub new_words: usize,
+    pub grammar_tracked: usize,
+    pub grammar_completed: usize,
+    pub grammar_due: usize,
+    pub next_actions: Vec<String>,
+}
+
+impl Store {
+    pub fn study_plan_summary(&self) -> StudyPlanSummary {
+        let mut out = StudyPlanSummary::default();
+        let Some(p) = self.active_profile() else { return out; };
+        let now = chrono::Utc::now().timestamp_millis();
+        out.livello_corrente = p.stato.progresso.livello_corrente.clone();
+        out.obiettivo_livello = p.stato.progresso.obiettivo_livello.clone();
+        out.lezione_corrente = p.stato.progresso.lezione_corrente;
+        out.due_words = self.due_reviews(now, usize::MAX).len();
+        out.new_words = self.new_words(usize::MAX).len();
+        let summaries = self.grammar_mastery_summaries();
+        out.grammar_tracked = summaries.len();
+        out.grammar_completed = summaries.iter().filter(|s| s.completata || s.percentuale >= 80).count();
+        out.grammar_due = summaries.iter().filter(|s| s.is_due(now)).count();
+
+        if out.due_words > 0 {
+            out.next_actions.push(format!("Review {} due word(s) (SRS)", out.due_words));
+        }
+        if out.grammar_due > 0 {
+            out.next_actions.push(format!("Review {} grammar unit(s) due", out.grammar_due));
+        }
+        if out.new_words > 0 {
+            out.next_actions.push(format!("Learn {} new word(s)", out.new_words.min(20)));
+        }
+        if out.lezione_corrente > 0 {
+            out.next_actions.push(format!("Continue lesson/unit progress (lesson {})", out.lezione_corrente));
+        }
+        if out.next_actions.is_empty() {
+            out.next_actions.push("Keep practicing: start a mixed exercise session".to_string());
+        }
+        out
     }
 }
 
