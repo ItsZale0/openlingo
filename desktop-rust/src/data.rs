@@ -1000,6 +1000,7 @@ pub struct GrammarUnitExercise {
 
 pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
     vec![
+        unit_a0_alfabeto(),
         unit_a0_articoli(),
         unit_a0_plurale(),
         unit_a0_pronomi_sein(),
@@ -2355,6 +2356,41 @@ fn unit_a0_plurale() -> GrammarUnit {
             GrammarUnitExercise { prompt_it: "Plurale di Auto:", prompt_en: "Plural of Auto:", options: &["die Auten", "die Autos", "die Autoe"], correct_index: 1, answer_text: "", explanation_it: "Prestito con -s: die Autos.", explanation_en: "Loanword with -s: die Autos." },
             GrammarUnitExercise { prompt_it: "Plurale di Frau:", prompt_en: "Plural of Frau:", options: &["die Fraus", "die Frauen", "die Fräue"], correct_index: 1, answer_text: "", explanation_it: "Frau -> Frauen.", explanation_en: "Frau -> Frauen." },
             GrammarUnitExercise { prompt_it: "Scrivi il plurale: das Buch -> die ___", prompt_en: "Type the plural: das Buch -> die ___", options: &[], correct_index: 0, answer_text: "Bücher", explanation_it: "Buch -> Bücher (umlaut + -er).", explanation_en: "Buch -> Bücher (umlaut + -er)." },
+        ],
+    }
+}
+
+
+fn unit_a0_alfabeto() -> GrammarUnit {
+    GrammarUnit {
+        id: "a0-alfabeto",
+        level: "A0",
+        title_it: "Alfabeto, suoni e pronuncia",
+        title_en: "Alphabet, sounds and pronunciation",
+        subtitle_it: "Leggere e scrivere i suoni tedeschi di base",
+        subtitle_en: "Read and write basic German sounds",
+        objective_it: "Riconoscere i suoni tedeschi più frequenti e leggere le prime parole.",
+        objective_en: "Recognize common German sounds and read basic words.",
+        theory_it: &[
+            "L'alfabeto tedesco ha 26 lettere più ä, ö, ü e ß (vale come ss).",
+            "Combinazioni chiave: ei = [ai] (mein), ie = [i:] lungo (sie), sch = [ʃ] (Schule), z = [ts] (Zeit).",
+            "v spesso suona [f] (Vater), w suona [v] (Wasser); s iniziale davanti a vocale è sonora [z] (Sonne).",
+        ],
+        theory_en: &[
+            "The German alphabet has 26 letters plus ä, ö, ü and ß (equals ss).",
+            "Key combinations: ei = [ai] (mein), ie = long [i:] (sie), sch = [ʃ] (Schule), z = [ts] (Zeit).",
+            "v often sounds [f] (Vater), w sounds [v] (Wasser); initial s before a vowel is voiced [z] (Sonne).",
+        ],
+        examples: &[
+            ("Ich heiße Anna.", "Mi chiamo Anna."),
+            ("Die Schule ist schön.", "La scuola è bella."),
+            ("Das ist mein Vater.", "Questo è mio padre."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Come si pronuncia \"ei\" in \"mein\"?", prompt_en: "How is \"ei\" pronounced in \"mein\"?", options: &["[ai]", "[i:]", "[oi]"], correct_index: 0, answer_text: "", explanation_it: "ei si pronuncia [ai].", explanation_en: "ei is pronounced [ai]." },
+            GrammarUnitExercise { prompt_it: "Come si pronuncia \"ie\" in \"sie\"?", prompt_en: "How is \"ie\" pronounced in \"sie\"?", options: &["[ai]", "[i:]", "[e]"], correct_index: 1, answer_text: "", explanation_it: "ie indica una i lunga [i:].", explanation_en: "ie indicates a long [i:]." },
+            GrammarUnitExercise { prompt_it: "Quale parola contiene il suono [ʃ] (sch)?", prompt_en: "Which word contains the [ʃ] (sch) sound?", options: &["Sonne", "Schule", "Zeit"], correct_index: 1, answer_text: "", explanation_it: "Schule inizia con sch = [ʃ].", explanation_en: "Schule starts with sch = [ʃ]." },
+            GrammarUnitExercise { prompt_it: "Completa: Stra___e (strada)", prompt_en: "Complete: Stra___e (street)", options: &[], correct_index: 0, answer_text: "ß", explanation_it: "Straße si scrive con ß (vale ss).", explanation_en: "Straße is written with ß (equals ss)." },
         ],
     }
 }
