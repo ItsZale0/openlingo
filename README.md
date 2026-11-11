@@ -208,7 +208,7 @@ the code or documentation.
 
 ## Development note: a vibecoded project
 
-Deutsch is a **vibecoded** project: most of the code, tests and documentation
+Openlingo is a **vibecoded** project: most of the code, tests and documentation
 were written in collaboration with AI agents, under human direction, review and
 verification.
 
