@@ -978,6 +978,8 @@ pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
         unit_a2_perfekt_intro(),
         unit_a2_dativ(),
         unit_a2_weil_dass(),
+        unit_a2_komparativ(),
+        unit_b1_adjektivdeklination_intro(),
     ]
 }
 
@@ -1286,6 +1288,74 @@ fn unit_a2_weil_dass() -> GrammarUnit {
             GrammarUnitExercise { prompt_it: "Completa: Ich denke, dass er heute ___ . (kommen)", prompt_en: "Complete: Ich denke, dass er heute ___ . (kommen)", options: &["kommt", "kommen", "kam"], correct_index: 0, answer_text: "", explanation_it: "Verbo coniugato alla fine della subordinata: dass er heute kommt.", explanation_en: "Conjugated verb at the end: dass er heute kommt." },
             GrammarUnitExercise { prompt_it: "Scegli la congiunzione: Ich lerne, ___ ich die Prüfung habe.", prompt_en: "Choose the conjunction: Ich lerne, ___ ich die Prüfung habe.", options: &["dass", "weil", "ob"], correct_index: 1, answer_text: "", explanation_it: "weil esprime causa: perché ho l'esame.", explanation_en: "weil expresses reason/cause." },
             GrammarUnitExercise { prompt_it: "Scrivi l'ultima parola: Ich weiß, dass du Recht ___ . (haben)", prompt_en: "Type the last word: Ich weiß, dass du Recht ___ . (haben)", options: &[], correct_index: 0, answer_text: "hast", explanation_it: "In subordinata il verbo coniugato va alla fine: dass du Recht hast.", explanation_en: "Conjugated verb at the end of subordinate clause: dass du Recht hast." },
+        ],
+    }
+}
+
+fn unit_a2_komparativ() -> GrammarUnit {
+    GrammarUnit {
+        id: "a2-komparativ",
+        level: "A2",
+        title_it: "Comparativi e superlativi",
+        title_en: "Comparatives and superlatives",
+        subtitle_it: "Confrontare persone, cose e qualità",
+        subtitle_en: "Compare people, things, and qualities",
+        objective_it: "Formare e usare comparativo e superlativo di base.",
+        objective_en: "Form and use basic comparative and superlative forms.",
+        theory_it: &[
+            "Comparativo: aggettivo + -er (+ spesso umlaut: alt -> älter), confronto con 'als'.",
+            "Superlativo: am + aggettivo + -sten (am schnellsten) oppure der/die/das + -ste in attributo.",
+            "Irregolari comuni: gut -> besser -> am besten; viel -> mehr -> am meisten.",
+        ],
+        theory_en: &[
+            "Comparative: adjective + -er (often umlaut: alt -> älter), comparison with 'als'.",
+            "Superlative: am + adjective + -sten (am schnellsten) or der/die/das + -ste as attribute.",
+            "Common irregulars: gut -> besser -> am besten; viel -> mehr -> am meisten.",
+        ],
+        examples: &[
+            ("Mein Auto ist schneller als dein Auto.", "La mia auto è più veloce della tua."),
+            ("Sie ist die beste Spielerin.", "Lei è la migliore giocatrice."),
+            ("Im Sommer ist es am wärmsten.", "In estate fa più caldo (è il periodo più caldo)."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa il comparativo: schnell -> ___", prompt_en: "Complete the comparative: schnell -> ___", options: &["schneller", "am schnellsten", "schnellste"], correct_index: 0, answer_text: "", explanation_it: "Comparativo regolare: schnell + -er = schneller.", explanation_en: "Regular comparative: schnell + -er = schneller." },
+            GrammarUnitExercise { prompt_it: "Scegli la forma corretta: gut -> ___ -> am besten", prompt_en: "Choose the correct form: gut -> ___ -> am besten", options: &["guter", "besser", "mehr"], correct_index: 1, answer_text: "", explanation_it: "gut è irregolare: besser.", explanation_en: "gut is irregular: besser." },
+            GrammarUnitExercise { prompt_it: "Completa: Dieses Buch ist ___ als jenes. (interessant)", prompt_en: "Complete: Dieses Buch ist ___ als jenes. (interessant)", options: &[], correct_index: 0, answer_text: "interessanter", explanation_it: "Comparativo: interessanter als ...", explanation_en: "Comparative: interessanter als ..." },
+            GrammarUnitExercise { prompt_it: "Scegli il superlativo predicativo di schnell.", prompt_en: "Choose the predicative superlative of schnell.", options: &["am schnellsten", "schneller", "der schnellste"], correct_index: 0, answer_text: "", explanation_it: "Predicativo: am + -sten = am schnellsten.", explanation_en: "Predicative: am + -sten = am schnellsten." },
+        ],
+    }
+}
+
+fn unit_b1_adjektivdeklination_intro() -> GrammarUnit {
+    GrammarUnit {
+        id: "b1-adjektivdeklination-intro",
+        level: "B1",
+        title_it: "Declinazione dell'aggettivo (introduzione)",
+        title_en: "Adjective declension (introduction)",
+        subtitle_it: "Desinenze con articolo determinativo e indeterminativo",
+        subtitle_en: "Endings with definite and indefinite articles",
+        objective_it: "Riconoscere le desinenze più comuni degli aggettivi attributivi.",
+        objective_en: "Recognize the most common attributive adjective endings.",
+        theory_it: &[
+            "L'aggettivo davanti al nome prende desinenze che dipendono da genere, caso e articolo.",
+            "Con articolo determinativo al nominativo: der gute Mann, die gute Frau, das gute Kind, die guten Kinder.",
+            "Con articolo indeterminativo al nominativo: ein guter Mann, eine gute Frau, ein gutes Kind.",
+        ],
+        theory_en: &[
+            "An adjective before a noun takes endings depending on gender, case, and article type.",
+            "With definite article in nominative: der gute Mann, die gute Frau, das gute Kind, die guten Kinder.",
+            "With indefinite article in nominative: ein guter Mann, eine gute Frau, ein gutes Kind.",
+        ],
+        examples: &[
+            ("Der kleine Hund schläft.", "Il cagnolino dorme."),
+            ("Ich habe eine neue Tasche.", "Ho una borsa nuova."),
+            ("Das ist ein gutes Buch.", "Questo è un buon libro."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa: der ___ Mann (gut)", prompt_en: "Complete: der ___ Mann (gut)", options: &["gute", "guter", "gutes"], correct_index: 0, answer_text: "", explanation_it: "Maschile nominativo con articolo determinativo: der gute Mann.", explanation_en: "Masculine nominative with definite article: der gute Mann." },
+            GrammarUnitExercise { prompt_it: "Completa: ein ___ Mann (gut)", prompt_en: "Complete: ein ___ Mann (gut)", options: &["gute", "guter", "guten"], correct_index: 1, answer_text: "", explanation_it: "Maschile nominativo con articolo indeterminativo: ein guter Mann.", explanation_en: "Masculine nominative with indefinite article: ein guter Mann." },
+            GrammarUnitExercise { prompt_it: "Completa: eine ___ Frau (neu)", prompt_en: "Complete: eine ___ Frau (neu)", options: &["neue", "neuer", "neuen"], correct_index: 0, answer_text: "", explanation_it: "Femminile nominativo con eine: eine neue Frau.", explanation_en: "Feminine nominative with eine: eine neue Frau." },
+            GrammarUnitExercise { prompt_it: "Scrivi la desinenza: das ___ Kind (klein)", prompt_en: "Type the ending/form: das ___ Kind (klein)", options: &[], correct_index: 0, answer_text: "kleine", explanation_it: "Neutro nominativo con articolo determinativo: das kleine Kind.", explanation_en: "Neuter nominative with definite article: das kleine Kind." },
         ],
     }
 }
