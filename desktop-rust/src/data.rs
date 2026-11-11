@@ -1010,9 +1010,11 @@ pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
         unit_a2_dativ(),
         unit_a2_weil_dass(),
         unit_a2_komparativ(),
-        unit_b1_adjektivdeklination_intro(),
         unit_a2_praepositionen_dativ(),
+        unit_b1_adjektivdeklination_intro(),
         unit_b1_relativsaetze_intro(),
+        unit_b1_konnektoren(),
+        unit_b1_reflexive_verben(),
     ]
 }
 
@@ -1457,6 +1459,74 @@ fn unit_b1_relativsaetze_intro() -> GrammarUnit {
             GrammarUnitExercise { prompt_it: "Completa: Das Kind, ___ ich sehe, spielt.", prompt_en: "Complete: Das Kind, ___ ich sehe, spielt.", options: &["der", "das", "dem"], correct_index: 1, answer_text: "", explanation_it: "Neutro, oggetto in relativa (accusativo = nominativo qui): das.", explanation_en: "Neuter object in relative clause: das." },
             GrammarUnitExercise { prompt_it: "Completa: Die Frau, ___ du kennst, ist Ärztin. (accusativo)", prompt_en: "Complete: Die Frau, ___ du kennst, ist Ärztin. (accusative)", options: &["der", "die", "den"], correct_index: 1, answer_text: "", explanation_it: "Femminile accusativo nella relativa: die.", explanation_en: "Feminine accusative in relative clause: die." },
             GrammarUnitExercise { prompt_it: "Scrivi il pronome: Der Hund, ___ ich habe, ist klein. (accusativo maschile)", prompt_en: "Type the pronoun: Der Hund, ___ ich habe, ist klein. (masc. accusative)", options: &[], correct_index: 0, answer_text: "den", explanation_it: "Maschile accusativo nella relativa: den.", explanation_en: "Masculine accusative relative pronoun: den." },
+        ],
+    }
+}
+
+fn unit_b1_konnektoren() -> GrammarUnit {
+    GrammarUnit {
+        id: "b1-konnektoren",
+        level: "B1",
+        title_it: "Connettori: deshalb, trotzdem, obwohl",
+        title_en: "Connectors: deshalb, trotzdem, obwohl",
+        subtitle_it: "Collegare idee: causa, conseguenza e contrasto",
+        subtitle_en: "Link ideas: cause, consequence, contrast",
+        objective_it: "Usare connettori comuni per strutturare frasi e argomenti.",
+        objective_en: "Use common connectors to structure sentences and arguments.",
+        theory_it: &[
+            "deshalb (perciò) introduce una conseguenza: spesso il verbo segue subito (posizione 2) nella frase principale.",
+            "trotzdem (nonostante ciò) esprime contrasto rispetto a quanto detto prima.",
+            "obwohl (sebbene) introduce una subordinata: il verbo coniugato va alla fine.",
+        ],
+        theory_en: &[
+            "deshalb (therefore) introduces a consequence; the verb often follows in position 2 in the main clause.",
+            "trotzdem (nevertheless) expresses contrast with what was said before.",
+            "obwohl (although) introduces a subordinate clause: the conjugated verb goes to the end.",
+        ],
+        examples: &[
+            ("Es regnet, deshalb bleibe ich zu Hause.", "Piove, perciò resto a casa."),
+            ("Ich bin müde, trotzdem arbeite ich.", "Sono stanco, eppure lavoro."),
+            ("Ich gehe spazieren, obwohl es regnet.", "Vado a passeggiare sebbene piova."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Scegli il connettore: Es ist kalt, ___ ziehe ich eine Jacke an.", prompt_en: "Choose the connector: Es ist kalt, ___ ziehe ich eine Jacke an.", options: &["obwohl", "deshalb", "weil"], correct_index: 1, answer_text: "", explanation_it: "Conseguenza: fa freddo, perciò metto la giacca.", explanation_en: "Consequence: it's cold, therefore I put on a jacket." },
+            GrammarUnitExercise { prompt_it: "Scegli il connettore: ___ ich krank bin, gehe ich zur Arbeit.", prompt_en: "Choose the connector: ___ ich krank bin, gehe ich zur Arbeit.", options: &["Deshalb", "Trotzdem", "Obwohl"], correct_index: 2, answer_text: "", explanation_it: "obwohl introduce una concessione/contrasto (verbo alla fine nella subordinata).", explanation_en: "obwohl introduces concession/contrast (verb at the end in the clause)." },
+            GrammarUnitExercise { prompt_it: "Completa: Ich habe wenig Zeit, ___ helfe ich dir.", prompt_en: "Complete: Ich habe wenig Zeit, ___ helfe ich dir.", options: &["trotzdem", "obwohl", "weil"], correct_index: 0, answer_text: "", explanation_it: "Contrasto: poco tempo, eppure ti aiuto.", explanation_en: "Contrast: little time, nevertheless I help you." },
+            GrammarUnitExercise { prompt_it: "Scrivi il connettore: Ich lerne viel, ___ möchte ich die Prüfung bestehen.", prompt_en: "Type the connector: Ich lerne viel, ___ möchte ich die Prüfung bestehen.", options: &[], correct_index: 0, answer_text: "deshalb", explanation_it: "Conseguenza: studio molto, perciò voglio superare l'esame.", explanation_en: "Consequence: I study a lot, therefore I want to pass the exam." },
+        ],
+    }
+}
+
+fn unit_b1_reflexive_verben() -> GrammarUnit {
+    GrammarUnit {
+        id: "b1-reflexive-verben",
+        level: "B1",
+        title_it: "Verbi riflessivi (introduzione)",
+        title_en: "Reflexive verbs (introduction)",
+        subtitle_it: "Pronomi riflessivi all'accusativo",
+        subtitle_en: "Reflexive pronouns in the accusative",
+        objective_it: "Usare i verbi riflessivi comuni con il pronome corretto.",
+        objective_en: "Use common reflexive verbs with the correct pronoun.",
+        theory_it: &[
+            "I verbi riflessivi usano un pronome che si riferisce al soggetto: mich, dich, sich, uns, euch, sich.",
+            "Accusativo: ich freue mich, du freust dich, er/sie/es freut sich, wir freuen uns, ihr freut euch, sie/Sie freuen sich.",
+            "Molti verbi riflessivi in tedesco non lo sono in italiano (es. sich freuen = essere contento).",
+        ],
+        theory_en: &[
+            "Reflexive verbs use a pronoun referring back to the subject: mich, dich, sich, uns, euch, sich.",
+            "Accusative: ich freue mich, du freust dich, er/sie/es freut sich, wir freuen uns, ihr freut euch, sie/Sie freuen sich.",
+            "Many German reflexive verbs are not reflexive in English/Italian (e.g. sich freuen = to be happy).",
+        ],
+        examples: &[
+            ("Ich freue mich.", "Sono contento/a."),
+            ("Er beeilt sich.", "Lui si sbrig/a."),
+            ("Wir interessieren uns für Musik.", "Ci interessiamo di musica."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa: Ich freue ___ .", prompt_en: "Complete: Ich freue ___ .", options: &["mich", "dich", "sich"], correct_index: 0, answer_text: "", explanation_it: "Con ich si usa mich.", explanation_en: "With ich use mich." },
+            GrammarUnitExercise { prompt_it: "Completa: Du wäschst ___ .", prompt_en: "Complete: Du wäschst ___ .", options: &["mich", "dich", "sich"], correct_index: 1, answer_text: "", explanation_it: "Con du si usa dich.", explanation_en: "With du use dich." },
+            GrammarUnitExercise { prompt_it: "Completa: Sie (lei) beeilt ___ .", prompt_en: "Complete: Sie (she) beeilt ___ .", options: &["mich", "dich", "sich"], correct_index: 2, answer_text: "", explanation_it: "Con er/sie/es si usa sich.", explanation_en: "With er/sie/es use sich." },
+            GrammarUnitExercise { prompt_it: "Scrivi il pronome: Wir freuen ___ auf das Wochenende.", prompt_en: "Type the pronoun: Wir freuen ___ auf das Wochenende.", options: &[], correct_index: 0, answer_text: "uns", explanation_it: "Con wir si usa uns.", explanation_en: "With wir use uns." },
         ],
     }
 }
