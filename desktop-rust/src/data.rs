@@ -1001,6 +1001,7 @@ pub struct GrammarUnitExercise {
 pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
     vec![
         unit_a0_articoli(),
+        unit_a0_plurale(),
         unit_a0_pronomi_sein(),
         unit_a0_frase(),
         unit_a1_akkusativ(),
@@ -2319,6 +2320,41 @@ fn unit_a1_separabili() -> GrammarUnit {
             GrammarUnitExercise { prompt_it: "Completa: Wir ___ heute im Supermarkt ___. (einkaufen)", prompt_en: "Complete: Wir ___ heute im Supermarkt ___. (einkaufen)", options: &["kaufen ... ein", "ein ... kaufen", "einkaufen ... -"], correct_index: 0, answer_text: "", explanation_it: "einkaufen: kaufen ... ein.", explanation_en: "einkaufen: kaufen ... ein." },
             GrammarUnitExercise { prompt_it: "Scegli: ___ du ___? (mitkommen)", prompt_en: "Choose: ___ du ___? (mitkommen)", options: &["Kommst ... mit", "Mit ... kommst", "Kommt ... mit"], correct_index: 0, answer_text: "", explanation_it: "Domanda: Kommst du mit?", explanation_en: "Question: Kommst du mit?" },
             GrammarUnitExercise { prompt_it: "Scrivi il prefisso: Er sieht abends ___. (fernsehen)", prompt_en: "Type the prefix: Er sieht abends ___. (fernsehen)", options: &[], correct_index: 0, answer_text: "fern", explanation_it: "fernsehen: sieht ... fern.", explanation_en: "fernsehen: sieht ... fern." },
+        ],
+    }
+}
+
+
+fn unit_a0_plurale() -> GrammarUnit {
+    GrammarUnit {
+        id: "a0-plurale",
+        level: "A0",
+        title_it: "Il plurale dei sostantivi",
+        title_en: "Plural of nouns",
+        subtitle_it: "Die Kinder, die Autos, die Frauen",
+        subtitle_en: "Die Kinder, die Autos, die Frauen",
+        objective_it: "Formare i plurali più frequenti e usare l'articolo die.",
+        objective_en: "Form common plurals and use the article die.",
+        theory_it: &[
+            "Al plurale l'articolo è sempre die, ma il sostantivo cambia forma in modi diversi.",
+            "Desinenze comuni: -e (Tisch -> Tische), -en (Frau -> Frauen), -er (Kind -> Kinder), -s (Auto -> Autos), nessuna (Lehrer -> Lehrer).",
+            "Alcuni plurali aggiungono l'umlaut: Stadt -> Städte, Mann -> Männer, Buch -> Bücher.",
+        ],
+        theory_en: &[
+            "In the plural the article is always die, but the noun changes in different ways.",
+            "Common endings: -e (Tisch -> Tische), -en (Frau -> Frauen), -er (Kind -> Kinder), -s (Auto -> Autos), none (Lehrer -> Lehrer).",
+            "Some plurals add an umlaut: Stadt -> Städte, Mann -> Männer, Buch -> Bücher.",
+        ],
+        examples: &[
+            ("Die Kinder spielen im Park.", "I bambini giocano nel parco."),
+            ("Die Bücher sind interessant.", "I libri sono interessanti."),
+            ("Die Autos sind neu.", "Le auto sono nuove."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Plurale di Kind:", prompt_en: "Plural of Kind:", options: &["die Kind", "die Kinder", "die Kindes"], correct_index: 1, answer_text: "", explanation_it: "Kind -> Kinder.", explanation_en: "Kind -> Kinder." },
+            GrammarUnitExercise { prompt_it: "Plurale di Auto:", prompt_en: "Plural of Auto:", options: &["die Auten", "die Autos", "die Autoe"], correct_index: 1, answer_text: "", explanation_it: "Prestito con -s: die Autos.", explanation_en: "Loanword with -s: die Autos." },
+            GrammarUnitExercise { prompt_it: "Plurale di Frau:", prompt_en: "Plural of Frau:", options: &["die Fraus", "die Frauen", "die Fräue"], correct_index: 1, answer_text: "", explanation_it: "Frau -> Frauen.", explanation_en: "Frau -> Frauen." },
+            GrammarUnitExercise { prompt_it: "Scrivi il plurale: das Buch -> die ___", prompt_en: "Type the plural: das Buch -> die ___", options: &[], correct_index: 0, answer_text: "Bücher", explanation_it: "Buch -> Bücher (umlaut + -er).", explanation_en: "Buch -> Bücher (umlaut + -er)." },
         ],
     }
 }
