@@ -1009,6 +1009,7 @@ pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
         unit_a2_trennbare_verben(),
         unit_a2_perfekt_intro(),
         unit_a2_dativ(),
+        unit_a2_praeteritum(),
         unit_a2_weil_dass(),
         unit_a2_komparativ(),
         unit_a2_praepositionen_dativ(),
@@ -1022,6 +1023,8 @@ pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
         unit_b1_praeteritum_perfekt(),
         unit_b1_genitiv_intro(),
         unit_b1_konjunktiv2_intro(),
+        unit_b1_indirekte_rede(),
+        unit_b1_nominalisierung(),
         unit_b1_passiv_modalverben_intro(),
     ]
 }
@@ -1807,6 +1810,109 @@ fn unit_b1_passiv_modalverben_intro() -> GrammarUnit {
             GrammarUnitExercise { prompt_it: "Completa: Das ___ gemacht werden. (können)", prompt_en: "Complete: Das ___ gemacht werden. (können)", options: &["kann", "kannst", "können"], correct_index: 0, answer_text: "", explanation_it: "Das -> kann gemacht werden.", explanation_en: "Das -> kann gemacht werden." },
             GrammarUnitExercise { prompt_it: "Qual è l'ordine corretto?", prompt_en: "Which order is correct?", options: &["Das muss werden gemacht.", "Das muss gemacht werden.", "Das gemacht muss werden."], correct_index: 1, answer_text: "", explanation_it: "Modale + Partizip II + werden: muss gemacht werden.", explanation_en: "Modal + Partizip II + werden: muss gemacht werden." },
             GrammarUnitExercise { prompt_it: "Scrivi il modale: Die Tür ___ geschlossen werden. (sollen, singolare)", prompt_en: "Type the modal: Die Tür ___ geschlossen werden. (sollen, singular)", options: &[], correct_index: 0, answer_text: "soll", explanation_it: "Singolare: die Tür soll geschlossen werden.", explanation_en: "Singular: die Tür soll geschlossen werden." },
+        ],
+    }
+}
+
+
+fn unit_a2_praeteritum() -> GrammarUnit {
+    GrammarUnit {
+        id: "a2-praeteritum",
+        level: "A2",
+        title_it: "Il Präteritum",
+        title_en: "Präteritum (simple past)",
+        subtitle_it: "Il passato della narrazione",
+        subtitle_en: "The narrative past tense",
+        objective_it: "Usare il Präteritum con verbi regolari, irregolari e modali comuni.",
+        objective_en: "Use Präteritum with regular, irregular, and common modal verbs.",
+        theory_it: &[
+            "Il Präteritum è il passato semplice, frequente nello scritto e nei racconti.",
+            "Verbi regolari: radice + -te (machen -> machte). Irregolari: cambio di radice (gehen -> ging).",
+            "Forme importanti: sein -> war, haben -> hatte, modali -> konnte, musste, wollte, durfte, sollte.",
+        ],
+        theory_en: &[
+            "Präteritum is the simple past, common in writing and narration.",
+            "Regular verbs: stem + -te (machen -> machte). Irregular verbs change the stem (gehen -> ging).",
+            "Important forms: sein -> war, haben -> hatte, modals -> konnte, musste, wollte, durfte, sollte.",
+        ],
+        examples: &[
+            ("Ich war gestern im Kino.", "Ieri ero al cinema."),
+            ("Wir hatten keine Zeit.", "Non avevamo tempo."),
+            ("Er ging nach Berlin.", "Andò a Berlino."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa: Ich ___ gestern im Kino. (sein)", prompt_en: "Complete: Ich ___ gestern im Kino. (sein)", options: &["war", "warst", "bin"], correct_index: 0, answer_text: "", explanation_it: "sein al Präteritum: ich war.", explanation_en: "sein in Präteritum: ich war." },
+            GrammarUnitExercise { prompt_it: "Completa: Wir ___ keine Zeit. (haben)", prompt_en: "Complete: Wir ___ keine Zeit. (haben)", options: &["hatte", "hatten", "haben"], correct_index: 1, answer_text: "", explanation_it: "haben al Präteritum: wir hatten.", explanation_en: "haben in Präteritum: wir hatten." },
+            GrammarUnitExercise { prompt_it: "Scegli la forma corretta: Er ___ nach Berlin. (gehen)", prompt_en: "Choose the correct form: Er ___ nach Berlin. (gehen)", options: &["gehte", "ging", "gegangen"], correct_index: 1, answer_text: "", explanation_it: "gehen è irregolare: er ging.", explanation_en: "gehen is irregular: er ging." },
+            GrammarUnitExercise { prompt_it: "Scrivi la forma: ich ___ (machen, Präteritum)", prompt_en: "Type the form: ich ___ (machen, Präteritum)", options: &[], correct_index: 0, answer_text: "machte", explanation_it: "Verbo regolare: machen -> machte.", explanation_en: "Regular verb: machen -> machte." },
+        ],
+    }
+}
+
+fn unit_b1_indirekte_rede() -> GrammarUnit {
+    GrammarUnit {
+        id: "b1-indirekte-rede",
+        level: "B1",
+        title_it: "Il discorso indiretto",
+        title_en: "Indirect speech",
+        subtitle_it: "Konjunktiv I e domande riportate",
+        subtitle_en: "Konjunktiv I and reported questions",
+        objective_it: "Riferire affermazioni e domande senza virgolette.",
+        objective_en: "Report statements and questions without quotation marks.",
+        theory_it: &[
+            "Nel discorso indiretto si riporta ciò che dice qualcuno; spesso si usa il Konjunktiv I (sei, habe, komme).",
+            "Se il Konjunktiv I coincide con l'indicativo, si può usare il Konjunktiv II per chiarezza.",
+            "Domande indirette: ob per sì/no, W-Wort per le altre; il verbo va alla fine.",
+        ],
+        theory_en: &[
+            "In indirect speech you report what someone said; Konjunktiv I is often used (sei, habe, komme).",
+            "If Konjunktiv I matches the indicative, Konjunktiv II can be used for clarity.",
+            "Indirect questions: ob for yes/no, a W-word for others; the verb goes to the end.",
+        ],
+        examples: &[
+            ("Er sagt, er sei müde.", "Dice che è stanco."),
+            ("Sie fragt, ob ich Zeit habe.", "Chiede se ho tempo."),
+            ("Er fragt, wo ich wohne.", "Chiede dove abito."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa: Er sagt, er ___ krank. (sein)", prompt_en: "Complete: Er sagt, er ___ krank. (sein)", options: &["ist", "sei", "war"], correct_index: 1, answer_text: "", explanation_it: "Konjunktiv I di sein: er sei.", explanation_en: "Konjunktiv I of sein: er sei." },
+            GrammarUnitExercise { prompt_it: "Completa: Sie sagt, sie ___ keine Zeit. (haben)", prompt_en: "Complete: Sie sagt, sie ___ keine Zeit. (haben)", options: &["hat", "habe", "hatte"], correct_index: 1, answer_text: "", explanation_it: "Konjunktiv I di haben: sie habe.", explanation_en: "Konjunktiv I of haben: sie habe." },
+            GrammarUnitExercise { prompt_it: "Domanda indiretta sì/no: Er fragt, ___ ich komme.", prompt_en: "Indirect yes/no question: Er fragt, ___ ich komme.", options: &["dass", "ob", "weil"], correct_index: 1, answer_text: "", explanation_it: "Le domande indirette sì/no usano ob.", explanation_en: "Indirect yes/no questions use ob." },
+            GrammarUnitExercise { prompt_it: "Scrivi la forma: sie ___ (kommen, Konjunktiv I)", prompt_en: "Type the form: sie ___ (kommen, Konjunktiv I)", options: &[], correct_index: 0, answer_text: "komme", explanation_it: "Konjunktiv I: sie komme.", explanation_en: "Konjunktiv I: sie komme." },
+        ],
+    }
+}
+
+fn unit_b1_nominalisierung() -> GrammarUnit {
+    GrammarUnit {
+        id: "b1-nominalisierung",
+        level: "B1",
+        title_it: "La nominalizzazione",
+        title_en: "Nominalization",
+        subtitle_it: "Trasformare verbi e aggettivi in nomi",
+        subtitle_en: "Turning verbs and adjectives into nouns",
+        objective_it: "Riconoscere e usare nomi derivati da verbi e aggettivi.",
+        objective_en: "Recognize and use nouns derived from verbs and adjectives.",
+        theory_it: &[
+            "In tedesco verbi e aggettivi possono diventare nomi; i nomi si scrivono sempre con la maiuscola.",
+            "L'infinito sostantivato è neutro: das Essen, das Lernen. Suffissi comuni: -ung, -heit, -keit, -schaft.",
+            "Spesso con preposizioni: beim Lernen, zum Essen, nach dem Schlafen.",
+        ],
+        theory_en: &[
+            "In German verbs and adjectives can become nouns; nouns are always capitalized.",
+            "Nominalized infinitives are neuter: das Essen, das Lernen. Common suffixes: -ung, -heit, -keit, -schaft.",
+            "Often used with prepositions: beim Lernen, zum Essen, nach dem Schlafen.",
+        ],
+        examples: &[
+            ("Das Lernen macht Spaß.", "Imparare è divertente."),
+            ("Die Prüfung war schwierig.", "L'esame è stato difficile."),
+            ("Die Freiheit ist wichtig.", "La libertà è importante."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Scegli la forma corretta: ___ ist wichtig. (lernen)", prompt_en: "Choose the correct form: ___ ist wichtig. (lernen)", options: &["lernen", "Das Lernen", "der Lernen"], correct_index: 1, answer_text: "", explanation_it: "Infinito sostantivato neutro: das Lernen.", explanation_en: "Nominalized infinitive (neuter): das Lernen." },
+            GrammarUnitExercise { prompt_it: "Completa: Die ___ war schwierig. (prüfen)", prompt_en: "Complete: Die ___ war schwierig. (prüfen)", options: &["Prüfen", "Prüfung", "Prüfheit"], correct_index: 1, answer_text: "", explanation_it: "Da prüfen: die Prüfung (-ung).", explanation_en: "From prüfen: die Prüfung (-ung)." },
+            GrammarUnitExercise { prompt_it: "Completa: Die ___ ist wichtig. (frei)", prompt_en: "Complete: Die ___ ist wichtig. (frei)", options: &["Frei", "Freiheit", "Freikeit"], correct_index: 1, answer_text: "", explanation_it: "Da frei: die Freiheit (-heit).", explanation_en: "From frei: die Freiheit (-heit)." },
+            GrammarUnitExercise { prompt_it: "Scrivi la forma: Ich gehe zum ___ (essen).", prompt_en: "Type the form: Ich gehe zum ___ (essen).", options: &[], correct_index: 0, answer_text: "Essen", explanation_it: "Nominalizzazione: zum Essen.", explanation_en: "Nominalization: zum Essen." },
         ],
     }
 }
