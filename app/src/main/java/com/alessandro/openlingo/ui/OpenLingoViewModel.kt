@@ -274,13 +274,25 @@ class OpenLingoViewModel(application: Application) : AndroidViewModel(applicatio
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
 
+    /** Feedback umano sugli esercizi: id -> true (corretto) / false (sbagliato). */
+    val feedbackEsercizi: StateFlow<Map<String, Boolean>> = profileManager.repositoryFlow
+        .map { r ->
+            r.profiloAttivoId?.let { r.profili[it]?.stato?.feedbackEsercizi } ?: emptyMap()
+        }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
+
     /** Esercizi generati dall'AI per unità, convertiti nel formato delle lezioni. */
     val eserciziUnitaAi: StateFlow<Map<String, List<EsercizioUnita>>> = profileManager.repositoryFlow
         .map { r ->
-            val mappa = r.profiloAttivoId
-                ?.let { r.profili[it]?.stato?.eserciziUnitaAi }
-                ?: emptyMap()
-            mappa.mapValues { (_, lista) -> lista.mapNotNull { SessioneLezione.daGenerato(it) } }
+            val stato = r.profiloAttivoId?.let { r.profili[it]?.stato }
+            val mappa = stato?.eserciziUnitaAi ?: emptyMap()
+            val feedback = stato?.feedbackEsercizi ?: emptyMap()
+            mappa.mapValues { (_, lista) ->
+                lista.mapNotNull { e ->
+                    if (feedback[e.id] == false || feedback["ai-${e.id}"] == false) null
+                    else SessioneLezione.daGenerato(e)
+                }
+            }
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
 
@@ -1421,11 +1433,13 @@ class OpenLingoViewModel(application: Application) : AndroidViewModel(applicatio
             TipoEsercizio.GRAMMATICA -> stato.eserciziGeneratiGrammatica
         }
 
-    private fun setGenFlow(tipo: TipoEsercizio, lista: List<EsercizioGenEntity>) {
+    private fun setGenFlow(tipo: TipoEsercizio, lista: List<EsercizioGenEntity>, feedback: Map<String, Boolean> = emptyMap()) {
         // Difesa in profondità: scarta anche gli esercizi ambigui/sbagliati già
         // salvati nei profili da versioni precedenti, così non ricompaiono.
+        // Esclude anche quelli segnalati dall'utente come esercizio sbagliato.
         val visibili = lista.filter {
-            ControlloGrammatica.problemi(it.domanda, it.opzioni, it.rispostaCorretta).isEmpty()
+            feedback[it.id] != false &&
+                ControlloGrammatica.problemi(it.domanda, it.opzioni, it.rispostaCorretta).isEmpty()
         }
         when (tipo) {
             TipoEsercizio.COMPRENSIONE -> _eserciziGenComprensione.value = visibili
@@ -1459,10 +1473,11 @@ class OpenLingoViewModel(application: Application) : AndroidViewModel(applicatio
     fun caricaEserciziGenerati() {
         viewModelScope.launch {
             val p = profileManager.profiloAttivo() ?: return@launch
-            setGenFlow(TipoEsercizio.COMPRENSIONE, p.stato.eserciziGeneratiComprensione)
-            setGenFlow(TipoEsercizio.PRODUZIONE, p.stato.eserciziGeneratiProduzione)
-            setGenFlow(TipoEsercizio.ASCOLTO, p.stato.eserciziGeneratiAscolto)
-            setGenFlow(TipoEsercizio.GRAMMATICA, p.stato.eserciziGeneratiGrammatica)
+            val fb = p.stato.feedbackEsercizi
+            setGenFlow(TipoEsercizio.COMPRENSIONE, p.stato.eserciziGeneratiComprensione, fb)
+            setGenFlow(TipoEsercizio.PRODUZIONE, p.stato.eserciziGeneratiProduzione, fb)
+            setGenFlow(TipoEsercizio.ASCOLTO, p.stato.eserciziGeneratiAscolto, fb)
+            setGenFlow(TipoEsercizio.GRAMMATICA, p.stato.eserciziGeneratiGrammatica, fb)
         }
     }
 
@@ -1480,7 +1495,9 @@ class OpenLingoViewModel(application: Application) : AndroidViewModel(applicatio
         val medico = profiloAttivo.value?.config?.mostraContestoMedico == true
         // evita duplicati: passa le domande già generate (forma leggibile per il
         // modello) E le chiavi normalizzate (filtro reale dopo la generazione)
-        val esistenti = statoGenerati(tipo, profileManager.profiloAttivo()?.stato ?: ProfiloStato())
+        val profiloStato = profileManager.profiloAttivo()?.stato ?: ProfiloStato()
+        val esistenti = statoGenerati(tipo, profiloStato)
+        val feedback = profiloStato.feedbackEsercizi
         fun chiaveEntita(e: EsercizioGenEntity): String = DeduplicaEsercizi.chiave(
             e.domanda,
             if (tipo == TipoEsercizio.ASCOLTO) e.fraseTedesca else null
@@ -1495,6 +1512,7 @@ class OpenLingoViewModel(application: Application) : AndroidViewModel(applicatio
             else t(e.domanda)
         }
         val evitaChiavi = esistenti.map(::chiaveEntita)
+        val evitaNegativi = esistenti.filter { feedback[it.id] == false }.map(::chiaveEntita)
         val risultato = aiService.generaEsercizi(
             config = config, tipo = tipo, livello = livello,
             quanti = quanti, contestoMedico = medico,
@@ -1508,7 +1526,7 @@ class OpenLingoViewModel(application: Application) : AndroidViewModel(applicatio
         // DEDUPLICA: oltre al filtro nel generatore, si scarta qualunque contenuto
         // già visto (difesa in profondità: vale anche per batch vecchi in cache).
         val nelLivello = risultato.filter { LivelloCEFR.daTesto(it.livello).ordine <= livelloUtente.ordine }
-        val filtrati = DeduplicaEsercizi.senzaGiaVisti(nelLivello, evitaChiavi, ::chiaveGenerata)
+        val filtrati = DeduplicaEsercizi.senzaGiaVisti(nelLivello, evitaChiavi + evitaNegativi, ::chiaveGenerata)
         // Se il modello ha riproposto SOLO domande già viste, meglio ripresentarle
         // (sempre deduplicate) che mostrare "nessun esercizio": lo studente può
         // comunque esercitarsi e la schermata non va in errore.
@@ -1528,7 +1546,7 @@ class OpenLingoViewModel(application: Application) : AndroidViewModel(applicatio
         if (profilo != null) {
             val nuovoStato = copiaStatoConNuovi(tipo, profilo.stato, nuovi)
             profileManager.aggiornaStatoAttivo(nuovoStato)
-            setGenFlow(tipo, statoGenerati(tipo, nuovoStato))
+            setGenFlow(tipo, statoGenerati(tipo, nuovoStato), nuovoStato.feedbackEsercizi)
         }
         return ammessi
     }
@@ -1562,6 +1580,33 @@ class OpenLingoViewModel(application: Application) : AndroidViewModel(applicatio
             profileManager.aggiornaStatoAttivo(copiaStatoCon(tipo, profilo.stato, aggiornati))
             setGenFlow(tipo, aggiornati)
             verificaEPromuovi()
+        }
+    }
+
+    /**
+     * Registra il feedback umano sulla correttezza dell'esercizio.
+     * corretto = true: l'esercizio è ben formulato.
+     * corretto = false: l'esercizio è sbagliato/ambiguo e va escluso.
+     */
+    fun impostaFeedbackEsercizio(id: String, corretto: Boolean) {
+        if (id.isBlank()) return
+        viewModelScope.launch {
+            val profilo = profileManager.profiloAttivo() ?: return@launch
+            val attuale = profilo.stato.feedbackEsercizi[id]
+            val nuovoFeedback = if (attuale == corretto) {
+                profilo.stato.feedbackEsercizi - id
+            } else {
+                profilo.stato.feedbackEsercizi + (id to corretto)
+            }
+            profileManager.aggiornaStatoAttivo(
+                profilo.stato.copy(feedbackEsercizi = nuovoFeedback)
+            )
+            val p = profileManager.profiloAttivo() ?: profilo
+            val fb = nuovoFeedback
+            setGenFlow(TipoEsercizio.COMPRENSIONE, p.stato.eserciziGeneratiComprensione, fb)
+            setGenFlow(TipoEsercizio.PRODUZIONE, p.stato.eserciziGeneratiProduzione, fb)
+            setGenFlow(TipoEsercizio.ASCOLTO, p.stato.eserciziGeneratiAscolto, fb)
+            setGenFlow(TipoEsercizio.GRAMMATICA, p.stato.eserciziGeneratiGrammatica, fb)
         }
     }
 
@@ -1713,10 +1758,17 @@ class OpenLingoViewModel(application: Application) : AndroidViewModel(applicatio
                 val attuale = profileManager.profiloAttivo() ?: return@launch
                 // Ripulisce anche gli esercizi AI già salvati: una versione
                 // precedente può aver accettato forme sbagliate ("einen Buch").
+                val feedback = attuale.stato.feedbackEsercizi
                 val giaPresenti = attuale.stato.eserciziUnitaAi[unitaId].orEmpty()
+                    .filter { feedback[it.id] != false }
                     .filter { ControlloGrammatica.problemi(it.domanda, it.opzioni, it.rispostaCorretta).isEmpty() }
+                val evitati = attuale.stato.eserciziUnitaAi[unitaId].orEmpty()
+                    .filter { feedback[it.id] == false }
+                    .map { DeduplicaEsercizi.chiave(it.domanda) }
+                    .toSet()
                 val chiavi = (unita.esercizi.map { it.domanda } + giaPresenti.map { it.domanda })
                     .mapTo(HashSet()) { DeduplicaEsercizi.chiave(it) }
+                chiavi.addAll(evitati)
                 val nuovi = DeduplicaEsercizi.distinti(generati) { DeduplicaEsercizi.chiave(it.domanda) }
                     .filter { DeduplicaEsercizi.chiave(it.domanda) !in chiavi }
                     .filter { ControlloGrammatica.problemi(it.domanda, it.opzioni, it.rispostaCorretta).isEmpty() }

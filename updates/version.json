@@ -1,7 +1,7 @@
 {
-  "versionCode": 340,
-  "versionName": "1.51.17",
-  "changelog": "Fixed ambiguous AI-generated exercises: the reviewer now evaluates every option and keeps an exercise only when exactly one option is correct and matches the key. Added a deterministic check for weak-noun number ambiguity (e.g. Patienten can be singular and plural) and hardened generation prompts (N-Deklination, possessive coherence).",
+  "versionCode": 341,
+  "versionName": "1.51.18",
+  "changelog": "Added per-exercise human feedback (correct/wrong) controls to mark AI-generated and grammar unit exercises. Exercises marked wrong are excluded from future sessions and generation avoids repeating them; feedback is persisted and merged in backups.",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.17/OpenLingo-v1.51.17.apk"
+  "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.18/OpenLingo-v1.51.18.apk"
 }

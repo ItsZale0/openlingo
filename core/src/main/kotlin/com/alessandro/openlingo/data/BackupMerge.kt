@@ -182,7 +182,8 @@ object BackupMerge {
             // La rotazione descrive la sessione in corso: quella locale (se
             // esiste) è la più vicina a ciò che l'utente sta vedendo.
             rotazioniEsercizi = remoto.rotazioniEsercizi + locale.rotazioniEsercizi,
-            eserciziUnitaAi = fondiMappeListe(locale.eserciziUnitaAi, remoto.eserciziUnitaAi)
+            eserciziUnitaAi = fondiMappeListe(locale.eserciziUnitaAi, remoto.eserciziUnitaAi),
+            feedbackEsercizi = fondiFeedbackEsercizi(locale.feedbackEsercizi, remoto.feedbackEsercizi)
         )
         // Se l'unione non ha cambiato nulla, l'ETag locale resta valido e il
         // feed non viene riscaricato inutilmente ad ogni sync automatico.
@@ -343,6 +344,30 @@ object BackupMerge {
     }
 
     // ------------------------------------------------------- esercizi e log
+
+    /**
+     * Unisce il feedback umano sugli esercizi.
+     * Se un lato segnala l'esercizio come sbagliato (false), resta sbagliato:
+     * è meglio non riproporre un esercizio segnalato che resuscitarlo.
+     */
+    private fun fondiFeedbackEsercizi(
+        locale: Map<String, Boolean>,
+        remoto: Map<String, Boolean>
+    ): Map<String, Boolean> {
+        if (remoto.isEmpty()) return locale
+        if (locale.isEmpty()) return remoto
+        val out = LinkedHashMap<String, Boolean>(locale.size + remoto.size)
+        out.putAll(remoto)
+        out.putAll(locale)
+        // Il segnale "sbagliato" vince su entrambi i lati.
+        for ((id, valore) in locale) {
+            if (valore == false || remoto[id] == false) out[id] = false
+        }
+        for ((id, valore) in remoto) {
+            if (valore == false || locale[id] == false) out[id] = false
+        }
+        return out
+    }
 
     private fun fondiEsercizi(
         locale: List<EsercizioGenEntity>,

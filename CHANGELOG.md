@@ -2,6 +2,13 @@
 
 All notable changes to OpenLingo are documented here. Release tags: https://github.com/ItsZale0/openlingo/tags
 
+## v1.51.18 — 2026-11-11
+
+### Exercises
+- Added per-exercise human feedback controls (✓/✗) to mark whether an exercise is correct or wrong as exercise logic.
+- Feedback is persisted per profile, excluded from future sessions/display when marked wrong, and merged safely in backups (a "wrong" report is not overwritten).
+- Generation and unit-AI exercise pools avoid reusing exercises/content marked wrong by the user.
+
 ## v1.51.17 — 2026-11-11
 
 ### AI exercises
