@@ -88,7 +88,7 @@ To add more people, create new profiles from settings. If you come from a
 previous version, your existing profile is preserved and the application id stays
 unchanged.
 
-## Artificial intelligence (optional)
+## Artificial intelligence (optional but raccomended)
 
 The teaching core works entirely offline. AI features activate only when the user
 enters their own API key, stored exclusively on the device:
