@@ -2,19 +2,29 @@
 
 ## Supported / current version
 
-- **Latest app version (this repository state):** 1.51.15 (`VERSION_CODE` 338)
+- **Latest app version (this repository state):** 1.51.16 (`VERSION_CODE` 339)
 - Security fixes and documentation updates are tracked in releases/tags and in [SECURITY-AUDIT.md](SECURITY-AUDIT.md).
 
 ## Reporting a vulnerability
 
-Please report suspected vulnerabilities privately (preferred: GitHub private security advisory) or contact the repository maintainers directly. Include:
+Please report suspected vulnerabilities **privately**:
+
+- **Preferred:** [GitHub Private Vulnerability Reporting / Security Advisories](https://github.com/ItsZale0/tedesco-app/security/advisories/new) for this repository.
+- **Alternative:** if private reporting is unavailable, open a minimal issue without exploit details and ask maintainers for a private contact channel.
+
+When reporting, include:
 
 - affected app version and platform (Android/desktop);
 - environment and configuration details (without sharing secrets);
 - clear reproduction steps and proof-of-concept if safe;
 - estimated impact and any suggested mitigation.
 
-Do not report issues that involve attacks on third-party systems or unauthorized testing.
+**Response targets (best effort):**
+- **Acknowledgement:** within 7 days.
+- **Initial triage/severity assessment:** within 14 days.
+- **Fix/release timeline:** depends on severity and complexity; we aim to provide status updates and coordinate disclosure once a fix or mitigation is available.
+
+Please do not publicly disclose details before a fix/mitigation is available or coordinated. Do not report issues that involve attacks on third-party systems or unauthorized testing.
 
 ## Security practices in this project
 
