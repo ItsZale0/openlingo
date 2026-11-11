@@ -1,17 +1,25 @@
 mod data;
 
 use chrono::Local;
-use data::{Store, WordEntity};
+use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_typing_quiz, check_typing_answer};
 use eframe::egui;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Screen {
     Home,
     Review,
+    Exercises,
     Vocabulary,
     Grammar,
     Progress,
     Settings,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum ExerciseMode {
+    ArticleQuiz,
+    MeaningQuiz,
+    TypingQuiz,
 }
 
 struct OpenLingoApp {
@@ -30,6 +38,14 @@ struct OpenLingoApp {
     add_article: String,
     add_level: String,
     add_example: String,
+    exercise_mode: ExerciseMode,
+    exercise_level: String,
+    exercise_queue: Vec<ExerciseQuestion>,
+    exercise_index: usize,
+    exercise_answer: String,
+    exercise_feedback: String,
+    exercise_correct: usize,
+    exercise_total: usize,
 }
 
 impl OpenLingoApp {
@@ -51,6 +67,14 @@ impl OpenLingoApp {
             add_article: String::new(),
             add_level: "A1".into(),
             add_example: String::new(),
+            exercise_mode: ExerciseMode::ArticleQuiz,
+            exercise_level: "A1".into(),
+            exercise_queue: Vec::new(),
+            exercise_index: 0,
+            exercise_answer: String::new(),
+            exercise_feedback: String::new(),
+            exercise_correct: 0,
+            exercise_total: 0,
         };
         app.refresh_review_queue();
         app
@@ -73,6 +97,7 @@ impl OpenLingoApp {
             ui.separator();
             ui.selectable_value(&mut self.screen, Screen::Home, "Home");
             ui.selectable_value(&mut self.screen, Screen::Review, "Review");
+            ui.selectable_value(&mut self.screen, Screen::Exercises, "Exercises");
             ui.selectable_value(&mut self.screen, Screen::Vocabulary, "Vocabulary");
             ui.selectable_value(&mut self.screen, Screen::Grammar, "Grammar");
             ui.selectable_value(&mut self.screen, Screen::Progress, "Progress");
@@ -100,10 +125,13 @@ impl OpenLingoApp {
             ui.label(format!("Words: {total}  •  Reviewed: {reviewed}  •  Due now: {due}  •  Streak: {streak} days"));
         });
         ui.add_space(8.0);
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             if ui.button("Start review").clicked() {
                 self.refresh_review_queue();
                 self.screen = Screen::Review;
+            }
+            if ui.button("Practice exercises").clicked() {
+                self.screen = Screen::Exercises;
             }
             if ui.button("Open vocabulary").clicked() {
                 self.screen = Screen::Vocabulary;
@@ -195,6 +223,126 @@ impl OpenLingoApp {
         if !self.status.is_empty() {
             ui.add_space(4.0);
             ui.label(&self.status);
+        }
+    }
+
+    fn start_exercise_session(&mut self) {
+        let words: Vec<WordEntity> = self.store.active_profile()
+            .map(|p| p.stato.parole.clone())
+            .unwrap_or_default();
+        let seed = chrono::Utc::now().timestamp_millis() as u64;
+        self.exercise_queue = match self.exercise_mode {
+            ExerciseMode::ArticleQuiz => build_article_quiz(&words, &self.exercise_level, seed, 1000),
+            ExerciseMode::MeaningQuiz => build_meaning_quiz(&words, seed, 20),
+            ExerciseMode::TypingQuiz => build_typing_quiz(&words, seed, 20),
+        };
+        self.exercise_index = 0;
+        self.exercise_answer.clear();
+        self.exercise_feedback.clear();
+        self.exercise_correct = 0;
+        self.exercise_total = 0;
+        if self.exercise_queue.is_empty() {
+            self.status = "No words available for this exercise mode/level.".into();
+        } else {
+            self.status = format!("Started {} questions.", self.exercise_queue.len());
+        }
+    }
+
+    fn submit_exercise_answer(&mut self, given: String) {
+        if self.exercise_index >= self.exercise_queue.len() { return; }
+        let q = self.exercise_queue[self.exercise_index].clone();
+        let correct = match q.kind {
+            ExerciseKind::Typing => check_typing_answer(&q.answer, &given),
+            _ => q.answer.trim().eq_ignore_ascii_case(given.trim()),
+        };
+        self.exercise_total += 1;
+        if correct { self.exercise_correct += 1; }
+        // persist to SRS/review log when possible
+        let _ = self.store.answer_review(&q.word.id, correct);
+        self.exercise_feedback = if correct {
+            "Correct!".to_string()
+        } else {
+            format!("Incorrect. Answer: {}", q.answer)
+        };
+        self.exercise_index += 1;
+        self.exercise_answer.clear();
+    }
+
+    fn screen_exercises(&mut self, ui: &mut egui::Ui) {
+        ui.heading("Exercises / Practice");
+        if self.store.active_profile().is_none() {
+            ui.label("No active profile.");
+            return;
+        }
+        ui.horizontal_wrapped(|ui| {
+            ui.label("Mode:");
+            ui.selectable_value(&mut self.exercise_mode, ExerciseMode::ArticleQuiz, "Article quiz (der/die/das)");
+            ui.selectable_value(&mut self.exercise_mode, ExerciseMode::MeaningQuiz, "Meaning quiz");
+            ui.selectable_value(&mut self.exercise_mode, ExerciseMode::TypingQuiz, "Typing");
+            if self.exercise_mode == ExerciseMode::ArticleQuiz {
+                ui.label("Level ≤");
+                egui::ComboBox::from_id_salt("ex_level")
+                    .selected_text(self.exercise_level.clone())
+                    .show_ui(ui, |ui| {
+                        for opt in ["A1", "A2", "B1", "B2", "C1", "C2"] {
+                            ui.selectable_value(&mut self.exercise_level, opt.to_string(), opt);
+                        }
+                    });
+            }
+            if ui.button("Start new session").clicked() {
+                self.start_exercise_session();
+            }
+        });
+        ui.small("Article quiz uses all active vocabulary words with der/die/das for the selected level and below (deduped, shuffled). Answers update SRS/review progress.");
+        ui.add_space(6.0);
+
+        if self.exercise_queue.is_empty() {
+            ui.label("No active exercise session. Choose a mode and start.");
+            if !self.status.is_empty() { ui.label(&self.status); }
+            return;
+        }
+        if self.exercise_index >= self.exercise_queue.len() {
+            ui.group(|ui| {
+                ui.heading("Session complete");
+                ui.label(format!("Score: {} / {}", self.exercise_correct, self.exercise_total));
+                if self.exercise_total > 0 {
+                    let pct = (self.exercise_correct * 100) / self.exercise_total;
+                    ui.label(format!("Accuracy: {pct}%"));
+                }
+            });
+            if !self.exercise_feedback.is_empty() { ui.label(&self.exercise_feedback); }
+            if ui.button("Restart").clicked() { self.start_exercise_session(); }
+            return;
+        }
+
+        let q = self.exercise_queue[self.exercise_index].clone();
+        ui.label(format!("Question {} / {}", self.exercise_index + 1, self.exercise_queue.len()));
+        ui.label(format!("Score: {} / {}", self.exercise_correct, self.exercise_total));
+        ui.add_space(6.0);
+        ui.group(|ui| {
+            ui.strong(&q.prompt);
+            match q.kind {
+                ExerciseKind::ArticleQuiz | ExerciseKind::MeaningChoice | ExerciseKind::GermanChoice => {
+                    for opt in &q.options {
+                        if ui.button(opt).clicked() {
+                            self.submit_exercise_answer(opt.clone());
+                        }
+                    }
+                }
+                ExerciseKind::Typing => {
+                    ui.add(egui::TextEdit::singleline(&mut self.exercise_answer).hint_text("Type your answer..."));
+                    ui.horizontal(|ui| {
+                        if ui.button("Submit").clicked() {
+                            let ans = self.exercise_answer.clone();
+                            self.submit_exercise_answer(ans);
+                        }
+                    });
+                }
+            }
+        });
+        if !self.exercise_feedback.is_empty() {
+            ui.add_space(4.0);
+            ui.label(&self.exercise_feedback);
         }
     }
 
@@ -435,6 +583,7 @@ impl eframe::App for OpenLingoApp {
         egui::CentralPanel::default().show(ctx, |ui| match self.screen {
             Screen::Home => self.screen_home(ui),
             Screen::Review => self.screen_review(ui),
+            Screen::Exercises => self.screen_exercises(ui),
             Screen::Vocabulary => self.screen_vocabulary(ui),
             Screen::Grammar => self.screen_grammar(ui),
             Screen::Progress => self.screen_progress(ui),
@@ -647,5 +796,29 @@ mod tests {
         assert_eq!(saved["profili"]["p1"]["futureProfileField"], 123);
         assert_eq!(stato["parole"][0]["source"], "SYNCED");
         let _ = fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn article_quiz_uses_level_words_deduped() {
+        let words = vec![
+            WordEntity { id:"1".into(), german:"Hund".into(), italian:"cane".into(), article:Some("der".into()), level:"A1".into(), ..Default::default() },
+            WordEntity { id:"2".into(), german:"Katze".into(), italian:"gatto".into(), article:Some("die".into()), level:"A1".into(), ..Default::default() },
+            WordEntity { id:"3".into(), german:"Haus".into(), italian:"casa".into(), article:Some("das".into()), level:"A2".into(), ..Default::default() },
+            WordEntity { id:"4".into(), german:"Auto".into(), italian:"auto".into(), article:Some("das".into()), level:"B1".into(), ..Default::default() },
+            WordEntity { id:"5".into(), german:"Hund".into(), italian:"cane".into(), article:Some("der".into()), level:"A1".into(), ..Default::default() }, // dup
+            WordEntity { id:"6".into(), german:"gehen".into(), italian:"andare".into(), article:None, level:"A1".into(), ..Default::default() },
+        ];
+        let q = build_article_quiz(&words, "A1", 42, 50);
+        assert_eq!(q.len(), 2); // Hund, Katze only (A1, with article, deduped)
+        assert!(q.iter().all(|x| ["der","die","das"].contains(&x.answer.as_str())));
+        let q2 = build_article_quiz(&words, "A2", 42, 50);
+        assert_eq!(q2.len(), 3); // includes Haus
+    }
+
+    #[test]
+    fn typing_check_is_case_and_space_insensitive() {
+        assert!(check_typing_answer("der Hund", "Der   hund"));
+        assert!(check_typing_answer("gehen", " gehen "));
+        assert!(!check_typing_answer("der Hund", "die Hund"));
     }
 }
