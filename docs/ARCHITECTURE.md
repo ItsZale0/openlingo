@@ -14,18 +14,20 @@ This document describes how OpenLingo is organized and which technical choices g
 ## Modules
 
 ```
-:core      learning engine and content (Kotlin/JVM, no Android dependency)
-:app       Android application (Compose, Material 3)
-:desktop   desktop application (Compose Desktop)
+:core         learning engine and content (Kotlin/JVM, no Android dependency)
+:app          Android application (Compose, Material 3)
+:desktop      desktop application (Compose Desktop, Kotlin)
+desktop-rust/ desktop application rebuilt from scratch in Rust (eframe/egui, Cargo project)
 ```
 
-`:core` contains vocabulary, grammar, exercises, dialogues, listening, adaptive engines, backup and merge logic. It does not depend on Android and can be tested with the JVM alone. `:app` and `:desktop` are two user interfaces on top of the same engine.
+`:core` contains vocabulary, grammar, exercises, dialogues, listening, adaptive engines, backup and merge logic. It does not depend on Android and can be tested with the JVM alone. `:app` and `:desktop` (Kotlin/Compose) are user interfaces on top of the same engine. `desktop-rust/` is an independent Rust rebuild that targets compatibility with existing desktop profile data and incrementally reimplements features (currently: core screens, profile/data I/O, and SRS-compatible review persistence) rather than depending on `:core`.
 
 Dependencies:
 
 ```
-app     ──▶ core
-desktop ──▶ core
+app          ──▶ core
+desktop      ──▶ core
+desktop-rust     (standalone; reads/writes compatible desktop profile data)
 ```
 
 ## Profiles and data
@@ -36,7 +38,7 @@ Each profile is described by `ProfiloConfig` and contains:
 - personal context (`contestoUtente`): study, work, interests, goals, used to personalize AI-generated content;
 - learning state: words, reviews, mistakes, grammar, listening, production, generated lessons, badges, streaks, study plan and sessions.
 
-Profiles are stored as JSON. On Android the document lives in a DataStore (`profili_data`); on desktop in `profili.json` and `preferenze.json` alongside the app data. New profiles receive a `profilo_<timestamp>` identifier; historical profiles keep their identifier to avoid data loss.
+Profiles are stored as JSON. On Android the document lives in a DataStore (`profili_data`); on desktop (Compose and Rust rebuild) in `profili.json` and `preferenze.json` under `~/.tedesco-desktop/`. New profiles receive a `profilo_<timestamp>` identifier; historical profiles keep their identifier to avoid data loss. The Rust desktop app is designed to read/write compatible profile/preference data (including SRS review state/logs/streak fields it manages).
 
 No profile is created automatically: the welcome screen guides creation of the first profile, and migration of existing data happens only when necessary.
 
@@ -117,3 +119,4 @@ Tests run with `:app:testDebugUnitTest` and `:core:test`. The project does not r
 - Public APKs may be signed with a development/debug-oriented setup depending on release configuration; store distribution requires an appropriate release key.
 - AI features depend on the availability and limits of the chosen provider.
 - Dynamic testing (DAST) of network surfaces is not automated; the security report documents the current scope and residual risks.
+- The Rust desktop app (`desktop-rust/`) does not yet have full feature parity with `:core`/Compose desktop (e.g. complete grammar syllabus/exercise flows, feed/cloud sync & backup, AI tutor/generation, listening/pronunciation/TTS, comprehension/production). It currently provides a compatible, tested foundation (data I/O, profile management, SRS review persistence, core screens) and is being expanded incrementally.
