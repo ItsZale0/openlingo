@@ -1,7 +1,7 @@
 mod data;
 
 use chrono::Local;
-use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_typing_quiz, check_typing_answer};
+use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, check_typing_answer};
 use eframe::egui;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -20,6 +20,8 @@ enum ExerciseMode {
     ArticleQuiz,
     MeaningQuiz,
     TypingQuiz,
+    ClozeQuiz,
+    Mixed,
 }
 
 struct OpenLingoApp {
@@ -235,6 +237,8 @@ impl OpenLingoApp {
             ExerciseMode::ArticleQuiz => build_article_quiz(&words, &self.exercise_level, seed, 1000),
             ExerciseMode::MeaningQuiz => build_meaning_quiz(&words, seed, 20),
             ExerciseMode::TypingQuiz => build_typing_quiz(&words, seed, 20),
+            ExerciseMode::ClozeQuiz => build_cloze_quiz(&words, seed, 20),
+            ExerciseMode::Mixed => build_mixed_quiz(&words, &self.exercise_level, seed, 24),
         };
         self.exercise_index = 0;
         self.exercise_answer.clear();
@@ -279,7 +283,9 @@ impl OpenLingoApp {
             ui.selectable_value(&mut self.exercise_mode, ExerciseMode::ArticleQuiz, "Article quiz (der/die/das)");
             ui.selectable_value(&mut self.exercise_mode, ExerciseMode::MeaningQuiz, "Meaning quiz");
             ui.selectable_value(&mut self.exercise_mode, ExerciseMode::TypingQuiz, "Typing");
-            if self.exercise_mode == ExerciseMode::ArticleQuiz {
+            ui.selectable_value(&mut self.exercise_mode, ExerciseMode::ClozeQuiz, "Cloze (from examples)");
+            ui.selectable_value(&mut self.exercise_mode, ExerciseMode::Mixed, "Mixed session");
+            if matches!(self.exercise_mode, ExerciseMode::ArticleQuiz | ExerciseMode::Mixed) {
                 ui.label("Level ≤");
                 egui::ComboBox::from_id_salt("ex_level")
                     .selected_text(self.exercise_level.clone())
@@ -293,7 +299,7 @@ impl OpenLingoApp {
                 self.start_exercise_session();
             }
         });
-        ui.small("Article quiz uses all active vocabulary words with der/die/das for the selected level and below (deduped, shuffled). Answers update SRS/review progress.");
+        ui.small("Article quiz uses all active vocabulary words with der/die/das for the selected level and below (deduped, shuffled). Cloze uses word examples. Answers update SRS/review progress.");
         ui.add_space(6.0);
 
         if self.exercise_queue.is_empty() {
@@ -820,5 +826,17 @@ mod tests {
         assert!(check_typing_answer("der Hund", "Der   hund"));
         assert!(check_typing_answer("gehen", " gehen "));
         assert!(!check_typing_answer("der Hund", "die Hund"));
+    }
+
+    #[test]
+    fn cloze_quiz_builds_from_examples() {
+        let words = vec![
+            WordEntity { id:"1".into(), german:"Hund".into(), italian:"cane".into(), article:Some("der".into()), level:"A1".into(), example:"Der Hund spielt.".into(), ..Default::default() },
+            WordEntity { id:"2".into(), german:"Katze".into(), italian:"gatto".into(), article:Some("die".into()), level:"A1".into(), example:"".into(), ..Default::default() },
+        ];
+        let qs = build_cloze_quiz(&words, 7, 10);
+        assert_eq!(qs.len(), 1);
+        assert!(qs[0].prompt.contains("_____"));
+        assert_eq!(qs[0].answer, "Hund");
     }
 }

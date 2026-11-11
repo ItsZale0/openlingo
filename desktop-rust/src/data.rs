@@ -250,6 +250,65 @@ pub fn check_typing_answer(expected: &str, given: &str) -> bool {
     norm(expected) == norm(given)
 }
 
+fn cloze_blank(example: &str, german: &str) -> Option<String> {
+    let ex = example.trim();
+    let g = german.trim();
+    if ex.is_empty() || g.is_empty() { return None; }
+    let ex_lower = ex.to_lowercase();
+    let g_lower = g.to_lowercase();
+    if let Some(idx) = ex_lower.find(&g_lower) {
+        let mut out = ex.to_string();
+        out.replace_range(idx..idx + g.len(), "_____");
+        return Some(out);
+    }
+    // try without article prefix in german label
+    let parts: Vec<&str> = g.split_whitespace().collect();
+    if parts.len() >= 2 {
+        let bare = parts[1..].join(" ");
+        let b_lower = bare.to_lowercase();
+        if let Some(idx) = ex_lower.find(&b_lower) {
+            let mut out = ex.to_string();
+            out.replace_range(idx..idx + bare.len(), "_____");
+            return Some(out);
+        }
+    }
+    None
+}
+
+pub fn build_cloze_quiz(words: &[WordEntity], seed: u64, limit: usize) -> Vec<ExerciseQuestion> {
+    let mut pool: Vec<_> = words.iter()
+        .filter(|w| !w.archived && !w.example.trim().is_empty() && !w.italian.trim().is_empty())
+        .cloned()
+        .collect();
+    simple_shuffle(&mut pool, seed ^ 0xC102E);
+    let mut out = Vec::new();
+    for w in pool {
+        if out.len() >= limit { break; }
+        if let Some(sentence) = cloze_blank(&w.example, &w.german) {
+            out.push(ExerciseQuestion {
+                prompt: format!("Complete: {sentence}"),
+                options: vec![],
+                answer: w.german.clone(),
+                word: w,
+                kind: ExerciseKind::Typing,
+            });
+        }
+    }
+    out
+}
+
+pub fn build_mixed_quiz(words: &[WordEntity], max_level: &str, seed: u64, limit: usize) -> Vec<ExerciseQuestion> {
+    let mut qs = Vec::new();
+    let n = (limit / 3).max(1);
+    qs.extend(build_article_quiz(words, max_level, seed, n + 2));
+    qs.extend(build_meaning_quiz(words, seed ^ 1, n + 2));
+    qs.extend(build_cloze_quiz(words, seed ^ 2, n + 2));
+    qs.extend(build_typing_quiz(words, seed ^ 3, n + 2));
+    simple_shuffle(&mut qs, seed ^ 0x51EED);
+    qs.truncate(limit);
+    qs
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ReviewEntity {
