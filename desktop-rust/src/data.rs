@@ -1017,6 +1017,7 @@ pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
         unit_a2_praepositionen_dativ(),
         unit_a2_praepositionen_akkusativ(),
         unit_a2_wechselpraepositionen(),
+        unit_a2_relative(),
         unit_a2_passiv_intro(),
         unit_b1_adjektivdeklination_intro(),
         unit_b1_relativsaetze_intro(),
@@ -1984,6 +1985,43 @@ fn unit_a2_subordinate() -> GrammarUnit {
             GrammarUnitExercise { prompt_it: "Completa: Er sagt, ___ er keine Zeit hat.", prompt_en: "Complete: Er sagt, ___ he has no time.", options: &["weil", "dass", "wenn"], correct_index: 1, answer_text: "", explanation_it: "dass introduce una frase completiva.", explanation_en: "dass introduces a complement clause." },
             GrammarUnitExercise { prompt_it: "Evento passato singolo: ___ ich klein war, wohnte ich in Rom.", prompt_en: "Single past event: ___ ich klein war, wohnte ich in Rom.", options: &["Wenn", "Als", "Ob"], correct_index: 1, answer_text: "", explanation_it: "Per un singolo evento nel passato si usa als.", explanation_en: "For a single event in the past use als." },
             GrammarUnitExercise { prompt_it: "Scrivi la congiunzione: Ich weiß nicht, ___ er kommt. (domanda indiretta sì/no)", prompt_en: "Type the conjunction: Ich weiß nicht, ___ er kommt. (indirect yes/no question)", options: &[], correct_index: 0, answer_text: "ob", explanation_it: "Le domande indirette sì/no usano ob.", explanation_en: "Indirect yes/no questions use ob." },
+        ],
+    }
+}
+
+
+fn unit_a2_relative() -> GrammarUnit {
+    GrammarUnit {
+        id: "a2-relative",
+        level: "A2",
+        title_it: "Le frasi relative",
+        title_en: "Relative clauses",
+        subtitle_it: "der, die, das: descrivere persone e cose",
+        subtitle_en: "der, die, das: describing people and things",
+        objective_it: "Usare i pronomi relativi corretti e mettere il verbo alla fine della relativa.",
+        objective_en: "Use correct relative pronouns and put the verb at the end of the relative clause.",
+        theory_it: &[
+            "La frase relativa descrive un sostantivo; il verbo coniugato va alla fine.",
+            "Genere e numero vengono dall'antecedente; il caso dipende dalla funzione nella relativa.",
+            "Forme base: nominativo der/die/das/die, accusativo den/die/das/die, dativo dem/der/dem/denen.",
+            "Con preposizione la preposizione resta davanti: Der Mann, mit dem ich spreche...",
+        ],
+        theory_en: &[
+            "A relative clause describes a noun; the conjugated verb goes to the end.",
+            "Gender and number come from the antecedent; case depends on the function in the relative clause.",
+            "Basic forms: nominative der/die/das/die, accusative den/die/das/die, dative dem/der/dem/denen.",
+            "With a preposition it stays in front: Der Mann, mit dem ich spreche...",
+        ],
+        examples: &[
+            ("Der Mann, der dort steht, ist mein Chef.", "L'uomo che sta là è il mio capo."),
+            ("Das Buch, das ich lese, ist spannend.", "Il libro che leggo è avvincente."),
+            ("Die Frau, der ich helfe, ist meine Nachbarin.", "La donna a cui aiuto è la mia vicina."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa (soggetto): Der Mann, ___ dort steht, ist mein Chef.", prompt_en: "Complete (subject): Der Mann, ___ dort steht, ist mein Chef.", options: &["der", "den", "dem"], correct_index: 0, answer_text: "", explanation_it: "Soggetto maschile nella relativa: der.", explanation_en: "Masculine subject in the relative clause: der." },
+            GrammarUnitExercise { prompt_it: "Completa (oggetto neutro): Das Buch, ___ ich lese, ist spannend.", prompt_en: "Complete (neuter object): Das Buch, ___ ich lese, ist spannend.", options: &["der", "das", "dem"], correct_index: 1, answer_text: "", explanation_it: "Neutro all'accusativo nella relativa: das.", explanation_en: "Neuter accusative in the relative clause: das." },
+            GrammarUnitExercise { prompt_it: "Completa (dativo): Die Frau, ___ ich helfe, ist nett.", prompt_en: "Complete (dative): Die Frau, ___ ich helfe, is nice.", options: &["die", "der", "denen"], correct_index: 1, answer_text: "", explanation_it: "helfen regge il dativo femminile: der.", explanation_en: "helfen takes dative feminine: der." },
+            GrammarUnitExercise { prompt_it: "Scrivi il pronome: Die Kinder, mit ___ ich spiele, sind nett. (plurale dativo)", prompt_en: "Type the pronoun: Die Kinder, mit ___ ich spiele, sind nett. (plural dative)", options: &[], correct_index: 0, answer_text: "denen", explanation_it: "Plurale al dativo nella relativa: denen.", explanation_en: "Plural dative in the relative clause: denen." },
         ],
     }
 }
