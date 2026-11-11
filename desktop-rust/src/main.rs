@@ -1,7 +1,7 @@
 mod data;
 
 use chrono::Local;
-use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, check_typing_answer, curriculum_lessons, lesson_topic};
+use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic};
 use eframe::egui;
 
 fn hex(c: u32) -> egui::Color32 {
@@ -99,6 +99,7 @@ enum ExerciseMode {
     TypingQuiz,
     ClozeQuiz,
     Mixed,
+    GuidedSession,
 }
 
 struct OpenLingoApp {
@@ -350,6 +351,14 @@ impl OpenLingoApp {
             ExerciseMode::TypingQuiz => build_typing_quiz(&words, seed, 20),
             ExerciseMode::ClozeQuiz => build_cloze_quiz(&words, seed, 20),
             ExerciseMode::Mixed => build_mixed_quiz(&words, &self.exercise_level, seed, 24),
+            ExerciseMode::GuidedSession => {
+                let now = chrono::Utc::now().timestamp_millis();
+                let mut pool = self.store.due_reviews(now, 30);
+                let mut neww = self.store.new_words(20);
+                pool.append(&mut neww);
+                if pool.is_empty() { pool = words.clone(); }
+                build_guided_session(&pool, &self.exercise_level, seed, 24)
+            }
         };
         self.exercise_index = 0;
         self.exercise_answer.clear();
@@ -400,7 +409,8 @@ impl OpenLingoApp {
             ui.selectable_value(&mut self.exercise_mode, ExerciseMode::TypingQuiz, "Typing");
             ui.selectable_value(&mut self.exercise_mode, ExerciseMode::ClozeQuiz, "Cloze (from examples)");
             ui.selectable_value(&mut self.exercise_mode, ExerciseMode::Mixed, "Mixed session");
-            if matches!(self.exercise_mode, ExerciseMode::ArticleQuiz | ExerciseMode::Mixed) {
+            ui.selectable_value(&mut self.exercise_mode, ExerciseMode::GuidedSession, "Guided session (due + new)");
+            if matches!(self.exercise_mode, ExerciseMode::ArticleQuiz | ExerciseMode::Mixed | ExerciseMode::GuidedSession) {
                 ui.label("Level ≤");
                 egui::ComboBox::from_id_salt("ex_level")
                     .selected_text(self.exercise_level.clone())
@@ -1243,5 +1253,20 @@ mod tests {
         let store2 = Store::load_from(dir.clone());
         assert_eq!(store2.study_plan_summary().lezione_corrente, 5);
         let _ = fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn guided_session_builds_mixed_questions() {
+        use crate::data::build_guided_session;
+        let words = vec![
+            WordEntity { id:"1".into(), german:"Tisch".into(), article:Some("der".into()), italian:"tavolo".into(), level:"A1".into(), example:"Der Tisch ist groß.".into(), ..Default::default() },
+            WordEntity { id:"2".into(), german:"Lampe".into(), article:Some("die".into()), italian:"lampada".into(), level:"A1".into(), example:"Die Lampe ist neu.".into(), ..Default::default() },
+            WordEntity { id:"3".into(), german:"Buch".into(), article:Some("das".into()), italian:"libro".into(), level:"A1".into(), example:"Das Buch ist gut.".into(), ..Default::default() },
+            WordEntity { id:"4".into(), german:"Stuhl".into(), article:Some("der".into()), italian:"sedia".into(), level:"A1".into(), example:"Der Stuhl ist alt.".into(), ..Default::default() },
+        ];
+        let qs = build_guided_session(&words, "A1", 12345, 12);
+        assert!(!qs.is_empty());
+        assert!(qs.len() <= 12);
+        assert!(qs.iter().any(|q| !q.word.id.is_empty()));
     }
 }
