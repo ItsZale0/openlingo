@@ -127,6 +127,127 @@ impl WordEntity {
             || self.tags.to_lowercase().contains(&q)
             || self.article.as_deref().unwrap_or("").to_lowercase().contains(&q)
     }
+
+    pub fn normalized_article(&self) -> Option<String> {
+        self.article.as_ref().map(|a| a.trim().to_lowercase()).filter(|a| !a.is_empty())
+    }
+
+    pub fn has_gender_article(&self) -> bool {
+        matches!(self.normalized_article().as_deref(), Some("der" | "die" | "das"))
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ExerciseKind {
+    MeaningChoice,
+    GermanChoice,
+    ArticleQuiz,
+    Typing,
+}
+
+#[derive(Debug, Clone)]
+pub struct ExerciseQuestion {
+    pub word: WordEntity,
+    pub kind: ExerciseKind,
+    pub prompt: String,
+    pub options: Vec<String>,
+    pub answer: String,
+}
+
+fn simple_shuffle<T: Clone>(items: &mut [T], seed: u64) {
+    if items.len() < 2 { return; }
+    let mut x = if seed == 0 { 0x9E3779B97F4A7C15 } else { seed };
+    for i in (1..items.len()).rev() {
+        x ^= x << 13;
+        x ^= x >> 7;
+        x ^= x << 17;
+        let j = (x as usize) % (i + 1);
+        items.swap(i, j);
+    }
+}
+
+fn level_rank(level: &str) -> i32 {
+    match level.trim().to_uppercase().as_str() {
+        "A1" => 1, "A2" => 2, "B1" => 3, "B2" => 4, "C1" => 5, "C2" => 6, _ => 0,
+    }
+}
+
+pub fn words_up_to_level(words: &[WordEntity], max_level: &str, require_article: bool) -> Vec<WordEntity> {
+    let cap = level_rank(max_level);
+    let mut seen: HashSet<String> = HashSet::new();
+    let mut out = Vec::new();
+    for w in words.iter().filter(|w| !w.archived) {
+        if require_article && !w.has_gender_article() { continue; }
+        let lr = level_rank(&w.level);
+        if cap > 0 && (lr == 0 || lr > cap) { continue; }
+        let key = format!("{}|{}", w.normalized_article().unwrap_or_default(), w.german.trim().to_lowercase());
+        if seen.insert(key) {
+            out.push(w.clone());
+        }
+    }
+    out
+}
+
+pub fn build_article_quiz(words: &[WordEntity], max_level: &str, seed: u64, limit: usize) -> Vec<ExerciseQuestion> {
+    let mut pool = words_up_to_level(words, max_level, true);
+    simple_shuffle(&mut pool, seed);
+    pool.truncate(limit);
+    pool.into_iter().map(|w| {
+        let ans = w.normalized_article().unwrap_or_default();
+        ExerciseQuestion {
+            prompt: format!("Choose the article: {}", w.german),
+            options: vec!["der".into(), "die".into(), "das".into()],
+            answer: ans,
+            word: w,
+            kind: ExerciseKind::ArticleQuiz,
+        }
+    }).collect()
+}
+
+pub fn build_meaning_quiz(words: &[WordEntity], seed: u64, limit: usize) -> Vec<ExerciseQuestion> {
+    let mut pool: Vec<_> = words.iter().filter(|w| !w.archived && !w.italian.trim().is_empty()).cloned().collect();
+    simple_shuffle(&mut pool, seed ^ 0xA5A5A5A5);
+    pool.truncate(limit.max(4));
+    let all = pool.clone();
+    if all.len() < 2 { return vec![]; }
+    pool.into_iter().take(limit).map(|w| {
+        let mut opts = vec![w.italian.clone()];
+        let mut i = 0u64;
+        while opts.len() < 4 && opts.len() < all.len() {
+            let pick = &all[((seed.wrapping_add(i).wrapping_mul(1103515245) as usize) + w.id.len() + opts.len()) % all.len()];
+            if !opts.iter().any(|o| o.eq_ignore_ascii_case(&pick.italian)) {
+                opts.push(pick.italian.clone());
+            }
+            i += 1;
+            if i > 50 { break; }
+        }
+        simple_shuffle(&mut opts, seed ^ (w.german.len() as u64));
+        ExerciseQuestion {
+            prompt: format!("What does '{}' mean?", w.label()),
+            options: opts,
+            answer: w.italian.clone(),
+            word: w,
+            kind: ExerciseKind::MeaningChoice,
+        }
+    }).collect()
+}
+
+pub fn build_typing_quiz(words: &[WordEntity], seed: u64, limit: usize) -> Vec<ExerciseQuestion> {
+    let mut pool: Vec<_> = words.iter().filter(|w| !w.archived && !w.italian.trim().is_empty()).cloned().collect();
+    simple_shuffle(&mut pool, seed ^ 0xC0FFEE);
+    pool.truncate(limit);
+    pool.into_iter().map(|w| ExerciseQuestion {
+        prompt: format!("Type the German for: {}", w.italian),
+        options: vec![],
+        answer: w.label(),
+        word: w,
+        kind: ExerciseKind::Typing,
+    }).collect()
+}
+
+pub fn check_typing_answer(expected: &str, given: &str) -> bool {
+    let norm = |s: &str| s.trim().to_lowercase().split_whitespace().collect::<Vec<_>>().join(" ");
+    norm(expected) == norm(given)
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
