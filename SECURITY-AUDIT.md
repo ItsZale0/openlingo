@@ -3,13 +3,15 @@
 ## Latest review
 
 - **Date:** 2026-11-11
-- **Version/state:** 1.51.15 (`VERSION_CODE` 338), branch state `master`/`publish-1.40.0` (tag `v1.51.15`)
-- **Type:** maintenance security review (documentation/SAST-oriented review of recent changes; no authorized DAST execution in this session)
+- **Version/state:** 1.51.16 (`VERSION_CODE` 339), branch state `master`/`publish-1.40.0` (tag `v1.51.16`)
+- **Type:** maintenance security review and repo-side Scorecard hardening (documentation/SAST-oriented review of recent changes; no authorized DAST execution in this session)
 
 ### Changes reviewed (recent)
 - English localization/i18n updates (runtime `t()`/`Traduttore` mappings and UI rendering fixes), including pronunciation and desktop/UI strings.
+- Backup feature update: added **Import from file** for exported backup JSON in Backup settings (with merge/replace confirmation flow).
 - Documentation and branding updates (README, CONTRIBUTING, docs, issue templates, SECURITY docs, in-app/desktop About strings).
 - Build/release metadata maintenance (version bumps, `updates/version.json` consistency, removal of UTF-8 BOM from `version.properties` and `updates/version.json` to fix release verification/CI parsing).
+- Security/Scorecard improvements: `SECURITY.md` updated with linked private reporting channel and response/disclosure timelines; CI workflows hardened (least-privilege permissions, pinned action SHAs, test/PR triggers where applicable) and CodeQL workflow prepared for SAST on PRs/pushes (requires merge to default branch to be credited).
 
 ### SAST-oriented checks (this review)
 | # | Area | Result |
