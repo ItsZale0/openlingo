@@ -1012,11 +1012,13 @@ pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
         unit_a2_weil_dass(),
         unit_a2_komparativ(),
         unit_a2_praepositionen_dativ(),
+        unit_a2_passiv_intro(),
         unit_b1_adjektivdeklination_intro(),
         unit_b1_relativsaetze_intro(),
         unit_b1_konnektoren(),
         unit_b1_reflexive_verben(),
         unit_b1_praeteritum_perfekt(),
+        unit_b1_genitiv_intro(),
     ]
 }
 
@@ -1597,6 +1599,74 @@ fn unit_b1_praeteritum_perfekt() -> GrammarUnit {
             GrammarUnitExercise { prompt_it: "Quale verbo e' spesso usato al Praeteritum anche nel parlato?", prompt_en: "Which verb is often used in Präteritum even in speech?", options: &["kaufen", "sein", "spielen"], correct_index: 1, answer_text: "", explanation_it: "sein, haben e i modali compaiono spesso al Praeteritum anche nel parlato.", explanation_en: "sein, haben and modals often appear in Präteritum even in speech." },
             GrammarUnitExercise { prompt_it: "Completa (Perfekt): Wir ___ einen Film ___ . (sehen)", prompt_en: "Complete (Perfekt): Wir ___ einen Film ___ . (sehen)", options: &["haben ... gesehen", "sind ... gesehen", "haben ... sahen"], correct_index: 0, answer_text: "", explanation_it: "Perfekt di sehen: haben + gesehen.", explanation_en: "Perfekt of sehen: haben + gesehen." },
             GrammarUnitExercise { prompt_it: "Scrivi la forma Praeteritum di 'haben' (ich).", prompt_en: "Type the Präteritum form of 'haben' (ich).", options: &[], correct_index: 0, answer_text: "hatte", explanation_it: "Praeteritum: ich hatte.", explanation_en: "Präteritum: ich hatte." },
+        ],
+    }
+}
+
+fn unit_a2_passiv_intro() -> GrammarUnit {
+    GrammarUnit {
+        id: "a2-passiv-intro",
+        level: "A2",
+        title_it: "Passivo (introduzione)",
+        title_en: "Passive voice (introduction)",
+        subtitle_it: "werden + Partizip II al presente",
+        subtitle_en: "werden + Partizip II in the present",
+        objective_it: "Riconoscere e formare frasi passive semplici al presente.",
+        objective_en: "Recognize and form simple passive sentences in the present.",
+        theory_it: &[
+            "Il passivo al presente si forma con werden (coniugato) + Partizip II alla fine: Das Haus wird gebaut.",
+            "Il soggetto dell'attivo diventa spesso complemento con von + dativo (facoltativo): Das Haus wird von den Arbeitern gebaut.",
+            "Il verbo werden al presente: ich werde, du wirst, er/sie/es wird, wir werden, ihr werdet, sie/Sie werden.",
+        ],
+        theory_en: &[
+            "The present passive is formed with werden (conjugated) + Partizip II at the end: Das Haus wird gebaut.",
+            "The active subject often becomes a von + dative phrase (optional): Das Haus wird von den Arbeitern gebaut.",
+            "werden in present: ich werde, du wirst, er/sie/es wird, wir werden, ihr werdet, sie/Sie werden.",
+        ],
+        examples: &[
+            ("Die Tuer wird geoeffnet.", "La porta viene aperta."),
+            ("Das Auto wird repariert.", "L'auto viene riparata."),
+            ("Die Briefe werden geschrieben.", "Le lettere vengono scritte."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa il passivo: Das Haus ___ gebaut. (werden)", prompt_en: "Complete the passive: Das Haus ___ gebaut. (werden)", options: &["wird", "werde", "werden"], correct_index: 0, answer_text: "", explanation_it: "Soggetto singolare (das Haus): wird.", explanation_en: "Singular subject (das Haus): wird." },
+            GrammarUnitExercise { prompt_it: "Scegli la frase passiva corretta.", prompt_en: "Choose the correct passive sentence.", options: &["Der Brief schreibt.", "Der Brief wird geschrieben.", "Der Brief ist schreiben."], correct_index: 1, answer_text: "", explanation_it: "Passivo presente: wird + Partizip II (geschrieben).", explanation_en: "Present passive: wird + Partizip II (geschrieben)." },
+            GrammarUnitExercise { prompt_it: "Scrivi il participio: reparieren -> ___ (nel passivo: Das Auto wird ___)", prompt_en: "Type the participle: reparieren -> ___ (in passive: Das Auto wird ___)", options: &[], correct_index: 0, answer_text: "repariert", explanation_it: "Partizip II di reparieren: repariert.", explanation_en: "Partizip II of reparieren: repariert." },
+            GrammarUnitExercise { prompt_it: "Quale ausiliare forma il passivo di processo?", prompt_en: "Which auxiliary forms the process passive?", options: &["sein", "haben", "werden"], correct_index: 2, answer_text: "", explanation_it: "Il passivo di processo (Vorgangspassiv) usa werden + Partizip II.", explanation_en: "The process passive (Vorgangspassiv) uses werden + Partizip II." },
+        ],
+    }
+}
+
+fn unit_b1_genitiv_intro() -> GrammarUnit {
+    GrammarUnit {
+        id: "b1-genitiv-intro",
+        level: "B1",
+        title_it: "Genitivo (introduzione)",
+        title_en: "Genitive case (introduction)",
+        subtitle_it: "Possesso e relazioni tra nomi",
+        subtitle_en: "Possession and relations between nouns",
+        objective_it: "Riconoscere le forme base del genitivo e il suo uso.",
+        objective_en: "Recognize basic genitive forms and usage.",
+        theory_it: &[
+            "Il genitivo esprime appartenenza/relazione: das Auto des Mannes (l'auto dell'uomo).",
+            "Articoli: des (m/n), der (f/pl). I nomi maschili/neutri spesso aggiungono -s/-es (des Mannes, des Kindes).",
+            "Preposizioni comuni con genitivo: wegen, trotz, waehrend, statt (uso varia nel parlato).",
+        ],
+        theory_en: &[
+            "The genitive expresses possession/relation: das Auto des Mannes (the man's car).",
+            "Articles: des (m/n), der (f/pl). Masculine/neuter nouns often add -s/-es (des Mannes, des Kindes).",
+            "Common genitive prepositions: wegen, trotz, waehrend, statt (usage varies in speech).",
+        ],
+        examples: &[
+            ("Das ist das Haus meiner Schwester.", "Questa e' la casa di mia sorella."),
+            ("Wegen des Wetters bleiben wir zu Hause.", "A causa del tempo restiamo a casa."),
+            ("Trotz des Regens gehen wir spazieren.", "Nonostante la pioggia andiamo a passeggiare."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa: das Auto ___ Mannes (der)", prompt_en: "Complete: das Auto ___ Mannes (der)", options: &["der", "des", "dem"], correct_index: 1, answer_text: "", explanation_it: "Genitivo maschile: der -> des (des Mannes).", explanation_en: "Masculine genitive: der -> des (des Mannes)." },
+            GrammarUnitExercise { prompt_it: "Completa: die Tasche ___ Frau (die)", prompt_en: "Complete: die Tasche ___ Frau (die)", options: &["die", "der", "den"], correct_index: 1, answer_text: "", explanation_it: "Genitivo femminile: die -> der (der Frau).", explanation_en: "Feminine genitive: die -> der (der Frau)." },
+            GrammarUnitExercise { prompt_it: "Quale preposizione richiede tipicamente il genitivo (standard)?", prompt_en: "Which preposition typically takes the genitive (standard)?", options: &["mit", "wegen", "fuer"], correct_index: 1, answer_text: "", explanation_it: "wegen regge il genitivo nello standard (wegen des Wetters).", explanation_en: "wegen takes the genitive in standard usage (wegen des Wetters)." },
+            GrammarUnitExercise { prompt_it: "Scrivi l'articolo: das Zimmer ___ Kindes (das)", prompt_en: "Type the article: das Zimmer ___ Kindes (das)", options: &[], correct_index: 0, answer_text: "des", explanation_it: "Genitivo neutro: das -> des (des Kindes).", explanation_en: "Neuter genitive: das -> des (des Kindes)." },
         ],
     }
 }
