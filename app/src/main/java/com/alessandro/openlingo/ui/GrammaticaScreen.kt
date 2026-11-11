@@ -64,6 +64,7 @@ fun GrammaticaScreen(vm: OpenLingoViewModel, onFatto: () -> Unit = {}) {
     val livello = profilo?.stato?.progresso?.livelloCorrente?.label ?: "A0"
     val lezioneCorrente by vm.lezioneCorrente.collectAsStateWithLifecycle(1)
     val eserciziGen by vm.eserciziGenGrammatica.collectAsStateWithLifecycle()
+    val feedbackEsercizi by vm.feedbackEsercizi.collectAsStateWithLifecycle()
     var generaInCorso by remember { mutableStateOf(false) }
     var erroreGen by remember { mutableStateOf<String?>(null) }
     var esercizi by remember { mutableStateOf<List<EsercizioGrammatica>>(emptyList()) }
@@ -358,6 +359,38 @@ fun GrammaticaScreen(vm: OpenLingoViewModel, onFatto: () -> Unit = {}) {
                                         color = MaterialTheme.colorScheme.primary,
                                         fontWeight = FontWeight.Medium
                                     )
+                                }
+                                Spacer(Modifier.height(8.dp))
+                                val fb = feedbackEsercizi[esercizio.id]
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Text(
+                                        text = t("Esercizio corretto?"),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    TextButton(
+                                        onClick = { vm.impostaFeedbackEsercizio(esercizio.id, true) },
+                                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
+                                    ) {
+                                        Text(
+                                            text = "✓",
+                                            color = if (fb == true) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                    TextButton(
+                                        onClick = { vm.impostaFeedbackEsercizio(esercizio.id, false) },
+                                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
+                                    ) {
+                                        Text(
+                                            text = "✗",
+                                            color = if (fb == false) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
                                 }
                             }
                         }

@@ -113,6 +113,7 @@ fun UnitaGrammaticaScreen(
     // Banco della lezione: esercizi scritti + quelli generati dall'AI.
     val rotazioni by vm.rotazioniEsercizi.collectAsStateWithLifecycle()
     val eserciziAi by vm.eserciziUnitaAi.collectAsStateWithLifecycle()
+    val feedbackEsercizi by vm.feedbackEsercizi.collectAsStateWithLifecycle()
     val banco = remember(unita.id, eserciziAi[unita.id]) {
         SessioneLezione.banco(unita, eserciziAi[unita.id].orEmpty())
     }
@@ -281,11 +282,13 @@ fun UnitaGrammaticaScreen(
                 scelta = scelta,
                 testo = testo,
                 verificato = verificato,
+                feedback = feedbackEsercizi[esercizio.id],
                 onScelta = { scelta = it },
                 onTesto = { testo = it },
                 onVerifica = { verificaRisposta() },
                 onAvanti = { prossimaDomanda() },
-                onAscolta = { tts.speak(it) }
+                onAscolta = { tts.speak(it) },
+                onFeedback = { vm.impostaFeedbackEsercizio(esercizio.id, it) }
             )
         }
 
@@ -774,11 +777,13 @@ internal fun EsercizioUnitaCard(
     scelta: Int,
     testo: String,
     verificato: Boolean,
+    feedback: Boolean? = null,
     onScelta: (Int) -> Unit,
     onTesto: (String) -> Unit,
     onVerifica: () -> Unit,
     onAvanti: () -> Unit,
-    onAscolta: (String) -> Unit
+    onAscolta: (String) -> Unit,
+    onFeedback: (Boolean) -> Unit = {}
 ) {
     val rispostaCorretta = when (esercizio.tipo) {
         TipoEsercizioGrammatica.SCELTA_MULTIPLA ->
@@ -1029,6 +1034,38 @@ internal fun EsercizioUnitaCard(
                     Text(
                         if (indice < totale - 1) t("Prossima domanda")
                         else t("Vedi risultato")
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = t("Esercizio corretto?"),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f)
+                )
+                TextButton(
+                    onClick = { onFeedback(true) },
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 2.dp)
+                ) {
+                    Text(
+                        text = "✓",
+                        color = if (feedback == true) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                TextButton(
+                    onClick = { onFeedback(false) },
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 2.dp)
+                ) {
+                    Text(
+                        text = "✗",
+                        color = if (feedback == false) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }

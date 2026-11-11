@@ -4350,6 +4350,7 @@ object Traduttore {
             "Correggo…" to "Correcting…",
             "Corretta" to "Correct",
             "Corretto!" to "Correct!",
+            "Esercizio corretto?" to "Is the exercise correct?",
             "Correzione automatica" to "Automatic correction",
             "Correzione non disponibile al momento. Riprova." to "Correction is not available right now. Try again.",
             "Correzione" to "Correction",

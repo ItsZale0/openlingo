@@ -405,7 +405,14 @@ data class ProfiloStato(
      * Restano separati dal banco scritto a mano: se l'AI non è raggiungibile
      * la lezione continua a funzionare con i suoi esercizi.
      */
-    val eserciziUnitaAi: Map<String, List<EsercizioGenEntity>> = emptyMap()
+    val eserciziUnitaAi: Map<String, List<EsercizioGenEntity>> = emptyMap(),
+    /**
+     * Feedback umano sulla correttezza dell'esercizio (non della risposta).
+     * Chiave = id esercizio (generato, unità o AI unità, prefisso "ai-..."),
+     * valore = true se l'esercizio è corretto, false se è sbagliato/ambiguo.
+     * Gli esercizi segnati come sbagliati vengono esclusi e non riproposti.
+     */
+    val feedbackEsercizi: Map<String, Boolean> = emptyMap()
 )
 
 /**
