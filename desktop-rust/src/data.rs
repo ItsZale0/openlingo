@@ -1012,6 +1012,7 @@ pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
         unit_a2_weil_dass(),
         unit_a2_komparativ(),
         unit_a2_praepositionen_dativ(),
+        unit_a2_praepositionen_akkusativ(),
         unit_a2_wechselpraepositionen(),
         unit_a2_passiv_intro(),
         unit_b1_adjektivdeklination_intro(),
@@ -1021,6 +1022,7 @@ pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
         unit_b1_praeteritum_perfekt(),
         unit_b1_genitiv_intro(),
         unit_b1_konjunktiv2_intro(),
+        unit_b1_passiv_modalverben_intro(),
     ]
 }
 
@@ -1737,6 +1739,74 @@ fn unit_b1_konjunktiv2_intro() -> GrammarUnit {
             GrammarUnitExercise { prompt_it: "Scegli la forma corretta: Ich ___ gern einen Tee. (haben)", prompt_en: "Choose the correct form: Ich ___ gern einen Tee. (haben)", options: &["habe", "hatte", "hätte"], correct_index: 2, answer_text: "", explanation_it: "Desiderio cortese: ich hätte gern...", explanation_en: "Polite wish: ich hätte gern..." },
             GrammarUnitExercise { prompt_it: "Completa: Wenn ich frei ___, würde ich kommen. (sein)", prompt_en: "Complete: Wenn ich frei ___, würde ich kommen. (sein)", options: &["bin", "war", "wäre"], correct_index: 2, answer_text: "", explanation_it: "Irreale/condizionale con sein: ich wäre.", explanation_en: "Unreal/conditional with sein: ich wäre." },
             GrammarUnitExercise { prompt_it: "Scrivi la forma: ich ___ (sein, Konjunktiv II)", prompt_en: "Type the form: ich ___ (sein, Konjunktiv II)", options: &[], correct_index: 0, answer_text: "wäre", explanation_it: "Konjunktiv II di sein: ich wäre.", explanation_en: "Konjunktiv II of sein: ich wäre." },
+        ],
+    }
+}
+
+fn unit_a2_praepositionen_akkusativ() -> GrammarUnit {
+    GrammarUnit {
+        id: "a2-praepositionen-akkusativ",
+        level: "A2",
+        title_it: "Preposizioni con accusativo",
+        title_en: "Prepositions with accusative",
+        subtitle_it: "durch, für, gegen, ohne, um",
+        subtitle_en: "durch, für, gegen, ohne, um",
+        objective_it: "Usare le preposizioni più comuni che richiedono l'accusativo.",
+        objective_en: "Use common prepositions that take the accusative.",
+        theory_it: &[
+            "Alcune preposizioni reggono sempre l'accusativo: durch, für, gegen, ohne, um.",
+            "Dopo queste preposizioni l'articolo maschile diventa den; femminile/neutro restano die/das.",
+            "Esempio: für den Mann, ohne die Tasche, durch das Fenster.",
+        ],
+        theory_en: &[
+            "Some prepositions always take the accusative: durch, für, gegen, ohne, um.",
+            "After these, the masculine article becomes den; feminine/neuter remain die/das.",
+            "Example: für den Mann, ohne die Tasche, durch das Fenster.",
+        ],
+        examples: &[
+            ("Das Geschenk ist für dich.", "Il regalo è per te."),
+            ("Wir gehen durch den Park.", "Attraversiamo il parco."),
+            ("Ich gehe ohne meinen Bruder.", "Vado senza mio fratello."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa: Das ist für ___ Mann. (der)", prompt_en: "Complete: Das ist für ___ Mann. (der)", options: &["der", "den", "dem"], correct_index: 1, answer_text: "", explanation_it: "für + accusativo maschile: den Mann.", explanation_en: "für + accusative masculine: den Mann." },
+            GrammarUnitExercise { prompt_it: "Completa: Wir fahren ohne ___ Auto. (das)", prompt_en: "Complete: Wir fahren ohne ___ Auto. (das)", options: &["dem", "das", "den"], correct_index: 1, answer_text: "", explanation_it: "Neutro all'accusativo resta das: ohne das Auto.", explanation_en: "Neuter accusative stays das: ohne das Auto." },
+            GrammarUnitExercise { prompt_it: "Quale preposizione richiede l'accusativo?", prompt_en: "Which preposition takes the accusative?", options: &["mit", "bei", "gegen"], correct_index: 2, answer_text: "", explanation_it: "gegen regge l'accusativo; mit/bei il dativo.", explanation_en: "gegen takes accusative; mit/bei take dative." },
+            GrammarUnitExercise { prompt_it: "Scrivi l'articolo: durch ___ Park (der)", prompt_en: "Type the article: durch ___ Park (der)", options: &[], correct_index: 0, answer_text: "den", explanation_it: "durch + accusativo maschile: den Park.", explanation_en: "durch + accusative masculine: den Park." },
+        ],
+    }
+}
+
+fn unit_b1_passiv_modalverben_intro() -> GrammarUnit {
+    GrammarUnit {
+        id: "b1-passiv-modalverben-intro",
+        level: "B1",
+        title_it: "Passivo con verbi modali (introduzione)",
+        title_en: "Passive with modal verbs (introduction)",
+        subtitle_it: "Modalverb + Partizip II + werden",
+        subtitle_en: "Modalverb + Partizip II + werden",
+        objective_it: "Riconoscere e formare frasi passive con modali (muss/kann/soll).",
+        objective_en: "Recognize and form passive sentences with modals (muss/kann/soll).",
+        theory_it: &[
+            "Con i verbi modali il passivo si forma: modale coniugato + Partizip II + werden (infinito finale).",
+            "Esempio: Das muss gemacht werden. / Die Tür kann geöffnet werden.",
+            "Il modale va in posizione 2 nella frase principale; 'werden' resta alla fine.",
+        ],
+        theory_en: &[
+            "With modal verbs the passive is formed: conjugated modal + Partizip II + werden (infinitive at the end).",
+            "Example: Das muss gemacht werden. / Die Tür kann geöffnet werden.",
+            "The modal is in position 2 in the main clause; 'werden' stays at the end.",
+        ],
+        examples: &[
+            ("Die Aufgabe muss heute gemacht werden.", "Il compito deve essere fatto oggi."),
+            ("Das Fenster kann geöffnet werden.", "La finestra può essere aperta."),
+            ("Die Regeln sollen beachtet werden.", "Le regole devono essere rispettate."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Scegli la forma corretta: Die Arbeit ___ erledigt werden. (müssen)", prompt_en: "Choose the correct form: Die Arbeit ___ erledigt werden. (müssen)", options: &["muss", "musst", "müssen"], correct_index: 0, answer_text: "", explanation_it: "Soggetto singolare (die Arbeit): muss erledigt werden.", explanation_en: "Singular subject (die Arbeit): muss erledigt werden." },
+            GrammarUnitExercise { prompt_it: "Completa: Das ___ gemacht werden. (können)", prompt_en: "Complete: Das ___ gemacht werden. (können)", options: &["kann", "kannst", "können"], correct_index: 0, answer_text: "", explanation_it: "Das -> kann gemacht werden.", explanation_en: "Das -> kann gemacht werden." },
+            GrammarUnitExercise { prompt_it: "Qual è l'ordine corretto?", prompt_en: "Which order is correct?", options: &["Das muss werden gemacht.", "Das muss gemacht werden.", "Das gemacht muss werden."], correct_index: 1, answer_text: "", explanation_it: "Modale + Partizip II + werden: muss gemacht werden.", explanation_en: "Modal + Partizip II + werden: muss gemacht werden." },
+            GrammarUnitExercise { prompt_it: "Scrivi il modale: Die Tür ___ geschlossen werden. (sollen, singolare)", prompt_en: "Type the modal: Die Tür ___ geschlossen werden. (sollen, singular)", options: &[], correct_index: 0, answer_text: "soll", explanation_it: "Singolare: die Tür soll geschlossen werden.", explanation_en: "Singular: die Tür soll geschlossen werden." },
         ],
     }
 }
