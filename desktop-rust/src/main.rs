@@ -1,7 +1,7 @@
 mod data;
 
 use chrono::Local;
-use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, check_typing_answer};
+use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, check_typing_answer};
 use eframe::egui;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -19,6 +19,7 @@ enum Screen {
 enum ExerciseMode {
     ArticleQuiz,
     MeaningQuiz,
+    GermanQuiz,
     TypingQuiz,
     ClozeQuiz,
     Mixed,
@@ -260,6 +261,7 @@ impl OpenLingoApp {
         self.exercise_queue = match self.exercise_mode {
             ExerciseMode::ArticleQuiz => build_article_quiz(&words, &self.exercise_level, seed, 1000),
             ExerciseMode::MeaningQuiz => build_meaning_quiz(&words, seed, 20),
+            ExerciseMode::GermanQuiz => build_german_choice_quiz(&words, seed, 20),
             ExerciseMode::TypingQuiz => build_typing_quiz(&words, seed, 20),
             ExerciseMode::ClozeQuiz => build_cloze_quiz(&words, seed, 20),
             ExerciseMode::Mixed => build_mixed_quiz(&words, &self.exercise_level, seed, 24),
@@ -306,6 +308,7 @@ impl OpenLingoApp {
             ui.label("Mode:");
             ui.selectable_value(&mut self.exercise_mode, ExerciseMode::ArticleQuiz, "Article quiz (der/die/das)");
             ui.selectable_value(&mut self.exercise_mode, ExerciseMode::MeaningQuiz, "Meaning quiz");
+            ui.selectable_value(&mut self.exercise_mode, ExerciseMode::GermanQuiz, "German quiz");
             ui.selectable_value(&mut self.exercise_mode, ExerciseMode::TypingQuiz, "Typing");
             ui.selectable_value(&mut self.exercise_mode, ExerciseMode::ClozeQuiz, "Cloze (from examples)");
             ui.selectable_value(&mut self.exercise_mode, ExerciseMode::Mixed, "Mixed session");
@@ -947,5 +950,19 @@ mod tests {
         store.prefs.lingua = "en".into();
         assert_eq!(super::ui_lang(&store), "en");
         let _ = fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn german_choice_quiz_builds_options() {
+        let words = vec![
+            WordEntity { id:"1".into(), german:"Hund".into(), italian:"cane".into(), article:Some("der".into()), level:"A1".into(), ..Default::default() },
+            WordEntity { id:"2".into(), german:"Katze".into(), italian:"gatto".into(), article:Some("die".into()), level:"A1".into(), ..Default::default() },
+            WordEntity { id:"3".into(), german:"Buch".into(), italian:"libro".into(), article:Some("das".into()), level:"A1".into(), ..Default::default() },
+            WordEntity { id:"4".into(), german:"Haus".into(), italian:"casa".into(), article:Some("das".into()), level:"A1".into(), ..Default::default() },
+        ];
+        let qs = build_german_choice_quiz(&words, 9, 2);
+        assert!(!qs.is_empty());
+        assert!(qs.iter().all(|q| q.options.iter().any(|o| o == &q.answer)));
+        assert!(qs.iter().all(|q| q.prompt.contains("German")));
     }
 }
