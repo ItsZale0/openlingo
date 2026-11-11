@@ -1006,6 +1006,7 @@ pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
         unit_a1_akkusativ(),
         unit_a1_sein_haben(),
         unit_a1_possessivi_negazione(),
+        unit_a1_imperativo(),
         unit_a1_modalverben(),
         unit_a2_trennbare_verben(),
         unit_a2_perfekt_intro(),
@@ -2058,6 +2059,42 @@ fn unit_a1_possessivi_negazione() -> GrammarUnit {
             GrammarUnitExercise { prompt_it: "Completa (accusativo maschile): Ich sehe ___ Bruder. (ich)", prompt_en: "Complete (masculine accusative): Ich sehe ___ Bruder. (ich)", options: &["mein", "meine", "meinen"], correct_index: 2, answer_text: "", explanation_it: "Accusativo maschile: meinen Bruder.", explanation_en: "Masculine accusative: meinen Bruder." },
             GrammarUnitExercise { prompt_it: "Scegli la negazione corretta: Ich habe ___ Zeit.", prompt_en: "Choose the correct negation: Ich habe ___ Zeit.", options: &["kein", "keine", "nicht"], correct_index: 1, answer_text: "", explanation_it: "Zeit è femminile: keine Zeit.", explanation_en: "Zeit is feminine: keine Zeit." },
             GrammarUnitExercise { prompt_it: "Scrivi il possessivo: Das ist ___ Schwester. (er)", prompt_en: "Type the possessive: Das ist ___ Schwester. (er)", options: &[], correct_index: 0, answer_text: "seine", explanation_it: "Femminile al nominativo: seine Schwester.", explanation_en: "Feminine nominative: seine Schwester." },
+        ],
+    }
+}
+
+
+fn unit_a1_imperativo() -> GrammarUnit {
+    GrammarUnit {
+        id: "a1-imperativo",
+        level: "A1",
+        title_it: "L'imperativo",
+        title_en: "The imperative",
+        subtitle_it: "Dare ordini, consigli e istruzioni",
+        subtitle_en: "Giving orders, advice, and instructions",
+        objective_it: "Formare l'imperativo nelle forme du, ihr, Sie e wir.",
+        objective_en: "Form the imperative in du, ihr, Sie, and wir forms.",
+        theory_it: &[
+            "Forma du: radice del verbo (senza -st), es. Mach! Komm! La -e finale è spesso facoltativa.",
+            "Forma ihr: radice + -t (Macht!); forma Sie: infinito + Sie (Machen Sie!); forma wir: infinito + wir (Gehen wir!).",
+            "Irregolari importanti: sein -> sei/seid/seien Sie; con prefissi separabili il prefisso va in fondo: Steh auf!",
+        ],
+        theory_en: &[
+            "du form: verb stem (without -st), e.g. Mach! Komm! Final -e is often optional.",
+            "ihr form: stem + -t (Macht!); Sie form: infinitive + Sie (Machen Sie!); wir form: infinitive + wir (Gehen wir!).",
+            "Important irregulars: sein -> sei/seid/seien Sie; separable prefixes go to the end: Steh auf!",
+        ],
+        examples: &[
+            ("Mach bitte die Tür zu!", "Per favore, chiudi la porta!"),
+            ("Kommt mit!", "Venite con noi!"),
+            ("Warten Sie bitte hier!", "Aspetti qui, per favore!"),
+            ("Sei ruhig!", "Stai calmo!"),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Imperativo du di machen:", prompt_en: "du imperative of machen:", options: &["Mach!", "Machst!", "Machen!"], correct_index: 0, answer_text: "", explanation_it: "Forma du: radice senza -st -> Mach!", explanation_en: "du form: stem without -st -> Mach!" },
+            GrammarUnitExercise { prompt_it: "Imperativo ihr di gehen:", prompt_en: "ihr imperative of gehen:", options: &["Geh!", "Geht!", "Gehen!"], correct_index: 1, answer_text: "", explanation_it: "Forma ihr: radice + -t -> Geht!", explanation_en: "ihr form: stem + -t -> Geht!" },
+            GrammarUnitExercise { prompt_it: "Imperativo Sie di warten:", prompt_en: "Sie imperative of warten:", options: &["Warte!", "Wartet!", "Warten Sie!"], correct_index: 2, answer_text: "", explanation_it: "Forma Sie: infinito + Sie -> Warten Sie!", explanation_en: "Sie form: infinitive + Sie -> Warten Sie!" },
+            GrammarUnitExercise { prompt_it: "Scrivi l'imperativo du di sein:", prompt_en: "Type the du imperative of sein:", options: &[], correct_index: 0, answer_text: "Sei", explanation_it: "Imperativo irregolare di sein (du): Sei!", explanation_en: "Irregular du imperative of sein: Sei!" },
         ],
     }
 }
