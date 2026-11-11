@@ -136,6 +136,7 @@ struct OpenLingoApp {
     grammar_practice_feedback: String,
     grammar_practice_input: String,
     grammar_practice_done: Option<(i32, bool)>, // (percent, completed)
+    lesson_practice_pending: bool,
 }
 
 fn ui_lang(store: &Store) -> &str {
@@ -197,6 +198,7 @@ impl OpenLingoApp {
             grammar_practice_feedback: String::new(),
             grammar_practice_input: String::new(),
             grammar_practice_done: None,
+            lesson_practice_pending: false,
         };
         app.backup_path = app.store.base_dir.join("openlingo-backup.json").to_string_lossy().to_string();
         app.refresh_review_queue();
@@ -478,6 +480,21 @@ impl OpenLingoApp {
                     ui.label(format!("Accuracy: {pct}%"));
                 }
             });
+            if self.lesson_practice_pending {
+                ui.add_space(4.0);
+                let lang = ui_lang(&self.store).to_string();
+                let lang = lang.as_str();
+                ui.label(tr(lang, "Lesson practice finished. You can mark this lesson as complete.", "Pratica della lezione terminata. Puoi segnare questa lezione come completata."));
+                if ui.button(tr(lang, "Mark lesson complete / Next", "Segna lezione completata / Avanti")).clicked() {
+                    match self.store.advance_lesson_progress() {
+                        Ok(n) => {
+                            self.status = if lang == "it" { format!("Lezione aggiornata: {n}") } else { format!("Lesson updated: {n}") };
+                            self.lesson_practice_pending = false;
+                        }
+                        Err(e) => self.status = format!("{}: {e}", tr(lang, "Update failed", "Aggiornamento fallito")),
+                    }
+                }
+            }
             if !self.exercise_feedback.is_empty() { ui.label(&self.exercise_feedback); }
             if ui.button("Restart").clicked() { self.start_exercise_session(); }
             return;
@@ -639,6 +656,12 @@ impl OpenLingoApp {
                         }
                         Err(e) => self.status = format!("{}: {e}", tr(lang, "Update failed", "Aggiornamento fallito")),
                     }
+                }
+                if ui.button(tr(lang, "Practice lesson (guided session)", "Pratica lezione (sessione guidata)")).clicked() {
+                    self.exercise_mode = ExerciseMode::GuidedSession;
+                    self.lesson_practice_pending = true;
+                    self.screen = Screen::Exercises;
+                    self.start_exercise_session();
                 }
                 if ui.button(tr(lang, "Reset to lesson 1", "Reimposta a lezione 1")).clicked() {
                     match self.store.set_lesson_progress(1) {
