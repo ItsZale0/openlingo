@@ -51,6 +51,15 @@ struct OpenLingoApp {
     backup_path: String,
 }
 
+fn ui_lang(store: &Store) -> &str {
+    let l = store.prefs.lingua.trim().to_lowercase();
+    if l == "it" { "it" } else { "en" }
+}
+
+fn tr<'a>(lang: &str, en: &'a str, it: &'a str) -> &'a str {
+    if lang == "it" { it } else { en }
+}
+
 impl OpenLingoApp {
     fn new(_cc: &eframe::CreationContext<'_>) -> Self {
         let store = Store::load_default();
@@ -97,21 +106,23 @@ impl OpenLingoApp {
     }
 
     fn top_bar(&mut self, ui: &mut egui::Ui) {
+        let lang = ui_lang(&self.store).to_string();
+        let lang = lang.as_str();
         ui.horizontal_wrapped(|ui| {
             ui.heading("OpenLingo");
             ui.separator();
-            ui.selectable_value(&mut self.screen, Screen::Home, "Home");
-            ui.selectable_value(&mut self.screen, Screen::Review, "Review");
-            ui.selectable_value(&mut self.screen, Screen::Exercises, "Exercises");
-            ui.selectable_value(&mut self.screen, Screen::Vocabulary, "Vocabulary");
-            ui.selectable_value(&mut self.screen, Screen::Grammar, "Grammar");
-            ui.selectable_value(&mut self.screen, Screen::Progress, "Progress");
-            ui.selectable_value(&mut self.screen, Screen::Settings, "Settings");
+            ui.selectable_value(&mut self.screen, Screen::Home, tr(lang, "Home", "Home"));
+            ui.selectable_value(&mut self.screen, Screen::Review, tr(lang, "Review", "Ripasso"));
+            ui.selectable_value(&mut self.screen, Screen::Exercises, tr(lang, "Exercises", "Esercizi"));
+            ui.selectable_value(&mut self.screen, Screen::Vocabulary, tr(lang, "Vocabulary", "Vocabolario"));
+            ui.selectable_value(&mut self.screen, Screen::Grammar, tr(lang, "Grammar", "Grammatica"));
+            ui.selectable_value(&mut self.screen, Screen::Progress, tr(lang, "Progress", "Progressi"));
+            ui.selectable_value(&mut self.screen, Screen::Settings, tr(lang, "Settings", "Impostazioni"));
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                 if let Some(p) = self.store.active_profile() {
-                    ui.label(format!("Profile: {}", p.config.nome_visualizzato));
+                    ui.label(format!("{}: {}", tr(lang, "Profile", "Profilo"), p.config.nome_visualizzato));
                 } else {
-                    ui.label("No profile");
+                    ui.label(tr(lang, "No profile", "Nessun profilo"));
                 }
             });
         });
@@ -119,32 +130,42 @@ impl OpenLingoApp {
     }
 
     fn screen_home(&mut self, ui: &mut egui::Ui) {
+        let lang = ui_lang(&self.store).to_string();
+        let lang = lang.as_str();
         let (total, reviewed, due, streak) = self.store.stats();
         let name = self.store.active_profile()
             .map(|p| p.config.nome_visualizzato.clone())
-            .unwrap_or_else(|| "studente".into());
-        ui.heading(format!("Ciao, {}", name));
-        ui.label("OpenLingo desktop (Rust rebuild) — language learning with real didactics and spaced repetition.");
+            .unwrap_or_else(|| tr(lang, "learner", "studente").into());
+        ui.heading(format!("{}, {}", tr(lang, "Hello", "Ciao"), name));
+        ui.label(tr(lang,
+            "OpenLingo desktop (Rust rebuild) — language learning with real didactics and spaced repetition.",
+            "OpenLingo desktop (rebuild in Rust) — apprendimento linguistico con didattica reale e ripetizione dilazionata."));
         ui.add_space(8.0);
         ui.group(|ui| {
-            ui.label(format!("Words: {total}  •  Reviewed: {reviewed}  •  Due now: {due}  •  Streak: {streak} days"));
+            ui.label(if lang == "it" {
+                format!("Parole: {total}  •  Ripassate: {reviewed}  •  Da ripassare ora: {due}  •  Serie: {streak} giorni")
+            } else {
+                format!("Words: {total}  •  Reviewed: {reviewed}  •  Due now: {due}  •  Streak: {streak} days")
+            });
         });
         ui.add_space(8.0);
         ui.horizontal_wrapped(|ui| {
-            if ui.button("Start review").clicked() {
+            if ui.button(tr(lang, "Start review", "Inizia ripasso")).clicked() {
                 self.refresh_review_queue();
                 self.screen = Screen::Review;
             }
-            if ui.button("Practice exercises").clicked() {
+            if ui.button(tr(lang, "Practice exercises", "Esercitati")).clicked() {
                 self.screen = Screen::Exercises;
             }
-            if ui.button("Open vocabulary").clicked() {
+            if ui.button(tr(lang, "Open vocabulary", "Apri vocabolario")).clicked() {
                 self.screen = Screen::Vocabulary;
             }
         });
         if self.store.repo.profili.is_empty() {
             ui.add_space(12.0);
-            ui.colored_label(egui::Color32::YELLOW, "No profiles found. Create one in Settings to get started.");
+            ui.colored_label(egui::Color32::YELLOW, tr(lang,
+                "No profiles found. Create one in Settings to get started.",
+                "Nessun profilo trovato. Creane uno in Impostazioni per iniziare."));
         }
         if !self.status.is_empty() {
             ui.add_space(8.0);
@@ -524,14 +545,31 @@ impl OpenLingoApp {
     }
 
     fn screen_settings(&mut self, ui: &mut egui::Ui) {
-        ui.heading("Settings");
-        ui.label(format!("Data folder: {}", self.store.base_dir.display()));
-        ui.label(format!("Profiles file: {}", self.store.profili_path.display()));
-        ui.label(format!("Preferences file: {}", self.store.preferenze_path.display()));
+        let lang = ui_lang(&self.store).to_string();
+        let lang = lang.as_str();
+        ui.heading(tr(lang, "Settings", "Impostazioni"));
+        ui.label(format!("{}: {}", tr(lang, "Data folder", "Cartella dati"), self.store.base_dir.display()));
+        ui.label(format!("{}: {}", tr(lang, "Profiles file", "File profili"), self.store.profili_path.display()));
+        ui.label(format!("{}: {}", tr(lang, "Preferences file", "File preferenze"), self.store.preferenze_path.display()));
         ui.add_space(8.0);
 
         ui.group(|ui| {
-            ui.label("Profiles");
+            ui.label(tr(lang, "Language", "Lingua"));
+            let mut selected = if self.store.prefs.lingua.trim().eq_ignore_ascii_case("it") { "it" } else { "en" };
+            ui.horizontal(|ui| {
+                if ui.selectable_label(selected == "en", "English").clicked() { selected = "en"; }
+                if ui.selectable_label(selected == "it", "Italiano").clicked() { selected = "it"; }
+            });
+            if self.store.prefs.lingua.trim().to_lowercase() != selected {
+                self.store.prefs.lingua = selected.to_string();
+                let _ = self.store.save();
+                self.status = tr(lang, "Language saved.", "Lingua salvata.").to_string();
+            }
+        });
+
+        ui.add_space(8.0);
+        ui.group(|ui| {
+            ui.label(tr(lang, "Profiles", "Profili"));
             let ids: Vec<(String, String)> = self.store.repo.profili.values()
                 .map(|p| (p.id.clone(), p.config.nome_visualizzato.clone()))
                 .collect();
@@ -549,13 +587,13 @@ impl OpenLingoApp {
             ui.add_space(6.0);
             ui.horizontal(|ui| {
                 ui.text_edit_singleline(&mut self.new_profile_name);
-                if ui.button("Create profile").clicked() {
+                if ui.button(tr(lang, "Create profile", "Crea profilo")).clicked() {
                     let name = self.new_profile_name.trim().to_string();
                     if !name.is_empty() {
                         self.store.create_profile(&name);
                         self.new_profile_name.clear();
                         self.refresh_review_queue();
-                        self.status = "Profile created.".into();
+                        self.status = tr(lang, "Profile created.", "Profilo creato.").into();
                     }
                 }
             });
@@ -563,46 +601,48 @@ impl OpenLingoApp {
 
         ui.add_space(8.0);
         ui.horizontal(|ui| {
-            if ui.button("Reload from disk").clicked() {
+            if ui.button(tr(lang, "Reload from disk", "Ricarica da disco")).clicked() {
                 self.store = Store::load_default();
                 self.refresh_review_queue();
-                self.status = format!("Reloaded at {}", Local::now().format("%H:%M:%S"));
+                self.status = if lang == "it" { format!("Ricaricato alle {}", Local::now().format("%H:%M:%S")) } else { format!("Reloaded at {}", Local::now().format("%H:%M:%S")) };
             }
-            if ui.button("Save").clicked() {
+            if ui.button(tr(lang, "Save", "Salva")).clicked() {
                 match self.store.save() {
-                    Ok(_) => self.status = "Saved.".into(),
-                    Err(e) => self.status = format!("Save error: {e}"),
+                    Ok(_) => self.status = tr(lang, "Saved.", "Salvato.").into(),
+                    Err(e) => self.status = format!("{}: {e}", tr(lang, "Save error", "Errore salvataggio")),
                 }
             }
         });
 
         ui.add_space(8.0);
         ui.group(|ui| {
-            ui.label("Backup (compatible profile data bundle)");
+            ui.label(tr(lang, "Backup (compatible profile data bundle)", "Backup (bundle dati profilo compatibile)"));
             ui.horizontal(|ui| {
-                ui.label("Path");
+                ui.label(tr(lang, "Path", "Percorso"));
                 ui.add(egui::TextEdit::singleline(&mut self.backup_path).desired_width(420.0));
             });
             ui.horizontal(|ui| {
-                if ui.button("Export backup").clicked() {
+                if ui.button(tr(lang, "Export backup", "Esporta backup")).clicked() {
                     let path = std::path::PathBuf::from(self.backup_path.trim());
                     match self.store.export_bundle_to(&path) {
-                        Ok(_) => self.status = format!("Exported backup to {}", path.display()),
-                        Err(e) => self.status = format!("Export failed: {e}"),
+                        Ok(_) => self.status = format!("{}: {}", tr(lang, "Exported backup to", "Backup esportato in"), path.display()),
+                        Err(e) => self.status = format!("{}: {e}", tr(lang, "Export failed", "Esportazione fallita")),
                     }
                 }
-                if ui.button("Import backup").clicked() {
+                if ui.button(tr(lang, "Import backup", "Importa backup")).clicked() {
                     let path = std::path::PathBuf::from(self.backup_path.trim());
                     match self.store.import_bundle_from(&path) {
                         Ok(_) => {
                             self.refresh_review_queue();
-                            self.status = format!("Imported backup from {}", path.display());
+                            self.status = format!("{}: {}", tr(lang, "Imported backup from", "Backup importato da"), path.display());
                         }
-                        Err(e) => self.status = format!("Import failed: {e}"),
+                        Err(e) => self.status = format!("{}: {e}", tr(lang, "Import failed", "Importazione fallita")),
                     }
                 }
             });
-            ui.small("Export/import includes profiles and preferences in a JSON bundle (also accepts profili-shaped JSON on import).");
+            ui.small(tr(lang,
+                "Export/import includes profiles and preferences in a JSON bundle (also accepts profili-shaped JSON on import).",
+                "Esporta/importa profili e preferenze in un bundle JSON (in import accetta anche JSON nel formato profili)."));
         });
 
         ui.add_space(10.0);
@@ -894,5 +934,18 @@ mod tests {
         assert_eq!(store2.active_profile().unwrap().stato.parole.len(), 1);
         let _ = fs::remove_dir_all(dir);
         let _ = fs::remove_dir_all(dir2);
+    }
+
+    #[test]
+    fn ui_translation_helper_respects_language() {
+        assert_eq!(super::tr("en", "Hello", "Ciao"), "Hello");
+        assert_eq!(super::tr("it", "Hello", "Ciao"), "Ciao");
+        let dir = temp_dir("lang");
+        let mut store = Store::load_from(dir.clone());
+        store.prefs.lingua = "it".into();
+        assert_eq!(super::ui_lang(&store), "it");
+        store.prefs.lingua = "en".into();
+        assert_eq!(super::ui_lang(&store), "en");
+        let _ = fs::remove_dir_all(dir);
     }
 }

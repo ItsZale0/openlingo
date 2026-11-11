@@ -6,6 +6,7 @@ A from-scratch Rust rebuild of the OpenLingo desktop application.
 - Native GUI built with `eframe`/`egui`
 - Reads/writes compatible profile data from `~/.tedesco-desktop/` (`profili.json`, `preferenze.json`)
 - **Forward-compatible data handling:** preserves unmodeled/unknown profile and preference fields on load/save (to avoid dropping data managed by the Kotlin/Compose app)
+- **UI language:** runtime English/Italian toggle (persisted in `preferenze.json` `lingua`) for key Rust desktop UI labels/screens (incremental; not full parity with Kotlin `Traduttore` coverage)
 - Screens: Home, Review, Exercises, Vocabulary, Grammar, Progress, Settings
 - Profile selection/creation, reload/save
 - **SRS-compatible review answers:** "Knew it / Didn't know" persists review cards (intervals/repetitions/ease/lapses/due), review log, and study streak/record to profile data
