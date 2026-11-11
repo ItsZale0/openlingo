@@ -1012,6 +1012,7 @@ pub fn embedded_grammar_units() -> Vec<GrammarUnit> {
         unit_a1_preposizioni_luogo(),
         unit_a1_preposizioni_tempo(),
         unit_a1_separabili(),
+        unit_a1_modali(),
         unit_a1_modalverben(),
         unit_a2_trennbare_verben(),
         unit_a2_perfekt_intro(),
@@ -2391,6 +2392,42 @@ fn unit_a0_alfabeto() -> GrammarUnit {
             GrammarUnitExercise { prompt_it: "Come si pronuncia \"ie\" in \"sie\"?", prompt_en: "How is \"ie\" pronounced in \"sie\"?", options: &["[ai]", "[i:]", "[e]"], correct_index: 1, answer_text: "", explanation_it: "ie indica una i lunga [i:].", explanation_en: "ie indicates a long [i:]." },
             GrammarUnitExercise { prompt_it: "Quale parola contiene il suono [ʃ] (sch)?", prompt_en: "Which word contains the [ʃ] (sch) sound?", options: &["Sonne", "Schule", "Zeit"], correct_index: 1, answer_text: "", explanation_it: "Schule inizia con sch = [ʃ].", explanation_en: "Schule starts with sch = [ʃ]." },
             GrammarUnitExercise { prompt_it: "Completa: Stra___e (strada)", prompt_en: "Complete: Stra___e (street)", options: &[], correct_index: 0, answer_text: "ß", explanation_it: "Straße si scrive con ß (vale ss).", explanation_en: "Straße is written with ß (equals ss)." },
+        ],
+    }
+}
+
+
+fn unit_a1_modali() -> GrammarUnit {
+    GrammarUnit {
+        id: "a1-modali",
+        level: "A1",
+        title_it: "I verbi modali",
+        title_en: "Modal verbs",
+        subtitle_it: "können, müssen, dürfen, wollen, sollen, mögen, möchten",
+        subtitle_en: "können, müssen, dürfen, wollen, sollen, mögen, möchten",
+        objective_it: "Esprimere possibilità, dovere, permesso e volontà con i verbi modali.",
+        objective_en: "Express possibility, necessity, permission, and desire with modal verbs.",
+        theory_it: &[
+            "Modali principali: können (potere), müssen (dovere), dürfen (permesso), wollen (volere), sollen (consiglio/dovere), mögen (piacere), möchten (vorrei).",
+            "Ich/er/sie/es non prendono -t: ich kann, er muss. Il modale è in seconda posizione e l'infinito va alla fine: Ich kann heute nicht kommen.",
+            "Con verbi riflessivi il pronome sta tra modale e infinito: Ich muss mich ausruhen. Negazione: nicht prima dell'infinito, kein davanti al sostantivo.",
+        ],
+        theory_en: &[
+            "Main modals: können (can), müssen (must), dürfen (may), wollen (want), sollen (should), mögen (like), möchten (would like).",
+            "Ich/er/sie/es take no -t: ich kann, er muss. The modal is in second position and the infinitive goes to the end: Ich kann heute nicht kommen.",
+            "With reflexive verbs the pronoun comes between modal and infinitive: Ich muss mich ausruhen. Negation: nicht before the infinitive, kein before a noun.",
+        ],
+        examples: &[
+            ("Ich kann gut schwimmen.", "So nuotare bene."),
+            ("Du musst heute arbeiten.", "Oggi devi lavorare."),
+            ("Er darf nicht rauchen.", "Non può fumare."),
+            ("Ich möchte einen Kaffee.", "Vorrei un caffè."),
+        ],
+        exercises: &[
+            GrammarUnitExercise { prompt_it: "Completa: Ich ___ gut schwimmen. (können)", prompt_en: "Complete: Ich ___ gut schwimmen. (können)", options: &["kann", "kannst", "können"], correct_index: 0, answer_text: "", explanation_it: "Con ich si usa kann (senza -t).", explanation_en: "With ich use kann (no -t)." },
+            GrammarUnitExercise { prompt_it: "Completa: Du ___ heute arbeiten. (müssen)", prompt_en: "Complete: Du ___ heute arbeiten. (müssen)", options: &["muss", "musst", "müssen"], correct_index: 1, answer_text: "", explanation_it: "Con du si usa musst.", explanation_en: "With du use musst." },
+            GrammarUnitExercise { prompt_it: "Metti l'infinito alla fine: Ich kann / Deutsch / sprechen.", prompt_en: "Put the infinitive at the end: Ich kann / Deutsch / sprechen.", options: &["Ich kann Deutsch sprechen.", "Ich kann sprechen Deutsch.", "Ich spreche kann Deutsch."], correct_index: 0, answer_text: "", explanation_it: "Il modale in seconda posizione, l'infinito alla fine.", explanation_en: "Modal in second position, infinitive at the end." },
+            GrammarUnitExercise { prompt_it: "Scrivi la forma: Ich ___ einen Tee. (möchten)", prompt_en: "Type the form: Ich ___ einen Tee. (möchten)", options: &[], correct_index: 0, answer_text: "möchte", explanation_it: "möchten: ich möchte.", explanation_en: "möchten: ich möchte." },
         ],
     }
 }
