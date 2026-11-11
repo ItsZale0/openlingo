@@ -44,4 +44,4 @@ Please do not publicly disclose details before a fix/mitigation is available or 
 
 ## OpenSSF Scorecard
 
-Project quality target: **Scorecard ≥ 0.4** (as tracked). Current status, findings, and recommendations are documented in [SECURITY-AUDIT.md](SECURITY-AUDIT.md).
+Project quality target: **Scorecard ≥ 6** (as tracked). Current status, findings, and recommendations are documented in [SECURITY-AUDIT.md](SECURITY-AUDIT.md).
