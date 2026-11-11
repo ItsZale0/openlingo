@@ -176,11 +176,13 @@ impl OpenLingoApp {
 
     fn answer_current(&mut self, saputa: bool) {
         if self.review_queue.is_empty() { return; }
+        let lang = ui_lang(&self.store).to_string();
+        let lang = lang.as_str();
         let idx = self.review_index.min(self.review_queue.len().saturating_sub(1));
         let word_id = self.review_queue[idx].id.clone();
         match self.store.answer_review(&word_id, saputa) {
             Ok(_) => {
-                self.status = if saputa { "Saved: knew it".into() } else { "Saved: didn't know".into() };
+                self.status = if saputa { tr(lang, "Saved: knew it", "Salvato: la sapevo").into() } else { tr(lang, "Saved: didn't know", "Salvato: non la sapevo").into() };
                 self.review_queue.remove(idx);
                 if self.review_index >= self.review_queue.len() && self.review_index > 0 {
                     self.review_index -= 1;
@@ -190,15 +192,19 @@ impl OpenLingoApp {
                     self.refresh_review_queue();
                 }
             }
-            Err(e) => self.status = format!("Save error: {e}"),
+            Err(e) => self.status = format!("{}: {e}", tr(lang, "Save error", "Errore salvataggio")),
         }
     }
 
     fn screen_review(&mut self, ui: &mut egui::Ui) {
-        ui.heading("Review");
+        let lang = ui_lang(&self.store).to_string();
+        let lang = lang.as_str();
+        ui.heading(tr(lang, "Review", "Ripasso"));
         if self.review_queue.is_empty() {
-            ui.label("No words due right now. Add words or sync data in the original app/profile data.");
-            if ui.button("Refresh").clicked() {
+            ui.label(tr(lang,
+                "No words due right now. Add words or sync data in the original app/profile data.",
+                "Nessuna parola da ripassare ora. Aggiungi parole o sincronizza i dati nell'app/profilo originale."));
+            if ui.button(tr(lang, "Refresh", "Aggiorna")).clicked() {
                 self.refresh_review_queue();
             }
             return;
@@ -206,34 +212,35 @@ impl OpenLingoApp {
         let idx = self.review_index.min(self.review_queue.len().saturating_sub(1));
         let total = self.review_queue.len();
         let word = self.review_queue[idx].clone();
-        ui.label(format!("Card {} / {}", idx + 1, total));
+        ui.label(if lang == "it" { format!("Scheda {} / {}", idx + 1, total) } else { format!("Card {} / {}", idx + 1, total) });
         ui.add_space(8.0);
         ui.group(|ui| {
             ui.heading(word.label());
-            ui.label(format!("Level: {}", if word.level.is_empty() { "-" } else { &word.level }));
+            ui.label(format!("{}: {}", tr(lang, "Level", "Livello"), if word.level.is_empty() { "-" } else { &word.level }));
             if self.show_answer {
                 ui.add_space(6.0);
-                ui.label(format!("Meaning: {}", word.italian));
+                ui.label(format!("{}: {}", tr(lang, "Meaning", "Significato"), word.italian));
                 if !word.example.trim().is_empty() {
-                    ui.label(format!("Example: {}", word.example));
+                    ui.label(format!("{}: {}", tr(lang, "Example", "Esempio"), word.example));
                 }
             } else {
                 ui.add_space(6.0);
-                ui.label("Think of the meaning, then reveal the answer.");
+                ui.label(tr(lang, "Think of the meaning, then reveal the answer.", "Pensa al significato, poi mostra la risposta."));
             }
         });
         ui.add_space(8.0);
         ui.horizontal(|ui| {
-            if ui.button(if self.show_answer { "Hide answer" } else { "Show answer" }).clicked() {
+            let show_lbl = if self.show_answer { tr(lang, "Hide answer", "Nascondi risposta") } else { tr(lang, "Show answer", "Mostra risposta") };
+            if ui.button(show_lbl).clicked() {
                 self.show_answer = !self.show_answer;
             }
-            if ui.button("Knew it").clicked() {
+            if ui.button(tr(lang, "Knew it", "La sapevo")).clicked() {
                 self.answer_current(true);
             }
-            if ui.button("Didn't know").clicked() {
+            if ui.button(tr(lang, "Didn't know", "Non la sapevo")).clicked() {
                 self.answer_current(false);
             }
-            if ui.button("Skip").clicked() {
+            if ui.button(tr(lang, "Skip", "Salta")).clicked() {
                 if self.review_index + 1 < self.review_queue.len() {
                     self.review_index += 1;
                 } else {
@@ -241,12 +248,14 @@ impl OpenLingoApp {
                 }
                 self.show_answer = false;
             }
-            if ui.button("Refresh queue").clicked() {
+            if ui.button(tr(lang, "Refresh queue", "Aggiorna coda")).clicked() {
                 self.refresh_review_queue();
             }
         });
         ui.add_space(6.0);
-        ui.small("SRS-compatible answers: saves review card, log, streak and due date (compatible with existing profile data).");
+        ui.small(tr(lang,
+            "SRS-compatible answers: saves review card, log, streak and due date (compatible with existing profile data).",
+            "Risposte compatibili SRS: salva scheda di ripasso, log, serie e scadenza (compatibile con i dati profilo esistenti)."));
         if !self.status.is_empty() {
             ui.add_space(4.0);
             ui.label(&self.status);
@@ -272,9 +281,11 @@ impl OpenLingoApp {
         self.exercise_correct = 0;
         self.exercise_total = 0;
         if self.exercise_queue.is_empty() {
-            self.status = "No words available for this exercise mode/level.".into();
+            let lang = ui_lang(&self.store);
+            self.status = tr(lang, "No words available for this exercise mode/level.", "Nessuna parola disponibile per questa modalità/livello.").into();
         } else {
-            self.status = format!("Started {} questions.", self.exercise_queue.len());
+            let lang = ui_lang(&self.store);
+            self.status = if lang == "it" { format!("Avviate {} domande.", self.exercise_queue.len()) } else { format!("Started {} questions.", self.exercise_queue.len()) };
         }
     }
 
@@ -289,10 +300,11 @@ impl OpenLingoApp {
         if correct { self.exercise_correct += 1; }
         // persist to SRS/review log when possible
         let _ = self.store.answer_review(&q.word.id, correct);
+        let lang = ui_lang(&self.store);
         self.exercise_feedback = if correct {
-            "Correct!".to_string()
+            tr(lang, "Correct!", "Corretto!").to_string()
         } else {
-            format!("Incorrect. Answer: {}", q.answer)
+            if lang == "it" { format!("Sbagliato. Risposta: {}", q.answer) } else { format!("Incorrect. Answer: {}", q.answer) }
         };
         self.exercise_index += 1;
         self.exercise_answer.clear();

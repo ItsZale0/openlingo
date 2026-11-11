@@ -20,10 +20,10 @@
 - `rg -n "sanitario|contestoSanitarioRichiesto|senza chiave|no-key|fallback" core/src app/src desktop/src` (sample hits) shows healthcare-context/personalization strings and fallback-related logic/tests exist (e.g. `Traduttore` healthcare strings, `AdaptiveTestEngine` fallback rounds, tests asserting no inflated fallback without real tests, preset/profile tests for medical context). This confirms **code paths exist**; it does **not** prove runtime behavior across all flows.
 
 ### Rust desktop (`desktop-rust/`) i18n/status (static + tested)
-- Runtime EN/IT toggle implemented (persisted in `preferenze.json` `lingua`): `ui_lang`, language selector/save in Settings, localized key nav/home/settings labels.  
+- Runtime EN/IT toggle implemented (persisted in `preferenze.json` `lingua`): `ui_lang`, language selector/save in Settings, localized key nav/home/settings labels; Review screen and core status/feedback messages localized (EN/IT).  
   `rg -n "ui_lang|prefs\.lingua" desktop-rust/src` shows usage in `src/main.rs` (including `tests::ui_translation_helper_respects_language`).
-- Prior hardcoded `Ciao` greeting replaced by localized greeting in Rust UI (incremental EN/IT parity; verified by merged/tested change).
-- **Limitation:** Rust UI localization is incremental (key labels/screens) and not full parity with Kotlin `Traduttore` coverage; Rust app does not execute AI personalization/provider flows.
+- Prior hardcoded `Ciao` greeting replaced by localized greeting in Rust UI (incremental EN/IT parity; verified by merged/tested changes).
+- **Limitation:** Rust UI localization is incremental (not all screens/prompts/content fully localized) and not full parity with Kotlin `Traduttore` coverage; Rust app does not execute AI personalization/provider flows.
 
 ## 2) Exercisable automated checks (verified)
 
