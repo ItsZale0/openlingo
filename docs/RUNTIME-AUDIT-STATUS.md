@@ -23,7 +23,7 @@
 - Runtime EN/IT toggle implemented (persisted in `preferenze.json` `lingua`): `ui_lang`, language selector/save in Settings, localized key nav/home/settings labels; Review screen and core status/feedback messages localized (EN/IT); Grammar & lessons screen includes localized labels/progression actions (incremental).  
   `rg -n "ui_lang|prefs\.lingua" desktop-rust/src` shows usage in `src/main.rs` (including `tests::ui_translation_helper_respects_language`).
 - Prior hardcoded `Ciao` greeting replaced by localized greeting in Rust UI (incremental EN/IT parity; verified by merged/tested changes).
-- **Grammar/lesson/unit parity increment (automated+tested):** CEFR syllabus topics (A1/A2/B1) and lesson progression controls (advance/reset) persisted to `progresso.lezione_corrente`; **embedded grammar units** (representative subset) with theory/examples and interactive practice flow that records mastery to `padronanzaGrammatica` (percent, attempts/correct, completion, timestamps/next review) compatibly; unit mastery/due view retained. Verified by `tests::curriculum_lessons_and_progression_update`, `tests::embedded_grammar_units_practice_saves_mastery`. Not full `GrammaticaPercorso` content/unit banks, rotation, or complete theory/exercise systems.
+- **Grammar/lesson/unit parity increment (automated+tested):** CEFR syllabus topics (A1/A2/B1) and lesson progression controls (advance/reset) persisted to `progresso.lezione_corrente`; **embedded grammar units** (expanded representative subset) with theory/examples and interactive practice flow (MCQ + typing/completion) that records mastery to `padronanzaGrammatica` (percent, attempts/correct, completion, timestamps/next review) compatibly; unit mastery/due view retained. Verified by `tests::curriculum_lessons_and_progression_update`, `tests::embedded_grammar_units_practice_saves_mastery`. Not full `GrammaticaPercorso` content/unit banks, rotation, or complete theory/exercise systems.
 - **Exercise/session parity increment (automated+tested):** added **Guided session** exercise mode/flow (prioritizes due + new words, mixed question types, falls back to active pool; answers update SRS). Verified by `tests::guided_session_builds_mixed_questions` (`cargo test`: 18 passed total). Not all original exercise types/session flows or full lesson/content systems.
 - **Limitation:** Rust UI localization is incremental (not all screens/prompts/content fully localized) and not full parity with Kotlin `Traduttore` coverage; Rust app does not execute AI personalization/provider flows.
 
@@ -38,19 +38,19 @@ test tests::curriculum_lessons_and_progression_update ... ok
 test tests::guided_session_builds_mixed_questions ... ok
 test tests::embedded_grammar_units_practice_saves_mastery ... ok
 ...
-test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
 ---TEST:0---
 
 cargo build --release
-Finished `release` profile [optimized] target(s) in 6.05s
+Finished `release` profile [optimized] target(s) in 6.21s
 ---BUILD:0---
 
 Binary: desktop-rust/target/release/openlingo-desktop.exe
 Name                   Length LastWriteTime
-openlingo-desktop.exe 5919744 11/11/2026 11:25:45
-SHA256: 6016707872B6DCD0CCB1B43278E0B37744FFCB951BD727BBA38967E144A8EEEC
+openlingo-desktop.exe 5925888 11/11/2026 11:30:30
+SHA256: ECE04DA29D28D72267163E39758E6F12EE439BC801CEA34746216A4DD2BB865F
 
-Runtime smoke (this PC): openlingo-desktop launched and Responding: True (PID 4364, 2026-11-11 11:25:38).
+Runtime smoke (this PC): openlingo-desktop launched and Responding: True (PID 12176, 2026-11-11 11:30:56).
 ```
 
 ### Rust (`desktop-rust/`) — previous verified run
