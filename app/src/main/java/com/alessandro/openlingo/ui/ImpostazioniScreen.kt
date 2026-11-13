@@ -308,7 +308,6 @@ fun ImpostazioniScreen(
                 ?: ProfiliPreset.feedPredefinito(profilo?.config?.tipo ?: TipoProfilo.PERSONALIZZATO)
         )
     }
-    var guidaDocId by rememberSaveable { mutableStateOf(profilo?.config?.guidaDocId ?: "") }
     var contestoUtente by rememberSaveable { mutableStateOf(profilo?.config?.contestoUtente ?: "") }
     var providerAI by rememberSaveable {
         mutableStateOf(profilo?.config?.providerEffettivo() ?: ProviderAI.PREDEFINITO)
@@ -606,32 +605,8 @@ fun ImpostazioniScreen(
                             )
                         }
                         Spacer(Modifier.height(12.dp))
-                        OutlinedTextField(
-                            value = guidaDocId, onValueChange = { guidaDocId = it },
-                            label = { Text(t("Documento Google della guida")) },
-                            modifier = Modifier.fillMaxWidth(), singleLine = true,
-                            placeholder = { Text(t("ID o URL del documento")) },
-                            shape = GlassShape,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
-                            )
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        GlassExpandableSection(
-                            title = t("Info"),
-                            description = null
-                        ) {
-                            Text(
-                                text = t("Come usare il TUO documento Google:\n\n1. Apri Google Docs e crea un documento\n2. Scrivi la guida (usa i Titoli)\n3. Condividi → Chiunque abbia il link → Visualizzatore\n4. Copia l'indirizzo e incollalo qui"),
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.padding(12.dp)
-                            )
-                        }
-                        Spacer(Modifier.height(12.dp))
                         SettingsButton(onClick = {
                             vm.aggiornaFeedUrl(feedUrl)
-                            vm.aggiornaGuidaDocId(guidaDocId)
                         }) { Text(t("Salva")) }
                     }
                     Spacer(Modifier.height(12.dp))

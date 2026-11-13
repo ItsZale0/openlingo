@@ -1236,8 +1236,7 @@ class OpenLingoViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun aggiornaGuidaDocId(nuovoDocId: String?) {
         viewModelScope.launch {
-            profileManager.aggiornaGuidaDocId(nuovoDocId?.ifBlank { null })
-            _messaggio.value = t("Documento guida aggiornato")
+            profileManager.aggiornaGuidaDocId(null)
         }
     }
 
