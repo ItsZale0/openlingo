@@ -2496,7 +2496,7 @@ pub enum TipoPasso {
     Produzione,
     Vocabolario,
     TestLivello,
-    SessioneGuidata,
+// SessioneGuidata,
 }
 
 #[derive(Debug, Clone)]
@@ -2635,7 +2635,7 @@ impl Store {
             passi.push(PassoPercorso {
                 titolo: "Sessione libera".into(),
                 descrizione: "Pratica libera di 20 minuti".into(),
-                tipo: TipoPasso::SessioneGuidata,
+                tipo: TipoPasso::Vocabolario,
                 priorita: 0,
                 stima_minuti: 20,
                 azione: "esercizi".into(),

@@ -676,7 +676,7 @@ impl OpenLingoApp {
                                 });
                             });
                             ui.add_space(12.0);
-                            ui.label(egui::RichText::new(tr(lang, "Theory and guided practice for this lesson.", "Teoria ed esercizi guidati per questa lezione.")).color(ui.visuals().strong_text_color()));
+                            ui.label(egui::RichText::new(tr(lang, "Theory and practice for this lesson.", "Teoria ed esercizi per questa lezione.")).color(ui.visuals().strong_text_color()));
                             ui.add_space(16.0);
                             ui.horizontal_wrapped(|ui| {
                                 if ui.add(egui::Button::new(egui::RichText::new(tr(lang, "Open lesson", "Apri lezione")).strong()).min_size(egui::vec2(160.0, 44.0)).rounding(egui::CornerRadius::same(22))).clicked() {
@@ -734,7 +734,7 @@ impl OpenLingoApp {
                             });
                             ui.add_space(8.0);
                             ui.columns(2, |cols| {
-                                if cols[0].add(egui::Button::new(tr(lang, "Guided session", "Sessione guidata")).min_size(egui::vec2(cols[0].available_width(), 44.0)).rounding(egui::CornerRadius::same(16))).clicked() {
+                                if cols[0].add(egui::Button::new(tr(lang, "Guided session", "Sessione libera")).min_size(egui::vec2(cols[0].available_width(), 44.0)).rounding(egui::CornerRadius::same(16))).clicked() {
                                     self.exercise_mode = ExerciseMode::GuidedSession;
                                     self.screen = Screen::Exercises;
                                     self.start_exercise_session();
@@ -1344,10 +1344,10 @@ impl OpenLingoApp {
                         });
                     };
 
-                    ui.label(egui::RichText::new(tr(lang, "Review & guided", "Ripasso e sessioni guidate")).size(16.0).strong());
+                    ui.label(egui::RichText::new(tr(lang, "Review & practice", "Ripasso e pratica")).size(16.0).strong());
                     ui.add_space(6.0);
                     let review_cards = vec![
-                        (ExerciseMode::GuidedSession, tr(lang, "Guided session", "Sessione guidata"), tr(lang, "Due reviews + new words", "Ripassi in scadenza + parole nuove"),
+                        (ExerciseMode::GuidedSession, tr(lang, "Guided session", "Sessione libera"), tr(lang, "Due reviews + new words", "Ripassi in scadenza + parole nuove"),
                             if lang == "it" { format!("{} dovute · {} nuove", plan.due_words, plan.new_words.min(20)) } else { format!("{} due · {} new", plan.due_words, plan.new_words.min(20)) }),
                         (ExerciseMode::WeakWords, tr(lang, "Weak words", "Parole fragili"), tr(lang, "Focus on difficult words", "Concentrati sulle parole difficili"),
                             if lang == "it" { format!("Parole fragili: {weak_count}") } else { format!("Weak words: {weak_count}") }),
@@ -1774,7 +1774,7 @@ impl OpenLingoApp {
             page(ui, 980.0, |ui| {
                 ui.add_space(8.0);
                     ui.label(egui::RichText::new(tr(lang, "Grammar path", "Percorso grammaticale")).size(34.0).strong());
-                ui.label(egui::RichText::new(tr(lang, "Theory, syllabus and guided practice.", "Teoria, programma e pratica guidata.")).size(16.0).color(ui.visuals().strong_text_color()));
+                ui.label(egui::RichText::new(tr(lang, "Theory, syllabus and practice.", "Teoria, programma e pratica.")).size(16.0).color(ui.visuals().strong_text_color()));
                 ui.add_space(16.0);
 
                     // --- Header: Level/Goal Progress ---
