@@ -55,11 +55,31 @@ android {
             enableV2Signing = true
             enableV3Signing = true
         }
+        create("release") {
+            // Permette di firmare un APK di release con lo stesso keystore di
+            // sviluppo (tedesco-debug.jks) quando non è disponibile un keystore
+            // privato. Senza firma l'APK non può essere installato come
+            // aggiornamento di una versione già firmata con questa chiave.
+            val percorsoKeystore = System.getenv("TEDESCO_KEYSTORE_FILE")
+            val ks = if (!percorsoKeystore.isNullOrBlank()) {
+                file(percorsoKeystore)
+            } else {
+                file("keystore/tedesco-debug.jks")
+            }
+            storeFile = ks
+            storePassword = System.getenv("TEDESCO_KEYSTORE_PASSWORD") ?: "android"
+            keyAlias = System.getenv("TEDESCO_KEY_ALIAS") ?: "androiddebugkey"
+            keyPassword = System.getenv("TEDESCO_KEY_PASSWORD") ?: "android"
+            enableV1Signing = true
+            enableV2Signing = true
+            enableV3Signing = true
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

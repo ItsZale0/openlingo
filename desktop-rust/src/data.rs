@@ -3,6 +3,7 @@ use serde_json::Value;
 use std::collections::{BTreeMap, HashMap, HashSet};
 use std::fs;
 use std::path::PathBuf;
+use chrono::{Duration, Local, NaiveDate, Utc};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(default)]
@@ -702,6 +703,53 @@ impl Store {
         }
         registra_studio(&mut p.stato, now);
         self.save()
+    }
+
+    /// Adds missing SRS review entries for active words in the selected level (or all levels).
+    /// Returns how many words were added to review.
+    pub fn add_words_to_review(&mut self, level: Option<&str>) -> Result<usize, String> {
+        let now = chrono::Utc::now().timestamp_millis();
+        let p = self.active_profile_mut().ok_or_else(|| "No active profile".to_string())?;
+        let mut added = 0usize;
+        let ids: Vec<String> = p.stato.parole.iter()
+            .filter(|w| !w.archived)
+            .filter(|w| match level {
+                Some(lv) if !lv.is_empty() && lv != "ALL" && lv != "—" => w.level.trim().eq_ignore_ascii_case(lv.trim()),
+                _ => true,
+            })
+            .map(|w| w.id.clone())
+            .collect();
+        for id in ids {
+            if !p.stato.reviews.contains_key(&id) {
+                p.stato.reviews.insert(id.clone(), nuova_review(&id, now));
+                added += 1;
+            }
+        }
+        if added > 0 {
+            self.save()?;
+        }
+        Ok(added)
+    }
+
+    /// Adds missing SRS review entries for the given word IDs (active profile). Returns how many were added.
+    pub fn add_word_ids_to_review(&mut self, ids: &[String]) -> Result<usize, String> {
+        let now = chrono::Utc::now().timestamp_millis();
+        let p = self.active_profile_mut().ok_or_else(|| "No active profile".to_string())?;
+        let mut added = 0usize;
+        let valid: std::collections::HashSet<String> = p.stato.parole.iter()
+            .filter(|w| !w.archived)
+            .map(|w| w.id.clone())
+            .collect();
+        for id in ids {
+            if valid.contains(id) && !p.stato.reviews.contains_key(id) {
+                p.stato.reviews.insert(id.clone(), nuova_review(id, now));
+                added += 1;
+            }
+        }
+        if added > 0 {
+            self.save()?;
+        }
+        Ok(added)
     }
 
     pub fn grammar_mastery_summaries(&self) -> Vec<GrammarMasterySummary> {
@@ -2440,9 +2488,198 @@ pub struct GrammarUnitPracticeResult {
     pub completed: bool,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TipoPasso {
+    Ripasso,
+    Grammatica,
+    Comprensione,
+    Produzione,
+    Vocabolario,
+    TestLivello,
+    SessioneGuidata,
+}
+
+#[derive(Debug, Clone)]
+pub struct PassoPercorso {
+    pub id: String,
+    pub titolo: String,
+    pub descrizione: String,
+    pub tipo: TipoPasso,
+    pub priorita: usize,
+    pub stima_minuti: i32,
+    pub azione: String,
+    pub urgente: bool,
+    pub completato: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct PercorsoGiornaliero {
+    pub data: String,
+    pub passi: Vec<PassoPercorso>,
+    pub messaggio_motivazionale: String,
+    pub prossimo_obiettivo: String,
+    pub minuti_totali: i32,
+    pub minuti_completati: i32,
+}
+
+impl PercorsoGiornaliero {
+    pub fn passi_totali(&self) -> usize { self.passi.len() }
+    pub fn passi_completati(&self) -> usize { self.passi.iter().filter(|p| p.completato).count() }
+    pub fn percorso_completato(&self) -> bool { !self.passi.is_empty() && self.passi.iter().all(|p| p.completato) }
+    pub fn prossimo_passo(&self) -> Option<&PassoPercorso> { self.passi.iter().find(|p| !p.completato) }
+}
+
 impl Store {
     pub fn embedded_grammar_units(&self) -> Vec<GrammarUnit> {
         embedded_grammar_units()
+    }
+
+    pub fn prossima_unita(&self) -> Option<GrammarUnit> {
+        let summaries = self.grammar_mastery_summaries();
+        let mut by_id: HashMap<String, GrammarMasterySummary> = HashMap::new();
+        for s in summaries { by_id.insert(s.id.clone(), s); }
+        let now = Utc::now().timestamp_millis();
+        let units = embedded_grammar_units();
+        // prefer incomplete/due in order
+        for u in &units {
+            if let Some(s) = by_id.get(u.id) {
+                if !s.completata || s.is_due(now) { return Some(u.clone()); }
+            } else {
+                return Some(u.clone());
+            }
+        }
+        None
+    }
+
+    pub fn passi_completati_oggi(&self) -> std::collections::HashSet<String> {
+        let oggi = Local::now().format("%Y-%m-%d").to_string();
+        let Some(p) = self.active_profile() else { return std::collections::HashSet::new(); };
+        let data = p.stato.extra.get("passiGiornoData").and_then(|v| v.as_str()).unwrap_or("");
+        if data != oggi { return std::collections::HashSet::new(); }
+        p.stato.extra.get("passiGiornoIds").and_then(|v| v.as_array()).map(|a| {
+            a.iter().filter_map(|x| x.as_str().map(|s| s.to_string())).collect()
+        }).unwrap_or_default()
+    }
+
+    pub fn completa_passo(&mut self, passo_id: &str) -> Result<(), String> {
+        let oggi = Local::now().format("%Y-%m-%d").to_string();
+        let p = self.active_profile_mut().ok_or_else(|| "No active profile".to_string())?;
+        let existing_data = p.stato.extra.get("passiGiornoData").and_then(|v| v.as_str()).unwrap_or("").to_string();
+        let mut ids: Vec<String> = if existing_data == oggi {
+            p.stato.extra.get("passiGiornoIds").and_then(|v| v.as_array()).map(|a| a.iter().filter_map(|x| x.as_str().map(|s| s.to_string())).collect()).unwrap_or_default()
+        } else { vec![] };
+        if !ids.iter().any(|x| x == passo_id) { ids.push(passo_id.to_string()); }
+        p.stato.extra.insert("passiGiornoData".into(), serde_json::Value::String(oggi));
+        p.stato.extra.insert("passiGiornoIds".into(), serde_json::Value::Array(ids.into_iter().map(serde_json::Value::String).collect()));
+        self.save()
+    }
+
+    pub fn piano_oggi(&self) -> PercorsoGiornaliero {
+        let oggi = Local::now().format("%Y-%m-%d").to_string();
+        let plan = self.study_plan_summary();
+        let (_total, _reviewed, da_ripassare, streak) = self.stats();
+        let prossima = self.prossima_unita();
+        let completati = self.passi_completati_oggi();
+        let obiettivo = plan.obiettivo_livello.clone();
+        let mut passi: Vec<PassoPercorso> = Vec::new();
+
+        if da_ripassare > 0 {
+            let minuti = ((da_ripassare as f32 * 0.5).round() as i32).clamp(4, 8);
+            let id = "ripasso-giornaliero".to_string();
+            passi.push(PassoPercorso {
+                titolo: "Ripasso flashcard".into(),
+                descrizione: format!("{da_ripassare} parole in scadenza · ~{minuti} min"),
+                tipo: TipoPasso::Ripasso,
+                priorita: 0,
+                stima_minuti: minuti,
+                azione: "ripasso".into(),
+                urgente: da_ripassare >= 10,
+                completato: completati.contains(&id),
+                id,
+            });
+        }
+        if plan.grammar_due > 0 || prossima.is_some() {
+            let id = "grammatica-giornaliera".to_string();
+            let azione = if let Some(u) = &prossima { format!("unita_grammatica/{}", u.id) } else { "grammatica".into() };
+            let urgente = plan.grammar_due >= 2;
+            passi.push(PassoPercorso {
+                titolo: "Pratica grammaticale".into(),
+                descrizione: if let Some(u) = &prossima { format!("{} · ~8 min", u.title_it) } else { "Ripassa grammatica · ~8 min".into() },
+                tipo: TipoPasso::Grammatica,
+                priorita: 0,
+                stima_minuti: 8,
+                azione,
+                urgente,
+                completato: completati.contains(&id),
+                id,
+            });
+        }
+        if plan.new_words > 0 && da_ripassare == 0 {
+            let n = plan.new_words.min(10);
+            let minuti = ((n as f32 * 0.6).round() as i32).clamp(4, 8);
+            let id = "vocabolario-giornaliero".to_string();
+            passi.push(PassoPercorso {
+                titolo: "Nuove parole".into(),
+                descrizione: format!("{n} parole nuove · ~{minuti} min"),
+                tipo: TipoPasso::Vocabolario,
+                priorita: 0,
+                stima_minuti: minuti,
+                azione: "wortliste".into(),
+                urgente: false,
+                completato: completati.contains(&id),
+                id,
+            });
+        }
+        if passi.is_empty() {
+            let id = "sessione-guidata".to_string();
+            passi.push(PassoPercorso {
+                titolo: "Sessione libera".into(),
+                descrizione: "Pratica libera di 20 minuti".into(),
+                tipo: TipoPasso::SessioneGuidata,
+                priorita: 0,
+                stima_minuti: 20,
+                azione: "esercizi".into(),
+                urgente: false,
+                completato: completati.contains(&id),
+                id,
+            });
+        }
+        // limit budget similar spirit
+        let mut limited: Vec<PassoPercorso> = Vec::new();
+        let mut restante = 22i32;
+        for mut p in passi.into_iter() {
+            if limited.len() >= 3 || restante < 4 { break; }
+            let m = p.stima_minuti.min(restante).max(4);
+            p.stima_minuti = m;
+            restante -= m;
+            p.priorita = limited.len() + 1;
+            limited.push(p);
+        }
+        let minuti_totali: i32 = limited.iter().map(|p| p.stima_minuti).sum();
+        let minuti_completati: i32 = limited.iter().filter(|p| p.completato).map(|p| p.stima_minuti).sum();
+        let any_urgente = limited.iter().any(|p| p.urgente && !p.completato);
+        let messaggio_motivazionale = if any_urgente {
+            "Oggi conviene concentrarsi sulle aree con il badge Priorità.".into()
+        } else if da_ripassare >= 20 {
+            "Tante parole da ripassare. Inizia dal ripasso!".into()
+        } else if da_ripassare >= 10 {
+            "Buon ritmo! Mantieni la costanza.".into()
+        } else if streak >= 7 {
+            format!("Streak di {streak} giorni! Sei inarrestabile.")
+        } else if limited.iter().all(|p| p.completato) && !limited.is_empty() {
+            "Prosegui così, stai facendo ottimi progressi.".into()
+        } else {
+            "Buona sessione di studio!".into()
+        };
+        let prossimo_obiettivo = match obiettivo.as_str() {
+            "A0" => "Raggiungere A1 con 50 parole".into(),
+            "A1" => "Raggiungere A2 con 150 parole".into(),
+            "A2" => "Raggiungere B1 con 900 parole".into(),
+            "B1" => "Raggiungere B2 con 1800 parole".into(),
+            _ => "Raggiungere C1 con 3500 parole".into(),
+        };
+
+        PercorsoGiornaliero { data: oggi, passi: limited, messaggio_motivazionale, prossimo_obiettivo, minuti_totali, minuti_completati }
     }
 
     pub fn record_grammar_unit_practice(&mut self, unit_id: &str, correct: usize, total: usize) -> Result<GrammarUnitPracticeResult, String> {
@@ -2473,5 +2710,130 @@ impl Store {
         });
         self.save()?;
         Ok(GrammarUnitPracticeResult { correct, total, percent, completed })
+    }
+
+    // --- settings / profile helpers (mobile-equivalent best effort) ---
+    pub fn rinomina_profilo(&mut self, nome: &str) -> Result<(), String> {
+        let nome = nome.trim();
+        if nome.is_empty() { return Err("Nome vuoto".into()); }
+        let p = self.active_profile_mut().ok_or_else(|| "Nessun profilo attivo".to_string())?;
+        p.config.nome_visualizzato = nome.to_string();
+        self.save()
+    }
+
+    pub fn imposta_contesto(&mut self, contesto: &str) -> Result<(), String> {
+        let p = self.active_profile_mut().ok_or_else(|| "Nessun profilo attivo".to_string())?;
+        p.config.contesto_utente = contesto.trim().to_string();
+        self.save()
+    }
+
+    pub fn imposta_livello_e_obiettivo(&mut self, iniziale: &str, obiettivo: &str) -> Result<(), String> {
+        let p = self.active_profile_mut().ok_or_else(|| "Nessun profilo attivo".to_string())?;
+        let ini = iniziale.trim().to_uppercase();
+        let ob = obiettivo.trim().to_uppercase();
+        if !ini.is_empty() { p.config.livello_iniziale = ini.clone(); }
+        if !ob.is_empty() { p.stato.progresso.obiettivo_livello = ob; }
+        // Keep current level consistent with starting level when user explicitly sets it (desktop parity intent),
+        // while preserving real progression semantics as much as possible.
+        if !ini.is_empty() { p.stato.progresso.livello_corrente = ini; }
+        self.save()
+    }
+
+    pub fn imposta_feed_url(&mut self, url: &str) -> Result<(), String> {
+        let p = self.active_profile_mut().ok_or_else(|| "Nessun profilo attivo".to_string())?;
+        p.config.feed_url = url.trim().to_string();
+        self.save()
+    }
+
+    pub fn salva_token_cloud(&mut self, token: &str) -> Result<(), String> {
+        self.prefs.github_token = token.trim().to_string();
+        self.save()
+    }
+
+    pub fn salva_repo_cloud(&mut self, repo: &str) -> Result<(), String> {
+        self.prefs.github_repo = repo.trim().to_string();
+        self.save()
+    }
+
+    pub fn svuota_profilo_attivo(&mut self) -> Result<(), String> {
+        let p = self.active_profile_mut().ok_or_else(|| "Nessun profilo attivo".to_string())?;
+        p.stato.parole.clear();
+        p.stato.reviews.clear();
+        p.stato.ripassi_log.clear();
+        p.stato.padronanza_grammatica.clear();
+        p.stato.streak_giorni = 0;
+        p.stato.streak_record = 0;
+        p.stato.ultimo_giorno_studio = None;
+        p.stato.progresso.lezione_corrente = 0;
+        p.stato.progresso.ultima_attivita = 0;
+        p.stato.extra.remove("passiGiornoData");
+        p.stato.extra.remove("passiGiornoIds");
+        self.save()
+    }
+
+    pub fn importa_wortliste_seed(&mut self) -> Result<usize, String> {
+        // Best-effort: try to import from a JSON bundle/word list if present near data dir or cwd.
+        let candidates = [
+            self.base_dir.join("wortliste.json"),
+            self.base_dir.join("Wortliste.json"),
+            std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")).join("wortliste.json"),
+            std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")).join("assets").join("wortliste.json"),
+        ];
+        for path in candidates {
+            if !path.exists() { continue; }
+            let data = fs::read_to_string(&path).map_err(|e| e.to_string())?;
+            let v: Value = serde_json::from_str(&data).map_err(|e| e.to_string())?;
+            let arr = if let Some(a) = v.as_array() { a.clone() }
+                else if let Some(a) = v.get("parole").and_then(|x| x.as_array()) { a.clone() }
+                else if let Some(a) = v.get("words").and_then(|x| x.as_array()) { a.clone() }
+                else { continue; };
+            let mut added = 0usize;
+            for item in arr {
+                let german = item.get("german").or_else(|| item.get("tedesco")).and_then(|x| x.as_str()).unwrap_or("").trim();
+                let italian = item.get("italian").or_else(|| item.get("italiano")).and_then(|x| x.as_str()).unwrap_or("").trim();
+                if german.is_empty() || italian.is_empty() { continue; }
+                let article = item.get("article").or_else(|| item.get("articolo")).and_then(|x| x.as_str()).map(|s| s.to_string());
+                let level = item.get("level").or_else(|| item.get("livello")).and_then(|x| x.as_str()).unwrap_or("A1");
+                let example = item.get("example").or_else(|| item.get("esempio")).and_then(|x| x.as_str()).unwrap_or("");
+                // add_word skips duplicates and saves each time? it saves; to reduce churn we can inline logic, but easier to reuse
+                let before = self.active_profile().map(|p| p.stato.parole.len()).unwrap_or(0);
+                let _ = self.add_word(german, italian, article, level, example);
+                let after = self.active_profile().map(|p| p.stato.parole.len()).unwrap_or(before);
+                if after > before { added += 1; }
+            }
+            return Ok(added);
+        }
+        Err("Wortliste non trovata in questa build Rust (atteso wortliste.json in cartella dati o assets).".into())
+    }
+
+    pub fn esporta_dati_completi_a(&self, path: &PathBuf) -> Result<(), String> {
+        // Full export including profiles + preferences (mobile-equivalent bundle), token left as-is in prefs file normally
+        // but for "Esporta tutti i dati" we omit sensitive cloud token from exported copy.
+        let mut prefs = self.prefs.clone();
+        prefs.github_token.clear();
+        prefs.ultimo_hash_cloud.clear();
+        let bundle = serde_json::json!({
+            "format": "openlingo-export-completo",
+            "version": 1,
+            "profili": self.repo,
+            "preferenze": prefs,
+        });
+        write_json(path, &bundle)
+    }
+
+    pub fn nome_file_backup_cloud(&self) -> String {
+        "tedesco-backup.json".to_string()
+    }
+
+    pub fn ultima_sincronizzazione_cloud(&self) -> i64 {
+        self.prefs.ultima_sincronizzazione_cloud
+    }
+
+    pub fn ultimo_backup_cloud(&self) -> i64 {
+        self.prefs.ultimo_backup
+    }
+
+    pub fn sincronizzazione_cloud_disponibile(&self) -> bool {
+        !self.prefs.github_token.trim().is_empty()
     }
 }
