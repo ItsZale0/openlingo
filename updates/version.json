@@ -4,5 +4,5 @@
   "changelog": "Removed Google document guide from mobile settings, cleaned up desktop wording, and fixed auto-update manifest/signing for release publishing.",
   "minVersionCode": 0,
   "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.19/OpenLingo-v1.51.19.apk",
-  "apkSha256": ""
+  "apkSha256": "a26ce66e835077a6347d457dfeaa061c08e39414cc0780007f6862f706290f05"
 }
