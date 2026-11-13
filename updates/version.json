@@ -3,5 +3,6 @@
   "versionName": "1.51.18",
   "changelog": "Added per-exercise human feedback (correct/wrong) controls to mark AI-generated and grammar unit exercises. Exercises marked wrong are excluded from future sessions and generation avoids repeating them; feedback is persisted and merged in backups.",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.18/OpenLingo-v1.51.18.apk"
+  "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.18/OpenLingo-v1.51.18.apk",
+  "apkSha256": "7ccf00de4d2bcdd739459aa6d7a4fb95cb962a4139d8ca70743343e996b181b0"
 }
