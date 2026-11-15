@@ -1,8 +1,8 @@
 {
-  "versionCode": 343,
-  "versionName": "1.51.20",
-  "changelog": "Improved AI exercise generation to reduce ambiguous or questionable answers (e.g. modal verbs), by enforcing clearer context and stricter review of alternatives.",
+  "versionCode": 344,
+  "versionName": "1.51.21",
+  "changelog": "Improved AI exercise quality: removed ambiguous modal exercises, added conjugation validation, cleaned desktop wording.",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.20/OpenLingo-v1.51.20.apk",
-  "apkSha256": "06891b004b74b53b1ecaa1e7e00080ef83c5bcb1501d50e150a5d1c61d631d20"
+  "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.21/OpenLingo-v1.51.21.apk",
+  "apkSha256": "224f94b97926c72a9f542e3e8f802addf34fc390dad8c48ad1f0bba2527ca82b"
 }
