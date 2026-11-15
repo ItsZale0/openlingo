@@ -165,6 +165,7 @@ class GeneratoreEsercizi(
             - significato naturale e coerente, anche col soggetto (con "Wir ..." normalmente "unsere", non "eure");
             - per la comprensione: la risposta è deducibile SOLO dal testo.
             ATTENZIONE ai nomi in -en (N-Deklination): Patient, Student, Kollege, Mensch, Junge, Kunde, Nachbar. La forma "Patienten" è identica all'accusativo/dativo singolare maschile E al plurale: se la frase non chiarisce numero e caso, sia "euren Patienten" sia "eure Patienten" sono corrette e l'esercizio ha DUE risposte.
+            ATTENZIONE ai VERBI MODALI: dürfen/müssen/können/sollen/wollen possono essere tutti grammaticalmente corretti nella stessa frase con significati diversi (permesso/obbligo/capacità/raccomandazione/volontà). Se la frase non fornisce contesto che rende inequivocabile un solo modale, conta TUTTE le opzioni modali semanticamente plausibili come corrette (esercizio ambiguo → da scartare). Esempio: "Du ___ das Rezept ausstellen." senza contesto → darfst e musst possono essere entrambi difendibili.
             NON correggere le spiegazioni: valuta solo quali opzioni sono corrette.
             Rispondi SOLO con JSON, senza testo prima o dopo:
             {"valutazioni":[{"indice":0,"corrette":[2]},{"indice":1,"corrette":[0,3]}]}
@@ -431,6 +432,13 @@ class GeneratoreEsercizi(
               oppure aggiungi un elemento che fissi numero e caso (un aggettivo con
               desinenza, un numerale, "diesen", "alle") e verifica che resti UNA sola
               risposta corretta.
+            - MODALI E SIGNIFICATO: verbi modali diversi (dürfen, müssen, können, sollen, wollen, mögen)
+              possono essere tutti grammaticalmente corretti nella stessa frase ma con significati diversi.
+              È VIETATO proporre più modali come opzioni se il contesto non rende una sola scelta inequivocabile.
+              Esempio AMBIGUO (vietato): "Du ___ das Rezept ausstellen." con darfst/musst/kannst/sollst — senza
+              contesto non si sa se è permesso, obbligo, capacità o raccomandazione. Per renderlo non ambiguo
+              aggiungi contesto esplicito nella frase/domanda (es. "Il dottore ha l'autorizzazione: Du ___ das
+              Rezept ausstellen." → darfst) oppure testa una regola diversa (coniugazione/forma del modale).
             - POSSESSIVO COERENTE: il possessivo deve suonare naturale rispetto al soggetto
               e al contesto: con "Wir ..." normalmente "unsere", con "Ihr ..." "eure",
               con "Ich ..." "meine". Non usare un possessivo che confonde lo studente
