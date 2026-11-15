@@ -31,7 +31,63 @@ object ControlloGrammatica {
         PLURALE("plurale")
     }
 
-    /** Nomi frequenti (singolare) con il loro genere. Chiavi già normalizzate. */
+    // ── Coniugazione modali (presente indicativo) per riconoscere errori grossolani ──
+    private val coniugazioniModale: Map<String, Map<String, String>> = mapOf(
+        "koennen" to mapOf("ich" to "kann", "du" to "kannst", "er" to "kann", "sie" to "kann", "es" to "kann",
+            "wir" to "koennen", "ihr" to "koeennt", "sie" to "koennen", "Sie" to "koennen"),
+        "muessen" to mapOf("ich" to "muss", "du" to "musst", "er" to "muss", "sie" to "muss", "es" to "muss",
+            "wir" to "muessen", "ihr" to "muesst", "sie" to "muessen", "Sie" to "muessen"),
+        "duerfen" to mapOf("ich" to "darf", "du" to "darfst", "er" to "darf", "sie" to "darf", "es" to "darf",
+            "wir" to "duerfen", "ihr" to "duerft", "sie" to "duerfen", "Sie" to "duerfen"),
+        "sollen" to mapOf("ich" to "soll", "du" to "sollst", "er" to "soll", "sie" to "soll", "es" to "soll",
+            "wir" to "sollen", "ihr" to "sollt", "sie" to "sollen", "Sie" to "sollen"),
+        "wollen" to mapOf("ich" to "will", "du" to "willst", "er" to "will", "sie" to "will", "es" to "will",
+            "wir" to "wollen", "ihr" to "wollt", "sie" to "wollen", "Sie" to "wollen"),
+        "moegen" to mapOf("ich" to "mag", "du" to "magst", "er" to "mag", "sie" to "mag", "es" to "mag",
+            "wir" to "moegen", "ihr" to "moegt", "sie" to "moegen", "Sie" to "moegen")
+    )
+
+    /** Cerca un soggetto esplicito (ich/du/er/sie/es/wir/ihr/man) prima o dopo il buco. */
+    private fun trovaSoggettoFrase(parole: List<String>, buco: Int): String? {
+        for (offset in -3..1) {
+            val idx = buco + offset
+            if (idx < 0 || idx >= parole.size) continue
+            val tok = chiave(parole[idx]).lowercase(Locale.ROOT)
+            if (tok in setOf("ich","du","er","sie","es","wir","ihr","man")) return tok
+        }
+        return null
+    }
+
+    /** Verifica coniugazione modale: scarta se nessuna opzione coniuga correttamente per il soggetto. */
+    private fun problemiConiugazioneModale(domanda: String, opzioni: List<String>): List<String> {
+        if (!domanda.contains("___")) return emptyList()
+        val parole = domanda.trim().split(Regex("\\s+"))
+        val buco = parole.indexOfFirst { it.matches(regexBuco) }
+        if (buco < 0) return emptyList()
+
+        val soggetto = trovaSoggettoFrase(parole, buco) ?: return emptyList()
+
+        val corrette = mutableListOf<Int>()
+        var haOpzioniModali = false
+
+        opzioni.forEachIndexed { idx, op ->
+            val k = chiave(op).lowercase(Locale.ROOT)
+            if (k.isEmpty()) return@forEachIndexed
+            val lemma = coniugazioniModale.keys.firstOrNull { k.startsWith(it) } ?: return@forEachIndexed
+            haOpzioniModali = true
+            val atteso =coniugazioniModale[lemma]?.get(soggetto) ?: return@forEachIndexed
+            if (chiave(atteso) == k) corrette.add(idx)
+        }
+
+        if (!haOpzioniModali) return emptyList()
+        // Se nessuna opzione è coniugata correttamente per il soggetto, l'esercizio è difettoso.
+        return when {
+            corrette.isEmpty() -> listOf(
+                "Modal verb conjugated wrong for subject '$soggetto': no option matches the expected form."
+            )
+            else -> emptyList() // esercizio ok, almeno una forma è corretta
+        }
+    }
     private val nomi: Map<String, Genere> = buildMap {
         fun m(vararg parole: String) = parole.forEach { put(it, Genere.MASCHILE) }
         fun f(vararg parole: String) = parole.forEach { put(it, Genere.FEMMINILE) }
@@ -518,6 +574,8 @@ object ControlloGrammatica {
         // Ambiguità di numero sui nomi deboli: due opzioni possono essere
         // entrambe corrette anche quando l'accordo della singola frase è giusto.
         problemi += problemiAmbiguitaNumero(domanda, opzioni)
+        // Coniugazione modale: scarta esercizi dove nessuna opzione coniuga correttamente per il soggetto.
+        problemi += problemiConiugazioneModale(domanda, opzioni)
         return problemi
     }
 
