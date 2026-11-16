@@ -46,7 +46,7 @@ compose.desktop {
         jvmArgs += listOf("-Dfile.encoding=UTF-8")
 
         nativeDistributions {
-            targetFormats(TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Dmg)
+            targetFormats(TargetFormat.Exe, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Dmg)
             packageName = "OpenLingo"
             packageVersion = appVersionName
             description = "OpenLingo - language learning with real didactics and spaced repetition"
