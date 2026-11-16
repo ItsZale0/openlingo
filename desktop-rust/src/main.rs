@@ -1,7 +1,7 @@
 ﻿mod data;
 
 use chrono::{Local};
-use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche};
+use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche, sudtirol_varianti, sudtirol_lessico, sudtirol_frasi, sudtirol_dialoghi};
 use eframe::egui;
 use std::collections::BTreeSet;
 
@@ -184,6 +184,7 @@ enum Screen {
     Speech,
     Errori,
     Pronuncia,
+    Sudtirol,
     Progress,
     Settings,
 }
@@ -261,6 +262,8 @@ struct OpenLingoApp {
     // Speech engines state
     speech_status: String,
     speech_busy: bool,
+    // Sudtirol dialogue quiz state: (dialogue index, question index) -> selected option
+    sudtirol_answers: std::collections::BTreeMap<(usize, usize), usize>,
 }
 
 fn ui_lang(store: &Store) -> &str {
@@ -347,6 +350,7 @@ impl OpenLingoApp {
             gender_level: "A1".into(),
             speech_status: String::new(),
             speech_busy: false,
+            sudtirol_answers: std::collections::BTreeMap::new(),
         };
         // Default to dark teal theme to better match mobile look (user can change in Settings)
         if app.store.prefs.tema_colore.trim().is_empty() {
@@ -448,6 +452,7 @@ impl OpenLingoApp {
             Screen::Speech => tr(lang, "Speech engines", "Motori vocali"),
             Screen::Errori => tr(lang, "Error notebook", "Quaderno errori"),
             Screen::Pronuncia => tr(lang, "Pronunciation", "Pronuncia"),
+            Screen::Sudtirol => tr(lang, "Südtirol / Austria", "Südtirol / Austria"),
             Screen::Progress => tr(lang, "Progress", "Progresso"),
             Screen::Settings => tr(lang, "Settings", "Impostazioni"),
         };
@@ -482,6 +487,7 @@ impl OpenLingoApp {
                     (Screen::Speech, tr(lang, "Speech", "Vocale")),
                     (Screen::Errori, tr(lang, "Errors", "Errori")),
                     (Screen::Pronuncia, tr(lang, "Pronunciation", "Pronuncia")),
+                    (Screen::Sudtirol, tr(lang, "Südtirol", "Südtirol")),
                     (Screen::Progress, tr(lang, "Progress", "Progresso")),
                     (Screen::Settings, tr(lang, "Settings", "Impostazioni")),
                 ];
@@ -516,6 +522,7 @@ impl OpenLingoApp {
             (Screen::Speech, "\u{1F3A4}", tr(lang, "Speech", "Vocale")),
             (Screen::Errori, "\u{1F4D5}", tr(lang, "Errors", "Errori")),
             (Screen::Pronuncia, "\u{1F5E3}", tr(lang, "Pronuncia", "Pronuncia")),
+            (Screen::Sudtirol, "\u{1F1E6}\u{1F1FA}", tr(lang, "Südtirol", "Südtirol")),
             (Screen::Progress, "\u{1F4C8}", tr(lang, "Progress", "Progresso")),
         ];
         let w = ui.available_width();
@@ -2671,6 +2678,109 @@ impl OpenLingoApp {
             ui.label(egui::RichText::new(&self.status).color(ui.visuals().strong_text_color()));
         }
     }
+    fn screen_sudtirol(&mut self, ui: &mut egui::Ui) {
+        let lang_s = ui_lang(&self.store).to_string();
+        let lang = lang_s.as_str();
+
+        ui.label(egui::RichText::new(tr(lang, "SÃ¼dtirol / Austria", "SÃ¼dtirol / Austria")).size(28.0).strong());
+        ui.add_space(6.0);
+        ui.label(egui::RichText::new(tr(
+            lang,
+            "Austrian German variants, administrative & healthcare lexicon, phrases and local dialogues.",
+            "Varianti dell'austriaco, lessico amministrativo e sanitario, frasi e dialoghi locali.",
+        )).color(ui.visuals().weak_text_color()));
+        ui.add_space(14.0);
+
+        // Austrian variants
+        ui.label(egui::RichText::new(tr(lang, "Austrian variants", "Varianti austriache")).size(20.0).strong());
+        ui.add_space(8.0);
+        for v in sudtirol_varianti() {
+            ui.horizontal_wrapped(|ui| {
+                ui.label(egui::RichText::new(&v.austriaco).strong());
+                ui.small(format!(" = {} - {}", v.standard, v.italiano));
+            });
+        }
+
+        // Lexicon
+        ui.add_space(16.0);
+        ui.label(egui::RichText::new(tr(lang, "Lexicon", "Lessico")).size(20.0).strong());
+        ui.add_space(8.0);
+        let mut last_cat = String::new();
+        for v in sudtirol_lessico() {
+            if v.categoria != last_cat {
+                ui.label(egui::RichText::new(&v.categoria).strong().color(ui.visuals().selection.stroke.color));
+                last_cat = v.categoria.clone();
+            }
+            ui.horizontal_wrapped(|ui| {
+                ui.label(&v.tedesco);
+                ui.small(format!(" - {}", v.italiano));
+            });
+        }
+
+        // Phrases
+        ui.add_space(16.0);
+        ui.label(egui::RichText::new(tr(lang, "Useful phrases", "Frasi utili")).size(20.0).strong());
+        ui.add_space(8.0);
+        for f in sudtirol_frasi() {
+            ui.label(egui::RichText::new(&f.tedesco).strong());
+            ui.small(&f.italiano);
+            if !f.nota.is_empty() {
+                ui.small(egui::RichText::new(&f.nota).italics());
+            }
+            ui.add_space(6.0);
+        }
+
+        // Dialogues with comprehension questions
+        ui.add_space(16.0);
+        ui.label(egui::RichText::new(tr(lang, "Dialogues", "Dialoghi")).size(20.0).strong());
+        ui.add_space(8.0);
+        for (di, dialogo) in sudtirol_dialoghi().iter().enumerate() {
+            egui::Frame::none()
+                .fill(ui.visuals().faint_bg_color)
+                .stroke(egui::Stroke::new(1.0, ui.visuals().widgets.noninteractive.bg_stroke.color))
+                .rounding(egui::CornerRadius::same(18))
+                .inner_margin(egui::Margin::same(14))
+                .show(ui, |ui| {
+                    ui.set_min_width(360.0);
+                    ui.label(egui::RichText::new(&dialogo.titolo).size(18.0).strong());
+                    ui.small(format!("{} - {}", dialogo.livello, dialogo.contesto));
+                    ui.add_space(8.0);
+                    for b in &dialogo.battute {
+                        ui.horizontal_wrapped(|ui| {
+                            ui.label(egui::RichText::new(format!("{}:", b.parlante)).strong());
+                            ui.label(&b.testo);
+                        });
+                    }
+                    ui.add_space(10.0);
+                    ui.label(egui::RichText::new(tr(lang, "Comprehension", "Comprensione")).strong());
+                    for (qi, q) in dialogo.domande.iter().enumerate() {
+                        ui.add_space(4.0);
+                        ui.label(&q.domanda);
+                        let key = (di, qi);
+                        let selected = self.sudtirol_answers.get(&key).copied();
+                        for (oi, opt) in q.opzioni.iter().enumerate() {
+                            let is_sel = selected == Some(oi);
+                            let mut btn = egui::Button::new(opt.clone()).rounding(egui::CornerRadius::same(12));
+                            if is_sel {
+                                btn = btn.fill(ui.visuals().selection.bg_fill);
+                            }
+                            if ui.add(btn).clicked() {
+                                self.sudtirol_answers.insert(key, oi);
+                            }
+                            if is_sel {
+                                if oi == q.corretta {
+                                    ui.label(egui::RichText::new(tr(lang, "Correct!", "Corretto!")).color(ui.visuals().selection.stroke.color));
+                                } else {
+                                    ui.label(egui::RichText::new(format!("{} {}", tr(lang, "Wrong. Correct:", "Sbagliato. Corretto:"), q.opzioni[q.corretta])).color(egui::Color32::from_rgb(220, 100, 100)));
+                                }
+                            }
+                        }
+                    }
+                });
+            ui.add_space(12.0);
+        }
+    }
+
     fn screen_settings(&mut self, ui: &mut egui::Ui) {
         let lang_s = ui_lang(&self.store).to_string();
         let lang = lang_s.as_str();
@@ -3164,6 +3274,7 @@ impl eframe::App for OpenLingoApp {
                 Screen::Speech => self.screen_speech(ui),
                 Screen::Errori => self.screen_errori(ui),
                 Screen::Pronuncia => self.screen_pronuncia(ui),
+                Screen::Sudtirol => self.screen_sudtirol(ui),
                 Screen::Settings => self.screen_settings(ui),
             });
     }
@@ -3605,6 +3716,17 @@ mod tests {
     }
 
     #[test]
+    fn sudtirol_data_is_complete() {
+        assert!(sudtirol_varianti().len() >= 15);
+        assert!(sudtirol_lessico().len() >= 17);
+        assert!(sudtirol_frasi().len() >= 14);
+        let dialoghi = sudtirol_dialoghi();
+        assert_eq!(dialoghi.len(), 3);
+        assert!(dialoghi.iter().all(|d| !d.battute.is_empty() && !d.domande.is_empty()));
+        assert_eq!(sudtirol_standard_di("der Jänner").as_deref(), Some("der Januar"));
+    }
+
+    #[test]
     fn pronuncia_data_is_complete() {
         let coppie = pronuncia_coppie();
         assert!(coppie.len() >= 18, "expected all minimal pairs, got {}", coppie.len());
@@ -3647,6 +3769,8 @@ mod tests {
         let _ = fs::remove_dir_all(dir);
     }
 }
+
+
 
 
 

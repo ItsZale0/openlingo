@@ -3373,3 +3373,172 @@ pub fn pronuncia_frasi_cliniche() -> Vec<&'static str> {
         "Heute war die Sitzung gut: Sie haben viel geschafft.",
     ]
 }
+
+// ── Südtirol / Austria module (variants, lexicon, phrases, dialogues) ──
+
+#[derive(Debug, Clone)]
+pub struct VarianteAustriaca {
+    pub austriaco: String,
+    pub standard: String,
+    pub italiano: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct VoceLessicoSud {
+    pub tedesco: String,
+    pub italiano: String,
+    pub categoria: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct FraseSud {
+    pub tedesco: String,
+    pub italiano: String,
+    pub nota: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct Battuta {
+    pub parlante: String,
+    pub testo: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct DomandaDialogo {
+    pub domanda: String,
+    pub opzioni: Vec<String>,
+    pub corretta: usize,
+}
+
+#[derive(Debug, Clone)]
+pub struct DialogoSud {
+    pub titolo: String,
+    pub livello: String,
+    pub contesto: String,
+    pub battute: Vec<Battuta>,
+    pub domande: Vec<DomandaDialogo>,
+}
+
+pub fn sudtirol_varianti() -> Vec<VarianteAustriaca> {
+    let raw = [
+        ("der Jänner", "der Januar", "gennaio"),
+        ("der Erdapfel", "die Kartoffel", "patata"),
+        ("heuer", "dieses Jahr", "quest'anno"),
+        ("das Sackerl", "die Tüte", "sacchetto"),
+        ("die Palatschinke", "der Pfannkuchen", "crespella"),
+        ("die Marille", "die Aprikose", "albicocca"),
+        ("die Ribisel", "die Johannisbeere", "ribes"),
+        ("der Topfen", "der Quark", "ricotta / quark"),
+        ("der Paradeiser", "die Tomate", "pomodoro"),
+        ("der Karfiol", "der Blumenkohl", "cavolfiore"),
+        ("die Fisolen", "die Bohnen", "fagiolini"),
+        ("die Kohlsprossen", "der Rosenkohl", "cavolini di Bruxelles"),
+        ("die Semmel", "das Brötchen", "panino"),
+        ("die Grammeln", "die Grieben", "ciccioli"),
+        ("der Leberkäse", "die Fleischwurst", "polpettone di carne"),
+    ];
+    raw.iter().map(|(a, s, i)| VarianteAustriaca {
+        austriaco: a.to_string(), standard: s.to_string(), italiano: i.to_string(),
+    }).collect()
+}
+
+pub fn sudtirol_lessico() -> Vec<VoceLessicoSud> {
+    let raw = [
+        ("der Befund", "referto / risultato clinico", "Ambulatorio"),
+        ("die Überweisung", "impegnativa / invio", "Ambulatorio"),
+        ("die Krankenkasse", "cassa mutua / assicurazione sanitaria", "Assicurazione"),
+        ("die Ordination", "studio medico", "Ambulatorio"),
+        ("der Termin", "appuntamento", "Ambulatorio"),
+        ("das Rezept", "ricetta", "Ambulatorio"),
+        ("die Arbeitsunfähigkeit", "inabilità al lavoro", "Assicurazione"),
+        ("die Behandlung", "trattamento", "Terapia"),
+        ("die Übung", "esercizio", "Terapia"),
+        ("der Patient / die Patientin", "paziente", "Ambulatorio"),
+        ("die Schmerzen", "dolori", "Sintomi"),
+        ("die Bewegung", "movimento", "Terapia"),
+        ("die Physiotherapie", "fisioterapia", "Terapia"),
+        ("die Anamnese", "anamnesi", "Ambulatorio"),
+        ("die Diagnose", "diagnosi", "Ambulatorio"),
+        ("der Therapieplan", "piano terapeutico", "Terapia"),
+        ("die Kontrolle", "controllo / visita di controllo", "Ambulatorio"),
+    ];
+    raw.iter().map(|(t, i, c)| VoceLessicoSud {
+        tedesco: t.to_string(), italiano: i.to_string(), categoria: c.to_string(),
+    }).collect()
+}
+
+pub fn sudtirol_frasi() -> Vec<FraseSud> {
+    let raw: &[(&str, &str, &str)] = &[
+        ("Guten Tag, haben Sie einen Termin?", "Buongiorno, ha un appuntamento?", ""),
+        ("Ich habe seit drei Tagen Schmerzen im Knie.", "Ho dolore al ginocchio da tre giorni.", ""),
+        ("Wie stark sind die Schmerzen auf einer Skala von 1 bis 10?", "Quanto è forte il dolore su una scala da 1 a 10?", ""),
+        ("Bitte beugen Sie das Knie langsam.", "Pieghi lentamente il ginocchio.", "Imperativo formale: Sie."),
+        ("Bitte strecken Sie das Bein.", "Distenda la gamba.", ""),
+        ("Atmen Sie tief ein und langsam aus.", "Inspiri profondamente ed espiri lentamente.", ""),
+        ("Die Übungen machen Sie bitte dreimal am Tag.", "Faccia gli esercizi tre volte al giorno.", ""),
+        ("Bitte bringen Sie den Befund mit.", "Porti il referto.", ""),
+        ("Haben Sie eine Überweisung?", "Ha un'impegnativa?", ""),
+        ("Sie können sich hier anmelden.", "Può registrarsi qui.", ""),
+        ("Ich verstehe nicht ganz. Können Sie das langsamer sagen?", "Non capisco del tutto. Può dirlo più lentamente?", ""),
+        ("Können Sie das bitte wiederholen?", "Può ripetere, per favore?", ""),
+        ("Ich spreche noch nicht so gut Deutsch.", "Non parlo ancora bene il tedesco.", ""),
+        ("Sind Sie gesetzlich versichert?", "È assicurato con il servizio sanitario?", ""),
+    ];
+    raw.iter().map(|(t, i, n)| FraseSud {
+        tedesco: t.to_string(), italiano: i.to_string(), nota: n.to_string(),
+    }).collect()
+}
+
+pub fn sudtirol_dialoghi() -> Vec<DialogoSud> {
+    vec![
+        DialogoSud {
+            titolo: "In der Ordination".into(), livello: "A2".into(),
+            contesto: "Alla reception di uno studio medico.".into(),
+            battute: vec![
+                Battuta { parlante: "Rezeption".into(), testo: "Guten Tag, haben Sie einen Termin?".into() },
+                Battuta { parlante: "Patient".into(), testo: "Ja, ich heiße Rossi. Ich habe um zehn Uhr einen Termin.".into() },
+                Battuta { parlante: "Rezeption".into(), testo: "Einen Moment bitte. Haben Sie die Überweisung dabei?".into() },
+                Battuta { parlante: "Patient".into(), testo: "Ja, hier bitte. Und meinen Befund habe ich auch.".into() },
+            ],
+            domande: vec![
+                DomandaDialogo { domanda: "A che ora ha l'appuntamento il paziente?".into(), opzioni: vec!["Alle 9".into(), "Alle 10".into(), "Alle 11".into(), "Alle 12".into()], corretta: 1 },
+                DomandaDialogo { domanda: "Che cosa porta con sé il paziente?".into(), opzioni: vec!["Solo il documento".into(), "L'impegnativa e il referto".into(), "La ricetta".into(), "Niente".into()], corretta: 1 },
+            ],
+        },
+        DialogoSud {
+            titolo: "Physiotherapie: Anamnese".into(), livello: "B1".into(),
+            contesto: "Primo colloquio in fisioterapia.".into(),
+            battute: vec![
+                Battuta { parlante: "Physiotherapeutin".into(), testo: "Guten Morgen, ich bin Frau Huber. Wo tut es weh?".into() },
+                Battuta { parlante: "Patient".into(), testo: "Mein Knie, seit drei Tagen. Besonders beim Treppensteigen.".into() },
+                Battuta { parlante: "Physiotherapeutin".into(), testo: "Wie stark sind die Schmerzen von eins bis zehn?".into() },
+                Battuta { parlante: "Patient".into(), testo: "Etwa sieben. In der Nacht wird es besser.".into() },
+            ],
+            domande: vec![
+                DomandaDialogo { domanda: "Da quanto tempo ha dolore il paziente?".into(), opzioni: vec!["Da un giorno".into(), "Da tre giorni".into(), "Da una settimana".into(), "Da un mese".into()], corretta: 1 },
+                DomandaDialogo { domanda: "Quando peggiora il dolore?".into(), opzioni: vec!["Di notte".into(), "Salendo le scale".into(), "Da seduto".into(), "Mangiando".into()], corretta: 1 },
+            ],
+        },
+        DialogoSud {
+            titolo: "Kollegengespräch: Jänner und Erdäpfel".into(), livello: "B1".into(),
+            contesto: "Due colleghi parlano in pausa pranzo, con lessico austriaco.".into(),
+            battute: vec![
+                Battuta { parlante: "Anna".into(), testo: "Hast du heuer schon Urlaub gemacht?".into() },
+                Battuta { parlante: "Lukas".into(), testo: "Ja, im Jänner. Ich war in Südtirol.".into() },
+                Battuta { parlante: "Anna".into(), testo: "Und? Gab es dort gute Erdäpfel?".into() },
+                Battuta { parlante: "Lukas".into(), testo: "Ja, und einen tollen Topfenstrudel. Die Semmeln waren auch frisch.".into() },
+            ],
+            domande: vec![
+                DomandaDialogo { domanda: "Quando è andato in vacanza Lukas?".into(), opzioni: vec!["A gennaio".into(), "A luglio".into(), "In autunno".into(), "A Natale".into()], corretta: 0 },
+                DomandaDialogo { domanda: "Che cosa ha mangiato di buono?".into(), opzioni: vec!["Una pizza".into(), "Uno strudel di ricotta".into(), "Un panino".into(), "Una torta".into()], corretta: 1 },
+            ],
+        },
+    ]
+}
+
+/// Traduce una variante austriaca nello standard.
+pub fn sudtirol_standard_di(austriaco: &str) -> Option<String> {
+    sudtirol_varianti().into_iter()
+        .find(|v| v.austriaco.eq_ignore_ascii_case(austriaco))
+        .map(|v| v.standard)
+}
