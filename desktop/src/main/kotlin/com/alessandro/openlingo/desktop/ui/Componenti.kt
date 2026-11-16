@@ -219,8 +219,18 @@ fun Pagina(contenuto: @Composable ColumnScope.() -> Unit) {
         Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 32.dp, vertical = 16.dp)
     ) {
-        Column(Modifier.fillMaxWidth().padding(bottom = 40.dp), content = contenuto)
+        // Larghezza massima: su monitor ultrawide le card non si allungano
+        // e il testo resta leggibile. Centrato orizzontalmente.
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .widthIn(max = 1080.dp)
+                .align(Alignment.TopCenter)
+                .padding(horizontal = 40.dp, vertical = 24.dp)
+                .padding(bottom = 48.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            content = contenuto
+        )
     }
 }

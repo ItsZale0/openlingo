@@ -18,9 +18,11 @@ import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Settings
@@ -72,10 +74,10 @@ import kotlinx.coroutines.withContext
 
 enum class Schermata(val titolo: String, val icona: ImageVector) {
     HOME("Home", Icons.Filled.Home),
-    ESERCIZI("Esercizi", Icons.Filled.School),
+    ESERCIZI("Esercizi", Icons.Filled.Edit),
     RIPASSO("Ripasso", Icons.Filled.Refresh),
     LESSICO("Lessico", Icons.Filled.Translate),
-    GENDER_TRAINER("Allenatore articoli", Icons.Filled.School),
+    GENDER_TRAINER("Articoli", Icons.Filled.QuestionMark),
     WORTLISTE("Wortliste", Icons.AutoMirrored.Filled.MenuBook),
     PODCAST("Podcast", Icons.Filled.Headphones),
     PROGRESSO("Progresso", Icons.Filled.BarChart),
@@ -199,9 +201,25 @@ private fun BarraNavigazione(schermata: Schermata, onScegli: (Schermata) -> Unit
                 modifier = Modifier.padding(vertical = 20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Surface(
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.MenuBook,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.size(26.dp)
+                        )
+                    }
+                }
+                Spacer(Modifier.height(10.dp))
                 Text(
                     t("OPENLINGO"),
-                    style = MaterialTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
@@ -241,7 +259,22 @@ private fun BarraSuperiore(store: DesktopStore) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Column {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Surface(
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(18.dp),
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                modifier = Modifier.size(40.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Text(
+                        (profilo?.config?.nomeVisualizzato ?: "?").trim().take(1).uppercase(),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                }
+            }
+            Column {
             Text(
                 profilo?.config?.nomeVisualizzato ?: t("Nessun profilo"),
                 style = MaterialTheme.typography.titleMedium
@@ -258,6 +291,7 @@ private fun BarraSuperiore(store: DesktopStore) {
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                }
             }
         }
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
