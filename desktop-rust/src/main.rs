@@ -1,7 +1,7 @@
 ﻿mod data;
 
 use chrono::{Local};
-use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche, sudtirol_varianti, sudtirol_lessico, sudtirol_frasi, sudtirol_dialoghi};
+use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche, sudtirol_varianti, sudtirol_lessico, sudtirol_frasi, sudtirol_dialoghi, dialoghi_ascolto, dialoghi_per_contesto};
 use eframe::egui;
 use std::collections::BTreeSet;
 
@@ -185,6 +185,7 @@ enum Screen {
     Errori,
     Pronuncia,
     Sudtirol,
+    Dialoghi,
     Progress,
     Settings,
 }
@@ -264,6 +265,9 @@ struct OpenLingoApp {
     speech_busy: bool,
     // Sudtirol dialogue quiz state: (dialogue index, question index) -> selected option
     sudtirol_answers: std::collections::BTreeMap<(usize, usize), usize>,
+    // Dialogue listening quiz state: (dialogue id, question index) -> selected option
+    dialoghi_answers: std::collections::BTreeMap<(String, usize), usize>,
+    show_dialoghi_translation: std::collections::BTreeSet<String>,
 }
 
 fn ui_lang(store: &Store) -> &str {
@@ -351,6 +355,8 @@ impl OpenLingoApp {
             speech_status: String::new(),
             speech_busy: false,
             sudtirol_answers: std::collections::BTreeMap::new(),
+            dialoghi_answers: std::collections::BTreeMap::new(),
+            show_dialoghi_translation: std::collections::BTreeSet::new(),
         };
         // Default to dark teal theme to better match mobile look (user can change in Settings)
         if app.store.prefs.tema_colore.trim().is_empty() {
@@ -453,6 +459,7 @@ impl OpenLingoApp {
             Screen::Errori => tr(lang, "Error notebook", "Quaderno errori"),
             Screen::Pronuncia => tr(lang, "Pronunciation", "Pronuncia"),
             Screen::Sudtirol => tr(lang, "Südtirol / Austria", "Südtirol / Austria"),
+            Screen::Dialoghi => tr(lang, "Dialogues", "Dialoghi"),
             Screen::Progress => tr(lang, "Progress", "Progresso"),
             Screen::Settings => tr(lang, "Settings", "Impostazioni"),
         };
@@ -488,6 +495,7 @@ impl OpenLingoApp {
                     (Screen::Errori, tr(lang, "Errors", "Errori")),
                     (Screen::Pronuncia, tr(lang, "Pronunciation", "Pronuncia")),
                     (Screen::Sudtirol, tr(lang, "Südtirol", "Südtirol")),
+                    (Screen::Dialoghi, tr(lang, "Dialogues", "Dialoghi")),
                     (Screen::Progress, tr(lang, "Progress", "Progresso")),
                     (Screen::Settings, tr(lang, "Settings", "Impostazioni")),
                 ];
@@ -523,6 +531,7 @@ impl OpenLingoApp {
             (Screen::Errori, "\u{1F4D5}", tr(lang, "Errors", "Errori")),
             (Screen::Pronuncia, "\u{1F5E3}", tr(lang, "Pronuncia", "Pronuncia")),
             (Screen::Sudtirol, "\u{1F1E6}\u{1F1FA}", tr(lang, "Südtirol", "Südtirol")),
+            (Screen::Dialoghi, "\u{1F4AC}", tr(lang, "Dialogues", "Dialoghi")),
             (Screen::Progress, "\u{1F4C8}", tr(lang, "Progress", "Progresso")),
         ];
         let w = ui.available_width();
@@ -2781,6 +2790,101 @@ impl OpenLingoApp {
         }
     }
 
+    fn screen_dialoghi(&mut self, ui: &mut egui::Ui) {
+        let lang_s = ui_lang(&self.store).to_string();
+        let lang = lang_s.as_str();
+
+        ui.label(egui::RichText::new(tr(lang, "Listening dialogues", "Dialoghi di ascolto")).size(28.0).strong());
+        ui.add_space(6.0);
+        ui.label(egui::RichText::new(tr(
+            lang,
+            "Real dialogues with translation and comprehension questions. Read the lines, check the translation, answer the questions.",
+            "Dialoghi reali con traduzione e domande di comprensione. Leggi le battute, controlla la traduzione, rispondi alle domande.",
+        )).color(ui.visuals().weak_text_color()));
+        ui.add_space(14.0);
+
+        let dialoghi = dialoghi_per_contesto(false);
+        let mut correct_total = 0usize;
+        let mut answered_total = 0usize;
+
+        for dialogo in dialoghi.iter() {
+            egui::Frame::none()
+                .fill(ui.visuals().faint_bg_color)
+                .stroke(egui::Stroke::new(1.0, ui.visuals().widgets.noninteractive.bg_stroke.color))
+                .rounding(egui::CornerRadius::same(18))
+                .inner_margin(egui::Margin::same(14))
+                .show(ui, |ui| {
+                    ui.set_min_width(380.0);
+                    ui.horizontal(|ui| {
+                        ui.label(egui::RichText::new(&dialogo.titolo).size(18.0).strong());
+                        ui.label(egui::RichText::new(&dialogo.livello).color(ui.visuals().weak_text_color()));
+                    });
+                    ui.small(&dialogo.traduzione);
+                    ui.add_space(8.0);
+
+                    // Mostra/Nascondi traduzione battuta per battuta
+                    let show = self.show_dialoghi_translation.contains(&dialogo.id);
+                    if ui.small_button(if show {
+                        tr(lang, "Hide translation", "Nascondi traduzione")
+                    } else {
+                        tr(lang, "Show translation", "Mostra traduzione")
+                    }).clicked() {
+                        if show {
+                            self.show_dialoghi_translation.remove(&dialogo.id);
+                        } else {
+                            self.show_dialoghi_translation.insert(dialogo.id.clone());
+                        }
+                    }
+                    ui.add_space(6.0);
+
+                    for b in &dialogo.battute {
+                        ui.horizontal_wrapped(|ui| {
+                            ui.label(egui::RichText::new(format!("{}:", b.parlante)).strong());
+                            ui.label(&b.testo);
+                        });
+                        if show {
+                            ui.small(egui::RichText::new(&b.traduzione).italics());
+                        }
+                    }
+                    ui.add_space(10.0);
+                    ui.label(egui::RichText::new(tr(lang, "Comprehension", "Comprensione")).strong());
+                    for (qi, q) in dialogo.domande.iter().enumerate() {
+                        ui.add_space(4.0);
+                        ui.label(&q.domanda);
+                        let key = (dialogo.id.clone(), qi);
+                        let selected = self.dialoghi_answers.get(&key).copied();
+                        for (oi, opt) in q.opzioni.iter().enumerate() {
+                            let is_sel = selected == Some(oi);
+                            let mut btn = egui::Button::new(opt.clone()).rounding(egui::CornerRadius::same(12));
+                            if is_sel {
+                                btn = btn.fill(ui.visuals().selection.bg_fill);
+                            }
+                            if ui.add(btn).clicked() {
+                                self.dialoghi_answers.insert(key.clone(), oi);
+                            }
+                            if is_sel {
+                                answered_total += 1;
+                                if oi == q.corretta {
+                                    correct_total += 1;
+                                    ui.label(egui::RichText::new(tr(lang, "Correct!", "Corretto!")).color(ui.visuals().selection.stroke.color));
+                                } else {
+                                    ui.label(egui::RichText::new(format!("{} {}", tr(lang, "Wrong. Correct:", "Sbagliato. Corretto:"), q.opzioni[q.corretta])).color(egui::Color32::from_rgb(220, 100, 100)));
+                                }
+                            }
+                        }
+                    }
+                });
+            ui.add_space(12.0);
+        }
+
+        ui.add_space(8.0);
+        ui.label(egui::RichText::new(format!(
+            "{}: {} / {}",
+            tr(lang, "Score", "Punteggio"), correct_total, answered_total
+        )).strong());
+        let _ = dialoghi_ascolto; // reference to keep import used
+    }
+
     fn screen_settings(&mut self, ui: &mut egui::Ui) {
         let lang_s = ui_lang(&self.store).to_string();
         let lang = lang_s.as_str();
@@ -3275,6 +3379,7 @@ impl eframe::App for OpenLingoApp {
                 Screen::Errori => self.screen_errori(ui),
                 Screen::Pronuncia => self.screen_pronuncia(ui),
                 Screen::Sudtirol => self.screen_sudtirol(ui),
+                Screen::Dialoghi => self.screen_dialoghi(ui),
                 Screen::Settings => self.screen_settings(ui),
             });
     }
@@ -3713,6 +3818,18 @@ mod tests {
         assert_eq!(SpeechEngineKind::Phonon.package(), "ptts");
         assert_eq!(SpeechEngineKind::Phonon.module(), "ptts");
         assert_eq!(SpeechEngineKind::Phonon.id(), "phonon");
+    }
+
+    #[test]
+    fn dialoghi_ascolto_data_is_complete() {
+        let tutti = dialoghi_ascolto();
+        assert!(tutti.len() >= 12, "expected 12+ dialogues, got {}", tutti.len());
+        assert!(tutti.iter().all(|d| !d.battute.is_empty() && !d.domande.is_empty()));
+        assert!(tutti.iter().all(|d| d.battute.iter().all(|b| !b.traduzione.is_empty())));
+        // Filtering by non-health context must return fewer or equal dialogs
+        let non_san = dialoghi_per_contesto(false);
+        assert!(non_san.len() <= tutti.len());
+        assert!(non_san.iter().all(|d| !d.sanitario));
     }
 
     #[test]

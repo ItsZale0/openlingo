@@ -3542,3 +3542,238 @@ pub fn sudtirol_standard_di(austriaco: &str) -> Option<String> {
         .find(|v| v.austriaco.eq_ignore_ascii_case(austriaco))
         .map(|v| v.standard)
 }
+
+// ── Dialoghi di ascolto (portati da Dialoghi.kt) ──
+
+#[derive(Debug, Clone)]
+pub struct BattutaDialogo { pub parlante: String, pub testo: String, pub traduzione: String }
+
+#[derive(Debug, Clone)]
+pub struct DomandaDialogoAscolto { pub domanda: String, pub opzioni: Vec<String>, pub corretta: usize }
+
+#[derive(Debug, Clone)]
+pub struct DialogoAscolto { pub id: String, pub titolo: String, pub livello: String, pub traduzione: String, pub battute: Vec<BattutaDialogo>, pub domande: Vec<DomandaDialogoAscolto>, pub sanitario: bool }
+
+pub fn dialoghi_ascolto() -> Vec<DialogoAscolto> {
+    vec![
+        DialogoAscolto {
+            id: "dial_01".into(), titolo: "Alla reception".into(), livello: "A2".into(), traduzione: "Un paziente si registra in fisioterapia.".into(), sanitario: true,
+            battute: vec![
+                BattutaDialogo { parlante: "A".into(), testo: "Guten Tag, ich habe einen Termin um zehn Uhr.".into(), traduzione: "Buongiorno, ho un appuntamento alle dieci.".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Guten Tag. Wie ist Ihr Name, bitte?".into(), traduzione: "Buongiorno. Come si chiama, per favore?".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Ich heiße Rossi. Mario Rossi.".into(), traduzione: "Mi chiamo Rossi. Mario Rossi.".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Herr Rossi. Haben Sie die Überweisung dabei?".into(), traduzione: "Signor Rossi. Ha l'impegnativa con sé?".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Ja, hier ist sie. Und den Befund vom Orthopäden.".into(), traduzione: "Sì, eccola. E il referto dell'ortopedico.".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Perfekt. Bitte nehmen Sie Platz. Die Therapeutin kommt gleich.".into(), traduzione: "Perfetto. Si accomodi pure. La terapista arriva tra poco.".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Danke schön. Wie lange dauert die erste Sitzung?".into(), traduzione: "Grazie. Quanto dura la prima seduta?".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Etwa 45 Minuten. Wir machen die Anamnese und einen Befund.".into(), traduzione: "Circa 45 minuti. Facciamo l'anamnesi e un esame.".into() },
+            ],
+            domande: vec![
+                DomandaDialogoAscolto { domanda: "A che ora è l'appuntamento?".into(), opzioni: vec!["Alle 9".into(), "Alle 10".into(), "Alle 11".into(), "Alle 12".into()], corretta: 1 },
+                DomandaDialogoAscolto { domanda: "Cosa porta il paziente?".into(), opzioni: vec!["Solo l'impegnativa".into(), "Impegnativa e referto".into(), "Solo il referto".into(), "Niente".into()], corretta: 1 },
+                DomandaDialogoAscolto { domanda: "Quanto dura la prima seduta?".into(), opzioni: vec!["30 minuti".into(), "45 minuti".into(), "60 minuti".into(), "90 minuti".into()], corretta: 1 },
+            ],
+        },
+        DialogoAscolto {
+            id: "dial_02".into(), titolo: "Anamnesi: mal di schiena".into(), livello: "B1".into(), traduzione: "Prima seduta: il fisioterapista fa l'anamnesi a un paziente con lombalgia.".into(), sanitario: true,
+            battute: vec![
+                BattutaDialogo { parlante: "A".into(), testo: "Guten Morgen, ich bin Herr Müller, Ihr Physiotherapeut. Was führt Sie zu uns?".into(), traduzione: "Buongiorno, sono il signor Müller, il suo fisioterapista. Cosa la porta da noi?".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Ich habe seit drei Wochen Rückenschmerzen, vor allem morgens.".into(), traduzione: "Ho mal di schiena da tre settimane, soprattutto la mattina.".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Können Sie mir zeigen, wo genau es wehtut?".into(), traduzione: "Mi può indicare dove fa male esattamente?".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Hier, im unteren Rücken. Manchmal strahlt es ins Bein aus.".into(), traduzione: "Qui, in basso alla schiena. A volte irradia alla gamba.".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Haben Sie Taubheitsgefühle oder Kribbeln im Bein?".into(), traduzione: "Ha intorpidimento o formicolio alla gamba?".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Nein, nur Schmerzen. Aber nachts wache ich manchmal auf.".into(), traduzione: "No, solo dolore. Ma di notte mi sveglio a volte.".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Verstehen Sie. Machen Sie Sport? Wie ist Ihr Arbeitsalltag?".into(), traduzione: "Capisco. Fa sport? Com'è la sua giornata lavorativa?".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Ich sitze viel am Schreibtisch. Jogge aber zweimal die Woche.".into(), traduzione: "Sto molto alla scrivania. Ma corro due volte a settimana.".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Gut. Dann schauen wir uns die Beweglichkeit an. Bitte beugen Sie sich vor.".into(), traduzione: "Bene. Allora controlliamo la mobilità. Si pieghi in avanti per favore.".into() },
+            ],
+            domande: vec![
+                DomandaDialogoAscolto { domanda: "Da quanto tempo ha dolore il paziente?".into(), opzioni: vec!["Una settimana".into(), "Due settimane".into(), "Tre settimane".into(), "Un mese".into()], corretta: 2 },
+                DomandaDialogoAscolto { domanda: "Dove irradia il dolore?".into(), opzioni: vec!["Al braccio".into(), "Alla gamba".into(), "Al collo".into(), "Non irradia".into()], corretta: 1 },
+                DomandaDialogoAscolto { domanda: "Cosa fa il paziente di lavoro?".into(), opzioni: vec!["Lavoro fisico".into(), "Lavoro alla scrivania".into(), "Insegnante".into(), "In pensione".into()], corretta: 1 },
+            ],
+        },
+        DialogoAscolto {
+            id: "dial_03".into(), titolo: "Telefonata: appuntamento".into(), livello: "A2".into(), traduzione: "Chiamata per fissare un appuntamento di fisioterapia.".into(), sanitario: true,
+            battute: vec![
+                BattutaDialogo { parlante: "A".into(), testo: "Physiotherapie Huber, guten Tag.".into(), traduzione: "Fisioterapia Huber, buongiorno.".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Guten Tag, ich möchte gerne einen Termin vereinbaren.".into(), traduzione: "Buongiorno, vorrei fissare un appuntamento.".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Gerne. Haben Sie eine Überweisung vom Arzt?".into(), traduzione: "Volentieri. Ha un'impegnativa del medico?".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Ja, die habe ich. Ich habe Knieschmerzen seit einer Woche.".into(), traduzione: "Sì, ce l'ho. Ho dolore al ginocchio da una settimana.".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Verstehe. Haben Sie morgens oder nachmittags Zeit?".into(), traduzione: "Capisco. Ha tempo la mattina o il pomeriggio?".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Nachmittags wäre besser. Ab 14 Uhr.".into(), traduzione: "Il pomeriggio sarebbe meglio. Dalle 14.".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Morgen um 14:30 wäre frei. Passt das?".into(), traduzione: "Domani alle 14:30 sarebbe libero. Va bene?".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Ja, perfekt. Danke schön!".into(), traduzione: "Sì, perfetto. Grazie mille!".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Bitte bringen Sie die Überweisung und bequeme Kleidung mit.".into(), traduzione: "Porti l'impegnativa e abbigliamento comodo.".into() },
+            ],
+            domande: vec![
+                DomandaDialogoAscolto { domanda: "Quando ha tempo il paziente?".into(), opzioni: vec!["Mattina".into(), "Pomeriggio dalle 14".into(), "Sera".into(), "Weekend".into()], corretta: 1 },
+                DomandaDialogoAscolto { domanda: "Quando è l'appuntamento?".into(), opzioni: vec!["Oggi 14:30".into(), "Domani 14:30".into(), "Domani 10:00".into(), "Dopodomani 14:30".into()], corretta: 1 },
+                DomandaDialogoAscolto { domanda: "Cosa deve portare?".into(), opzioni: vec!["Solo documento".into(), "Impegnativa e abbigliamento comodo".into(), "Referto RM".into(), "Niente".into()], corretta: 1 },
+            ],
+        },
+        DialogoAscolto {
+            id: "dial_04".into(), titolo: "In pausa: colleghi austriaci".into(), livello: "B1".into(), traduzione: "Due colleghi in mensa usano varianti austriache (Jänner, Erdapfel, Topfen).".into(), sanitario: false,
+            battute: vec![
+                BattutaDialogo { parlante: "A".into(), testo: "Na, hast du heuer schon Urlaub gemacht?".into(), traduzione: "Allora, hai fatto le ferie quest'anno?".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Ja, im Jänner war ich in Südtirol. Die Berge sind traumhaft.".into(), traduzione: "Sì, a gennaio ero in Südtirol. Le montagne sono da sogno.".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Und? Gab's dort gute Erdäpfel? Die Knödel sind der Hammer.".into(), traduzione: "E? Ci sono buone patate lì? I canederli sono spettacolari.".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Absolut. Und einen Topfenstrudel muss man probieren. Nicht Quark, Topfen!".into(), traduzione: "Assolutamente. E devi provare lo strudel di topfen. Non quark, topfen!".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Stimmt. Bei uns sagt man Semmel, nicht Brötchen. Und Paradeiser für Tomaten.".into(), traduzione: "Vero. Da noi si dice Semmel, non Brötchen. E Paradeiser per pomodori.".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Genau. In der Ordination sagen die Patienten oft 'Jänner' statt Januar.".into(), traduzione: "Esatto. In ambulatorio i pazienti dicono spesso 'Jänner' invece di Januar.".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Macht nichts. Hauptsache, wir verstehen uns. Prost!".into(), traduzione: "Non importa. L'importante è capirsi. Cin cin!".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Prost! Auf die Erdäpfel!".into(), traduzione: "Cin cin! Alle patate!".into() },
+            ],
+            domande: vec![
+                DomandaDialogoAscolto { domanda: "Quando è andato in vacanza il collega B?".into(), opzioni: vec!["A luglio".into(), "A gennaio".into(), "Ad agosto".into(), "A Natale".into()], corretta: 1 },
+                DomandaDialogoAscolto { domanda: "Quale dolce austriaco menzionano?".into(), opzioni: vec!["Apfelstrudel".into(), "Topfenstrudel".into(), "Sachertorte".into(), "Kaiserschmarrn".into()], corretta: 1 },
+                DomandaDialogoAscolto { domanda: "Come dicono 'panino' in Austria?".into(), opzioni: vec!["Brötchen".into(), "Semmel".into(), "Weck".into(), "Schrippe".into()], corretta: 1 },
+            ],
+        },
+        DialogoAscolto {
+            id: "dial_05".into(), titolo: "Esercizi a casa: istruzioni".into(), livello: "B1".into(), traduzione: "Il fisioterapista spiega gli esercizi da fare a casa per il ginocchio.".into(), sanitario: true,
+            battute: vec![
+                BattutaDialogo { parlante: "A".into(), testo: "So, jetzt zeige ich Ihnen die Hausübungen für Ihr Knie.".into(), traduzione: "Allora, le mostro gli esercizi da fare a casa per il ginocchio.".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Wie oft soll ich die machen?".into(), traduzione: "Quanto spesso devo farli?".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Dreimal am Tag. Morgens, mittags, abends. Je zehn Wiederholungen.".into(), traduzione: "Tre volte al giorno. Mattina, mezzogiorno, sera. Dieci ripetizioni ciascuna.".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Und wenn es wehtut? Soll ich aufhören?".into(), traduzione: "E se fa male? Devo smettere?".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Leichter Schmerz ist okay. Aber scharfer Schmerz: sofort aufhören.".into(), traduzione: "Un leggero dolore va bene. Ma dolore acuto: smetta subito.".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Verstanden. Wann kommt die Kontrolle?".into(), traduzione: "Capito. Quando è il controllo?".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "In zwei Wochen. Bringen Sie das Tagebuch mit, wo Sie die Übungen eintragen.".into(), traduzione: "Tra due settimane. Porti il diario dove segna gli esercizi.".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Alles klar. Danke, Herr Müller.".into(), traduzione: "Tutto chiaro. Grazie, signor Müller.".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Gute Besserung! Und denken Sie dran: Bewegung ist die beste Medizin.".into(), traduzione: "Buona guarigione! E ricordi: il movimento è la migliore medicina.".into() },
+            ],
+            domande: vec![
+                DomandaDialogoAscolto { domanda: "Quante volte al giorno gli esercizi?".into(), opzioni: vec!["Una".into(), "Due".into(), "Tre".into(), "Quattro".into()], corretta: 2 },
+                DomandaDialogoAscolto { domanda: "Quando è il prossimo controllo?".into(), opzioni: vec!["Tra una settimana".into(), "Tra due settimane".into(), "Tra un mese".into(), "Non c'è".into()], corretta: 1 },
+                DomandaDialogoAscolto { domanda: "Cosa portare al controllo?".into(), opzioni: vec!["Il referto".into(), "Il diario degli esercizi".into(), "La ricetta".into(), "L'impegnativa".into()], corretta: 1 },
+            ],
+        },
+        DialogoAscolto {
+            id: "dial_06".into(), titolo: "Primo giorno di corso".into(), livello: "A1".into(), traduzione: "Due partecipanti al corso di tedesco si conoscono presentandosi.".into(), sanitario: false,
+            battute: vec![
+                BattutaDialogo { parlante: "A".into(), testo: "Hallo! Sind Sie auch hier im Deutschkurs?".into(), traduzione: "Ciao! È anche lei qui nel corso di tedesco?".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Ja, ich bin hier neu. Ich heiße Sophie. Und du?".into(), traduzione: "Sì, sono nuovo qui. Mi chiamo Sophie. E tu?".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Ich bin Thomas, sehr schön. Woher kommst du?".into(), traduzione: "Sono Thomas, molto piacere. Da dove vieni?".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Ich komme aus Brixen. Und du?".into(), traduzione: "Vengo da Bressanone. E tu?".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Auch aus Brixen! Warum lernst du Deutsch?".into(), traduzione: "Anche io da Bressanone! Perché studi tedesco?".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Für die Arbeit und die Prüfung. Und du?".into(), traduzione: "Per il lavoro e per l'esame. E tu?".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Für meine Arbeit im Krankenhaus. Der Kurs ist jeden Dienstag.".into(), traduzione: "Per il mio lavoro in ospedale. Il corso è ogni martedì.".into() },
+            ],
+            domande: vec![
+                DomandaDialogoAscolto { domanda: "Da dove viene Sophie?".into(), opzioni: vec!["Da Bolzano".into(), "Da Bressanone".into(), "Da Merano".into(), "Da Trento".into()], corretta: 1 },
+                DomandaDialogoAscolto { domanda: "Perché studia Thomas?".into(), opzioni: vec!["Per esame".into(), "Per il lavoro all'ospedale".into(), "Per hobby".into(), "Per un trasloco".into()], corretta: 1 },
+                DomandaDialogoAscolto { domanda: "Quando è il corso?".into(), opzioni: vec!["Lunedì".into(), "Mercoledì".into(), "Martedì".into(), "Giovedì".into()], corretta: 2 },
+            ],
+        },
+        DialogoAscolto {
+            id: "dial_07".into(), titolo: "In farmacia".into(), livello: "A2".into(), traduzione: "Un cliente chiede alla farmacia un rimedio per il raffreddore.".into(), sanitario: false,
+            battute: vec![
+                BattutaDialogo { parlante: "A".into(), testo: "Guten Tag, was kann ich für Sie tun?".into(), traduzione: "Buongiorno, cosa posso fare per lei?".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Guten Tag. Ich habe Schnuppen und Kopfschmerzen.".into(), traduzione: "Buongiorno. Ho il raffreddore e mal di testa.".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Seit wann haben Sie die Symptome?".into(), traduzione: "Da quando ha i sintomi?".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Seit drei Tagen. Nachts kann ich schlecht schlafen.".into(), traduzione: "Da tre giorni. Di notte dormo male.".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Ich empfehle diese Tropfen und eine Salbe gegen Schmerzen.".into(), traduzione: "Le consiglio queste gocce e una crema contro il dolore.".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Wie oft soll ich die Tropfen einnehmen?".into(), traduzione: "Ogni quanto devo prendere le gocce?".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Dreimal täglich, nach dem Essen. Gute Besserung!".into(), traduzione: "Tre volte al giorno, dopo i pasti. Migliorie!".into() },
+            ],
+            domande: vec![
+                DomandaDialogoAscolto { domanda: "Che cosa ha il cliente?".into(), opzioni: vec!["Raffreddore e mal di testa".into(), "Solo febbre".into(), "Mal di schiena".into(), "Vertigini".into()], corretta: 0 },
+                DomandaDialogoAscolto { domanda: "Da quanto ha i sintomi?".into(), opzioni: vec!["Da un giorno".into(), "Da tre giorni".into(), "Da una settimana".into(), "Da un mese".into()], corretta: 1 },
+                DomandaDialogoAscolto { domanda: "Come si prendono le gocce?".into(), opzioni: vec!["Prima dei pasti".into(), "Tre volte al giorno dopo i pasti".into(), "Solo la sera".into(), "Due volte nel weekend".into()], corretta: 1 },
+            ],
+        },
+        DialogoAscolto {
+            id: "dial_08".into(), titolo: "Al supermercato".into(), livello: "A2".into(), traduzione: "Un cliente chiede indicazioni al commesso e fa la spesa.".into(), sanitario: false,
+            battute: vec![
+                BattutaDialogo { parlante: "A".into(), testo: "Entschuldigung, wo finde ich Brot und Milch?".into(), traduzione: "Scusi, dove trovo il pane e il latte?".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Das Brot ist am Backregal hinten links. Die Milch bei den Kühlregalen.".into(), traduzione: "Il pane è nel reparto panetteria, in fondo a sinistra. Il latte nei frigo dei latticini.".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Vielen Dank. Und wie viel kostet der Semmel?".into(), traduzione: "Grazie mille. E quanto costa la ciabatta?".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "40 Cent das Stück. Heute haben wir eine Aktion: drei für ein Euro.".into(), traduzione: "40 centesimi l'uno. Oggi c'è una promozione: tre per un euro.".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Super, dann nehme ich drei. Woher ist der Käse?".into(), traduzione: "Bene, allora ne prendo tre. Da dove viene il formaggio?".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Von einer Käserei in Südtirol — sehr gutes Produkt!".into(), traduzione: "Da una latteria in Alto Adige — un ottimo prodotto!".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Dann nehme ich auch davon 200 Gramm. Danke schön.".into(), traduzione: "Allora ne prendo anche 200 grammi. Grazie mille.".into() },
+            ],
+            domande: vec![
+                DomandaDialogoAscolto { domanda: "Quanto costa la ciabatta?".into(), opzioni: vec!["30 centesimi".into(), "40 centesimi".into(), "Un euro".into(), "Un euro e venti".into()], corretta: 1 },
+                DomandaDialogoAscolto { domanda: "Che promozione c'è oggi?".into(), opzioni: vec!["Tre ciabatte per un euro".into(), "Due latte per uno".into(), "Sconto del 20%".into(), "Formaggio gratis".into()], corretta: 0 },
+                DomandaDialogoAscolto { domanda: "Da dove viene il formaggio?".into(), opzioni: vec!["Da una latteria altoatesina".into(), "Dall'Austria".into(), "Dall'Olanda".into(), "Da una fabbrica locale".into()], corretta: 0 },
+            ],
+        },
+        DialogoAscolto {
+            id: "dial_09".into(), titolo: "Dal medico di base".into(), livello: "A2".into(), traduzione: "Consultazione con il medico di base per un problema alla schiena.".into(), sanitario: true,
+            battute: vec![
+                BattutaDialogo { parlante: "A".into(), testo: "Guten Tag, Frau Huber. Was führt Sie heute zu mir?".into(), traduzione: "Buongiorno, signora Huber. Cosa la porta oggi da me?".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Ich habe seit einer Woche Rückenschmerzen, links unterhalb der Schulter.".into(), traduzione: "Ho mal di schiena da una settimana, a sinistra sotto la spalla.".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Fieber? Husten? Gewichtsverlust?".into(), traduzione: "Febbre? Tosse? Perdita di peso?".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Nein, keine. Aber nachts wache ich auf.".into(), traduzione: "No, niente. Ma di notte mi sveglio.".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Ich verschreibe Ihnen ein Schmerzmittel und eine Überweisung zur Physiotherapie.".into(), traduzione: "Le prescrivo un antidolorifico e un'impegnativa per la fisioterapia.".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Wie lange muss ich die Tabletten nehmen?".into(), traduzione: "Per quanto tempo devo prendere le compresse?".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Vier Tage, maximal zweimal täglich. Wenn es nicht besser wird: bitte zurück.".into(), traduzione: "Quattro giorni, al massimo due volte al giorno. Se non migliora, torni da me.".into() },
+            ],
+            domande: vec![
+                DomandaDialogoAscolto { domanda: "Dove fa male?".into(), opzioni: vec!["Sotto la spalla sinistra".into(), "Sotto la spalla destra".into(), "Sul collo".into(), "Alla gamba".into()], corretta: 0 },
+                DomandaDialogoAscolto { domanda: "Cosa riceve la paziente?".into(), opzioni: vec!["Antidolorifico e impegnativa".into(), "Solo la impegnativa".into(), "Una radiografia".into(), "Iniezioni".into()], corretta: 0 },
+                DomandaDialogoAscolto { domanda: "Per quanto tempo le compresse?".into(), opzioni: vec!["Due giorni".into(), "Quattro giorni".into(), "Una settimana".into(), "Un mese".into()], corretta: 1 },
+            ],
+        },
+        DialogoAscolto {
+            id: "dial_10".into(), titolo: "Dal dentista".into(), livello: "B1".into(), traduzione: "Visita dentistica: dolore al dente e cura discussa con la dottoressa.".into(), sanitario: false,
+            battute: vec![
+                BattutaDialogo { parlante: "A".into(), testo: "Guten Tag, setzen Sie sich bitte. Welcher Zahn tut weh?".into(), traduzione: "Buongiorno, si sieda per favore. Quale dente fa male?".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Unten rechts, der Backenzahn. Beim Kauen tut er besonders weh.".into(), traduzione: "In basso a destra, il molare. Quando mastico fa male, soprattutto.".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Öffnen Sie bitte den Mund. ... Ja, ich sehe eine kleine Karies.".into(), traduzione: "Apra la bocca per favore. ... Sì, vedo una piccola carie.".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Muss es eine Wurzelbehandlung sein? Ich habe Angst davor.".into(), traduzione: "Deve fare la devitalizzazione? Ho paura.".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Nein, glaube ich nicht. Eine Füllung reicht. Mit Betäubung fühlen Sie nichts.".into(), traduzione: "No, credo di no. Basta un'otturazione. Con l'anestesia non sentirà nulla.".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Darf ich nachher essen? Und wie oft die Zahnseide?".into(), traduzione: "Posso mangiare dopo? E ogni quanto il filo interdentale?".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Zwei Stunden warten. Und die Zahnseide bitte jeden Abend.".into(), traduzione: "Attenda due ore. E il filo interdentale ogni sera, per favore.".into() },
+            ],
+            domande: vec![
+                DomandaDialogoAscolto { domanda: "Quale dente fa male?".into(), opzioni: vec!["La molare in basso a destra".into(), "L'incisivo in alto".into(), "Il dente del giudizio".into(), "Nessuno".into()], corretta: 0 },
+                DomandaDialogoAscolto { domanda: "Che trattamento servirà?".into(), opzioni: vec!["Una devitalizzazione".into(), "Un'otturazione".into(), "L'estrazione".into(), "Una pulizia".into()], corretta: 1 },
+                DomandaDialogoAscolto { domanda: "Quando si può mangiare?".into(), opzioni: vec!["Subito".into(), "Dopo due ore".into(), "Il giorno dopo".into(), "Mai con anestesia".into()], corretta: 1 },
+            ],
+        },
+        DialogoAscolto {
+            id: "dial_11".into(), titolo: "Il primo giorno al lavoro".into(), livello: "B1".into(), traduzione: "Un nuovo collega viene presentato in un ambulatorio di fisioterapia.".into(), sanitario: true,
+            battute: vec![
+                BattutaDialogo { parlante: "A".into(), testo: "Frau Rossi, das ist Thomas, unser neuer Kollege.".into(), traduzione: "Signora Rossi, questo è Thomas, il nostro nuovo collega.".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Schön, dich kennenzulernen! Wo hast du vorher gearbeitet?".into(), traduzione: "Piacere di conoscerti! Dove hai lavorato prima?".into() },
+                BattutaDialogo { parlante: "C".into(), testo: "In einem Rehabilitationszentrum in Bozen. Zwei Jahre lang.".into(), traduzione: "In un centro di riabilitazione a Bolzano. Per due anni.".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Und welche Bereiche kennst du gut?".into(), traduzione: "E quali settori conosci bene?".into() },
+                BattutaDialogo { parlante: "C".into(), testo: "Rückenprobleme, vor allem. Und auch Sportverletzungen.".into(), traduzione: "Problemi alla schiena, soprattutto. E anche lesioni sportive.".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Perfekt. Wir bekommen viele Patienten mit Rückenschmerzen.".into(), traduzione: "Perfetto. Abbiamo molti pazienti con mal di schiena.".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Am Montag kommt die erste Patientin um neun Uhr. Du machst die Anamnese.".into(), traduzione: "Lunedì arriva la prima paziente alle nove. Tu fai l'anamnesi.".into() },
+                BattutaDialogo { parlante: "C".into(), testo: "Kein Problem. Wo finde ich die Unterlagen?".into(), traduzione: "Nessun problema. Dove trovo i documenti?".into() },
+            ],
+            domande: vec![
+                DomandaDialogoAscolto { domanda: "Dove ha lavorato prima Thomas?".into(), opzioni: vec!["In un ospedale a Merano".into(), "In un centro di riabilitazione a Bolzano".into(), "In una palestra".into(), "In un ambulatorio lombardo".into()], corretta: 1 },
+                DomandaDialogoAscolto { domanda: "Quali pazienti sono più frequenti?".into(), opzioni: vec!["Con mal di schiena".into(), "Con problemi cardiaci".into(), "Bambini".into(), "Post-operatori del ginocchio".into()], corretta: 0 },
+                DomandaDialogoAscolto { domanda: "Quando arriva la prima paziente per Thomas?".into(), opzioni: vec!["Giovedì alle 9".into(), "Lunedì alle 9".into(), "Mercoledì alle 11".into(), "Sabato alle 8".into()], corretta: 1 },
+            ],
+        },
+        DialogoAscolto {
+            id: "dial_12".into(), titolo: "Colloquio di lavoro".into(), livello: "B2".into(), traduzione: "Selezione per la posizione di fisioterapista in una clinica sportiva.".into(), sanitario: true,
+            battute: vec![
+                BattutaDialogo { parlante: "A".into(), testo: "Herr Renato, danke für das Gespräch. Erzählen Sie kurz von sich.".into(), traduzione: "Signor Renato, grazie per il colloquio. Si presenti brevemente.".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Gerne. Ich bin Physiotherapeut mit fünf Jahren Erfahrung, davon zwei in der Sportmedizin.".into(), traduzione: "Con piacere. Sono fisioterapista con cinque anni di esperienza, di cui due in medicina sportiva.".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Was empfinden Sie als Ihre größte Stärke?".into(), traduzione: "Cosa considera la sua maggiore forza?".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Geduld und Flexibilität bei komplexen Fällen. Außerdem kommuniziere ich klar mit dem Team.".into(), traduzione: "Pazienza e flessibilità nei casi complessi. Inoltre comunico in modo chiaro con il team.".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Wie stehen Sie zu Fortbildungen in diesem Jahr?".into(), traduzione: "Cosa pensa della formazione continua quest'anno?".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Sehr positiv. Ich plane eine Zusatzausbildung in Manueller Therapie.".into(), traduzione: "Molto positivamente. Ho in programma un percorso aggiuntivo in terapia manuale.".into() },
+                BattutaDialogo { parlante: "A".into(), testo: "Wir melden uns bis Freitag. Möchten Sie noch etwas fragen?".into(), traduzione: "Ci faremo sentire entro venerdì. Vuole farci altre domande?".into() },
+                BattutaDialogo { parlante: "B".into(), testo: "Ja: wie groß ist das Team und wie viele Behandlungen macht man pro Tag?".into(), traduzione: "Sì: quanto è grande il team e quante sedute si fanno al giorno?".into() },
+            ],
+            domande: vec![
+                DomandaDialogoAscolto { domanda: "Da quanti anni lavora il candidato?".into(), opzioni: vec!["Due".into(), "Cinque".into(), "Dieci".into(), "Venti".into()], corretta: 1 },
+                DomandaDialogoAscolto { domanda: "Cosa pianifica come formazione aggiuntiva?".into(), opzioni: vec!["Terapia manuale".into(), "Osteopatia".into(), "Yoga terapeutico".into(), "Bioingegneria".into()], corretta: 0 },
+                DomandaDialogoAscolto { domanda: "Quando riceverà la risposta?".into(), opzioni: vec!["Entro lunedì".into(), "Entro giovedì".into(), "Entro venerdì".into(), "Il mese prossimo".into()], corretta: 2 },
+            ],
+        },
+    ]
+}
+
+/// Filtra i dialoghi in base al contesto sanitario.
+pub fn dialoghi_per_contesto(mostra_sanitario: bool) -> Vec<DialogoAscolto> {
+    dialoghi_ascolto().into_iter().filter(|d| mostra_sanitario || !d.sanitario).collect()
+}
