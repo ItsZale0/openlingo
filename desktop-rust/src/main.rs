@@ -1,7 +1,7 @@
 ﻿mod data;
 
 use chrono::{Local};
-use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche, sudtirol_varianti, sudtirol_lessico, sudtirol_frasi, sudtirol_dialoghi, dialoghi_ascolto, dialoghi_per_contesto, placement_domande, placement_valuta, sprechtuebungen_per_livello, esercizi_ascolto_per_livello, domande_comprensione, domande_produzione};
+use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche, sudtirol_varianti, sudtirol_lessico, sudtirol_frasi, sudtirol_dialoghi, dialoghi_ascolto, dialoghi_per_contesto, placement_domande, placement_valuta, sprechtuebungen_per_livello, esercizi_ascolto_per_livello, domande_comprensione, domande_produzione, wortliste_voci};
 use eframe::egui;
 use std::collections::BTreeSet;
 
@@ -190,6 +190,7 @@ enum Screen {
     Sprech,
     Ascolto,
     Comprensione,
+    Wortliste,
     Progress,
     Settings,
 }
@@ -468,6 +469,7 @@ impl OpenLingoApp {
             Screen::Sprech => tr(lang, "Speaking", "Produzione orale"),
             Screen::Ascolto => tr(lang, "Listening", "Ascolto"),
             Screen::Comprensione => tr(lang, "Reading & Writing", "Comprensione e Produzione"),
+            Screen::Wortliste => tr(lang, "Wortliste", "Wortliste"),
             Screen::Progress => tr(lang, "Progress", "Progresso"),
             Screen::Settings => tr(lang, "Settings", "Impostazioni"),
         };
@@ -508,6 +510,7 @@ impl OpenLingoApp {
                     (Screen::Sprech, tr(lang, "Speaking", "Orale")),
                     (Screen::Ascolto, tr(lang, "Listening", "Ascolto")),
                     (Screen::Comprensione, tr(lang, "Reading", "Comprensione")),
+                    (Screen::Wortliste, tr(lang, "Words", "Parole")),
                     (Screen::Progress, tr(lang, "Progress", "Progresso")),
                     (Screen::Settings, tr(lang, "Settings", "Impostazioni")),
                 ];
@@ -548,6 +551,7 @@ impl OpenLingoApp {
             (Screen::Sprech, "\u{1F5E3}", tr(lang, "Orale", "Orale")),
             (Screen::Ascolto, "\u{1F3A7}", tr(lang, "Ascolto", "Ascolto")),
             (Screen::Comprensione, "\u{1F4D6}", tr(lang, "Comprensione", "Comprensione")),
+            (Screen::Wortliste, "\u{1F4D1}", tr(lang, "Wortliste", "Wortliste")),
             (Screen::Progress, "\u{1F4C8}", tr(lang, "Progress", "Progresso")),
         ];
         let w = ui.available_width();
@@ -3211,6 +3215,81 @@ impl OpenLingoApp {
         ui.label(egui::RichText::new(format!("{}: {} / {}", tr(lang, "Score", "Punteggio"), corrette, domande.len())).strong());
     }
 
+    fn screen_wortliste(&mut self, ui: &mut egui::Ui) {
+        let lang_s = ui_lang(&self.store).to_string();
+        let lang = lang_s.as_str();
+
+        ui.label(egui::RichText::new(tr(lang, "Wortliste", "Wortliste")).size(28.0).strong());
+        ui.add_space(6.0);
+        ui.label(egui::RichText::new(tr(
+            lang,
+            "Curated German vocabulary: 280 words with article, example, theme and level. Search and filter.",
+            "Vocabolario tedesco curato: 280 parole con articolo, esempio, tema e livello. Cerca e filtra.",
+        )).color(ui.visuals().weak_text_color()));
+        ui.add_space(14.0);
+
+        // Search field
+        ui.horizontal(|ui| {
+            ui.label(egui::RichText::new(tr(lang, "Search", "Cerca")).strong());
+            ui.add(egui::TextEdit::singleline(&mut self.vocab_query).desired_width(260.0).hint_text(tr(lang, "German or Italian...", "Tedesco o italiano...")));
+        });
+        ui.add_space(8.0);
+
+        // Filters: level (reuse vocab_level) + theme (stored in vocab_status_filter)
+        let voci = wortliste_voci();
+        let mut temi: Vec<String> = voci.iter().map(|v| v.tema.clone()).collect();
+        temi.sort();
+        temi.dedup();
+        temi.insert(0, "ALL".into());
+
+        ui.horizontal_wrapped(|ui| {
+            ui.label(egui::RichText::new(tr(lang, "Level", "Livello")).strong());
+            for lv in ["ALL", "A1", "A2", "B1"] {
+                if ui.selectable_label(self.vocab_level == lv, lv).clicked() {
+                    self.vocab_level = lv.into();
+                }
+            }
+        });
+        ui.add_space(4.0);
+        ui.horizontal_wrapped(|ui| {
+            ui.label(egui::RichText::new(tr(lang, "Theme", "Tema")).strong());
+            for tema in &temi {
+                let sel = self.vocab_status_filter == *tema;
+                if ui.selectable_label(sel, tema).clicked() {
+                    self.vocab_status_filter = tema.clone();
+                }
+            }
+        });
+        ui.add_space(12.0);
+
+        let q = self.vocab_query.trim().to_lowercase();
+        let filtered: Vec<_> = voci.iter().filter(|v| {
+            let level_ok = self.vocab_level == "ALL" || v.livello == self.vocab_level;
+            let tema_ok = self.vocab_status_filter == "ALL" || v.tema == self.vocab_status_filter;
+            let q_ok = q.is_empty()
+                || v.tedesco.to_lowercase().contains(&q)
+                || v.italiano.to_lowercase().contains(&q);
+            level_ok && tema_ok && q_ok
+        }).collect();
+
+        ui.label(egui::RichText::new(format!("{}: {}", tr(lang, "Words", "Parole"), filtered.len())).strong());
+        ui.add_space(8.0);
+
+        egui::ScrollArea::vertical().max_height(ui.available_height()).show(ui, |ui| {
+            for v in filtered.iter().take(200) {
+                ui.horizontal_wrapped(|ui| {
+                    ui.label(egui::RichText::new(&v.tedesco).strong());
+                    ui.label(egui::RichText::new(format!("— {}", v.italiano)).color(ui.visuals().weak_text_color()));
+                    ui.label(egui::RichText::new(format!("[{} · {}]", v.livello, v.tema)).color(ui.visuals().weak_text_color()).small());
+                });
+                if !v.esempio.is_empty() {
+                    ui.small(egui::RichText::new(&v.esempio).italics());
+                }
+                ui.separator();
+            }
+        });
+    }
+
     fn screen_settings(&mut self, ui: &mut egui::Ui) {
         let lang_s = ui_lang(&self.store).to_string();
         let lang = lang_s.as_str();
@@ -3710,6 +3789,7 @@ impl eframe::App for OpenLingoApp {
                 Screen::Sprech => self.screen_sprechtuebungen(ui),
                 Screen::Ascolto => self.screen_ascolto(ui),
                 Screen::Comprensione => self.screen_comprensione(ui),
+                Screen::Wortliste => self.screen_wortliste(ui),
                 Screen::Settings => self.screen_settings(ui),
             });
     }
@@ -4148,6 +4228,16 @@ mod tests {
         assert_eq!(SpeechEngineKind::Phonon.package(), "ptts");
         assert_eq!(SpeechEngineKind::Phonon.module(), "ptts");
         assert_eq!(SpeechEngineKind::Phonon.id(), "phonon");
+    }
+
+    #[test]
+    fn wortliste_data_is_complete() {
+        let voci = wortliste_voci();
+        assert!(voci.len() >= 280, "expected 280+ wordlist entries, got {}", voci.len());
+        assert!(voci.iter().all(|v| !v.tedesco.is_empty() && !v.italiano.is_empty() && !v.tema.is_empty()));
+        assert!(voci.iter().any(|v| v.tedesco == "der Termin" && v.articolo.as_deref() == Some("der")));
+        // levels A1/A2/B1 all present
+        assert!(["A1", "A2", "B1"].iter().all(|lv| voci.iter().any(|v| v.livello == *lv)));
     }
 
     #[test]
