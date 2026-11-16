@@ -86,8 +86,172 @@ pub struct ProfiloStato {
     #[serde(alias = "ultimoGiornoStudio")]
     pub ultimo_giorno_studio: Option<String>,
     pub progresso: Progresso,
+    /// Quaderno degli errori: SRS separato dal lessico (portato dall'app mobile).
+    #[serde(default, alias = "erroriQuaderno")]
+    pub errori_quaderno: Vec<ErroreEntity>,
     #[serde(flatten)]
     pub extra: HashMap<String, Value>,
+}
+
+// ── Quaderno degli errori (error notebook, SRS separato) ──
+
+/// Un errore reale fatto dallo studente (articolo, caso, ordine parole, ...).
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[serde(default)]
+pub struct ErroreEntity {
+    pub id: String,
+    pub tipo: String,
+    pub domanda: String,
+    #[serde(alias = "rispostaCorretta")]
+    pub risposta_corretta: String,
+    #[serde(alias = "rispostaData")]
+    pub risposta_data: String,
+    pub spiegazione: String,
+    pub livello: String,
+    #[serde(default = "now_millis")]
+    pub creato: i64,
+    #[serde(alias = "ultimaVolta", default = "now_millis")]
+    pub ultima_volta: i64,
+    #[serde(default)]
+    pub ripetizioni: i32,
+    #[serde(alias = "intervalloGiorni", default)]
+    pub intervallo_giorni: i32,
+    #[serde(alias = "prossimaRipasso", default)]
+    pub prossima_ripasso: i64,
+    #[serde(default)]
+    pub risolto: bool,
+}
+
+fn now_millis() -> i64 {
+    Utc::now().timestamp_millis()
+}
+
+impl ErroreEntity {
+    /// Chiave stabile per non duplicare lo stesso errore.
+    pub fn chiave(&self) -> String {
+        format!(
+            "{}|{}|{}",
+            self.tipo.trim().to_lowercase(),
+            normalizza_risposta(&self.domanda),
+            normalizza_risposta(&self.risposta_corretta)
+        )
+    }
+}
+
+fn normalizza_risposta(s: &str) -> String {
+    s.trim().to_lowercase().split_whitespace().collect::<Vec<_>>().join(" ")
+}
+
+/// Ripetizione spaziata degli errori (piu' semplice dell'SM-2 del lessico).
+pub struct ErroriSRS;
+
+impl ErroriSRS {
+    pub const INTERVALLI: [i32; 7] = [1, 3, 7, 16, 35, 75, 150];
+    const GIORNO_MS: i64 = 24 * 60 * 60 * 1000;
+    const SOGLIA_RISOLTO: i32 = 5;
+
+    pub fn nuovo(
+        tipo: &str,
+        domanda: &str,
+        risposta_corretta: &str,
+        risposta_data: &str,
+        spiegazione: &str,
+        livello: &str,
+    ) -> ErroreEntity {
+        let now = now_millis();
+        ErroreEntity {
+            id: format!("err_{}_{}_{}", now, hash_u32(domanda), hash_u32(risposta_corretta)),
+            tipo: tipo.to_string(),
+            domanda: domanda.to_string(),
+            risposta_corretta: risposta_corretta.to_string(),
+            risposta_data: risposta_data.to_string(),
+            spiegazione: spiegazione.to_string(),
+            livello: livello.to_string(),
+            creato: now,
+            ultima_volta: now,
+            ripetizioni: 0,
+            intervallo_giorni: 1,
+            prossima_ripasso: now + Self::GIORNO_MS,
+            risolto: false,
+        }
+    }
+
+    /// Aggiorna l'errore dopo un ripasso: saputo = richiamo riuscito.
+    pub fn rispondi(mut errore: ErroreEntity, saputo: bool) -> ErroreEntity {
+        let now = now_millis();
+        errore.ultima_volta = now;
+        if saputo {
+            errore.ripetizioni += 1;
+            let giorni = Self::INTERVALLI
+                .get((errore.ripetizioni - 1) as usize)
+                .copied()
+                .unwrap_or(*Self::INTERVALLI.last().unwrap());
+            errore.intervallo_giorni = giorni;
+            errore.prossima_ripasso = now + giorni as i64 * Self::GIORNO_MS;
+            errore.risolto = errore.ripetizioni >= Self::SOGLIA_RISOLTO;
+        } else {
+            errore.ripetizioni = 0;
+            errore.intervallo_giorni = 1;
+            errore.prossima_ripasso = now + Self::GIORNO_MS;
+            errore.risolto = false;
+        }
+        errore
+    }
+
+    pub fn da_ripassare(errore: &ErroreEntity) -> bool {
+        !errore.risolto && errore.prossima_ripasso <= now_millis()
+    }
+
+    pub fn giorni_alla_scadenza(errore: &ErroreEntity) -> i32 {
+        if errore.risolto { return -1; }
+        let diff = errore.prossima_ripasso - now_millis();
+        if diff <= 0 { return 0; }
+        ((diff + Self::GIORNO_MS - 1) / Self::GIORNO_MS) as i32
+    }
+}
+
+fn hash_u32(s: &str) -> u32 {
+    use std::collections::hash_map::DefaultHasher;
+    use std::hash::{Hash, Hasher};
+    let mut h = DefaultHasher::new();
+    s.hash(&mut h);
+    h.finish() as u32
+}
+
+impl Store {
+    /// Aggiunge un errore al quaderno, evitando duplicati per chiave stabile.
+    pub fn aggiungi_errore(&mut self, errore: ErroreEntity) -> Result<(), String> {
+        let profilo = self.active_profile_mut().ok_or("Nessun profilo attivo")?;
+        let chiave = errore.chiave();
+        if profilo.stato.errori_quaderno.iter().any(|e| e.chiave() == chiave) {
+            return Ok(());
+        }
+        profilo.stato.errori_quaderno.push(errore);
+        Ok(())
+    }
+
+    /// Errori da ripassare (non risolti e in scadenza).
+    pub fn errori_da_ripassare(&self) -> Vec<ErroreEntity> {
+        self.active_profile()
+            .map(|p| p.stato.errori_quaderno.iter().filter(|e| ErroriSRS::da_ripassare(e)).cloned().collect())
+            .unwrap_or_default()
+    }
+
+    /// Registra la risposta a un errore aggiornando l'SRS.
+    pub fn rispondi_errore(&mut self, id: &str, saputo: bool) -> Result<(), String> {
+        let profilo = self.active_profile_mut().ok_or("Nessun profilo attivo")?;
+        if let Some(e) = profilo.stato.errori_quaderno.iter_mut().find(|e| e.id == id) {
+            *e = ErroriSRS::rispondi(e.clone(), saputo);
+        }
+        Ok(())
+    }
+
+    /// Rimuove un errore dal quaderno.
+    pub fn rimuovi_errore(&mut self, id: &str) {
+        if let Some(profilo) = self.active_profile_mut() {
+            profilo.stato.errori_quaderno.retain(|e| e.id != id);
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]

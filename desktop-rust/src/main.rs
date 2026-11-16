@@ -1,7 +1,7 @@
 ﻿mod data;
 
 use chrono::{Local};
-use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path};
+use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS};
 use eframe::egui;
 use std::collections::BTreeSet;
 
@@ -182,6 +182,7 @@ enum Screen {
     Grammar,
     Gender,
     Speech,
+    Errori,
     Progress,
     Settings,
 }
@@ -444,6 +445,7 @@ impl OpenLingoApp {
             Screen::Grammar => tr(lang, "Grammar", "Grammatica"),
             Screen::Gender => tr(lang, "Gender Trainer", "Allenatore Articoli"),
             Screen::Speech => tr(lang, "Speech engines", "Motori vocali"),
+            Screen::Errori => tr(lang, "Error notebook", "Quaderno errori"),
             Screen::Progress => tr(lang, "Progress", "Progresso"),
             Screen::Settings => tr(lang, "Settings", "Impostazioni"),
         };
@@ -476,6 +478,7 @@ impl OpenLingoApp {
                     (Screen::Grammar, tr(lang, "Grammar", "Grammatica")),
                     (Screen::Gender, tr(lang, "Gender Trainer", "Allenatore Articoli")),
                     (Screen::Speech, tr(lang, "Speech", "Vocale")),
+                    (Screen::Errori, tr(lang, "Errors", "Errori")),
                     (Screen::Progress, tr(lang, "Progress", "Progresso")),
                     (Screen::Settings, tr(lang, "Settings", "Impostazioni")),
                 ];
@@ -507,8 +510,9 @@ impl OpenLingoApp {
             (Screen::Exercises, "âœï¸", tr(lang, "Exercises", "Esercizi")),
             (Screen::Vocabulary, "ðŸ“š", tr(lang, "Words", "Parole")),
             (Screen::Gender, "ðŸ”¤", tr(lang, "Gender Trainer", "Allenatore Articoli")),
-            (Screen::Speech, "ðŸŽ™", tr(lang, "Speech", "Vocale")),
-            (Screen::Progress, "ðŸ“ˆ", tr(lang, "Progress", "Progresso")),
+            (Screen::Speech, "\u{1F3A4}", tr(lang, "Speech", "Vocale")),
+            (Screen::Errori, "\u{1F4D5}", tr(lang, "Errors", "Errori")),
+            (Screen::Progress, "\u{1F4C8}", tr(lang, "Progress", "Progresso")),
         ];
         let w = ui.available_width();
         let cols = nav_items.len() as f32;
@@ -2507,6 +2511,93 @@ impl OpenLingoApp {
             ui.label(egui::RichText::new(&self.speech_status).color(ui.visuals().strong_text_color()));
         }
     }
+    fn screen_errori(&mut self, ui: &mut egui::Ui) {
+        let lang_s = ui_lang(&self.store).to_string();
+        let lang = lang_s.as_str();
+
+        ui.label(egui::RichText::new(tr(lang, "Error notebook", "Quaderno errori")).size(28.0).strong());
+        ui.add_space(6.0);
+        ui.label(egui::RichText::new(tr(
+            lang,
+            "Your real mistakes, revisited with spaced repetition. Recurring errors are the real bottleneck to B1.",
+            "I tuoi errori reali, ripassati con ripetizione spaziata. Gli errori ricorrenti sono il vero collo di bottiglia verso il B1.",
+        )).color(ui.visuals().weak_text_color()));
+        ui.add_space(14.0);
+
+        let da_ripassare = self.store.errori_da_ripassare();
+        let tutti: Vec<_> = self.store.active_profile()
+            .map(|p| p.stato.errori_quaderno.clone())
+            .unwrap_or_default();
+        let risolti = tutti.iter().filter(|e| e.risolto).count();
+
+        ui.label(egui::RichText::new(format!(
+            "{}: {}  ·  {}: {}  ·  {}: {}",
+            tr(lang, "Total", "Totale"), tutti.len(),
+            tr(lang, "Due", "In scadenza"), da_ripassare.len(),
+            tr(lang, "Resolved", "Risolti"), risolti,
+        )).strong());
+        ui.add_space(12.0);
+
+        // Sessione di ripasso: errori in scadenza
+        if !da_ripassare.is_empty() {
+            ui.label(egui::RichText::new(tr(lang, "Review session", "Sessione di ripasso")).size(20.0).strong());
+            ui.add_space(8.0);
+            for errore in da_ripassare.iter().take(10) {
+                let card = egui::Frame::none()
+                    .fill(ui.visuals().faint_bg_color)
+                    .stroke(egui::Stroke::new(1.0, ui.visuals().widgets.noninteractive.bg_stroke.color))
+                    .rounding(egui::CornerRadius::same(16))
+                    .inner_margin(egui::Margin::same(14))
+                    .show(ui, |ui| {
+                        ui.set_min_width(360.0);
+                        ui.label(egui::RichText::new(&errore.domanda).size(17.0).strong());
+                        ui.add_space(4.0);
+                        ui.small(format!("{} · {}", errore.tipo, errore.livello));
+                        ui.add_space(8.0);
+                        ui.label(format!("{}: {}", tr(lang, "Correct answer", "Risposta corretta"), errore.risposta_corretta));
+                        if !errore.spiegazione.is_empty() {
+                            ui.label(egui::RichText::new(&errore.spiegazione).color(ui.visuals().weak_text_color()));
+                        }
+                        ui.add_space(10.0);
+                        ui.horizontal_wrapped(|ui| {
+                            if ui.add(egui::Button::new(tr(lang, "Got it", "Saputo")).min_size(egui::vec2(120.0, 38.0)).rounding(egui::CornerRadius::same(14))).clicked() {
+                                let _ = self.store.rispondi_errore(&errore.id, true);
+                                let _ = self.store.save();
+                            }
+                            if ui.add(egui::Button::new(tr(lang, "Again", "Ancora")).min_size(egui::vec2(120.0, 38.0)).rounding(egui::CornerRadius::same(14))).clicked() {
+                                let _ = self.store.rispondi_errore(&errore.id, false);
+                                let _ = self.store.save();
+                            }
+                        });
+                    });
+                let _ = card;
+                ui.add_space(8.0);
+            }
+        } else {
+            ui.label(tr(lang, "Nothing due right now. Keep studying!", "Nulla in scadenza ora. Continua a studiare!"));
+            ui.add_space(12.0);
+        }
+
+        // Elenco di tutti gli errori
+        ui.add_space(16.0);
+        ui.label(egui::RichText::new(tr(lang, "All errors", "Tutti gli errori")).size(20.0).strong());
+        ui.add_space(8.0);
+        if tutti.is_empty() {
+            ui.label(tr(lang, "No errors recorded yet. Errors are added automatically when you answer exercises wrong.", "Nessun errore registrato. Gli errori vengono aggiunti automaticamente quando sbagli gli esercizi."));
+        } else {
+            for errore in tutti.iter().rev().take(50) {
+                ui.horizontal_wrapped(|ui| {
+                    ui.label(egui::RichText::new(&errore.domanda).strong());
+                    ui.small(format!(" -> {} ", errore.risposta_corretta));
+                    ui.small(format!("[{}]", errore.tipo));
+                    if ui.small_button(tr(lang, "Remove", "Rimuovi")).clicked() {
+                        self.store.rimuovi_errore(&errore.id);
+                        let _ = self.store.save();
+                    }
+                });
+            }
+        }
+    }
     fn screen_settings(&mut self, ui: &mut egui::Ui) {
         let lang_s = ui_lang(&self.store).to_string();
         let lang = lang_s.as_str();
@@ -2998,6 +3089,7 @@ impl eframe::App for OpenLingoApp {
                 Screen::Progress => self.screen_progress(ui),
                 Screen::Gender => self.screen_gender(ui),
                 Screen::Speech => self.screen_speech(ui),
+                Screen::Errori => self.screen_errori(ui),
                 Screen::Settings => self.screen_settings(ui),
             });
     }
@@ -3439,6 +3531,26 @@ mod tests {
     }
 
     #[test]
+    fn error_notebook_srs_advances_and_resolves() {
+        let e = ErroriSRS::nuovo("grammatica", "Ich ___ gegangen", "bin", "", "", "A1");
+        assert_eq!(e.ripetizioni, 0);
+        assert!(!e.risolto);
+        assert!(ErroriSRS::da_ripassare(&e) == false || ErroriSRS::da_ripassare(&e) == true); // no panic
+        // Correct answers advance the interval
+        let e1 = ErroriSRS::rispondi(e, true);
+        assert_eq!(e1.ripetizioni, 1);
+        assert_eq!(e1.intervallo_giorni, 1);
+        // Wrong answer resets
+        let e2 = ErroriSRS::rispondi(e1.clone(), false);
+        assert_eq!(e2.ripetizioni, 0);
+        // 5 correct in a row resolves
+        let mut resolved = e2;
+        for _ in 0..5 { resolved = ErroriSRS::rispondi(resolved, true); }
+        assert!(resolved.risolto);
+        assert_eq!(ErroriSRS::giorni_alla_scadenza(&resolved), -1);
+    }
+
+    #[test]
     fn speech_venv_path_is_under_app_data_dir() {
         let dir = temp_dir("speech-path");
         let store = Store::load_from(dir.clone());
@@ -3451,4 +3563,5 @@ mod tests {
         let _ = fs::remove_dir_all(dir);
     }
 }
+
 

@@ -4,5 +4,5 @@
   "changelog": "Added Whistle (speech-to-text) and Phonon (text-to-speech) on-device speech engines with automatic install/uninstall on desktop; continued mobile/desktop parity.",
   "minVersionCode": 0,
   "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.23/OpenLingo-v1.51.23.apk",
-  "apkSha256": ""
+  "apkSha256": "277566eaba5d861ec1cabb69aae81922b99b2368b05c81ca027bc45e7c355edc"
 }
