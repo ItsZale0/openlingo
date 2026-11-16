@@ -1,7 +1,7 @@
 ﻿mod data;
 
 use chrono::{Local};
-use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche, sudtirol_varianti, sudtirol_lessico, sudtirol_frasi, sudtirol_dialoghi, dialoghi_ascolto, dialoghi_per_contesto};
+use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche, sudtirol_varianti, sudtirol_lessico, sudtirol_frasi, sudtirol_dialoghi, dialoghi_ascolto, dialoghi_per_contesto, placement_domande, placement_valuta, sprechtuebungen_per_livello};
 use eframe::egui;
 use std::collections::BTreeSet;
 
@@ -186,6 +186,8 @@ enum Screen {
     Pronuncia,
     Sudtirol,
     Dialoghi,
+    Placement,
+    Sprech,
     Progress,
     Settings,
 }
@@ -460,6 +462,8 @@ impl OpenLingoApp {
             Screen::Pronuncia => tr(lang, "Pronunciation", "Pronuncia"),
             Screen::Sudtirol => tr(lang, "Südtirol / Austria", "Südtirol / Austria"),
             Screen::Dialoghi => tr(lang, "Dialogues", "Dialoghi"),
+            Screen::Placement => tr(lang, "Placement test", "Test di ingresso"),
+            Screen::Sprech => tr(lang, "Speaking", "Produzione orale"),
             Screen::Progress => tr(lang, "Progress", "Progresso"),
             Screen::Settings => tr(lang, "Settings", "Impostazioni"),
         };
@@ -496,6 +500,8 @@ impl OpenLingoApp {
                     (Screen::Pronuncia, tr(lang, "Pronunciation", "Pronuncia")),
                     (Screen::Sudtirol, tr(lang, "Südtirol", "Südtirol")),
                     (Screen::Dialoghi, tr(lang, "Dialogues", "Dialoghi")),
+                    (Screen::Placement, tr(lang, "Placement", "Test")),
+                    (Screen::Sprech, tr(lang, "Speaking", "Orale")),
                     (Screen::Progress, tr(lang, "Progress", "Progresso")),
                     (Screen::Settings, tr(lang, "Settings", "Impostazioni")),
                 ];
@@ -532,6 +538,8 @@ impl OpenLingoApp {
             (Screen::Pronuncia, "\u{1F5E3}", tr(lang, "Pronuncia", "Pronuncia")),
             (Screen::Sudtirol, "\u{1F1E6}\u{1F1FA}", tr(lang, "Südtirol", "Südtirol")),
             (Screen::Dialoghi, "\u{1F4AC}", tr(lang, "Dialogues", "Dialoghi")),
+            (Screen::Placement, "\u{1F3AF}", tr(lang, "Test", "Test")),
+            (Screen::Sprech, "\u{1F5E3}", tr(lang, "Orale", "Orale")),
             (Screen::Progress, "\u{1F4C8}", tr(lang, "Progress", "Progresso")),
         ];
         let w = ui.available_width();
@@ -2885,6 +2893,155 @@ impl OpenLingoApp {
         let _ = dialoghi_ascolto; // reference to keep import used
     }
 
+    fn screen_placement(&mut self, ui: &mut egui::Ui) {
+        let lang_s = ui_lang(&self.store).to_string();
+        let lang = lang_s.as_str();
+
+        ui.label(egui::RichText::new(tr(lang, "Placement test", "Test di ingresso")).size(28.0).strong());
+        ui.add_space(6.0);
+        ui.label(egui::RichText::new(tr(
+            lang,
+            "A short 12-question test (3 per level) to find your starting level.",
+            "Un breve test di 12 domande (3 per livello) per trovare il tuo livello di partenza.",
+        )).color(ui.visuals().weak_text_color()));
+        ui.add_space(14.0);
+
+        let domande = placement_domande();
+        let mut corrette = 0usize;
+        let mut risposte = 0usize;
+
+        for (qi, q) in domande.iter().enumerate() {
+            egui::Frame::none()
+                .fill(ui.visuals().faint_bg_color)
+                .stroke(egui::Stroke::new(1.0, ui.visuals().widgets.noninteractive.bg_stroke.color))
+                .rounding(egui::CornerRadius::same(14))
+                .inner_margin(egui::Margin::same(12))
+                .show(ui, |ui| {
+                    ui.set_min_width(340.0);
+                    ui.horizontal(|ui| {
+                        ui.label(egui::RichText::new(format!("{}.", qi + 1)).strong());
+                        ui.label(egui::RichText::new(&q.domanda).strong());
+                        ui.label(egui::RichText::new(&q.livello).color(ui.visuals().weak_text_color()));
+                    });
+                    ui.add_space(6.0);
+                    let key = ("placement".to_string(), qi);
+                    let selected = self.dialoghi_answers.get(&key).copied();
+                    ui.horizontal_wrapped(|ui| {
+                        for (oi, opt) in q.opzioni.iter().enumerate() {
+                            let is_sel = selected == Some(oi);
+                            let mut btn = egui::Button::new(opt.clone()).rounding(egui::CornerRadius::same(12));
+                            if is_sel { btn = btn.fill(ui.visuals().selection.bg_fill); }
+                            if ui.add(btn).clicked() {
+                                self.dialoghi_answers.insert(key.clone(), oi);
+                            }
+                            if is_sel {
+                                risposte += 1;
+                                if oi == q.corretta {
+                                    corrette += 1;
+                                    ui.label(egui::RichText::new("\u{2713}").color(ui.visuals().selection.stroke.color));
+                                } else {
+                                    ui.label(egui::RichText::new("\u{2717}").color(egui::Color32::from_rgb(220, 100, 100)));
+                                }
+                            }
+                        }
+                    });
+                });
+            ui.add_space(6.0);
+        }
+
+        ui.add_space(12.0);
+        ui.label(egui::RichText::new(format!("{}: {} / {}", tr(lang, "Score", "Punteggio"), corrette, domande.len())).strong());
+        if risposte == domande.len() {
+            let (livello, messaggio) = placement_valuta(corrette);
+            ui.add_space(10.0);
+            egui::Frame::none()
+                .fill(ui.visuals().selection.bg_fill)
+                .rounding(egui::CornerRadius::same(16))
+                .inner_margin(egui::Margin::same(14))
+                .show(ui, |ui| {
+                    ui.label(egui::RichText::new(format!("{}: {}", tr(lang, "Your level", "Il tuo livello"), livello)).size(20.0).strong());
+                    ui.label(messaggio);
+                    ui.add_space(8.0);
+                    if ui.add(egui::Button::new(egui::RichText::new(tr(lang, "Set as starting level", "Imposta come livello iniziale")).strong()).min_size(egui::vec2(200.0, 40.0)).rounding(egui::CornerRadius::same(14))).clicked() {
+                        if let Ok(p) = self.store.active_profile_mut().ok_or("no profile") {
+                            p.config.livello_iniziale = livello.to_string();
+                        }
+                        let _ = self.store.save();
+                        self.status = format!("{}: {}", tr(lang, "Level set", "Livello impostato"), livello);
+                    }
+                });
+        }
+        ui.add_space(8.0);
+        if !self.status.is_empty() {
+            ui.label(&self.status);
+        }
+    }
+
+    fn screen_sprechtuebungen(&mut self, ui: &mut egui::Ui) {
+        let lang_s = ui_lang(&self.store).to_string();
+        let lang = lang_s.as_str();
+
+        ui.label(egui::RichText::new(tr(lang, "Speaking exercises", "Esercizi di produzione orale")).size(28.0).strong());
+        ui.add_space(6.0);
+        ui.label(egui::RichText::new(tr(
+            lang,
+            "Sprechübungen: speak, then compare with the model answer (Goethe Sprechen Teil 1-3).",
+            "Sprechübungen: parla, poi confronta con la risposta modello (Goethe Sprechen Teil 1-3).",
+        )).color(ui.visuals().weak_text_color()));
+        ui.add_space(14.0);
+
+        let livello = self.store.active_profile()
+            .map(|p| p.config.livello_iniziale.clone())
+            .unwrap_or_else(|| "A1".into());
+        let prompts = sprechtuebungen_per_livello(&livello, false);
+
+        ui.label(egui::RichText::new(format!("{}: {} · {}: {}", tr(lang, "Level", "Livello"), livello, tr(lang, "Exercises", "Esercizi"), prompts.len())).strong());
+        ui.add_space(10.0);
+
+        for p in prompts.iter() {
+            let key = format!("sprecht_{}", p.id);
+            let show_model = self.show_dialoghi_translation.contains(&key);
+            egui::Frame::none()
+                .fill(ui.visuals().faint_bg_color)
+                .stroke(egui::Stroke::new(1.0, ui.visuals().widgets.noninteractive.bg_stroke.color))
+                .rounding(egui::CornerRadius::same(18))
+                .inner_margin(egui::Margin::same(14))
+                .show(ui, |ui| {
+                    ui.set_min_width(360.0);
+                    ui.horizontal(|ui| {
+                        ui.label(egui::RichText::new(&p.situazione).size(18.0).strong());
+                        ui.label(egui::RichText::new(&p.livello).color(ui.visuals().weak_text_color()));
+                    });
+                    ui.add_space(4.0);
+                    ui.label(egui::RichText::new(&p.prompt).strong());
+                    ui.add_space(6.0);
+                    if !p.vocabolario.is_empty() {
+                        ui.small(format!("{}: {}", tr(lang, "Useful words", "Parole utili"), p.vocabolario.join(" · ")));
+                    }
+                    ui.add_space(8.0);
+                    if ui.small_button(if show_model {
+                        tr(lang, "Hide model answer", "Nascondi risposta modello")
+                    } else {
+                        tr(lang, "Show model answer", "Mostra risposta modello")
+                    }).clicked() {
+                        if show_model { self.show_dialoghi_translation.remove(&key); }
+                        else { self.show_dialoghi_translation.insert(key.clone()); }
+                    }
+                    if show_model {
+                        ui.add_space(6.0);
+                        egui::Frame::none()
+                            .fill(ui.visuals().widgets.inactive.bg_fill)
+                            .rounding(egui::CornerRadius::same(12))
+                            .inner_margin(egui::Margin::same(10))
+                            .show(ui, |ui| {
+                                ui.label(egui::RichText::new(&p.modello).italics());
+                            });
+                    }
+                });
+            ui.add_space(10.0);
+        }
+    }
+
     fn screen_settings(&mut self, ui: &mut egui::Ui) {
         let lang_s = ui_lang(&self.store).to_string();
         let lang = lang_s.as_str();
@@ -3380,6 +3537,8 @@ impl eframe::App for OpenLingoApp {
                 Screen::Pronuncia => self.screen_pronuncia(ui),
                 Screen::Sudtirol => self.screen_sudtirol(ui),
                 Screen::Dialoghi => self.screen_dialoghi(ui),
+                Screen::Placement => self.screen_placement(ui),
+                Screen::Sprech => self.screen_sprechtuebungen(ui),
                 Screen::Settings => self.screen_settings(ui),
             });
     }
@@ -3818,6 +3977,21 @@ mod tests {
         assert_eq!(SpeechEngineKind::Phonon.package(), "ptts");
         assert_eq!(SpeechEngineKind::Phonon.module(), "ptts");
         assert_eq!(SpeechEngineKind::Phonon.id(), "phonon");
+    }
+
+    #[test]
+    fn placement_and_sprechtuebungen_data_is_complete() {
+        let qs = placement_domande();
+        assert_eq!(qs.len(), 12, "expected 12 placement questions");
+        assert!(qs.iter().all(|q| q.opzioni.len() == 4 && q.corretta < 4));
+        assert_eq!(placement_valuta(0).0, "A0");
+        assert_eq!(placement_valuta(4).0, "A1");
+        assert_eq!(placement_valuta(7).0, "A2");
+        assert_eq!(placement_valuta(10).0, "B1");
+        let prompts = sprechtuebungen_per_livello("A1", false);
+        assert!(!prompts.is_empty());
+        assert!(prompts.iter().all(|p| !p.modello.is_empty() && !p.vocabolario.is_empty()));
+        assert!(prompts.iter().all(|p| !p.sanitario));
     }
 
     #[test]
