@@ -83,10 +83,9 @@ fun SchermataHome(
                 ) {
                     Column(Modifier.weight(1f)) {
                         Text(
-                            t("PIANO DI OGGI"),
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.65f)
+                            t("Il tuo piano di oggi"),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.75f)
                         )
                         Spacer(Modifier.height(8.dp))
                         Text(
@@ -174,11 +173,13 @@ fun SchermataHome(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            // Griglia non uniforme: Ripasso e' l'azione principale (piu' larga),
+            // le altre restano secondarie. Rompe il pattern "4 card uguali".
             AzioneRapidaDesktop(
                 icona = Icons.Filled.Refresh,
                 etichetta = t("Ripasso"),
                 onClick = { onVaiA(Schermata.RIPASSO) },
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1.6f)
             )
             AzioneRapidaDesktop(
                 icona = Icons.Filled.Translate,

@@ -21,8 +21,8 @@ import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.LightMode
-import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Settings
@@ -77,7 +77,7 @@ enum class Schermata(val titolo: String, val icona: ImageVector) {
     ESERCIZI("Esercizi", Icons.Filled.Edit),
     RIPASSO("Ripasso", Icons.Filled.Refresh),
     LESSICO("Lessico", Icons.Filled.Translate),
-    GENDER_TRAINER("Articoli", Icons.Filled.QuestionMark),
+    GENDER_TRAINER("Articoli", Icons.Filled.Language),
     WORTLISTE("Wortliste", Icons.AutoMirrored.Filled.MenuBook),
     PODCAST("Podcast", Icons.Filled.Headphones),
     PROGRESSO("Progresso", Icons.Filled.BarChart),

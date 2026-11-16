@@ -6471,6 +6471,7 @@ object Traduttore {
             "passi fatti" to "steps done",
 
             "PIANO DI OGGI" to "TODAY'S PLAN",
+            "Il tuo piano di oggi" to "Your plan for today",
 
             "Sessione: \$tipo" to "Session: \$tipo",
 

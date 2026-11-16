@@ -236,9 +236,3 @@ private fun StrumentoRiga(
     }
 }
 
-private fun coloreStato(stato: StatoUnita): Color = when (stato) {
-    StatoUnita.COMPLETATA -> Color(0xFF1F7A5C)
-    StatoUnita.DA_RIPASSARE -> Color(0xFF2C5F8A)
-    StatoUnita.DISPONIBILE -> Color(0xFF2F5BEA)
-    StatoUnita.BLOCCATA -> Color(0xFF74777F)
-}
