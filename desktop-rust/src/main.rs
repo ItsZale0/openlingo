@@ -1,7 +1,7 @@
 ﻿mod data;
 
 use chrono::{Local};
-use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche, sudtirol_varianti, sudtirol_lessico, sudtirol_frasi, sudtirol_dialoghi, dialoghi_ascolto, dialoghi_per_contesto, placement_domande, placement_valuta, sprechtuebungen_per_livello, esercizi_ascolto_per_livello, domande_comprensione, domande_produzione, wortliste_voci};
+use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche, sudtirol_varianti, sudtirol_lessico, sudtirol_frasi, sudtirol_dialoghi, dialoghi_ascolto, dialoghi_per_contesto, placement_domande, placement_valuta, sprechtuebungen_per_livello, esercizi_ascolto_per_livello, domande_comprensione, domande_produzione, wortliste_voci, podcast_episodi, podcast_livelli_info};
 use eframe::egui;
 use std::collections::BTreeSet;
 
@@ -191,6 +191,7 @@ enum Screen {
     Ascolto,
     Comprensione,
     Wortliste,
+    Podcast,
     Progress,
     Settings,
 }
@@ -470,6 +471,7 @@ impl OpenLingoApp {
             Screen::Ascolto => tr(lang, "Listening", "Ascolto"),
             Screen::Comprensione => tr(lang, "Reading & Writing", "Comprensione e Produzione"),
             Screen::Wortliste => tr(lang, "Wortliste", "Wortliste"),
+            Screen::Podcast => tr(lang, "Podcast & video", "Podcast e video"),
             Screen::Progress => tr(lang, "Progress", "Progresso"),
             Screen::Settings => tr(lang, "Settings", "Impostazioni"),
         };
@@ -511,6 +513,7 @@ impl OpenLingoApp {
                     (Screen::Ascolto, tr(lang, "Listening", "Ascolto")),
                     (Screen::Comprensione, tr(lang, "Reading", "Comprensione")),
                     (Screen::Wortliste, tr(lang, "Words", "Parole")),
+                    (Screen::Podcast, tr(lang, "Podcast", "Podcast")),
                     (Screen::Progress, tr(lang, "Progress", "Progresso")),
                     (Screen::Settings, tr(lang, "Settings", "Impostazioni")),
                 ];
@@ -552,6 +555,7 @@ impl OpenLingoApp {
             (Screen::Ascolto, "\u{1F3A7}", tr(lang, "Ascolto", "Ascolto")),
             (Screen::Comprensione, "\u{1F4D6}", tr(lang, "Comprensione", "Comprensione")),
             (Screen::Wortliste, "\u{1F4D1}", tr(lang, "Wortliste", "Wortliste")),
+            (Screen::Podcast, "\u{1F3A7}", tr(lang, "Podcast", "Podcast")),
             (Screen::Progress, "\u{1F4C8}", tr(lang, "Progress", "Progresso")),
         ];
         let w = ui.available_width();
@@ -3290,6 +3294,75 @@ impl OpenLingoApp {
         });
     }
 
+    fn screen_podcast(&mut self, ui: &mut egui::Ui) {
+        let lang_s = ui_lang(&self.store).to_string();
+        let lang = lang_s.as_str();
+
+        ui.label(egui::RichText::new(tr(lang, "Podcast & video", "Podcast e video")).size(28.0).strong());
+        ui.add_space(6.0);
+        ui.label(egui::RichText::new(tr(
+            lang,
+            "Curated German listening resources by level (A1-B2), with platform, speed and subtitles info.",
+            "Risorse di ascolto tedesco curate per livello (A1-B2), con piattaforma, velocita' e sottotitoli.",
+        )).color(ui.visuals().weak_text_color()));
+        ui.add_space(14.0);
+
+        // Level info tabs
+        for info in podcast_livelli_info() {
+            let code = info[0];
+            if ui.selectable_label(self.vocab_level == code, code).clicked() {
+                self.vocab_level = code.to_string();
+            }
+        }
+        ui.add_space(6.0);
+        if let Some(info) = podcast_livelli_info().iter().find(|i| i[0] == self.vocab_level) {
+            ui.label(egui::RichText::new(info[1]).strong());
+            ui.label(egui::RichText::new(info[2]).color(ui.visuals().weak_text_color()));
+            ui.small(info[3]);
+        }
+        ui.add_space(12.0);
+
+        let episodi: Vec<_> = podcast_episodi().into_iter()
+            .filter(|e| self.vocab_level == "ALL" || e.livello == self.vocab_level)
+            .collect();
+
+        ui.label(egui::RichText::new(format!("{}: {}", tr(lang, "Episodes", "Episodi"), episodi.len())).strong());
+        ui.add_space(8.0);
+        egui::ScrollArea::vertical().max_height(ui.available_height()).show(ui, |ui| {
+            for e in episodi.iter() {
+                egui::Frame::none()
+                    .fill(ui.visuals().faint_bg_color)
+                    .stroke(egui::Stroke::new(1.0, ui.visuals().widgets.noninteractive.bg_stroke.color))
+                    .rounding(egui::CornerRadius::same(16))
+                    .inner_margin(egui::Margin::same(12))
+                    .show(ui, |ui| {
+                        ui.set_min_width(360.0);
+                        ui.horizontal(|ui| {
+                            ui.label(egui::RichText::new(&e.titolo).size(17.0).strong());
+                            if e.consigliato {
+                                ui.label(egui::RichText::new(tr(lang, "Recommended", "Consigliato")).color(ui.visuals().selection.stroke.color));
+                            }
+                        });
+                        ui.small(format!("{} · {} · {}", e.canale, e.livello, e.durata));
+                        ui.add_space(4.0);
+                        ui.label(&e.descrizione);
+                        ui.add_space(4.0);
+                        ui.small(format!("{} · {} · {} · {}", e.piattaforma, e.tipo, e.velocita, e.supporto));
+                        ui.add_space(6.0);
+                        if ui.small_button(tr(lang, "Open link", "Apri link")).clicked() {
+                            #[cfg(target_os = "windows")]
+                            let _ = std::process::Command::new("cmd").args(["/C", "start", "", &e.url]).spawn();
+                            #[cfg(target_os = "macos")]
+                            let _ = std::process::Command::new("open").arg(&e.url).spawn();
+                            #[cfg(target_os = "linux")]
+                            let _ = std::process::Command::new("xdg-open").arg(&e.url).spawn();
+                        }
+                    });
+                ui.add_space(8.0);
+            }
+        });
+    }
+
     fn screen_settings(&mut self, ui: &mut egui::Ui) {
         let lang_s = ui_lang(&self.store).to_string();
         let lang = lang_s.as_str();
@@ -3790,6 +3863,7 @@ impl eframe::App for OpenLingoApp {
                 Screen::Ascolto => self.screen_ascolto(ui),
                 Screen::Comprensione => self.screen_comprensione(ui),
                 Screen::Wortliste => self.screen_wortliste(ui),
+                Screen::Podcast => self.screen_podcast(ui),
                 Screen::Settings => self.screen_settings(ui),
             });
     }
@@ -4228,6 +4302,15 @@ mod tests {
         assert_eq!(SpeechEngineKind::Phonon.package(), "ptts");
         assert_eq!(SpeechEngineKind::Phonon.module(), "ptts");
         assert_eq!(SpeechEngineKind::Phonon.id(), "phonon");
+    }
+
+    #[test]
+    fn podcast_data_is_complete() {
+        let episodi = podcast_episodi();
+        assert!(episodi.len() >= 30, "expected 30+ podcast episodes, got {}", episodi.len());
+        assert!(episodi.iter().all(|e| !e.titolo.is_empty() && !e.url.is_empty() && !e.livello.is_empty()));
+        assert_eq!(podcast_livelli_info().len(), 4);
+        assert!(["A1", "A2", "B1", "B2"].iter().all(|lv| episodi.iter().any(|e| e.livello == *lv)));
     }
 
     #[test]
