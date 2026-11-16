@@ -1,7 +1,7 @@
 ﻿mod data;
 
 use chrono::{Local};
-use data::{embedded_grammar_units, Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche, sudtirol_varianti, sudtirol_lessico, sudtirol_frasi, sudtirol_dialoghi, dialoghi_ascolto, dialoghi_per_contesto, placement_domande, placement_valuta, sprechtuebungen_per_livello, esercizi_ascolto_per_livello, domande_comprensione, domande_produzione, wortliste_voci, podcast_episodi, podcast_livelli_info, test_b1_domande, test_b1_testo_lesen, ai_chat, roleplay_scenari, verifica_domande, storie_immersione};
+use data::{embedded_grammar_units, Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche, sudtirol_varianti, sudtirol_lessico, sudtirol_frasi, sudtirol_dialoghi, dialoghi_ascolto, dialoghi_per_contesto, placement_domande, placement_valuta, sprechtuebungen_per_livello, esercizi_ascolto_per_livello, domande_comprensione, domande_produzione, wortliste_voci, podcast_episodi, podcast_livelli_info, test_b1_domande, test_b1_testo_lesen, ai_chat, roleplay_scenari, verifica_domande, storie_immersione, traduci_de_it, produzione_attiva_esercizi, normalizza_produttiva};
 use eframe::egui;
 use std::collections::BTreeSet;
 
@@ -204,6 +204,9 @@ enum Screen {
     PercorsoGrammatica,
     EserciziLessico,
     Didattica,
+    Produzione,
+    ProduzioneAttiva,
+    Traduttore,
     Progress,
     Settings,
 }
@@ -302,6 +305,13 @@ struct OpenLingoApp {
     verifica_picked: Option<usize>,
     verifica_feedback: bool,
     nuove_lezione: i32,
+    // Active production + translator state
+    prod_input: String,
+    prod_esito: Option<bool>,
+    prod_index: usize,
+    prod_correct: usize,
+    prod_show_all: bool,
+    traduzione_result: String,
 }
 
 fn ui_lang(store: &Store) -> &str {
@@ -404,6 +414,12 @@ impl OpenLingoApp {
             verifica_picked: None,
             verifica_feedback: false,
             nuove_lezione: 0,
+            prod_input: String::new(),
+            prod_esito: None,
+            prod_index: 0,
+            prod_correct: 0,
+            prod_show_all: false,
+            traduzione_result: String::new(),
         };
         // Default to dark teal theme to better match mobile look (user can change in Settings)
         if app.store.prefs.tema_colore.trim().is_empty() {
@@ -566,6 +582,9 @@ impl OpenLingoApp {
             Screen::PercorsoGrammatica => tr(lang, "Grammar syllabus", "Percorso grammatica"),
             Screen::EserciziLessico => tr(lang, "Lexicon drills", "Esercizi lessico"),
             Screen::Didattica => tr(lang, "Immersion", "Didattica"),
+            Screen::Produzione => tr(lang, "Production", "Produzione"),
+            Screen::ProduzioneAttiva => tr(lang, "Active production", "Produzione attiva"),
+            Screen::Traduttore => tr(lang, "Translator", "Traduttore"),
             Screen::Progress => tr(lang, "Progress", "Progresso"),
             Screen::Settings => tr(lang, "Settings", "Impostazioni"),
         };
@@ -658,6 +677,7 @@ impl OpenLingoApp {
             (Screen::Roleplay, "\u{1F3AD}", tr(lang, "Ruoli", "Ruoli")),
             (Screen::Verifica, "\u{1F9EA}", tr(lang, "Verifica", "Verifica")),
             (Screen::Didattica, "\u{1F4DA}", tr(lang, "Didattica", "Didattica")),
+            (Screen::Produzione, "\u{270F}", tr(lang, "Produzione", "Produzione")),
             (Screen::Backup, "\u{1F4BE}", tr(lang, "Backup", "Backup")),
             (Screen::Progress, "\u{1F4C8}", tr(lang, "Progress", "Progresso")),
         ];
@@ -4050,6 +4070,174 @@ impl OpenLingoApp {
         }
     }
 
+    fn screen_produzione(&mut self, ui: &mut egui::Ui) {
+        let lang = ui_lang(&self.store).to_string();
+        let lang = lang.as_str();
+        ui.label(egui::RichText::new(tr(lang, "Production", "Produzione")).size(28.0).strong());
+        ui.add_space(6.0);
+        ui.label(egui::RichText::new(tr(
+            lang,
+            "Writing production hub: practice sentences, check them with AI, and build your vocabulary.",
+            "Centro di produzione scritta: esercitati con frasi, verificale con l'AI e costruisci il lessico.",
+        )).color(ui.visuals().weak_text_color()));
+        ui.add_space(14.0);
+
+        ui.horizontal_wrapped(|ui| {
+            if ui.add(egui::Button::new(egui::RichText::new(tr(lang, "Writing (free text)", "Scrittura (testo libero)")).strong()).min_size(egui::vec2(200.0, 44.0)).rounding(egui::CornerRadius::same(16))).clicked() {
+                self.screen = Screen::ProduzioneScritta;
+            }
+            if ui.add(egui::Button::new(egui::RichText::new(tr(lang, "Active production drills", "Esercizi di produzione attiva")).strong()).min_size(egui::vec2(220.0, 44.0)).rounding(egui::CornerRadius::same(16))).clicked() {
+                self.screen = Screen::ProduzioneAttiva;
+            }
+            if ui.add(egui::Button::new(tr(lang, "Translator", "Traduttore")).min_size(egui::vec2(160.0, 44.0)).rounding(egui::CornerRadius::same(16))).clicked() {
+                self.screen = Screen::Traduttore;
+            }
+        });
+        ui.add_space(16.0);
+
+        // Quick stats from progress
+        let (total, _reviewed, _due, _streak) = self.store.stats();
+        ui.label(egui::RichText::new(tr(lang, "How production works", "Come funziona la produzione")).size(18.0).strong());
+        ui.label(tr(lang, "1. Pick a prompt or translate a sentence. 2. Write your German answer. 3. Get AI feedback on grammar, articles, cases and word order. 4. Mistakes go to your error notebook.", "1. Scegli un tema o traduci una frase. 2. Scrivi la tua risposta in tedesco. 3. Ricevi feedback AI su grammatica, articoli, casi e ordine delle parole. 4. Gli errori finiscono nel quaderno errori."));
+        ui.add_space(8.0);
+        ui.small(format!("{}: {}", tr(lang, "Vocabulary words", "Parole nel lessico"), total));
+    }
+
+    fn screen_produzione_attiva(&mut self, ui: &mut egui::Ui) {
+        let lang = ui_lang(&self.store).to_string();
+        let lang = lang.as_str();
+        ui.label(egui::RichText::new(tr(lang, "Active production", "Produzione attiva")).size(28.0).strong());
+        ui.add_space(6.0);
+        ui.label(egui::RichText::new(tr(lang, "Here you don't guess: you produce. Translate, fill the gap, unscramble or write from dictation.", "Qui non si indovina: si produce. Traduci, completa il buco, riordina o scrivi sotto dettatura.")).color(ui.visuals().weak_text_color()));
+        ui.add_space(12.0);
+
+        let livello = self.store.active_profile().map(|p| p.config.livello_iniziale.clone()).unwrap_or_else(|| "A1".into());
+        let target = if livello.starts_with("A0") || livello.starts_with("A1") { "A1" } else if livello.starts_with("A2") { "A2" } else { "B1" };
+        let tutti = produzione_attiva_esercizi();
+
+        let tipi = ["TRADUZIONE", "CLOZE", "DETTATO", "RIORDINO"];
+        let tipi_label = [tr(lang, "Translate", "Traduzione"), tr(lang, "Complete", "Completa"), tr(lang, "Dictation", "Dettato"), tr(lang, "Unscramble", "Riordina")];
+        let mut tipo_idx = 0usize;
+        if self.speech_status.starts_with("PA:") { tipo_idx = self.speech_status[3..].parse().unwrap_or(0); }
+        ui.horizontal_wrapped(|ui| {
+            for (i, lbl) in tipi_label.iter().enumerate() {
+                if ui.selectable_label(tipo_idx == i, *lbl).clicked() {
+                    self.speech_status = format!("PA:{}", i);
+                    self.chat_input.clear();
+                    self.prod_esito = None;
+                }
+            }
+        });
+        ui.add_space(12.0);
+
+        let esercizi: Vec<_> = tutti.iter()
+            .filter(|e| e.tipo == tipi[tipo_idx] && (e.livello == target || (self.prod_show_all && e.tipo == tipi[tipo_idx])))
+            .collect();
+        let esercizi = if esercizi.is_empty() {
+            tutti.iter().filter(|e| e.tipo == tipi[tipo_idx]).collect::<Vec<_>>()
+        } else { esercizi };
+        ui.checkbox(&mut self.prod_show_all, tr(lang, "Show all levels", "Mostra tutti i livelli"));
+        ui.add_space(8.0);
+
+        if self.prod_index >= esercizi.len() { self.prod_index = 0; }
+        if esercizi.is_empty() {
+            ui.label(tr(lang, "No exercises available.", "Nessun esercizio disponibile."));
+            return;
+        }
+        let e = esercizi[self.prod_index];
+        ui.label(format!("{}/{} · {}", self.prod_index + 1, esercizi.len(), e.consegna));
+        ui.add_space(8.0);
+        ui.label(egui::RichText::new(&e.prompt).size(18.0).strong());
+        ui.add_space(10.0);
+
+        if e.tipo == "RIORDINO" {
+            ui.label(tr(lang, "Tap the words in the correct order:", "Tocca le parole nell'ordine corretto:"));
+            ui.horizontal_wrapped(|ui| {
+                for w in &e.parole {
+                    if ui.button(w).clicked() {
+                        self.prod_input = format!("{} {}", self.prod_input, w).trim().to_string();
+                    }
+                }
+            });
+        }
+        ui.add(egui::TextEdit::multiline(&mut self.prod_input).desired_rows(2).desired_width(f32::INFINITY).hint_text(tr(lang, "Your answer in German...", "La tua risposta in tedesco...")));
+        ui.add_space(8.0);
+        if ui.add(egui::Button::new(egui::RichText::new(tr(lang, "Check", "Verifica")).strong()).min_size(egui::vec2(140.0, 40.0)).rounding(egui::CornerRadius::same(14))).clicked() {
+            let norm = normalizza_produttiva(&self.prod_input);
+            let ok = (!norm.is_empty()) && (std::iter::once(&e.risposta).chain(e.alternative.iter()).any(|r| normalizza_produttiva(r) == norm));
+            self.prod_esito = Some(ok);
+            if ok { self.prod_correct += 1; }
+        }
+        if let Some(ok) = self.prod_esito {
+            ui.add_space(8.0);
+            if ok {
+                ui.label(egui::RichText::new(tr(lang, "Correct!", "Corretto!")).color(ui.visuals().selection.stroke.color));
+            } else {
+                ui.label(egui::RichText::new(format!("{}: {}", tr(lang, "Correct answer", "Risposta corretta"), e.risposta)).color(egui::Color32::from_rgb(230, 110, 110)));
+                ui.small(&e.spiegazione);
+            }
+        }
+        ui.add_space(10.0);
+        ui.label(format!("{}: {}", tr(lang, "Score", "Punteggio"), self.prod_correct));
+        if ui.add(egui::Button::new(tr(lang, "Next", "Avanti")).min_size(egui::vec2(120.0, 38.0)).rounding(egui::CornerRadius::same(14))).clicked() {
+            self.prod_index = (self.prod_index + 1) % esercizi.len();
+            self.prod_input.clear();
+            self.prod_esito = None;
+        }
+    }
+
+    fn screen_traduttore(&mut self, ui: &mut egui::Ui) {
+        let lang = ui_lang(&self.store).to_string();
+        let lang = lang.as_str();
+        ui.label(egui::RichText::new(tr(lang, "Translator", "Traduttore")).size(28.0).strong());
+        ui.add_space(6.0);
+        ui.label(egui::RichText::new(tr(lang, "Translate German words and phrases to Italian. Every word is a building block!", "Traduci parole e frasi dal tedesco all'italiano. Ogni parola e' un tassello!")).color(ui.visuals().weak_text_color()));
+        ui.add_space(12.0);
+
+        ui.label(egui::RichText::new(tr(lang, "German text", "Testo in tedesco")).strong());
+        ui.add(egui::TextEdit::multiline(&mut self.chat_input).desired_rows(3).desired_width(f32::INFINITY).hint_text("Ich..."));
+        ui.add_space(8.0);
+        if ui.add_enabled(!self.chat_busy, egui::Button::new(egui::RichText::new(if self.chat_busy { tr(lang, "Translating...", "Traduzione...") } else { tr(lang, "Translate", "Traduci") }).strong()).min_size(egui::vec2(160.0, 42.0)).rounding(egui::CornerRadius::same(16))).clicked() {
+            let text = self.chat_input.trim().to_string();
+            if !text.is_empty() {
+                self.chat_busy = true;
+                self.traduzione_result = match traduci_de_it(&text) {
+                    Ok(t) => t,
+                    Err(e) => format!("Errore: {}", e),
+                };
+                self.chat_busy = false;
+            }
+        }
+        ui.add_space(12.0);
+        if !self.traduzione_result.is_empty() {
+            egui::Frame::none()
+                .fill(ui.visuals().selection.bg_fill)
+                .rounding(egui::CornerRadius::same(16))
+                .inner_margin(egui::Margin::same(14))
+                .show(ui, |ui| {
+                    ui.label(egui::RichText::new(tr(lang, "Translation", "Traduzione")).strong());
+                    ui.add_space(4.0);
+                    ui.label(egui::RichText::new(&self.traduzione_result).size(18.0));
+                });
+            ui.add_space(10.0);
+            if !self.traduzione_result.starts_with("Errore:") {
+                if ui.add(egui::Button::new(tr(lang, "Add to vocabulary", "Aggiungi al vocabolario")).min_size(egui::vec2(200.0, 40.0)).rounding(egui::CornerRadius::same(14))).clicked() {
+                    let german = self.chat_input.trim().to_string();
+                    let italian = self.traduzione_result.clone();
+                    match self.store.add_word(&german, &italian, None, "A1", "tradotto") {
+                        Ok(_) => {
+                            let _ = self.store.save();
+                            self.status = tr(lang, "Added to vocabulary.", "Aggiunto al vocabolario.").into();
+                        }
+                        Err(e) => self.status = format!("Errore: {e}"),
+                    }
+                }
+            }
+        }
+        ui.add_space(8.0);
+        if !self.status.is_empty() { ui.label(&self.status); }
+    }
+
     fn screen_settings(&mut self, ui: &mut egui::Ui) {
         let lang_s = ui_lang(&self.store).to_string();
         let lang = lang_s.as_str();
@@ -4563,6 +4751,9 @@ impl eframe::App for OpenLingoApp {
                 Screen::PercorsoGrammatica => self.screen_percorso_grammatica(ui),
                 Screen::EserciziLessico => self.screen_esercizi_lessico(ui),
                 Screen::Didattica => self.screen_didattica(ui),
+                Screen::Produzione => self.screen_produzione(ui),
+                Screen::ProduzioneAttiva => self.screen_produzione_attiva(ui),
+                Screen::Traduttore => self.screen_traduttore(ui),
                 Screen::Settings => self.screen_settings(ui),
             });
     }
@@ -5001,6 +5192,19 @@ mod tests {
         assert_eq!(SpeechEngineKind::Phonon.package(), "ptts");
         assert_eq!(SpeechEngineKind::Phonon.module(), "ptts");
         assert_eq!(SpeechEngineKind::Phonon.id(), "phonon");
+    }
+
+    #[test]
+    fn produzione_attiva_data_is_complete() {
+        let es = produzione_attiva_esercizi();
+        assert_eq!(es.len(), 72, "expected 72 production exercises, got {}", es.len());
+        for tipo in ["TRADUZIONE", "CLOZE", "DETTATO", "RIORDINO"] {
+            assert_eq!(es.iter().filter(|e| e.tipo == tipo).count(), 18);
+        }
+        assert!(es.iter().all(|e| !e.id.is_empty() && !e.risposta.is_empty()));
+        assert!(es.iter().any(|e| e.id == "tr_a1_1" && e.risposta.contains("Anna")));
+        // normalization accepts umlaut variants
+        assert_eq!(normalizza_produttiva("Ich heiße Anna"), normalizza_produttiva("ich heisse anna"));
     }
 
     #[test]
