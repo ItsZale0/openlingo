@@ -1,8 +1,8 @@
 {
-  "versionCode": 348,
-  "versionName": "1.51.25",
-  "changelog": "AI chat context now expires after 30 minutes: older messages are no longer sent to the tutor and the conversation restarts fresh.",
+  "versionCode": 347,
+  "versionName": "1.51.24",
+  "changelog": "New: select a word in exercises and add it to vocabulary via AI (meaning, article, example) - it enters both lexicon and review. Fixed modal-conjugation validator.",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.25/OpenLingo-v1.51.25.apk",
-  "apkSha256": ""
+  "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.24/OpenLingo-v1.51.24.apk",
+  "apkSha256": "8073e9dd0c69b5000238a21fe52a901e67a76b92386c88c46d3afb0c3b319f99"
 }

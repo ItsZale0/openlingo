@@ -52,23 +52,11 @@ data class MessaggioTutor(
      * stesso hashCode(): il LazyColumn della bolla li usa come chiave e va in crash
      * con "Key was already used" dopo pochi giri di chat.
      */
-    val id: Long = 0L,
-    /** Timestamp reale del messaggio: usato per far scadere il contesto. */
-    val timestamp: Long = 0L
+    val id: Long = 0L
 )
 
 /** Conversazione tenuta in memoria: oltre questi messaggi i piu' vecchi cadono. */
 private const val LIMITE_CHAT = 100
-
-/**
- * Il contesto della chat resta valido per 30 minuti: dopo, la conversazione
- * precedente non viene piu' passata al modello e si riparte da zero.
- */
-internal const val SCADEZZA_CONTESTO_CHAT_MS = 30L * 60 * 1000
-
-/** True se il messaggio e' ancora dentro la finestra di contesto. */
-internal fun messaggioNelContesto(timestamp: Long, ora: Long = System.currentTimeMillis()): Boolean =
-    timestamp > 0L && ora - timestamp <= SCADEZZA_CONTESTO_CHAT_MS
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -91,19 +79,14 @@ fun TutorChatScreen(vm: OpenLingoViewModel, onIndietro: (() -> Unit)? = null) {
     LaunchedEffect(profilo?.id) {
         val p = profilo
         if (p != null && !storicoCaricato) {
-            val ora = System.currentTimeMillis()
-            // Solo i messaggi degli ultimi 30 minuti entrano nel contesto.
             val storico = p.stato.conversazioni
                 .filter { it.tipo == "tutor" }
-                .filter { messaggioNelContesto(it.timestamp, ora) }
-                .map { MessaggioTutor(it.testo, it.ruolo == "utente", it.correzione != null, timestamp = it.timestamp) }
-            // Se tutto e' scaduto si riparte dal messaggio di benvenuto: nessun
-            // contesto vecchio viene passato al modello.
+                .map { MessaggioTutor(it.testo, it.ruolo == "utente", it.correzione != null) }
+            // Id unici per posizione: la stessa frase inviata due volte non deve collidere.
             messaggi = (if (storico.isNotEmpty()) storico else listOf(
                 MessaggioTutor(
                     testo = t("Ciao! Sono il tuo tutor di tedesco. Chiedimi quello che vuoi: grammatica, esempi, esercizi, dubbi. Rispondo in italiano."),
-                    daUtente = false,
-                    timestamp = ora
+                    daUtente = false
                 )
             )).mapIndexed { i, m -> m.copy(id = i.toLong()) }
             contatoreId = messaggi.size.toLong()
@@ -121,16 +104,13 @@ fun TutorChatScreen(vm: OpenLingoViewModel, onIndietro: (() -> Unit)? = null) {
     LaunchedEffect(messaggi, profilo) {
         val p = profilo
         if (p != null && storicoCaricato) {
-            val ora = System.currentTimeMillis()
             val conversazioni = messaggi.mapIndexed { index, msg ->
                 ConversazioneEntry(
-                    id = "tutor_${ora}_$index",
+                    id = "tutor_${System.currentTimeMillis()}_$index",
                     tipo = "tutor",
                     ruolo = if (msg.daUtente) "utente" else "tutor",
                     testo = msg.testo,
-                    // Timestamp reale: i vecchi falsificati (-index*1000) facevano
-                    // sembrare recenti messaggi di ore fa.
-                    timestamp = if (msg.timestamp > 0L) msg.timestamp else ora,
+                    timestamp = System.currentTimeMillis() - (messaggi.size - index) * 1000,
                     correzione = if (msg.errore) msg.testo else null
                 )
             }
@@ -138,10 +118,10 @@ fun TutorChatScreen(vm: OpenLingoViewModel, onIndietro: (() -> Unit)? = null) {
         }
     }
 
-    /** Aggiunge un messaggio con id e timestamp unici; tiene solo gli ultimi LIMITE_CHAT. */
+    /** Aggiunge un messaggio con id unico e tiene in memoria solo gli ultimi LIMITE_CHAT. */
     fun aggiungi(m: MessaggioTutor): List<MessaggioTutor> {
         contatoreId += 1
-        return (messaggi + m.copy(id = contatoreId, timestamp = System.currentTimeMillis())).takeLast(LIMITE_CHAT)
+        return (messaggi + m.copy(id = contatoreId)).takeLast(LIMITE_CHAT)
     }
 
     fun invia(testo: String) {
@@ -153,12 +133,8 @@ fun TutorChatScreen(vm: OpenLingoViewModel, onIndietro: (() -> Unit)? = null) {
         caricamento = true
 
         scope.launch {
-            val ora = System.currentTimeMillis()
-            // Se l'ultimo messaggio e' piu' vecchio di 30 minuti, il contesto e'
-            // scaduto: non passare nulla di vecchio al modello (riparti pulito).
             val cronologia = messaggi
                 .filterNot { it.errore }
-                .filter { messaggioNelContesto(it.timestamp, ora) }
                 .map { if (it.daUtente) "utente" to it.testo else "tutor" to it.testo }
 
             val risultato = vm.chiediAlTutor(cronologia, livello, lezioneCorrente)
