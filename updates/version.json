@@ -4,5 +4,5 @@
   "changelog": "Fixed autoupdate: new release build ensures existing users can upgrade in-place; added modal verb conjugation validation; removed Google Doc guide.",
   "minVersionCode": 0,
   "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.22/OpenLingo-v1.51.22.apk",
-  "apkSha256": ""
+  "apkSha256": "5ba683149b0b20e18df4ae40c5a51539fdb4e14248c9fa25a3e481b1a7a66988"
 }
