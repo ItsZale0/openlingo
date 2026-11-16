@@ -27,8 +27,73 @@ pub struct Preferenze {
     #[serde(alias = "ultimaSincronizzazioneCloud")]
     pub ultima_sincronizzazione_cloud: i64,
     pub lingua: String,
+    /// AI tutor config (OpenAI-compatible endpoint, e.g. Groq).
+    #[serde(alias = "aiApiKey", default)]
+    pub ai_api_key: String,
+    #[serde(alias = "aiBaseUrl", default)]
+    pub ai_base_url: String,
+    #[serde(alias = "aiModel", default)]
+    pub ai_model: String,
     #[serde(flatten)]
     pub extra: HashMap<String, Value>,
+}
+
+/// Default AI base URL (Groq, OpenAI-compatible).
+pub fn ai_default_base_url() -> &'static str {
+    "https://api.groq.com/openai/v1"
+}
+
+/// Default AI model.
+pub fn ai_default_model() -> &'static str {
+    "llama-3.3-70b-versatile"
+}
+
+/// Invia un messaggio a un provider AI OpenAI-compatible e restituisce la risposta testuale.
+/// Ritorna Err con messaggio user-friendly se non configurato o in caso di errore.
+pub fn ai_chat(
+    api_key: &str,
+    base_url: &str,
+    model: &str,
+    system: &str,
+    user_text: &str,
+) -> Result<String, String> {
+    if api_key.trim().is_empty() {
+        return Err("Nessuna chiave API configurata. Apri Impostazioni > Tutor AI e inserisci una chiave.".into());
+    }
+    let base = if base_url.trim().is_empty() { ai_default_base_url() } else { base_url.trim() };
+    let mdl = if model.trim().is_empty() { ai_default_model() } else { model.trim() };
+    let url = format!("{}/chat/completions", base.trim_end_matches('/'));
+
+    let body = serde_json::json!({
+        "model": mdl,
+        "messages": [
+            { "role": "system", "content": system },
+            { "role": "user", "content": user_text }
+        ],
+        "temperature": 0.7,
+        "max_tokens": 1024
+    });
+
+    let resp = ureq::post(&url)
+        .set("Authorization", &format!("Bearer {}", api_key.trim()))
+        .set("Content-Type", "application/json")
+        .send_json(body)
+        .map_err(|e| format!("Errore di rete/API: {}", e))?;
+
+    let json: serde_json::Value = resp.into_json().map_err(|e| format!("Risposta API non valida: {}", e))?;
+    let content = json
+        .get("choices")
+        .and_then(|c| c.get(0))
+        .and_then(|c| c.get("message"))
+        .and_then(|m| m.get("content"))
+        .and_then(|c| c.as_str())
+        .unwrap_or("")
+        .to_string();
+    if content.is_empty() {
+        Err("Risposta vuota dal modello.".into())
+    } else {
+        Ok(content)
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -4325,4 +4390,23 @@ pub fn test_b1_domande() -> Vec<DomandaTestB1> {
         DomandaTestB1 { id: "sp4".into(), sezione: "SPRECHEN".into(), domanda: "Wie verabschiedet man sich?".into(), opzioni: vec!["Mit 'Auf Wiedersehen' und 'Tschüss'".into(), "Mit 'Hallo' und 'Hi'".into(), "Mit 'Guten Morgen' und 'Gute Nacht'".into(), "Mit 'Bis bald' und 'Mach's gut'".into()], risposta_corretta: 0, spiegazione: "Verabschiedungen: 'Auf Wiedersehen', 'Tschüss'.".into() },
         DomandaTestB1 { id: "sp5".into(), sezione: "SPRECHEN".into(), domanda: "Welches Wort passt? 'Ich ___ gern nach Deutschland reisen.'".into(), opzioni: vec!["würde".into(), "werde".into(), "würde".into(), "werde".into()], risposta_corretta: 0, spiegazione: "Konjunktiv II per desideri irreali.".into() },
     ]
+}
+
+// ── Roleplay scenarios (portati da TutorService.kt) ──
+
+#[derive(Debug, Clone)]
+pub struct ScenarioRoleplay { pub id: String, pub titolo: String, pub descrizione: String, pub ruolo_ai: String, pub ruolo_utente: String, pub situazione: String }
+
+pub fn roleplay_scenari() -> Vec<ScenarioRoleplay> {
+    let raw = [
+        ("ristorante", "Al ristorante", "Ordina un pasto in un ristorante tedesco", "Cameriere", "Cliente", "Sei in un ristorante a Berlino. Il cameriere ti accoglie e ti porta al tavolo."),
+        ("stazione", "Alla stazione", "Chiedi informazioni e biglietti alla stazione", "Impiegato della stazione", "Viaggiatore", "Sei alla stazione centrale di Monaco e devi comprare un biglietto per Vienna."),
+        ("negozio", "Negozio", "Fai shopping e chiedi informazioni sui prodotti", "Commesso", "Cliente", "Sei in un negozio di abiti a Amburgo e cerchi un vestito per una festa."),
+        ("medico", "Al medico", "Descrivi i tuoi sintomi al medico", "Medico", "Paziente", "Sei dal medico perche' hai mal di testa e febbre da due giorni."),
+        ("albergo", "In albergo", "Fai il check-in e chiedi informazioni", "Receptionist", "Ospite", "Arrivi in un albergo a Zurigo e fai il check-in. Hai una prenotazione."),
+    ];
+    raw.iter().map(|(id, t, d, rai, ru, s)| ScenarioRoleplay {
+        id: id.to_string(), titolo: t.to_string(), descrizione: d.to_string(),
+        ruolo_ai: rai.to_string(), ruolo_utente: ru.to_string(), situazione: s.to_string(),
+    }).collect()
 }

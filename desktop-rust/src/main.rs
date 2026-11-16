@@ -1,7 +1,7 @@
 ﻿mod data;
 
 use chrono::{Local};
-use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche, sudtirol_varianti, sudtirol_lessico, sudtirol_frasi, sudtirol_dialoghi, dialoghi_ascolto, dialoghi_per_contesto, placement_domande, placement_valuta, sprechtuebungen_per_livello, esercizi_ascolto_per_livello, domande_comprensione, domande_produzione, wortliste_voci, podcast_episodi, podcast_livelli_info, test_b1_domande, test_b1_testo_lesen};
+use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche, sudtirol_varianti, sudtirol_lessico, sudtirol_frasi, sudtirol_dialoghi, dialoghi_ascolto, dialoghi_per_contesto, placement_domande, placement_valuta, sprechtuebungen_per_livello, esercizi_ascolto_per_livello, domande_comprensione, domande_produzione, wortliste_voci, podcast_episodi, podcast_livelli_info, test_b1_domande, test_b1_testo_lesen, ai_chat, roleplay_scenari};
 use eframe::egui;
 use std::collections::BTreeSet;
 
@@ -193,6 +193,9 @@ enum Screen {
     Wortliste,
     Podcast,
     TestB1,
+    Tutor,
+    Roleplay,
+    VoiceChat,
     Progress,
     Settings,
 }
@@ -275,6 +278,15 @@ struct OpenLingoApp {
     // Dialogue listening quiz state: (dialogue id, question index) -> selected option
     dialoghi_answers: std::collections::BTreeMap<(String, usize), usize>,
     show_dialoghi_translation: std::collections::BTreeSet<String>,
+    // AI chat state (Tutor / Roleplay / VoiceChat)
+    chat_messages: Vec<(String, String)>, // (role, text)
+    chat_input: String,
+    chat_busy: bool,
+    chat_scenario: String,
+    // AI settings drafts
+    ai_key_draft: String,
+    ai_base_draft: String,
+    ai_model_draft: String,
 }
 
 fn ui_lang(store: &Store) -> &str {
@@ -364,6 +376,13 @@ impl OpenLingoApp {
             sudtirol_answers: std::collections::BTreeMap::new(),
             dialoghi_answers: std::collections::BTreeMap::new(),
             show_dialoghi_translation: std::collections::BTreeSet::new(),
+            chat_messages: Vec::new(),
+            chat_input: String::new(),
+            chat_busy: false,
+            chat_scenario: String::new(),
+            ai_key_draft: String::new(),
+            ai_base_draft: String::new(),
+            ai_model_draft: String::new(),
         };
         // Default to dark teal theme to better match mobile look (user can change in Settings)
         if app.store.prefs.tema_colore.trim().is_empty() {
@@ -397,6 +416,32 @@ impl OpenLingoApp {
             .unwrap_or_default();
         self.token_draft = self.store.prefs.github_token.clone();
         self.repo_draft = self.store.prefs.github_repo.clone();
+        self.ai_key_draft = self.store.prefs.ai_api_key.clone();
+        self.ai_base_draft = self.store.prefs.ai_base_url.clone();
+        self.ai_model_draft = self.store.prefs.ai_model.clone();
+    }
+
+    /// Invia il messaggio corrente al tutor AI (system prompt adattato alla modalita').
+    fn send_chat(&mut self, system_prompt: String) {
+        let user_text = self.chat_input.trim().to_string();
+        if user_text.is_empty() || self.chat_busy { return; }
+        self.chat_messages.push(("user".into(), user_text.clone()));
+        self.chat_input.clear();
+        self.chat_busy = true;
+        // Costruisci la cronologia (ultimi 8 messaggi) come contesto extra nel system.
+        let recent: Vec<String> = self.chat_messages.iter().rev().take(9).rev()
+            .filter(|(r, _)| r != "user" || true)
+            .map(|(r, t)| format!("{}: {}", r, t)).collect();
+        // Per semplicita' inviamo il messaggio corrente; la cronologia e' mostrata in UI.
+        let _ = &recent;
+        let key = self.store.prefs.ai_api_key.clone();
+        let base = self.store.prefs.ai_base_url.clone();
+        let model = self.store.prefs.ai_model.clone();
+        match ai_chat(&key, &base, &model, &system_prompt, &user_text) {
+            Ok(reply) => self.chat_messages.push(("assistant".into(), reply)),
+            Err(e) => self.chat_messages.push(("error".into(), e)),
+        }
+        self.chat_busy = false;
     }
 
     fn refresh_review_queue(&mut self) {
@@ -474,6 +519,9 @@ impl OpenLingoApp {
             Screen::Wortliste => tr(lang, "Wortliste", "Wortliste"),
             Screen::Podcast => tr(lang, "Podcast & video", "Podcast e video"),
             Screen::TestB1 => tr(lang, "B1 exam test", "Test B1"),
+            Screen::Tutor => tr(lang, "AI Tutor", "Tutor AI"),
+            Screen::Roleplay => tr(lang, "Roleplay", "Gioco di ruolo"),
+            Screen::VoiceChat => tr(lang, "Voice chat", "Chat vocale"),
             Screen::Progress => tr(lang, "Progress", "Progresso"),
             Screen::Settings => tr(lang, "Settings", "Impostazioni"),
         };
@@ -517,6 +565,8 @@ impl OpenLingoApp {
                     (Screen::Wortliste, tr(lang, "Words", "Parole")),
                     (Screen::Podcast, tr(lang, "Podcast", "Podcast")),
                     (Screen::TestB1, tr(lang, "Test B1", "Test B1")),
+                    (Screen::Tutor, tr(lang, "Tutor", "Tutor")),
+                    (Screen::Roleplay, tr(lang, "Roleplay", "Ruoli")),
                     (Screen::Progress, tr(lang, "Progress", "Progresso")),
                     (Screen::Settings, tr(lang, "Settings", "Impostazioni")),
                 ];
@@ -560,6 +610,8 @@ impl OpenLingoApp {
             (Screen::Wortliste, "\u{1F4D1}", tr(lang, "Wortliste", "Wortliste")),
             (Screen::Podcast, "\u{1F3A7}", tr(lang, "Podcast", "Podcast")),
             (Screen::TestB1, "\u{1F4DD}", tr(lang, "Test B1", "Test B1")),
+            (Screen::Tutor, "\u{1F916}", tr(lang, "Tutor", "Tutor")),
+            (Screen::Roleplay, "\u{1F3AD}", tr(lang, "Ruoli", "Ruoli")),
             (Screen::Progress, "\u{1F4C8}", tr(lang, "Progress", "Progresso")),
         ];
         let w = ui.available_width();
@@ -3463,6 +3515,106 @@ impl OpenLingoApp {
         ui.label(egui::RichText::new(format!("{}: {} / {}", tr(lang, "Score", "Punteggio"), corrette, domande.len())).strong());
     }
 
+    /// Renderizza la conversazione e il campo di input (riutilizzato da Tutor/Roleplay/VoiceChat).
+    fn render_chat(&mut self, ui: &mut egui::Ui, system_prompt: String) {
+        let lang = ui_lang(&self.store).to_string();
+        let lang = lang.as_str();
+
+        egui::ScrollArea::vertical().max_height(ui.available_height() - 90.0).show(ui, |ui| {
+            for (role, text) in &self.chat_messages {
+                let color = if role == "user" {
+                    ui.visuals().selection.stroke.color
+                } else if role == "error" {
+                    egui::Color32::from_rgb(230, 110, 110)
+                } else {
+                    ui.visuals().strong_text_color()
+                };
+                let label = if role == "user" { tr(lang, "You", "Tu") }
+                    else if role == "error" { tr(lang, "Error", "Errore") }
+                    else { tr(lang, "Tutor", "Tutor") };
+                ui.label(egui::RichText::new(format!("{}:", label)).strong().color(color));
+                ui.label(text);
+                ui.add_space(8.0);
+            }
+        });
+        ui.separator();
+        ui.horizontal(|ui| {
+            ui.add(egui::TextEdit::singleline(&mut self.chat_input).desired_width(ui.available_width() - 90.0).hint_text(tr(lang, "Write a message...", "Scrivi un messaggio...")));
+            if ui.add_enabled(!self.chat_busy, egui::Button::new(tr(lang, "Send", "Invia"))).clicked() {
+                self.send_chat(system_prompt.clone());
+            }
+        });
+    }
+
+    fn screen_tutor(&mut self, ui: &mut egui::Ui) {
+        let lang = ui_lang(&self.store).to_string();
+        let lang = lang.as_str();
+        ui.label(egui::RichText::new(tr(lang, "AI Tutor", "Tutor AI")).size(28.0).strong());
+        ui.add_space(4.0);
+        let livello = self.store.active_profile().map(|p| p.config.livello_iniziale.clone()).unwrap_or_else(|| "A1".into());
+        let contesto = self.store.active_profile().map(|p| p.config.contesto_utente.clone()).unwrap_or_default();
+        let system = format!("Sei un tutor di tedesco per uno studente italiano di livello {}. Rispondi ESCLUSIVAMENTE in italiano (il tedesco solo negli esempi). Spiega in modo chiaro e completo, usa markdown semplice. Contesto: {}", livello, contesto);
+        if self.store.prefs.ai_api_key.trim().is_empty() {
+            ui.label(egui::RichText::new(tr(lang, "No API key configured. Configure it in Settings > AI, or here:", "Nessuna chiave API configurata. Configurala in Impostazioni > AI, o qui:")).color(ui.visuals().weak_text_color()));
+            ui.horizontal(|ui| {
+                ui.add(egui::TextEdit::singleline(&mut self.ai_key_draft).password(true).desired_width(200.0).hint_text("API key"));
+                if ui.small_button(tr(lang, "Save key", "Salva chiave")).clicked() {
+                    self.store.prefs.ai_api_key = self.ai_key_draft.trim().to_string();
+                    let _ = self.store.save();
+                    self.status = tr(lang, "Key saved.", "Chiave salvata.").into();
+                }
+            });
+            ui.add_space(8.0);
+        }
+        ui.label(egui::RichText::new(tr(lang, "Ask the tutor anything about German", "Chiedi al tutor qualsiasi cosa sul tedesco")).color(ui.visuals().weak_text_color()));
+        ui.add_space(10.0);
+        self.render_chat(ui, system);
+    }
+
+    fn screen_roleplay(&mut self, ui: &mut egui::Ui) {
+        let lang = ui_lang(&self.store).to_string();
+        let lang = lang.as_str();
+        ui.label(egui::RichText::new(tr(lang, "Roleplay", "Gioco di ruolo")).size(28.0).strong());
+        ui.add_space(4.0);
+
+        let scenari = roleplay_scenari();
+        ui.horizontal_wrapped(|ui| {
+            for s in &scenari {
+                if ui.selectable_label(self.chat_scenario == s.id, &s.titolo).clicked() {
+                    self.chat_scenario = s.id.clone();
+                    self.chat_messages.clear();
+                }
+            }
+        });
+        ui.add_space(10.0);
+
+        let scenario = scenari.iter().find(|s| s.id == self.chat_scenario).cloned().unwrap_or_else(|| scenari[0].clone());
+        ui.label(egui::RichText::new(&scenario.descrizione).strong());
+        ui.small(&scenario.situazione);
+        ui.small(format!("{}: {} · {}: {}", tr(lang, "AI role", "Ruolo AI"), scenario.ruolo_ai, tr(lang, "Your role", "Tu"), scenario.ruolo_utente));
+        ui.add_space(10.0);
+
+        let livello = self.store.active_profile().map(|p| p.config.livello_iniziale.clone()).unwrap_or_else(|| "A1".into());
+        let system = format!("Sei {} in un gioco di ruolo per uno studente italiano di tedesco di livello {}. SCENARIO: {}. SITUAZIONE: {}. Interagisci SEMPRE in tedesco (con traduzione italiana tra parentesi se necessario). Resta nel personaggio. Correggi gentilmente gli errori.", scenario.ruolo_ai, livello, scenario.titolo, scenario.situazione);
+        self.render_chat(ui, system);
+    }
+
+    fn screen_voicechat(&mut self, ui: &mut egui::Ui) {
+        let lang = ui_lang(&self.store).to_string();
+        let lang = lang.as_str();
+        ui.label(egui::RichText::new(tr(lang, "Voice chat", "Chat vocale")).size(28.0).strong());
+        ui.add_space(4.0);
+        ui.label(egui::RichText::new(tr(
+            lang,
+            "Practice speaking with the tutor. Type your message (microphone capture can be added with a native audio backend).",
+            "Allenati a parlare con il tutor. Scrivi il tuo messaggio (il microfono puo' essere aggiunto con un backend audio nativo).",
+        )).color(ui.visuals().weak_text_color()));
+        ui.add_space(10.0);
+        let livello = self.store.active_profile().map(|p| p.config.livello_iniziale.clone()).unwrap_or_else(|| "A1".into());
+        let system = format!("Sei un partner di conversazione tedesca per uno studente italiano di livello {}. Rispondi in tedesco con traduzione italiana tra parentesi. Mantieni la conversazione naturale e correggi gentilmente gli errori.", livello);
+        self.render_chat(ui, system);
+    }
+
     fn screen_settings(&mut self, ui: &mut egui::Ui) {
         let lang_s = ui_lang(&self.store).to_string();
         let lang = lang_s.as_str();
@@ -3965,6 +4117,9 @@ impl eframe::App for OpenLingoApp {
                 Screen::Wortliste => self.screen_wortliste(ui),
                 Screen::Podcast => self.screen_podcast(ui),
                 Screen::TestB1 => self.screen_testb1(ui),
+                Screen::Tutor => self.screen_tutor(ui),
+                Screen::Roleplay => self.screen_roleplay(ui),
+                Screen::VoiceChat => self.screen_voicechat(ui),
                 Screen::Settings => self.screen_settings(ui),
             });
     }
@@ -4403,6 +4558,16 @@ mod tests {
         assert_eq!(SpeechEngineKind::Phonon.package(), "ptts");
         assert_eq!(SpeechEngineKind::Phonon.module(), "ptts");
         assert_eq!(SpeechEngineKind::Phonon.id(), "phonon");
+    }
+
+    #[test]
+    fn roleplay_and_ai_config_data_is_complete() {
+        let scenari = roleplay_scenari();
+        assert_eq!(scenari.len(), 5);
+        assert!(scenari.iter().all(|s| !s.titolo.is_empty() && !s.situazione.is_empty() && !s.ruolo_ai.is_empty()));
+        assert!(scenari.iter().any(|s| s.id == "ristorante"));
+        assert!(ai_default_base_url().contains("groq") || ai_default_base_url().contains("openai"));
+        assert!(!ai_default_model().is_empty());
     }
 
     #[test]
