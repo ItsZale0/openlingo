@@ -1,7 +1,7 @@
 ﻿mod data;
 
 use chrono::{Local};
-use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche, sudtirol_varianti, sudtirol_lessico, sudtirol_frasi, sudtirol_dialoghi, dialoghi_ascolto, dialoghi_per_contesto, placement_domande, placement_valuta, sprechtuebungen_per_livello, esercizi_ascolto_per_livello, domande_comprensione, domande_produzione, wortliste_voci, podcast_episodi, podcast_livelli_info};
+use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche, sudtirol_varianti, sudtirol_lessico, sudtirol_frasi, sudtirol_dialoghi, dialoghi_ascolto, dialoghi_per_contesto, placement_domande, placement_valuta, sprechtuebungen_per_livello, esercizi_ascolto_per_livello, domande_comprensione, domande_produzione, wortliste_voci, podcast_episodi, podcast_livelli_info, test_b1_domande, test_b1_testo_lesen};
 use eframe::egui;
 use std::collections::BTreeSet;
 
@@ -192,6 +192,7 @@ enum Screen {
     Comprensione,
     Wortliste,
     Podcast,
+    TestB1,
     Progress,
     Settings,
 }
@@ -472,6 +473,7 @@ impl OpenLingoApp {
             Screen::Comprensione => tr(lang, "Reading & Writing", "Comprensione e Produzione"),
             Screen::Wortliste => tr(lang, "Wortliste", "Wortliste"),
             Screen::Podcast => tr(lang, "Podcast & video", "Podcast e video"),
+            Screen::TestB1 => tr(lang, "B1 exam test", "Test B1"),
             Screen::Progress => tr(lang, "Progress", "Progresso"),
             Screen::Settings => tr(lang, "Settings", "Impostazioni"),
         };
@@ -514,6 +516,7 @@ impl OpenLingoApp {
                     (Screen::Comprensione, tr(lang, "Reading", "Comprensione")),
                     (Screen::Wortliste, tr(lang, "Words", "Parole")),
                     (Screen::Podcast, tr(lang, "Podcast", "Podcast")),
+                    (Screen::TestB1, tr(lang, "Test B1", "Test B1")),
                     (Screen::Progress, tr(lang, "Progress", "Progresso")),
                     (Screen::Settings, tr(lang, "Settings", "Impostazioni")),
                 ];
@@ -556,6 +559,7 @@ impl OpenLingoApp {
             (Screen::Comprensione, "\u{1F4D6}", tr(lang, "Comprensione", "Comprensione")),
             (Screen::Wortliste, "\u{1F4D1}", tr(lang, "Wortliste", "Wortliste")),
             (Screen::Podcast, "\u{1F3A7}", tr(lang, "Podcast", "Podcast")),
+            (Screen::TestB1, "\u{1F4DD}", tr(lang, "Test B1", "Test B1")),
             (Screen::Progress, "\u{1F4C8}", tr(lang, "Progress", "Progresso")),
         ];
         let w = ui.available_width();
@@ -3363,6 +3367,102 @@ impl OpenLingoApp {
         });
     }
 
+    fn screen_testb1(&mut self, ui: &mut egui::Ui) {
+        let lang_s = ui_lang(&self.store).to_string();
+        let lang = lang_s.as_str();
+
+        ui.label(egui::RichText::new(tr(lang, "B1 exam test", "Test B1")).size(28.0).strong());
+        ui.add_space(6.0);
+        ui.label(egui::RichText::new(tr(
+            lang,
+            "Goethe-Zertifikat B1 simulation: Lesen, Hören, Schreiben, Sprechen (20 questions).",
+            "Simulazione Goethe-Zertifikat B1: Lesen, Hören, Schreiben, Sprechen (20 domande).",
+        )).color(ui.visuals().weak_text_color()));
+        ui.add_space(14.0);
+
+        let sezioni = ["LESEN", "HOEREN", "SCHREIBEN", "SPRECHEN"];
+        let sez_labels = [
+            tr(lang, "Reading", "Lettura"),
+            tr(lang, "Listening", "Ascolto"),
+            tr(lang, "Writing", "Scrittura"),
+            tr(lang, "Speaking", "Orale"),
+        ];
+        let mut sez_idx = 0usize;
+        if self.speech_status.starts_with("B1:") {
+            sez_idx = self.speech_status[3..].parse().unwrap_or(0);
+        }
+
+        // Reading text for LESEN section
+        if sez_idx == 0 {
+            egui::Frame::none()
+                .fill(ui.visuals().widgets.inactive.bg_fill)
+                .rounding(egui::CornerRadius::same(14))
+                .inner_margin(egui::Margin::same(12))
+                .show(ui, |ui| {
+                    ui.label(egui::RichText::new(tr(lang, "Reading text", "Testo di lettura")).strong());
+                    ui.add_space(4.0);
+                    ui.label(test_b1_testo_lesen());
+                });
+            ui.add_space(10.0);
+        }
+
+        ui.horizontal_wrapped(|ui| {
+            for (i, (s, lbl)) in sezioni.iter().zip(sez_labels.iter()).enumerate() {
+                let _ = s;
+                if ui.selectable_label(sez_idx == i, *lbl).clicked() {
+                    self.speech_status = format!("B1:{}", i);
+                }
+            }
+        });
+        ui.add_space(12.0);
+
+        let tutte = test_b1_domande();
+        let sez = sezioni[sez_idx];
+        let domande: Vec<_> = tutte.iter().filter(|d| d.sezione == sez).collect();
+        let mut corrette = 0usize;
+
+        for (qi, q) in domande.iter().enumerate() {
+            let key = (format!("b1_{}", q.id), 0usize);
+            let selected = self.dialoghi_answers.get(&key).copied();
+            egui::Frame::none()
+                .fill(ui.visuals().faint_bg_color)
+                .stroke(egui::Stroke::new(1.0, ui.visuals().widgets.noninteractive.bg_stroke.color))
+                .rounding(egui::CornerRadius::same(14))
+                .inner_margin(egui::Margin::same(12))
+                .show(ui, |ui| {
+                    ui.set_min_width(340.0);
+                    ui.horizontal(|ui| {
+                        ui.label(egui::RichText::new(format!("{}.", qi + 1)).strong());
+                        ui.label(egui::RichText::new(&q.domanda).strong());
+                    });
+                    ui.add_space(6.0);
+                    ui.horizontal_wrapped(|ui| {
+                        for (oi, opt) in q.opzioni.iter().enumerate() {
+                            let is_sel = selected == Some(oi);
+                            let mut btn = egui::Button::new(opt.clone()).rounding(egui::CornerRadius::same(12));
+                            if is_sel { btn = btn.fill(ui.visuals().selection.bg_fill); }
+                            if ui.add(btn).clicked() {
+                                self.dialoghi_answers.insert(key.clone(), oi);
+                            }
+                        }
+                    });
+                    if let Some(sel) = selected {
+                        ui.add_space(6.0);
+                        if sel == q.risposta_corretta {
+                            corrette += 1;
+                            ui.label(egui::RichText::new(tr(lang, "Correct!", "Corretto!")).color(ui.visuals().selection.stroke.color));
+                        } else {
+                            ui.label(egui::RichText::new(format!("{} {}", tr(lang, "Wrong. Correct:", "Sbagliato. Corretto:"), q.opzioni[q.risposta_corretta])).color(egui::Color32::from_rgb(220, 100, 100)));
+                        }
+                        ui.label(egui::RichText::new(&q.spiegazione).color(ui.visuals().weak_text_color()));
+                    }
+                });
+            ui.add_space(6.0);
+        }
+        ui.add_space(10.0);
+        ui.label(egui::RichText::new(format!("{}: {} / {}", tr(lang, "Score", "Punteggio"), corrette, domande.len())).strong());
+    }
+
     fn screen_settings(&mut self, ui: &mut egui::Ui) {
         let lang_s = ui_lang(&self.store).to_string();
         let lang = lang_s.as_str();
@@ -3864,6 +3964,7 @@ impl eframe::App for OpenLingoApp {
                 Screen::Comprensione => self.screen_comprensione(ui),
                 Screen::Wortliste => self.screen_wortliste(ui),
                 Screen::Podcast => self.screen_podcast(ui),
+                Screen::TestB1 => self.screen_testb1(ui),
                 Screen::Settings => self.screen_settings(ui),
             });
     }
@@ -4302,6 +4403,17 @@ mod tests {
         assert_eq!(SpeechEngineKind::Phonon.package(), "ptts");
         assert_eq!(SpeechEngineKind::Phonon.module(), "ptts");
         assert_eq!(SpeechEngineKind::Phonon.id(), "phonon");
+    }
+
+    #[test]
+    fn test_b1_data_is_complete() {
+        let qs = test_b1_domande();
+        assert_eq!(qs.len(), 20, "expected 20 B1 test questions, got {}", qs.len());
+        for sec in ["LESEN", "HOEREN", "SCHREIBEN", "SPRECHEN"] {
+            assert_eq!(qs.iter().filter(|q| q.sezione == sec).count(), 5, "section {sec} should have 5 questions");
+        }
+        assert!(qs.iter().all(|q| q.opzioni.len() == 4 && q.risposta_corretta < 4 && !q.spiegazione.is_empty()));
+        assert!(test_b1_testo_lesen().len() > 100);
     }
 
     #[test]
