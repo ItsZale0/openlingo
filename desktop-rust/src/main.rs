@@ -1,7 +1,7 @@
 ﻿mod data;
 
 use chrono::{Local};
-use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS};
+use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche};
 use eframe::egui;
 use std::collections::BTreeSet;
 
@@ -183,6 +183,7 @@ enum Screen {
     Gender,
     Speech,
     Errori,
+    Pronuncia,
     Progress,
     Settings,
 }
@@ -446,6 +447,7 @@ impl OpenLingoApp {
             Screen::Gender => tr(lang, "Gender Trainer", "Allenatore Articoli"),
             Screen::Speech => tr(lang, "Speech engines", "Motori vocali"),
             Screen::Errori => tr(lang, "Error notebook", "Quaderno errori"),
+            Screen::Pronuncia => tr(lang, "Pronunciation", "Pronuncia"),
             Screen::Progress => tr(lang, "Progress", "Progresso"),
             Screen::Settings => tr(lang, "Settings", "Impostazioni"),
         };
@@ -479,6 +481,7 @@ impl OpenLingoApp {
                     (Screen::Gender, tr(lang, "Gender Trainer", "Allenatore Articoli")),
                     (Screen::Speech, tr(lang, "Speech", "Vocale")),
                     (Screen::Errori, tr(lang, "Errors", "Errori")),
+                    (Screen::Pronuncia, tr(lang, "Pronunciation", "Pronuncia")),
                     (Screen::Progress, tr(lang, "Progress", "Progresso")),
                     (Screen::Settings, tr(lang, "Settings", "Impostazioni")),
                 ];
@@ -512,6 +515,7 @@ impl OpenLingoApp {
             (Screen::Gender, "ðŸ”¤", tr(lang, "Gender Trainer", "Allenatore Articoli")),
             (Screen::Speech, "\u{1F3A4}", tr(lang, "Speech", "Vocale")),
             (Screen::Errori, "\u{1F4D5}", tr(lang, "Errors", "Errori")),
+            (Screen::Pronuncia, "\u{1F5E3}", tr(lang, "Pronuncia", "Pronuncia")),
             (Screen::Progress, "\u{1F4C8}", tr(lang, "Progress", "Progresso")),
         ];
         let w = ui.available_width();
@@ -2598,6 +2602,75 @@ impl OpenLingoApp {
             }
         }
     }
+    fn screen_pronuncia(&mut self, ui: &mut egui::Ui) {
+        let lang_s = ui_lang(&self.store).to_string();
+        let lang = lang_s.as_str();
+
+        ui.label(egui::RichText::new(tr(lang, "Pronunciation", "Pronuncia")).size(28.0).strong());
+        ui.add_space(6.0);
+        ui.label(egui::RichText::new(tr(
+            lang,
+            "Minimal pairs, tips, tongue twisters and clinical phrases. Listen, repeat, record and compare.",
+            "Coppie minime, consigli, scioglilingua e frasi cliniche. Ascolta, ripeti, registrati e confronta.",
+        )).color(ui.visuals().weak_text_color()));
+        ui.add_space(14.0);
+
+        // Coppie minime
+        ui.label(egui::RichText::new(tr(lang, "Minimal pairs", "Coppie minime")).size(20.0).strong());
+        ui.add_space(8.0);
+        for c in pronuncia_coppie() {
+            egui::Frame::none()
+                .fill(ui.visuals().faint_bg_color)
+                .stroke(egui::Stroke::new(1.0, ui.visuals().widgets.noninteractive.bg_stroke.color))
+                .rounding(egui::CornerRadius::same(14))
+                .inner_margin(egui::Margin::same(12))
+                .show(ui, |ui| {
+                    ui.set_min_width(340.0);
+                    ui.horizontal(|ui| {
+                        ui.label(egui::RichText::new(&c.a).size(19.0).strong());
+                        ui.label(" / ");
+                        ui.label(egui::RichText::new(&c.b).size(19.0).strong());
+                    });
+                    ui.small(format!("{} · {} / {}", c.nota, c.italiano_a, c.italiano_b));
+                    ui.add_space(6.0);
+                    if ui.small_button(tr(lang, "Speak", "Pronuncia")).clicked() {
+                        self.status = format!("{} / {}", c.a, c.b);
+                    }
+                });
+            ui.add_space(6.0);
+        }
+
+        // Consigli
+        ui.add_space(16.0);
+        ui.label(egui::RichText::new(tr(lang, "Pronunciation tips", "Consigli di pronuncia")).size(20.0).strong());
+        ui.add_space(8.0);
+        for c in pronuncia_consigli() {
+            ui.label(egui::RichText::new(&c.titolo).strong());
+            ui.label(&c.testo);
+            ui.small(format!("Es. {}", c.esempio));
+            ui.add_space(8.0);
+        }
+
+        // Scioglilingua
+        ui.add_space(16.0);
+        ui.label(egui::RichText::new(tr(lang, "Tongue twisters", "Scioglilingua")).size(20.0).strong());
+        ui.add_space(8.0);
+        for (i, s) in pronuncia_scioglilingua().iter().enumerate() {
+            ui.label(format!("{}. {}", i + 1, s));
+        }
+
+        // Frasi cliniche
+        ui.add_space(16.0);
+        ui.label(egui::RichText::new(tr(lang, "Clinical phrases", "Frasi cliniche")).size(20.0).strong());
+        ui.add_space(8.0);
+        for (i, s) in pronuncia_frasi_cliniche().iter().enumerate() {
+            ui.label(format!("{}. {}", i + 1, s));
+        }
+        ui.add_space(12.0);
+        if !self.status.is_empty() {
+            ui.label(egui::RichText::new(&self.status).color(ui.visuals().strong_text_color()));
+        }
+    }
     fn screen_settings(&mut self, ui: &mut egui::Ui) {
         let lang_s = ui_lang(&self.store).to_string();
         let lang = lang_s.as_str();
@@ -3090,6 +3163,7 @@ impl eframe::App for OpenLingoApp {
                 Screen::Gender => self.screen_gender(ui),
                 Screen::Speech => self.screen_speech(ui),
                 Screen::Errori => self.screen_errori(ui),
+                Screen::Pronuncia => self.screen_pronuncia(ui),
                 Screen::Settings => self.screen_settings(ui),
             });
     }
@@ -3531,6 +3605,16 @@ mod tests {
     }
 
     #[test]
+    fn pronuncia_data_is_complete() {
+        let coppie = pronuncia_coppie();
+        assert!(coppie.len() >= 18, "expected all minimal pairs, got {}", coppie.len());
+        assert!(coppie.iter().any(|c| c.a == "schon" && c.b == "schön"));
+        assert!(pronuncia_consigli().len() >= 9);
+        assert!(pronuncia_scioglilingua().len() >= 9);
+        assert!(pronuncia_frasi_cliniche().len() >= 16);
+    }
+
+    #[test]
     fn error_notebook_srs_advances_and_resolves() {
         let e = ErroriSRS::nuovo("grammatica", "Ich ___ gegangen", "bin", "", "", "A1");
         assert_eq!(e.ripetizioni, 0);
@@ -3563,5 +3647,6 @@ mod tests {
         let _ = fs::remove_dir_all(dir);
     }
 }
+
 
 

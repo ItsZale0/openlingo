@@ -3270,3 +3270,106 @@ pub fn speech_version(store: &Store, engine: SpeechEngineKind) -> String {
 pub fn speech_venv_path(store: &Store) -> String {
     speech_venv_dir(store).to_string_lossy().to_string()
 }
+
+// ── Pronuncia (coppie minime, consigli, scioglilingua, frasi cliniche) ──
+
+/// Coppia minima di tedesco (due parole che differiscono per un solo suono).
+#[derive(Debug, Clone)]
+pub struct CoppiaMinima {
+    pub a: String,
+    pub b: String,
+    pub nota: String,
+    pub italiano_a: String,
+    pub italiano_b: String,
+}
+
+/// Consiglio di pronuncia.
+#[derive(Debug, Clone)]
+pub struct ConsiglioPronuncia {
+    pub titolo: String,
+    pub testo: String,
+    pub esempio: String,
+}
+
+/// Coppie minime (portate dall'app mobile).
+pub fn pronuncia_coppie() -> Vec<CoppiaMinima> {
+    let raw = [
+        ("schon", "schön", "u corta vs ü", "già", "bello"),
+        ("Mutter", "Mütter", "u vs ü", "madre", "madri"),
+        ("Kuchen", "Küchen", "u vs ü", "torta", "cucine"),
+        ("Höhle", "Hölle", "ö lunga vs ö corta", "caverna", "inferno"),
+        ("Ofen", "offen", "o lunga vs o corta + ff", "forno", "aperto"),
+        ("bitten", "bieten", "i corta vs ie lunga", "chiedere", "offrire"),
+        ("fühlen", "füllen", "ü lunga vs ü corta", "sentire", "riempire"),
+        ("Beet", "Bett", "e lunga vs e corta", "aiuola", "letto"),
+        ("Stadt", "Staat", "a corta vs a lunga", "città", "stato"),
+        ("Kirche", "Kirsche", "ch dolce vs sch", "chiesa", "ciliegia"),
+        ("wissen", "weißen", "ss vs ß + ei", "sapere", "bianco (verbo)"),
+        ("reisen", "reißen", "s vs ß", "viaggiare", "strappare"),
+        ("Kahn", "Kann", "a lunga vs a corta", "barca", "posso"),
+        ("Bruder", "Brüder", "u vs ü", "fratello", "fratelli"),
+        ("Vetter", "Wetter", "v si legge 'f' vs w", "cugino", "tempo"),
+        ("weisen", "wissen", "ei vs i", "indicare/biancare", "sapere"),
+        ("Hund", "Hand", "au vs a", "cane", "mano"),
+        ("Beeren", "Bären", "e lunga vs ä lunga", "bacche", "orsi"),
+    ];
+    raw.iter().map(|(a, b, n, ia, ib)| CoppiaMinima {
+        a: a.to_string(), b: b.to_string(), nota: n.to_string(),
+        italiano_a: ia.to_string(), italiano_b: ib.to_string(),
+    }).collect()
+}
+
+/// Consigli di pronuncia.
+pub fn pronuncia_consigli() -> Vec<ConsiglioPronuncia> {
+    let raw = [
+        ("ü", "Dì 'i' con le labbra arrotondate come per 'u'. Non è 'u'.", "Mütter, Küche, Übung"),
+        ("ö", "Dì 'e' con le labbra arrotondate come per 'o'.", "schön, Höhle, können"),
+        ("ch", "Dopo a/o/u è un suono gutturale (come la 'c' toscana di 'casa'); dopo i/e è dolce.", "Bach, Buch, ich, Kirche"),
+        ("r", "In finale è quasi muto, vocalizzato: 'der' suona 'dea'. Non arrotare la r italiana.", "der, Mutter, Arzt"),
+        ("z", "È 'ts', non 'z' italiana: 'zehn' = 'tsehn'.", "Zeit, zehn, Arzt"),
+        ("s iniziale", "Davanti a vocale è sonora ('s' di 'rosa'): 'sie' = 'zii'.", "sie, sagen, Sonne"),
+        ("ei / ie", "'ei' = 'ai'; 'ie' = 'ii' lunga. Sono opposti: non confonderli.", "mein vs Wien, Zeit vs sie"),
+        ("Auslautverhärtung", "A fine sillaba b/d/g diventano p/t/k.", "Kind = 'kint', gab = 'gap', Tag = 'tak'"),
+        ("accento", "Nelle parole tedesche l'accento è spesso sulla prima sillaba.", "Árbeit, Múttern, Phýsiotherapie (eccezione)"),
+    ];
+    raw.iter().map(|(t, x, e)| ConsiglioPronuncia {
+        titolo: t.to_string(), testo: x.to_string(), esempio: e.to_string(),
+    }).collect()
+}
+
+/// Scioglilingua.
+pub fn pronuncia_scioglilingua() -> Vec<&'static str> {
+    vec![
+        "Fischers Fritz fischt frische Fische.",
+        "Brautkleid bleibt Brautkleid und Blaukraut bleibt Blaukraut.",
+        "Zehn zahme Ziegen zogen zehn Zentner Zucker zum Zoo.",
+        "Schnecken erschrecken, wenn Schnecken an Schnecken schlecken.",
+        "Der Whiskymixer mixt Whisky, wenn der Whiskymixer Whisky mixt.",
+        "In Ulm, um Ulm und um Ulm herum.",
+        "Zwischen zwei Zwetschgenzweigen sitzen zwei zwitschernde Schwalben.",
+        "Esel essen Nesseln nicht, Nesseln essen Esel nicht.",
+        "Der Cottbuser Postkutscher putzt den Cottbuser Postkutscherkasten.",
+    ]
+}
+
+/// Frasi cliniche (contesto sanitario).
+pub fn pronuncia_frasi_cliniche() -> Vec<&'static str> {
+    vec![
+        "Bitte beugen Sie das Knie langsam.",
+        "Bitte strecken Sie das Bein.",
+        "Atmen Sie tief ein und langsam aus.",
+        "Wie stark sind die Schmerzen auf einer Skala von 1 bis 10?",
+        "Bitte entspannen Sie die Schulter.",
+        "Ich zeige Ihnen die Übung, dann machen Sie sie nach.",
+        "Bitte bringen Sie den Befund mit.",
+        "Haben Sie noch Fragen?",
+        "Bitte drehen Sie sich auf den Bauch.",
+        "Bitte heben Sie die Schulter an und lassen Sie sie langsam sinken.",
+        "Wie fühlen Sie sich heute?",
+        "Bitte stehen Sie langsam auf: erst seitwärts, dann aufrecht.",
+        "Machen Sie dreimal zehn Wiederholungen mit einer Pause dazwischen.",
+        "Strecken und beugen Sie das Knie, ohne es ganz durchzudrücken.",
+        "Der Schmerz ist nachmittags schlimmer oder morgens?",
+        "Heute war die Sitzung gut: Sie haben viel geschafft.",
+    ]
+}
