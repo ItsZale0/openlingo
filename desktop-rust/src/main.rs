@@ -1,7 +1,7 @@
 ﻿mod data;
 
 use chrono::{Local};
-use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche, sudtirol_varianti, sudtirol_lessico, sudtirol_frasi, sudtirol_dialoghi, dialoghi_ascolto, dialoghi_per_contesto, placement_domande, placement_valuta, sprechtuebungen_per_livello, esercizi_ascolto_per_livello, domande_comprensione, domande_produzione, wortliste_voci, podcast_episodi, podcast_livelli_info, test_b1_domande, test_b1_testo_lesen, ai_chat, roleplay_scenari, verifica_domande};
+use data::{embedded_grammar_units, Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche, sudtirol_varianti, sudtirol_lessico, sudtirol_frasi, sudtirol_dialoghi, dialoghi_ascolto, dialoghi_per_contesto, placement_domande, placement_valuta, sprechtuebungen_per_livello, esercizi_ascolto_per_livello, domande_comprensione, domande_produzione, wortliste_voci, podcast_episodi, podcast_livelli_info, test_b1_domande, test_b1_testo_lesen, ai_chat, roleplay_scenari, verifica_domande, storie_immersione};
 use eframe::egui;
 use std::collections::BTreeSet;
 
@@ -201,6 +201,9 @@ enum Screen {
     Backup,
     Benvenuto,
     ProduzioneScritta,
+    PercorsoGrammatica,
+    EserciziLessico,
+    Didattica,
     Progress,
     Settings,
 }
@@ -560,6 +563,9 @@ impl OpenLingoApp {
             Screen::Backup => tr(lang, "Backup & data", "Backup e dati"),
             Screen::Benvenuto => tr(lang, "Welcome", "Benvenuto"),
             Screen::ProduzioneScritta => tr(lang, "Writing", "Produzione scritta"),
+            Screen::PercorsoGrammatica => tr(lang, "Grammar syllabus", "Percorso grammatica"),
+            Screen::EserciziLessico => tr(lang, "Lexicon drills", "Esercizi lessico"),
+            Screen::Didattica => tr(lang, "Immersion", "Didattica"),
             Screen::Progress => tr(lang, "Progress", "Progresso"),
             Screen::Settings => tr(lang, "Settings", "Impostazioni"),
         };
@@ -651,6 +657,7 @@ impl OpenLingoApp {
             (Screen::Tutor, "\u{1F916}", tr(lang, "Tutor", "Tutor")),
             (Screen::Roleplay, "\u{1F3AD}", tr(lang, "Ruoli", "Ruoli")),
             (Screen::Verifica, "\u{1F9EA}", tr(lang, "Verifica", "Verifica")),
+            (Screen::Didattica, "\u{1F4DA}", tr(lang, "Didattica", "Didattica")),
             (Screen::Backup, "\u{1F4BE}", tr(lang, "Backup", "Backup")),
             (Screen::Progress, "\u{1F4C8}", tr(lang, "Progress", "Progresso")),
         ];
@@ -3894,6 +3901,155 @@ impl OpenLingoApp {
         }
     }
 
+    fn screen_percorso_grammatica(&mut self, ui: &mut egui::Ui) {
+        let lang = ui_lang(&self.store).to_string();
+        let lang = lang.as_str();
+        ui.label(egui::RichText::new(tr(lang, "Grammar syllabus", "Percorso grammatica")).size(28.0).strong());
+        ui.add_space(6.0);
+        ui.label(egui::RichText::new(tr(lang, "All grammar units from A0 to B2 with mastery tracking.", "Tutte le unita' grammaticali da A0 a B2 con tracciamento della padronanza.")).color(ui.visuals().weak_text_color()));
+        ui.add_space(12.0);
+
+        let units = embedded_grammar_units();
+        let mut livelli: Vec<&str> = units.iter().map(|u| u.level).collect();
+        livelli.sort(); livelli.dedup();
+
+        ui.horizontal_wrapped(|ui| {
+            if ui.selectable_label(self.grammar_unit_level_filter == "ALL", tr(lang, "All", "Tutte")).clicked() {
+                self.grammar_unit_level_filter = "ALL".into();
+            }
+            for lv in &livelli {
+                if ui.selectable_label(self.grammar_unit_level_filter == *lv, *lv).clicked() {
+                    self.grammar_unit_level_filter = lv.to_string();
+                }
+            }
+        });
+        ui.add_space(10.0);
+
+        let filtered: Vec<_> = units.iter().filter(|u| self.grammar_unit_level_filter == "ALL" || u.level == self.grammar_unit_level_filter.as_str()).collect();
+        let mastery = self.store.grammar_mastery_summaries();
+        ui.label(format!("{}: {}", tr(lang, "Units", "Unita'"), filtered.len()));
+        ui.add_space(8.0);
+        egui::ScrollArea::vertical().max_height(ui.available_height()).show(ui, |ui| {
+            for u in filtered {
+                let m = mastery.iter().find(|m| m.id == u.id);
+                let pct = m.map(|x| x.percentuale).unwrap_or(0);
+                let done = m.map(|x| x.completata).unwrap_or(false);
+                let title: &str = if lang == "it" { u.title_it } else { u.title_en };
+                egui::Frame::none()
+                    .fill(ui.visuals().faint_bg_color)
+                    .stroke(egui::Stroke::new(1.0, ui.visuals().widgets.noninteractive.bg_stroke.color))
+                    .rounding(egui::CornerRadius::same(14))
+                    .inner_margin(egui::Margin::same(12))
+                    .show(ui, |ui| {
+                        ui.set_min_width(340.0);
+                        ui.horizontal(|ui| {
+                            ui.label(egui::RichText::new(title).strong());
+                            ui.label(egui::RichText::new(u.level).color(ui.visuals().weak_text_color()));
+                            if done { ui.label(egui::RichText::new("\u{2713}").color(ui.visuals().selection.stroke.color)); }
+                        });
+                        ui.add(egui::ProgressBar::new(pct as f32 / 100.0).desired_height(6.0));
+                        ui.small(format!("{}%", pct));
+                        if ui.small_button(tr(lang, "Open unit", "Apri unita'")).clicked() {
+                            self.grammar_unit_id = Some(u.id.to_string());
+                            self.screen = Screen::Grammar;
+                        }
+                    });
+                ui.add_space(6.0);
+            }
+        });
+    }
+
+    fn screen_esercizi_lessico(&mut self, ui: &mut egui::Ui) {
+        let lang = ui_lang(&self.store).to_string();
+        let lang = lang.as_str();
+        ui.label(egui::RichText::new(tr(lang, "Lexicon drills", "Esercizi lessico")).size(28.0).strong());
+        ui.add_space(6.0);
+        ui.label(egui::RichText::new(tr(lang, "Drill articles, meanings and spelling from your vocabulary.", "Allena articoli, significati e ortografia dal tuo lessico.")).color(ui.visuals().weak_text_color()));
+        ui.add_space(12.0);
+
+        let mode_labels = [
+            tr(lang, "Articles", "Articoli"),
+            tr(lang, "Meanings", "Significati"),
+            tr(lang, "Typing", "Dettato"),
+            tr(lang, "Mixed", "Misti"),
+        ];
+        let modes = [ExerciseMode::ArticleQuiz, ExerciseMode::MeaningQuiz, ExerciseMode::TypingQuiz, ExerciseMode::Mixed];
+        ui.horizontal_wrapped(|ui| {
+            for (i, label) in mode_labels.iter().enumerate() {
+                if ui.selectable_label(self.exercise_mode == modes[i], *label).clicked() {
+                    self.exercise_mode = modes[i].clone();
+                    self.exercise_queue.clear();
+                }
+            }
+        });
+        ui.add_space(10.0);
+        if ui.add(egui::Button::new(egui::RichText::new(tr(lang, "Start drill", "Inizia esercizio")).strong()).min_size(egui::vec2(180.0, 42.0)).rounding(egui::CornerRadius::same(16))).clicked() {
+            self.start_exercise_session();
+        }
+        ui.add_space(12.0);
+        ui.label(egui::RichText::new(tr(lang, "Or jump to the full exercise session:", "Oppure vai alla sessione esercizi completa:")).color(ui.visuals().weak_text_color()));
+        if ui.add(egui::Button::new(tr(lang, "Go to Exercises", "Vai agli esercizi")).min_size(egui::vec2(180.0, 40.0)).rounding(egui::CornerRadius::same(14))).clicked() {
+            self.screen = Screen::Exercises;
+        }
+    }
+
+    fn screen_didattica(&mut self, ui: &mut egui::Ui) {
+        let lang = ui_lang(&self.store).to_string();
+        let lang = lang.as_str();
+        ui.label(egui::RichText::new(tr(lang, "Immersion stories", "Didattica per immersione")).size(28.0).strong());
+        ui.add_space(6.0);
+        ui.label(egui::RichText::new(tr(lang, "Learn through short stories: read, check the gloss, answer comprehension questions.", "Impara attraverso brevi storie: leggi, controlla il glossario, rispondi alle domande.")).color(ui.visuals().weak_text_color()));
+        ui.add_space(12.0);
+
+        let livello = self.store.active_profile().map(|p| p.config.livello_iniziale.clone()).unwrap_or_else(|| "A0".into());
+        let storie: Vec<_> = storie_immersione().into_iter().filter(|s| s.livello == livello).collect();
+        let storie = if storie.is_empty() { storie_immersione().into_iter().take(2).collect::<Vec<_>>() } else { storie };
+
+        for s in storie.iter() {
+            ui.label(egui::RichText::new(format!("{} · Ep. {} — {}", s.serie, s.episodio, s.titolo)).size(20.0).strong());
+            ui.small(format!("{} · copertura {}% · {} min", s.livello, s.copertura, s.minuti));
+            ui.label(egui::RichText::new(&s.contesto).italics());
+            ui.add_space(8.0);
+            if !s.parole_chiave.is_empty() {
+                ui.label(egui::RichText::new(tr(lang, "Key words", "Parole chiave")).strong());
+                for g in &s.parole_chiave {
+                    ui.small(format!("{} — {}", g.tedesco, g.italiano));
+                }
+            }
+            ui.add_space(8.0);
+            ui.label(egui::RichText::new(tr(lang, "Story", "Storia")).strong());
+            for f in &s.frasi {
+                ui.label(&f.tedesco);
+                ui.small(&f.italiano);
+            }
+            ui.add_space(8.0);
+            ui.label(egui::RichText::new(tr(lang, "Comprehension", "Comprensione")).strong());
+            for (qi, q) in s.domande.iter().enumerate() {
+                ui.label(&q.domanda);
+                let key = (format!("did_{}_ep{}_q{}", s.serie, s.episodio, qi), 0usize);
+                let selected = self.dialoghi_answers.get(&key).copied();
+                ui.horizontal_wrapped(|ui| {
+                    for (oi, opt) in q.opzioni.iter().enumerate() {
+                        let is_sel = selected == Some(oi);
+                        let mut btn = egui::Button::new(opt.clone()).rounding(egui::CornerRadius::same(12));
+                        if is_sel { btn = btn.fill(ui.visuals().selection.bg_fill); }
+                        if ui.add(btn).clicked() { self.dialoghi_answers.insert(key.clone(), oi); }
+                    }
+                });
+                if let Some(sel) = selected {
+                    if sel == q.corretta {
+                        ui.label(egui::RichText::new(tr(lang, "Correct!", "Corretto!")).color(ui.visuals().selection.stroke.color));
+                    } else {
+                        ui.label(egui::RichText::new(format!("{} {}", tr(lang, "Wrong. Correct:", "Sbagliato. Corretto:"), q.opzioni[q.corretta])).color(egui::Color32::from_rgb(220, 100, 100)));
+                    }
+                    ui.small(&q.spiegazione);
+                }
+            }
+            ui.separator();
+            ui.add_space(12.0);
+        }
+    }
+
     fn screen_settings(&mut self, ui: &mut egui::Ui) {
         let lang_s = ui_lang(&self.store).to_string();
         let lang = lang_s.as_str();
@@ -4404,6 +4560,9 @@ impl eframe::App for OpenLingoApp {
                 Screen::Backup => self.screen_backup(ui),
                 Screen::Benvenuto => self.screen_benvenuto(ui),
                 Screen::ProduzioneScritta => self.screen_produzione_scritta(ui),
+                Screen::PercorsoGrammatica => self.screen_percorso_grammatica(ui),
+                Screen::EserciziLessico => self.screen_esercizi_lessico(ui),
+                Screen::Didattica => self.screen_didattica(ui),
                 Screen::Settings => self.screen_settings(ui),
             });
     }
@@ -4842,6 +5001,15 @@ mod tests {
         assert_eq!(SpeechEngineKind::Phonon.package(), "ptts");
         assert_eq!(SpeechEngineKind::Phonon.module(), "ptts");
         assert_eq!(SpeechEngineKind::Phonon.id(), "phonon");
+    }
+
+    #[test]
+    fn immersion_stories_data_is_complete() {
+        let storie = storie_immersione();
+        assert!(storie.len() >= 10, "expected 10+ immersion stories, got {}", storie.len());
+        assert!(storie.iter().all(|s| !s.titolo.is_empty() && !s.frasi.is_empty() && !s.domande.is_empty()));
+        assert!(storie.iter().all(|s| s.domande.iter().all(|q| q.corretta < q.opzioni.len())));
+        assert!(["A0", "A1", "A2", "B1", "B2"].iter().all(|lv| storie.iter().any(|s| s.livello == *lv)));
     }
 
     #[test]
