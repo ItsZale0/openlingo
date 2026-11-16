@@ -1,8 +1,8 @@
 {
-  "versionCode": 344,
-  "versionName": "1.51.21",
-  "changelog": "Improved AI exercise quality: removed ambiguous modal exercises, added conjugation validation, cleaned desktop wording.",
+  "versionCode": 345,
+  "versionName": "1.51.22",
+  "changelog": "Fixed autoupdate: new release build ensures existing users can upgrade in-place; added modal verb conjugation validation; removed Google Doc guide.",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.21/OpenLingo-v1.51.21.apk",
-  "apkSha256": "224f94b97926c72a9f542e3e8f802addf34fc390dad8c48ad1f0bba2527ca82b"
+  "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.22/OpenLingo-v1.51.22.apk",
+  "apkSha256": ""
 }
