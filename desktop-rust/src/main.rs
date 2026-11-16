@@ -430,6 +430,10 @@ impl OpenLingoApp {
         if app.store.prefs.tema_modalita.trim().is_empty() {
             app.store.prefs.tema_modalita = "dark".into();
         }
+        // Default TTS: Edge neural German voice (best pronunciation out of the box)
+        if app.store.prefs.tts_engine.trim().is_empty() {
+            app.store.prefs.tts_engine = "edge".into();
+        }
         let _ = app.store.save();
         app.backup_path = app.store.base_dir.join("openlingo-backup.json").to_string_lossy().to_string();
         app.sync_settings_drafts_from_store();
@@ -2602,18 +2606,22 @@ impl OpenLingoApp {
             .show(ui, |ui| {
                 ui.label(egui::RichText::new(tr(lang, "Text-to-speech engine", "Motore text-to-speech")).strong());
                 ui.add_space(6.0);
-                let is_system = !self.store.prefs.tts_engine.eq_ignore_ascii_case("phonon");
+                let engine = self.store.prefs.tts_engine.trim().to_lowercase();
                 ui.horizontal(|ui| {
-                    if ui.selectable_label(is_system, tr(lang, "System voice (fast)", "Voce di sistema (veloce)")).clicked() {
+                    if ui.selectable_label(engine.is_empty() || engine == "system", tr(lang, "System voice", "Voce di sistema")).clicked() {
                         self.store.prefs.tts_engine = "system".into();
                         let _ = self.store.save();
                     }
-                    if ui.selectable_label(!is_system, tr(lang, "Phonon (best German)", "Phonon (tedesco migliore)")).clicked() {
+                    if ui.selectable_label(engine == "edge" || engine == "edge-tts", tr(lang, "Edge (best German)", "Edge (tedesco migliore)")).clicked() {
+                        self.store.prefs.tts_engine = "edge".into();
+                        let _ = self.store.save();
+                    }
+                    if ui.selectable_label(engine == "phonon", tr(lang, "Phonon (offline)", "Phonon (offline)")).clicked() {
                         self.store.prefs.tts_engine = "phonon".into();
                         let _ = self.store.save();
                     }
                 });
-                ui.small(tr(lang, "System voice may mispronounce German if no German voice is installed. Phonon needs the German model (40m).", "La voce di sistema puo' sbagliare il tedesco senza una voce tedesca installata. Phonon richiede il modello tedesco (40m)."));
+                ui.small(tr(lang, "System voice may mispronounce German if no German voice is installed. Edge uses a neural German voice (needs network). Phonon is fully offline but needs a gated German model.", "La voce di sistema puo' sbagliare il tedesco. Edge usa una voce neurale tedesca (serve rete). Phonon e' offline ma richiede un modello tedesco con licenza."));
             });
         ui.add_space(12.0);
 
@@ -5264,8 +5272,10 @@ mod tests {
 
     #[test]
     fn speech_engines_have_correct_packages_and_modules() {
-        // Whistle = STT via cactus-compute (module cactus)
-        assert_eq!(SpeechEngineKind::Whistle.package(), "cactus-compute");
+        // Whistle = STT via cactus-compute[mic] (module cactus) - mic extra includes sounddevice
+        assert_eq!(SpeechEngineKind::Whistle.package(), "cactus-compute[mic]");
+        assert!(SpeechEngineKind::Whistle.extra_packages().contains(&"sounddevice"));
+        assert!(SpeechEngineKind::Whistle.extra_packages().contains(&"edge-tts"));
         assert_eq!(SpeechEngineKind::Whistle.module(), "cactus");
         assert_eq!(SpeechEngineKind::Whistle.id(), "whistle");
         // Phonon = TTS via ptts (module ptts)

@@ -3179,11 +3179,19 @@ impl SpeechEngineKind {
             SpeechEngineKind::Phonon => "phonon",
         }
     }
-    /// Pacchetto pip da installare.
+    /// Pacchetto pip da installare (Whistle include i extra [mic] per sounddevice).
     pub fn package(self) -> &'static str {
         match self {
-            SpeechEngineKind::Whistle => "cactus-compute",
+            SpeechEngineKind::Whistle => "cactus-compute[mic]",
             SpeechEngineKind::Phonon => "ptts",
+        }
+    }
+
+    /// Dipendenze extra necessarie per microfono e TTS tedesco (edge-tts).
+    pub fn extra_packages(self) -> &'static [&'static str] {
+        match self {
+            SpeechEngineKind::Whistle => &["sounddevice", "numpy", "edge-tts"],
+            SpeechEngineKind::Phonon => &[],
         }
     }
     /// Modulo Python da verificare dopo l'installazione.
@@ -3261,6 +3269,7 @@ pub fn speech_install(store: &Store, engine: SpeechEngineKind) -> Result<String,
     speech_ensure_venv(store)?;
     let venv = speech_venv_dir(store);
     let pip = venv_pip(&venv);
+    // Installa il pacchetto principale
     let out = std::process::Command::new(&pip)
         .args(["install", "--upgrade", engine.package()])
         .output()
@@ -3272,7 +3281,17 @@ pub fn speech_install(store: &Store, engine: SpeechEngineKind) -> Result<String,
             String::from_utf8_lossy(&out.stderr).trim()
         ));
     }
-    Ok(format!("{} installato.", engine.label()))
+    // Installa dipendenze extra (mic: sounddevice/numpy; TTS tedesco: edge-tts)
+    for pkg in engine.extra_packages() {
+        let out = std::process::Command::new(&pip)
+            .args(["install", "--quiet", "--upgrade", pkg])
+            .output()
+            .map_err(|e| format!("installazione {pkg} fallita: {e}"))?;
+        if !out.status.success() {
+            return Err(format!("installazione dipendenza {pkg} fallita: {}", String::from_utf8_lossy(&out.stderr).trim()));
+        }
+    }
+    Ok(format!("{} installato (con dipendenze vocali).", engine.label()))
 }
 
 /// Disinstalla un motore vocale dal venv dedicato (non rimuove il venv).
@@ -4405,6 +4424,36 @@ pub fn test_b1_domande() -> Vec<DomandaTestB1> {
 
 // ── Text-to-speech (audio reale, portato da TtsHelper.kt) ──
 
+/// Voce tedesca Neural di alta qualita' via edge-tts (richiede rete, nessun modello gated).
+pub fn tts_edge(store: &Store, text: &str, lang: &str) -> Result<(), String> {
+    let venv = speech_venv_dir(store);
+    let py = venv_python(&venv);
+    if !py.exists() {
+        return Err("Ambiente vocale non installato. Installa Whistle in Motori vocali.".into());
+    }
+    let voice = if lang.starts_with("de") { "de-DE-KatjaNeural" } else { "en-US-AriaNeural" };
+    let mp3 = store.base_dir.join("speech").join("tts_edge.mp3");
+    // edge-tts genera MP3 con voce tedesca naturale
+    let out = std::process::Command::new(&py)
+        .args(["-m", "edge_tts", "--voice", voice, "--text", text, "--write-media", &mp3.to_string_lossy()])
+        .output()
+        .map_err(|e| format!("edge-tts non avviabile: {e}"))?;
+    if !out.status.success() {
+        return Err(format!("edge-tts fallito: {}", String::from_utf8_lossy(&out.stderr).trim()));
+    }
+    // Riproduci MP3 con il player di sistema
+    #[cfg(target_os = "windows")]
+    {
+        let ps = format!("Add-Type -AssemblyName PresentationCore; $m = New-Object System.Windows.Media.MediaPlayer; $m.Open([Uri]'{}'); $m.Play(); Start-Sleep -Seconds 8", mp3.to_string_lossy().replace('\'', "''"));
+        let _ = std::process::Command::new("powershell").args(["-NoProfile", "-Command", &ps]).spawn();
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        let _ = std::process::Command::new("ffplay").args(["-nodisp", "-autoexit", &mp3.to_string_lossy()]).spawn();
+    }
+    Ok(())
+}
+
 /// Pronuncia un testo tedesco con Phonon (modello 40m multilingua, qualita' superiore).
 /// Richiede `speech_install(Phonon)` e il modello tedesco scaricato.
 pub fn tts_phonon(store: &Store, text: &str, lang: &str) -> Result<(), String> {
@@ -4443,10 +4492,12 @@ pub fn tts_phonon(store: &Store, text: &str, lang: &str) -> Result<(), String> {
 /// Pronuncia un testo tedesco con la voce di sistema (SAPI su Windows, say/espeak altrove).
 /// Ritorna Ok(()) se il comando e' stato avviato, Err con messaggio in caso di errore.
 pub fn tts_speak_with_store(store: &Store, text: &str, lang: &str) -> Result<(), String> {
-    if store.prefs.tts_engine.eq_ignore_ascii_case("phonon") {
-        return tts_phonon(store, text, lang);
+    let engine = store.prefs.tts_engine.trim().to_lowercase();
+    match engine.as_str() {
+        "phonon" => tts_phonon(store, text, lang),
+        "edge" | "edge-tts" => tts_edge(store, text, lang),
+        _ => tts_speak(text, lang), // system (default)
     }
-    tts_speak(text, lang)
 }
 
 /// Pronuncia un testo tedesco con la voce di sistema (SAPI su Windows, say/espeak altrove).
