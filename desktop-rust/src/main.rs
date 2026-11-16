@@ -1,7 +1,7 @@
 ﻿mod data;
 
 use chrono::{Local};
-use data::{embedded_grammar_units, Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche, sudtirol_varianti, sudtirol_lessico, sudtirol_frasi, sudtirol_dialoghi, dialoghi_ascolto, dialoghi_per_contesto, placement_domande, placement_valuta, sprechtuebungen_per_livello, esercizi_ascolto_per_livello, domande_comprensione, domande_produzione, wortliste_voci, podcast_episodi, podcast_livelli_info, test_b1_domande, test_b1_testo_lesen, ai_chat, roleplay_scenari, verifica_domande, storie_immersione, traduci_de_it, produzione_attiva_esercizi, normalizza_produttiva};
+use data::{embedded_grammar_units, Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche, sudtirol_varianti, sudtirol_lessico, sudtirol_frasi, sudtirol_dialoghi, dialoghi_ascolto, dialoghi_per_contesto, placement_domande, placement_valuta, sprechtuebungen_per_livello, esercizi_ascolto_per_livello, domande_comprensione, domande_produzione, wortliste_voci, podcast_episodi, podcast_livelli_info, test_b1_domande, test_b1_testo_lesen, ai_chat, roleplay_scenari, verifica_domande, storie_immersione, traduci_de_it, produzione_attiva_esercizi, normalizza_produttiva, tts_speak, tts_speak_with_store, mic_record_and_transcribe};
 use eframe::egui;
 use std::collections::BTreeSet;
 
@@ -312,6 +312,7 @@ struct OpenLingoApp {
     prod_correct: usize,
     prod_show_all: bool,
     traduzione_result: String,
+    mic_busy: bool,
 }
 
 fn ui_lang(store: &Store) -> &str {
@@ -420,6 +421,7 @@ impl OpenLingoApp {
             prod_correct: 0,
             prod_show_all: false,
             traduzione_result: String::new(),
+            mic_busy: false,
         };
         // Default to dark teal theme to better match mobile look (user can change in Settings)
         if app.store.prefs.tema_colore.trim().is_empty() {
@@ -2591,6 +2593,30 @@ impl OpenLingoApp {
         )).color(ui.visuals().weak_text_color()));
         ui.add_space(12.0);
 
+        // TTS engine selector
+        egui::Frame::none()
+            .fill(ui.visuals().faint_bg_color)
+            .stroke(egui::Stroke::new(1.0, ui.visuals().widgets.noninteractive.bg_stroke.color))
+            .rounding(egui::CornerRadius::same(16))
+            .inner_margin(egui::Margin::same(14))
+            .show(ui, |ui| {
+                ui.label(egui::RichText::new(tr(lang, "Text-to-speech engine", "Motore text-to-speech")).strong());
+                ui.add_space(6.0);
+                let is_system = !self.store.prefs.tts_engine.eq_ignore_ascii_case("phonon");
+                ui.horizontal(|ui| {
+                    if ui.selectable_label(is_system, tr(lang, "System voice (fast)", "Voce di sistema (veloce)")).clicked() {
+                        self.store.prefs.tts_engine = "system".into();
+                        let _ = self.store.save();
+                    }
+                    if ui.selectable_label(!is_system, tr(lang, "Phonon (best German)", "Phonon (tedesco migliore)")).clicked() {
+                        self.store.prefs.tts_engine = "phonon".into();
+                        let _ = self.store.save();
+                    }
+                });
+                ui.small(tr(lang, "System voice may mispronounce German if no German voice is installed. Phonon needs the German model (40m).", "La voce di sistema puo' sbagliare il tedesco senza una voce tedesca installata. Phonon richiede il modello tedesco (40m)."));
+            });
+        ui.add_space(12.0);
+
         // Percorso venv
         egui::Frame::none()
             .fill(ui.visuals().faint_bg_color)
@@ -2796,8 +2822,11 @@ impl OpenLingoApp {
                     });
                     ui.small(format!("{} · {} / {}", c.nota, c.italiano_a, c.italiano_b));
                     ui.add_space(6.0);
-                    if ui.small_button(tr(lang, "Speak", "Pronuncia")).clicked() {
-                        self.status = format!("{} / {}", c.a, c.b);
+                    if ui.small_button(tr(lang, "Speak A", "Pronuncia A")).clicked() {
+                        match tts_speak_with_store(&self.store, &c.a, "de") { Ok(_) => self.status = format!("{} {}", tr(lang, "Speaking:", "Pronuncia:"), c.a), Err(e) => self.status = format!("Errore: {e}") }
+                    }
+                    if ui.small_button(tr(lang, "Speak B", "Pronuncia B")).clicked() {
+                        match tts_speak_with_store(&self.store, &c.b, "de") { Ok(_) => self.status = format!("{} {}", tr(lang, "Speaking:", "Pronuncia:"), c.b), Err(e) => self.status = format!("Errore: {e}") }
                     }
                 });
             ui.add_space(6.0);
@@ -2905,6 +2934,9 @@ impl OpenLingoApp {
                         ui.horizontal_wrapped(|ui| {
                             ui.label(egui::RichText::new(format!("{}:", b.parlante)).strong());
                             ui.label(&b.testo);
+                            if ui.small_button("🔊").on_hover_text(tr(lang, "Listen", "Ascolta")).clicked() {
+                                let _ = tts_speak_with_store(&self.store, &b.testo, "de");
+                            }
                         });
                     }
                     ui.add_space(10.0);
@@ -2988,6 +3020,9 @@ impl OpenLingoApp {
                         ui.horizontal_wrapped(|ui| {
                             ui.label(egui::RichText::new(format!("{}:", b.parlante)).strong());
                             ui.label(&b.testo);
+                            if ui.small_button("🔊").on_hover_text(tr(lang, "Listen", "Ascolta")).clicked() {
+                                let _ = tts_speak_with_store(&self.store, &b.testo, "de");
+                            }
                         });
                         if show {
                             ui.small(egui::RichText::new(&b.traduzione).italics());
@@ -3158,6 +3193,17 @@ impl OpenLingoApp {
                         ui.small(format!("{}: {}", tr(lang, "Useful words", "Parole utili"), p.vocabolario.join(" · ")));
                     }
                     ui.add_space(8.0);
+                    if ui.small_button(tr(lang, "🎤 Speak & check", "🎤 Parla e verifica")).clicked() {
+                        let store = self.store.clone();
+                        match mic_record_and_transcribe(&store, 5) {
+                            Ok(testo) if !testo.is_empty() => self.status = format!("{}: {}", tr(lang, "You said", "Hai detto"), testo),
+                            Ok(_) => self.status = tr(lang, "No speech detected.", "Nessun parlato rilevato.").into(),
+                            Err(e) => self.status = format!("Errore: {e}"),
+                        }
+                    }
+                    if ui.small_button("🔊").on_hover_text(tr(lang, "Listen to model", "Ascolta modello")).clicked() {
+                        let _ = tts_speak_with_store(&self.store, &p.modello, "de");
+                    }
                     if ui.small_button(if show_model {
                         tr(lang, "Hide model answer", "Nascondi risposta modello")
                     } else {
@@ -3225,7 +3271,12 @@ impl OpenLingoApp {
                         ui.label(egui::RichText::new(&e.livello).color(ui.visuals().weak_text_color()));
                     });
                     ui.add_space(6.0);
-                    ui.label(egui::RichText::new(&e.frase_tedesca).size(19.0).strong());
+                    ui.horizontal(|ui| {
+                        ui.label(egui::RichText::new(&e.frase_tedesca).size(19.0).strong());
+                        if ui.small_button("🔊").on_hover_text(tr(lang, "Listen", "Ascolta")).clicked() {
+                            let _ = tts_speak_with_store(&self.store, &e.frase_tedesca, "de");
+                        }
+                    });
                     ui.add_space(6.0);
                     if ui.small_button(if show_trad {
                         tr(lang, "Hide translation", "Nascondi traduzione")
@@ -3599,7 +3650,12 @@ impl OpenLingoApp {
                 let label = if role == "user" { tr(lang, "You", "Tu") }
                     else if role == "error" { tr(lang, "Error", "Errore") }
                     else { tr(lang, "Tutor", "Tutor") };
-                ui.label(egui::RichText::new(format!("{}:", label)).strong().color(color));
+                ui.horizontal(|ui| {
+                    ui.label(egui::RichText::new(format!("{}:", label)).strong().color(color));
+                    if role == "assistant" && ui.small_button("🔊").on_hover_text(tr(lang, "Listen", "Ascolta")).clicked() {
+                        let _ = tts_speak_with_store(&self.store, text, "de");
+                    }
+                });
                 ui.label(text);
                 ui.add_space(8.0);
             }
@@ -3673,9 +3729,28 @@ impl OpenLingoApp {
         ui.add_space(4.0);
         ui.label(egui::RichText::new(tr(
             lang,
-            "Practice speaking with the tutor. Type your message (microphone capture can be added with a native audio backend).",
-            "Allenati a parlare con il tutor. Scrivi il tuo messaggio (il microfono puo' essere aggiunto con un backend audio nativo).",
+            "Practice speaking: record your voice (Whistle STT) or type. Assistant replies are spoken aloud.",
+            "Allenati a parlare: registra la voce (Whistle STT) o scrivi. Le risposte dell'assistente vengono lette ad alta voce.",
         )).color(ui.visuals().weak_text_color()));
+        ui.add_space(10.0);
+        if ui.add_enabled(!self.mic_busy, egui::Button::new(egui::RichText::new(if self.mic_busy { tr(lang, "Recording...", "Registrazione...") } else { tr(lang, "🎤 Hold to speak (5s)", "🎤 Parla (5s)") }).strong()).min_size(egui::vec2(220.0, 44.0)).rounding(egui::CornerRadius::same(16))).clicked() {
+            self.mic_busy = true;
+            let store = self.store.clone();
+            match mic_record_and_transcribe(&store, 5) {
+                Ok(testo) if !testo.is_empty() => {
+                    self.chat_messages.push(("user".into(), testo.clone()));
+                    let livello = self.store.active_profile().map(|p| p.config.livello_iniziale.clone()).unwrap_or_else(|| "A1".into());
+                    let system = format!("Sei un partner di conversazione tedesca per uno studente italiano di livello {}. Rispondi in tedesco con traduzione italiana tra parentesi. Mantieni la conversazione naturale e correggi gentilmente gli errori.", livello);
+                    match ai_chat(&self.store.prefs.ai_api_key, &self.store.prefs.ai_base_url, &self.store.prefs.ai_model, &system, &testo) {
+                        Ok(r) => self.chat_messages.push(("assistant".into(), r)),
+                        Err(e) => self.chat_messages.push(("error".into(), e)),
+                    }
+                }
+                Ok(_) => self.chat_messages.push(("error".into(), tr(lang, "No speech detected.", "Nessun parlato rilevato.").into())),
+                Err(e) => self.chat_messages.push(("error".into(), e)),
+            }
+            self.mic_busy = false;
+        }
         ui.add_space(10.0);
         let livello = self.store.active_profile().map(|p| p.config.livello_iniziale.clone()).unwrap_or_else(|| "A1".into());
         let system = format!("Sei un partner di conversazione tedesca per uno studente italiano di livello {}. Rispondi in tedesco con traduzione italiana tra parentesi. Mantieni la conversazione naturale e correggi gentilmente gli errori.", livello);
@@ -4147,7 +4222,12 @@ impl OpenLingoApp {
         let e = esercizi[self.prod_index];
         ui.label(format!("{}/{} · {}", self.prod_index + 1, esercizi.len(), e.consegna));
         ui.add_space(8.0);
-        ui.label(egui::RichText::new(&e.prompt).size(18.0).strong());
+        ui.horizontal(|ui| {
+            ui.label(egui::RichText::new(&e.prompt).size(18.0).strong());
+            if e.tipo == "DETTATO" && ui.small_button("🔊").on_hover_text(tr(lang, "Play dictation", "Ascolta dettato")).clicked() {
+                let _ = tts_speak_with_store(&self.store, &e.risposta, "de");
+            }
+        });
         ui.add_space(10.0);
 
         if e.tipo == "RIORDINO" {
@@ -5192,6 +5272,17 @@ mod tests {
         assert_eq!(SpeechEngineKind::Phonon.package(), "ptts");
         assert_eq!(SpeechEngineKind::Phonon.module(), "ptts");
         assert_eq!(SpeechEngineKind::Phonon.id(), "phonon");
+    }
+
+    #[test]
+    fn tts_and_stt_helpers_available() {
+        // TTS with empty text is a no-op success; STT without Whistle returns a clear error.
+        assert!(tts_speak("", "de").is_ok());
+        let dir = temp_dir("speech-check");
+        let store = Store::load_from(dir.clone());
+        assert!(stt_trascrivi(&store, "none.wav").is_err()); // Whistle not installed -> clear error
+        assert_eq!(store.prefs.tts_engine, ""); // default = system voice
+        let _ = fs::remove_dir_all(dir);
     }
 
     #[test]

@@ -34,6 +34,9 @@ pub struct Preferenze {
     pub ai_base_url: String,
     #[serde(alias = "aiModel", default)]
     pub ai_model: String,
+    /// TTS engine: "system" (SAPI/say/espeak) or "phonon" (on-device, German-capable).
+    #[serde(alias = "ttsEngine", default)]
+    pub tts_engine: String,
     #[serde(flatten)]
     pub extra: HashMap<String, Value>,
 }
@@ -4398,6 +4401,144 @@ pub fn test_b1_domande() -> Vec<DomandaTestB1> {
         DomandaTestB1 { id: "sp4".into(), sezione: "SPRECHEN".into(), domanda: "Wie verabschiedet man sich?".into(), opzioni: vec!["Mit 'Auf Wiedersehen' und 'Tschüss'".into(), "Mit 'Hallo' und 'Hi'".into(), "Mit 'Guten Morgen' und 'Gute Nacht'".into(), "Mit 'Bis bald' und 'Mach's gut'".into()], risposta_corretta: 0, spiegazione: "Verabschiedungen: 'Auf Wiedersehen', 'Tschüss'.".into() },
         DomandaTestB1 { id: "sp5".into(), sezione: "SPRECHEN".into(), domanda: "Welches Wort passt? 'Ich ___ gern nach Deutschland reisen.'".into(), opzioni: vec!["würde".into(), "werde".into(), "würde".into(), "werde".into()], risposta_corretta: 0, spiegazione: "Konjunktiv II per desideri irreali.".into() },
     ]
+}
+
+// ── Text-to-speech (audio reale, portato da TtsHelper.kt) ──
+
+/// Pronuncia un testo tedesco con Phonon (modello 40m multilingua, qualita' superiore).
+/// Richiede `speech_install(Phonon)` e il modello tedesco scaricato.
+pub fn tts_phonon(store: &Store, text: &str, lang: &str) -> Result<(), String> {
+    if !speech_is_installed(store, SpeechEngineKind::Phonon) {
+        return Err("Phonon non installato. Installalo in Motori vocali.".into());
+    }
+    let venv = speech_venv_dir(store);
+    let py = venv_python(&venv);
+    let wav = store.base_dir.join("speech").join("tts_out.wav");
+    let code = format!(
+        "import ptts; t=ptts.TTS(lang={lang:?}); t.save({wav:?}, {text:?})",
+        lang = lang,
+        wav = wav.to_string_lossy(),
+        text = text
+    );
+    let out = std::process::Command::new(&py)
+        .args(["-c", &code])
+        .output()
+        .map_err(|e| format!("Phonon TTS non avviabile: {e}"))?;
+    if !out.status.success() {
+        return Err(format!("Phonon TTS fallito: {}", String::from_utf8_lossy(&out.stderr).trim()));
+    }
+    // Riproduci il WAV generato con il player di sistema
+    #[cfg(target_os = "windows")]
+    {
+        let ps = format!("Add-Type -AssemblyName System.Media; (New-Object System.Media.SoundPlayer('{}')).PlaySync()", wav.to_string_lossy().replace('\'', "''"));
+        let _ = std::process::Command::new("powershell").args(["-NoProfile", "-Command", &ps]).spawn();
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        let _ = std::process::Command::new("aplay").arg(&wav).spawn();
+    }
+    Ok(())
+}
+
+/// Pronuncia un testo tedesco con la voce di sistema (SAPI su Windows, say/espeak altrove).
+/// Ritorna Ok(()) se il comando e' stato avviato, Err con messaggio in caso di errore.
+pub fn tts_speak_with_store(store: &Store, text: &str, lang: &str) -> Result<(), String> {
+    if store.prefs.tts_engine.eq_ignore_ascii_case("phonon") {
+        return tts_phonon(store, text, lang);
+    }
+    tts_speak(text, lang)
+}
+
+/// Pronuncia un testo tedesco con la voce di sistema (SAPI su Windows, say/espeak altrove).
+/// Ritorna Ok(()) se il comando e' stato avviato, Err con messaggio in caso di errore.
+pub fn tts_speak(text: &str, lang: &str) -> Result<(), String> {
+    let t = text.trim();
+    if t.is_empty() { return Ok(()); }
+    // Escape per evitare injection nei comandi shell
+    let safe = t.replace('"', "").replace('`', "").replace('$', "").replace('\n', " ").replace('\r', "");
+
+    #[cfg(target_os = "windows")]
+    {
+        // Prova una voce tedesca, altrimenti usa la voce predefinita di sistema.
+        let de = lang.starts_with("de");
+        let script = if de {
+            format!(
+                "Add-Type -AssemblyName System.Speech; $s = New-Object System.Speech.Synthesis.SpeechSynthesizer; $v = $s.GetInstalledVoices() | Where-Object {{ $_.VoiceInfo.Culture.Name -like 'de-*' }} | Select-Object -First 1; if ($v) {{ $s.SelectVoice($v.VoiceInfo.Name) }}; $s.Speak(\"{}\")",
+                safe
+            )
+        } else {
+            format!(
+                "Add-Type -AssemblyName System.Speech; $s = New-Object System.Speech.Synthesis.SpeechSynthesizer; $s.Speak(\"{}\")",
+                safe
+            )
+        };
+        std::process::Command::new("powershell")
+            .args(["-NoProfile", "-Command", &script])
+            .spawn()
+            .map(|_| ())
+            .map_err(|e| format!("TTS non disponibile: {e}"))
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let voice = if lang.starts_with("de") { "Anna" } else { "Samantha" };
+        std::process::Command::new("say").args(["-v", voice, &safe]).spawn().map(|_| ()).map_err(|e| format!("TTS non disponibile: {e}"))
+    }
+    #[cfg(target_os = "linux")]
+    {
+        let voice = if lang.starts_with("de") { "de" } else { "en" };
+        std::process::Command::new("espeak-ng").args(["-v", voice, &safe]).spawn().map(|_| ()).map_err(|e| format!("TTS non disponibile (installa espeak-ng): {e}"))
+    }
+}
+
+// ── Speech-to-text (microfono via Whistle, portato da VoiceHelper/VoiceChat) ──
+
+/// Trascrive un file audio WAV con Whistle nel venv dedicato (richiede speech_install Whistle).
+pub fn stt_trascrivi(store: &Store, wav_path: &str) -> Result<String, String> {
+    if !speech_is_installed(store, SpeechEngineKind::Whistle) {
+        return Err("Whistle non installato. Installalo nella schermata Motori vocali.".into());
+    }
+    let venv = speech_venv_dir(store);
+    let py = venv_python(&venv);
+    let code = format!(
+        "import cactus, json; r = cactus.transcribe({:?}); print(r[\"text\"])",
+        wav_path
+    );
+    let out = std::process::Command::new(&py)
+        .args(["-c", &code])
+        .output()
+        .map_err(|e| format!("Whistle non avviabile: {e}"))?;
+    if !out.status.success() {
+        return Err(format!("Trascrizione fallita: {}", String::from_utf8_lossy(&out.stderr).trim()));
+    }
+    Ok(String::from_utf8_lossy(&out.stdout).trim().to_string())
+}
+
+/// Registra audio dal microfono per `seconds` secondi in un WAV 16kHz mono e lo trascrive con Whistle.
+/// Richiede sounddevice (`pip install sounddevice` o cactus-compute[mic]) nel venv.
+pub fn mic_record_and_transcribe(store: &Store, seconds: u32) -> Result<String, String> {
+    if !speech_is_installed(store, SpeechEngineKind::Whistle) {
+        return Err("Whistle non installato. Installalo in Motori vocali.".into());
+    }
+    let venv = speech_venv_dir(store);
+    let py = venv_python(&venv);
+    let wav = store.base_dir.join("speech").join("mic_capture.wav");
+    // 1) registra con sounddevice + wave (libreria standard)
+    let rec_code = format!(
+        "import sounddevice as sd, wave, numpy as np; \
+         fs=16000; x=sd.rec(int({s}*fs), samplerate=fs, channels=1, dtype='int16'); sd.wait(); \
+         w=wave.open({p:?},'wb'); w.setnchannels(1); w.setsampwidth(2); w.setframerate(fs); w.writeframes(x.tobytes()); w.close()",
+        s = seconds,
+        p = wav.to_string_lossy()
+    );
+    let out = std::process::Command::new(&py)
+        .args(["-c", &rec_code])
+        .output()
+        .map_err(|e| format!("Microfono non disponibile: {e}"))?;
+    if !out.status.success() {
+        return Err(format!("Registrazione fallita (serve sounddevice): {}", String::from_utf8_lossy(&out.stderr).trim()));
+    }
+    // 2) trascrivi con Whistle
+    stt_trascrivi(store, &wav.to_string_lossy())
 }
 
 // ── Translator (MyMemory API, portato da TraduttoreScreen.kt) ──
