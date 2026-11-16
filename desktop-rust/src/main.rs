@@ -1,7 +1,7 @@
 ﻿mod data;
 
 use chrono::{Local};
-use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche, sudtirol_varianti, sudtirol_lessico, sudtirol_frasi, sudtirol_dialoghi, dialoghi_ascolto, dialoghi_per_contesto, placement_domande, placement_valuta, sprechtuebungen_per_livello, esercizi_ascolto_per_livello, domande_comprensione, domande_produzione, wortliste_voci, podcast_episodi, podcast_livelli_info, test_b1_domande, test_b1_testo_lesen, ai_chat, roleplay_scenari};
+use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche, sudtirol_varianti, sudtirol_lessico, sudtirol_frasi, sudtirol_dialoghi, dialoghi_ascolto, dialoghi_per_contesto, placement_domande, placement_valuta, sprechtuebungen_per_livello, esercizi_ascolto_per_livello, domande_comprensione, domande_produzione, wortliste_voci, podcast_episodi, podcast_livelli_info, test_b1_domande, test_b1_testo_lesen, ai_chat, roleplay_scenari, verifica_domande};
 use eframe::egui;
 use std::collections::BTreeSet;
 
@@ -196,6 +196,11 @@ enum Screen {
     Tutor,
     Roleplay,
     VoiceChat,
+    Verifica,
+    NuoveParole,
+    Backup,
+    Benvenuto,
+    ProduzioneScritta,
     Progress,
     Settings,
 }
@@ -287,6 +292,13 @@ struct OpenLingoApp {
     ai_key_draft: String,
     ai_base_draft: String,
     ai_model_draft: String,
+    // Verifica self-test state
+    verifica_queue: Vec<data::DomandaVerifica>,
+    verifica_index: usize,
+    verifica_correct: usize,
+    verifica_picked: Option<usize>,
+    verifica_feedback: bool,
+    nuove_lezione: i32,
 }
 
 fn ui_lang(store: &Store) -> &str {
@@ -383,6 +395,12 @@ impl OpenLingoApp {
             ai_key_draft: String::new(),
             ai_base_draft: String::new(),
             ai_model_draft: String::new(),
+            verifica_queue: Vec::new(),
+            verifica_index: 0,
+            verifica_correct: 0,
+            verifica_picked: None,
+            verifica_feedback: false,
+            nuove_lezione: 0,
         };
         // Default to dark teal theme to better match mobile look (user can change in Settings)
         if app.store.prefs.tema_colore.trim().is_empty() {
@@ -438,6 +456,21 @@ impl OpenLingoApp {
         let base = self.store.prefs.ai_base_url.clone();
         let model = self.store.prefs.ai_model.clone();
         match ai_chat(&key, &base, &model, &system_prompt, &user_text) {
+            Ok(reply) => self.chat_messages.push(("assistant".into(), reply)),
+            Err(e) => self.chat_messages.push(("error".into(), e)),
+        }
+        self.chat_busy = false;
+    }
+
+    /// Invia un testo specifico al tutor AI (usato dalla produzione scritta).
+    fn send_chat_with_text(&mut self, system_prompt: String, text: String) {
+        if self.chat_busy { return; }
+        self.chat_messages.push(("user".into(), text.clone()));
+        self.chat_busy = true;
+        let key = self.store.prefs.ai_api_key.clone();
+        let base = self.store.prefs.ai_base_url.clone();
+        let model = self.store.prefs.ai_model.clone();
+        match ai_chat(&key, &base, &model, &system_prompt, &text) {
             Ok(reply) => self.chat_messages.push(("assistant".into(), reply)),
             Err(e) => self.chat_messages.push(("error".into(), e)),
         }
@@ -522,6 +555,11 @@ impl OpenLingoApp {
             Screen::Tutor => tr(lang, "AI Tutor", "Tutor AI"),
             Screen::Roleplay => tr(lang, "Roleplay", "Gioco di ruolo"),
             Screen::VoiceChat => tr(lang, "Voice chat", "Chat vocale"),
+            Screen::Verifica => tr(lang, "Vocabulary check", "Verifica lessico"),
+            Screen::NuoveParole => tr(lang, "New words", "Nuove parole"),
+            Screen::Backup => tr(lang, "Backup & data", "Backup e dati"),
+            Screen::Benvenuto => tr(lang, "Welcome", "Benvenuto"),
+            Screen::ProduzioneScritta => tr(lang, "Writing", "Produzione scritta"),
             Screen::Progress => tr(lang, "Progress", "Progresso"),
             Screen::Settings => tr(lang, "Settings", "Impostazioni"),
         };
@@ -612,6 +650,8 @@ impl OpenLingoApp {
             (Screen::TestB1, "\u{1F4DD}", tr(lang, "Test B1", "Test B1")),
             (Screen::Tutor, "\u{1F916}", tr(lang, "Tutor", "Tutor")),
             (Screen::Roleplay, "\u{1F3AD}", tr(lang, "Ruoli", "Ruoli")),
+            (Screen::Verifica, "\u{1F9EA}", tr(lang, "Verifica", "Verifica")),
+            (Screen::Backup, "\u{1F4BE}", tr(lang, "Backup", "Backup")),
             (Screen::Progress, "\u{1F4C8}", tr(lang, "Progress", "Progresso")),
         ];
         let w = ui.available_width();
@@ -3615,6 +3655,245 @@ impl OpenLingoApp {
         self.render_chat(ui, system);
     }
 
+    fn screen_verifica(&mut self, ui: &mut egui::Ui) {
+        let lang = ui_lang(&self.store).to_string();
+        let lang = lang.as_str();
+        ui.label(egui::RichText::new(tr(lang, "Vocabulary check", "Verifica lessico")).size(28.0).strong());
+        ui.add_space(6.0);
+        ui.label(egui::RichText::new(tr(lang, "Test your active vocabulary: pick the correct Italian meaning.", "Verifica il lessico attivo: scegli il significato italiano corretto.")).color(ui.visuals().weak_text_color()));
+        ui.add_space(12.0);
+
+        if self.verifica_queue.is_empty() {
+            let parole = self.store.difficult_words(20);
+            let parole: Vec<_> = if parole.len() < 2 {
+                self.store.active_profile().map(|p| p.stato.parole.iter().filter(|w| !w.archived).take(20).cloned().collect()).unwrap_or_default()
+            } else { parole };
+            self.verifica_queue = verifica_domande(&parole, 3, 12345);
+            self.verifica_index = 0;
+            self.verifica_correct = 0;
+        }
+        if self.verifica_queue.is_empty() {
+            ui.label(tr(lang, "Not enough words to run a check. Add at least 2 words to your vocabulary.", "Parole insufficienti per la verifica. Aggiungi almeno 2 parole al lessico."));
+            return;
+        }
+        if self.verifica_index >= self.verifica_queue.len() {
+            ui.label(egui::RichText::new(tr(lang, "Check completed!", "Verifica completata!")).size(22.0).strong());
+            ui.label(format!("{}: {} / {}", tr(lang, "Score", "Punteggio"), self.verifica_correct, self.verifica_queue.len()));
+            ui.add_space(12.0);
+            if ui.add(egui::Button::new(tr(lang, "Restart", "Ricomincia")).min_size(egui::vec2(150.0, 42.0)).rounding(egui::CornerRadius::same(16))).clicked() {
+                self.verifica_queue.clear();
+            }
+            return;
+        }
+        let q = self.verifica_queue[self.verifica_index].clone();
+        let total = self.verifica_queue.len();
+        ui.label(format!("{}/{}", self.verifica_index + 1, total));
+        ui.add(egui::ProgressBar::new(self.verifica_index as f32 / total as f32).desired_height(8.0));
+        ui.add_space(12.0);
+        ui.label(egui::RichText::new(&q.parola.label()).size(24.0).strong());
+        ui.add_space(12.0);
+        let mut picked: Option<usize> = None;
+        for (oi, opt) in q.opzioni.iter().enumerate() {
+            let mut btn = egui::Button::new(opt.clone()).min_size(egui::vec2(ui.available_width() * 0.8, 40.0)).rounding(egui::CornerRadius::same(14));
+            if self.verifica_feedback {
+                if *opt == q.corretta { btn = btn.fill(egui::Color32::from_rgb(70, 140, 80)); }
+                else if self.verifica_picked == Some(oi) { btn = btn.fill(egui::Color32::from_rgb(180, 70, 70)); }
+            }
+            if ui.add(btn).clicked() && !self.verifica_feedback {
+                picked = Some(oi);
+            }
+        }
+        if !self.verifica_feedback {
+            if let Some(p) = picked {
+                self.verifica_picked = Some(p);
+                if q.opzioni[p] == q.corretta { self.verifica_correct += 1; }
+                self.verifica_feedback = true;
+            }
+        } else if ui.add(egui::Button::new(tr(lang, "Next", "Avanti")).min_size(egui::vec2(150.0, 42.0)).rounding(egui::CornerRadius::same(16))).clicked() {
+            self.verifica_index += 1;
+            self.verifica_feedback = false;
+            self.verifica_picked = None;
+        }
+    }
+
+    fn screen_nuove_parole(&mut self, ui: &mut egui::Ui) {
+        let lang = ui_lang(&self.store).to_string();
+        let lang = lang.as_str();
+        ui.label(egui::RichText::new(tr(lang, "New words", "Nuove parole")).size(28.0).strong());
+        ui.add_space(6.0);
+        ui.label(egui::RichText::new(tr(lang, "Browse words by lesson and add new ones to your vocabulary.", "Sfoglia le parole per lezione e aggiungine di nuove al lessico.")).color(ui.visuals().weak_text_color()));
+        ui.add_space(12.0);
+
+        let parole = self.store.active_profile()
+            .map(|p| p.stato.parole.iter().filter(|w| !w.archived).cloned().collect::<Vec<_>>())
+            .unwrap_or_default();
+        let mut lezioni: Vec<i32> = parole.iter().map(|w| w.lesson_number()).collect();
+        lezioni.sort(); lezioni.dedup();
+
+        ui.horizontal_wrapped(|ui| {
+            if ui.selectable_label(self.nuove_lezione == 0, tr(lang, "All", "Tutte")).clicked() { self.nuove_lezione = 0; }
+            for l in lezioni {
+                if ui.selectable_label(self.nuove_lezione == l, format!("L{}", l)).clicked() { self.nuove_lezione = l; }
+            }
+        });
+        ui.add_space(8.0);
+        ui.horizontal(|ui| {
+            ui.add(egui::TextEdit::singleline(&mut self.vocab_query).desired_width(240.0).hint_text(tr(lang, "Search...", "Cerca...")));
+        });
+        ui.add_space(8.0);
+
+        let q = self.vocab_query.trim().to_lowercase();
+        let filtered: Vec<_> = parole.iter().filter(|w| {
+            let lez_ok = self.nuove_lezione == 0 || w.lesson_number() == self.nuove_lezione;
+            let q_ok = q.is_empty() || w.german.to_lowercase().contains(&q) || w.italian.to_lowercase().contains(&q);
+            lez_ok && q_ok
+        }).collect();
+        ui.label(format!("{}: {}", tr(lang, "Words", "Parole"), filtered.len()));
+        egui::ScrollArea::vertical().max_height(ui.available_height()).show(ui, |ui| {
+            for w in filtered.iter().take(200) {
+                ui.horizontal_wrapped(|ui| {
+                    ui.label(egui::RichText::new(w.label()).strong());
+                    ui.label(egui::RichText::new(format!("— {}", w.italian)).color(ui.visuals().weak_text_color()));
+                    ui.small(format!("[L{} · {}]", w.lesson_number(), w.level));
+                });
+                ui.separator();
+            }
+        });
+    }
+
+    fn screen_backup(&mut self, ui: &mut egui::Ui) {
+        let lang = ui_lang(&self.store).to_string();
+        let lang = lang.as_str();
+        ui.label(egui::RichText::new(tr(lang, "Backup & data", "Backup e dati")).size(28.0).strong());
+        ui.add_space(6.0);
+        ui.label(egui::RichText::new(tr(lang, "Export or import your data. Your data stays on this device unless you choose to export it.", "Esporta o importa i tuoi dati. I dati restano su questo dispositivo除非 scegli di esportarli.")).color(ui.visuals().weak_text_color()));
+        ui.add_space(14.0);
+
+        egui::Frame::none().fill(ui.visuals().faint_bg_color).stroke(egui::Stroke::new(1.0, ui.visuals().widgets.noninteractive.bg_stroke.color)).rounding(egui::CornerRadius::same(18)).inner_margin(egui::Margin::same(14)).show(ui, |ui| {
+            ui.label(egui::RichText::new(tr(lang, "Export", "Esporta")).size(18.0).strong());
+            ui.add_space(6.0);
+            ui.horizontal(|ui| {
+                ui.add(egui::TextEdit::singleline(&mut self.backup_path).desired_width(320.0).hint_text("percorso file .json"));
+                if ui.small_button(tr(lang, "Browse", "Sfoglia")).clicked() {
+                    if let Some(path) = rfd::FileDialog::new().add_filter("JSON", &["json"]).save_file() {
+                        self.backup_path = path.to_string_lossy().to_string();
+                    }
+                }
+            });
+            ui.add_space(8.0);
+            if ui.add(egui::Button::new(egui::RichText::new(tr(lang, "Export full bundle", "Esporta bundle completo")).strong()).min_size(egui::vec2(200.0, 40.0)).rounding(egui::CornerRadius::same(14))).clicked() {
+                if self.backup_path.trim().is_empty() {
+                    self.status = tr(lang, "Choose a path first.", "Scegli prima un percorso.").into();
+                } else {
+                    let path = std::path::PathBuf::from(self.backup_path.trim());
+                    match self.store.export_bundle_to(&path) {
+                        Ok(_) => self.status = tr(lang, "Export completed.", "Esportazione completata.").into(),
+                        Err(e) => self.status = format!("Errore: {e}"),
+                    }
+                }
+            }
+            if ui.add(egui::Button::new(tr(lang, "Export profiles JSON", "Esporta profili JSON")).min_size(egui::vec2(200.0, 40.0)).rounding(egui::CornerRadius::same(14))).clicked() {
+                let path = std::path::PathBuf::from(self.backup_path.trim());
+                match self.store.export_profiles_json_to(&path) {
+                    Ok(_) => self.status = tr(lang, "Profiles exported.", "Profili esportati.").into(),
+                    Err(e) => self.status = format!("Errore: {e}"),
+                }
+            }
+        });
+        ui.add_space(14.0);
+        egui::Frame::none().fill(ui.visuals().faint_bg_color).stroke(egui::Stroke::new(1.0, ui.visuals().widgets.noninteractive.bg_stroke.color)).rounding(egui::CornerRadius::same(18)).inner_margin(egui::Margin::same(14)).show(ui, |ui| {
+            ui.label(egui::RichText::new(tr(lang, "Import", "Importa")).size(18.0).strong());
+            ui.add_space(6.0);
+            if ui.add(egui::Button::new(egui::RichText::new(tr(lang, "Import from file", "Importa da file")).strong()).min_size(egui::vec2(200.0, 40.0)).rounding(egui::CornerRadius::same(14))).clicked() {
+                if let Some(path) = rfd::FileDialog::new().add_filter("JSON", &["json"]).pick_file() {
+                    match self.store.import_bundle_from(&path) {
+                        Ok(_) => { self.status = tr(lang, "Import completed.", "Importazione completata.").into(); self.sync_settings_drafts_from_store(); }
+                        Err(e) => self.status = format!("Errore: {e}"),
+                    }
+                }
+            }
+        });
+        ui.add_space(14.0);
+        ui.label(egui::RichText::new(tr(lang, "Data folder", "Cartella dati")).strong());
+        ui.small(self.store.base_dir.to_string_lossy());
+        if !self.status.is_empty() { ui.add_space(8.0); ui.label(&self.status); }
+    }
+
+    fn screen_benvenuto(&mut self, ui: &mut egui::Ui) {
+        let lang = ui_lang(&self.store).to_string();
+        let lang = lang.as_str();
+        ui.vertical_centered(|ui| {
+            ui.add_space(40.0);
+            ui.label(egui::RichText::new("OpenLingo").size(42.0).strong());
+            ui.add_space(8.0);
+            ui.label(egui::RichText::new(tr(lang, "Learn German, your way.", "Impara il tedesco, a modo tuo.")).size(20.0));
+            ui.add_space(30.0);
+        });
+        let has_profile = self.store.active_profile().is_some();
+        if has_profile {
+            let nome = self.store.active_profile().map(|p| p.config.nome_visualizzato.clone()).unwrap_or_default();
+            ui.label(egui::RichText::new(format!("{}: {}", tr(lang, "Active profile", "Profilo attivo"), nome)).size(18.0).strong());
+            ui.add_space(12.0);
+            if ui.add(egui::Button::new(egui::RichText::new(tr(lang, "Start studying", "Inizia a studiare")).strong()).min_size(egui::vec2(220.0, 48.0)).rounding(egui::CornerRadius::same(20))).clicked() {
+                self.screen = Screen::Home;
+            }
+        } else {
+            ui.label(tr(lang, "Create your first profile to begin.", "Crea il tuo primo profilo per iniziare."));
+            ui.add_space(12.0);
+            ui.horizontal(|ui| {
+                ui.add(egui::TextEdit::singleline(&mut self.new_profile_name).desired_width(220.0).hint_text(tr(lang, "Your name", "Il tuo nome")));
+                if ui.add(egui::Button::new(tr(lang, "Create profile", "Crea profilo")).min_size(egui::vec2(150.0, 40.0)).rounding(egui::CornerRadius::same(14))).clicked() {
+                    if !self.new_profile_name.trim().is_empty() {
+                        let id = self.store.create_profile(self.new_profile_name.trim());
+                        self.store.set_active_profile(&id);
+                        let _ = self.store.save();
+                        self.sync_settings_drafts_from_store();
+                        self.new_profile_name.clear();
+                        self.screen = Screen::Home;
+                    }
+                }
+            });
+        }
+    }
+
+    fn screen_produzione_scritta(&mut self, ui: &mut egui::Ui) {
+        let lang = ui_lang(&self.store).to_string();
+        let lang = lang.as_str();
+        ui.label(egui::RichText::new(tr(lang, "Writing production", "Produzione scritta")).size(28.0).strong());
+        ui.add_space(6.0);
+        ui.label(egui::RichText::new(tr(lang, "Write a German text and get AI feedback on your mistakes.", "Scrivi un testo in tedesco e ricevi feedback AI sugli errori.")).color(ui.visuals().weak_text_color()));
+        ui.add_space(12.0);
+        let livello = self.store.active_profile().map(|p| p.config.livello_iniziale.clone()).unwrap_or_else(|| "A1".into());
+        let prompts = [
+            tr(lang, "Describe your daily routine.", "Descrivi la tua routine quotidiana."),
+            tr(lang, "Write about your last holiday.", "Scrivi sulle tue ultime vacanze."),
+            tr(lang, "Describe your job and your tasks.", "Descrivi il tuo lavoro e i tuoi compiti."),
+            tr(lang, "Write about a health problem and what you did.", "Scrivi di un problema di salute e cosa hai fatto."),
+        ];
+        ui.label(egui::RichText::new(tr(lang, "Choose a prompt:", "Scegli un tema:")).strong());
+        for p in prompts { ui.label(format!("- {}", p)); }
+        ui.add_space(12.0);
+        ui.label(egui::RichText::new(tr(lang, "Your text (German):", "Il tuo testo (tedesco):")).strong());
+        ui.add(egui::TextEdit::multiline(&mut self.chat_input).desired_rows(6).desired_width(f32::INFINITY).hint_text("Ich..."));
+        ui.add_space(10.0);
+        if ui.add_enabled(!self.chat_busy, egui::Button::new(egui::RichText::new(tr(lang, "Get AI feedback", "Chiedi feedback AI")).strong()).min_size(egui::vec2(200.0, 42.0)).rounding(egui::CornerRadius::same(16))).clicked() {
+            let text = self.chat_input.trim().to_string();
+            if !text.is_empty() {
+                let system = format!("Sei un correttore di tedesco per uno studente italiano di livello {}. Analizza il testo, elenca TUTTI gli errori (grammatica, articoli, casi, preposizioni, ortografia) e spiega brevemente in italiano. Usa markdown semplice.", livello);
+                self.send_chat_with_text(system, text);
+            }
+        }
+        ui.add_space(12.0);
+        if !self.chat_messages.is_empty() {
+            ui.label(egui::RichText::new(tr(lang, "Feedback", "Feedback")).size(18.0).strong());
+            for (role, text) in self.chat_messages.iter().rev().take(4).rev() {
+                let color = if role == "error" { egui::Color32::from_rgb(230, 110, 110) } else { ui.visuals().strong_text_color() };
+                ui.label(egui::RichText::new(text).color(color));
+                ui.add_space(6.0);
+            }
+        }
+    }
+
     fn screen_settings(&mut self, ui: &mut egui::Ui) {
         let lang_s = ui_lang(&self.store).to_string();
         let lang = lang_s.as_str();
@@ -4120,6 +4399,11 @@ impl eframe::App for OpenLingoApp {
                 Screen::Tutor => self.screen_tutor(ui),
                 Screen::Roleplay => self.screen_roleplay(ui),
                 Screen::VoiceChat => self.screen_voicechat(ui),
+                Screen::Verifica => self.screen_verifica(ui),
+                Screen::NuoveParole => self.screen_nuove_parole(ui),
+                Screen::Backup => self.screen_backup(ui),
+                Screen::Benvenuto => self.screen_benvenuto(ui),
+                Screen::ProduzioneScritta => self.screen_produzione_scritta(ui),
                 Screen::Settings => self.screen_settings(ui),
             });
     }
@@ -4558,6 +4842,25 @@ mod tests {
         assert_eq!(SpeechEngineKind::Phonon.package(), "ptts");
         assert_eq!(SpeechEngineKind::Phonon.module(), "ptts");
         assert_eq!(SpeechEngineKind::Phonon.id(), "phonon");
+    }
+
+    #[test]
+    fn verifica_question_builder_works() {
+        let mut words = Vec::new();
+        for i in 0..5 {
+            let mut w = WordEntity::default();
+            w.id = format!("w{}", i);
+            w.german = format!("Wort{}", i);
+            w.italian = format!("significato{}", i);
+            words.push(w);
+        }
+        let qs = verifica_domande(&words, 3, 42);
+        assert_eq!(qs.len(), 5);
+        for q in &qs {
+            assert!(q.opzioni.len() >= 2 && q.opzioni.len() <= 4);
+            assert!(q.opzioni.contains(&q.corretta), "correct answer must be among options");
+        }
+        assert!(verifica_domande(&words[..1], 3, 42).is_empty());
     }
 
     #[test]

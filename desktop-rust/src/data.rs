@@ -341,6 +341,14 @@ pub struct WordEntity {
 }
 
 impl WordEntity {
+    /// Numero di lezione (salvato in extra per compatibilita' con i profili mobile).
+    pub fn lesson_number(&self) -> i32 {
+        self.extra.get("lesson")
+            .and_then(|v| v.as_i64())
+            .map(|v| v as i32)
+            .unwrap_or(0)
+    }
+
     pub fn label(&self) -> String {
         match &self.article {
             Some(a) if !a.trim().is_empty() => format!("{} {}", a.trim(), self.german),
@@ -4409,4 +4417,40 @@ pub fn roleplay_scenari() -> Vec<ScenarioRoleplay> {
         id: id.to_string(), titolo: t.to_string(), descrizione: d.to_string(),
         ruolo_ai: rai.to_string(), ruolo_utente: ru.to_string(), situazione: s.to_string(),
     }).collect()
+}
+
+
+// ── Verifica lessico (self-test costruito dal profilo, portato da VerificaLessico.kt) ──
+
+#[derive(Debug, Clone)]
+pub struct DomandaVerifica { pub parola: WordEntity, pub opzioni: Vec<String>, pub corretta: String }
+
+/// Costruisce domande di verifica mescolando i significati di altre parole come distrattori.
+pub fn verifica_domande(parole: &[WordEntity], distrattori: usize, seed: u64) -> Vec<DomandaVerifica> {
+    if parole.len() < 2 { return vec![]; }
+    let mut out = Vec::new();
+    for (idx, p) in parole.iter().enumerate() {
+        let corretta = p.italian.trim();
+        if corretta.is_empty() { continue; }
+        let mut candidati: Vec<String> = parole.iter().enumerate()
+            .filter(|(i, w)| *i != idx && !w.italian.trim().is_empty())
+            .filter(|(_, w)| w.italian.trim().to_lowercase() != corretta.to_lowercase())
+            .map(|(_, w)| w.italian.trim().to_string())
+            .collect();
+        candidati.sort();
+        candidati.dedup();
+        let mut s = seed.wrapping_add((idx as u64).wrapping_mul(0x9E3779B97F4A7C15));
+        for i in (1..candidati.len()).rev() {
+            s ^= s << 13; s ^= s >> 7; s ^= s << 17;
+            candidati.swap(i, (s as usize) % (i + 1));
+        }
+        let mut opzioni: Vec<String> = candidati.into_iter().take(distrattori).collect();
+        opzioni.push(corretta.to_string());
+        for i in (1..opzioni.len()).rev() {
+            s ^= s << 13; s ^= s >> 7; s ^= s << 17;
+            opzioni.swap(i, (s as usize) % (i + 1));
+        }
+        out.push(DomandaVerifica { parola: p.clone(), opzioni, corretta: corretta.to_string() });
+    }
+    out
 }
