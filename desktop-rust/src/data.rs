@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+﻿use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::{BTreeMap, HashMap, HashSet};
 use std::fs;
@@ -625,7 +625,7 @@ impl Store {
         let mut out: BTreeMap<String, usize> = BTreeMap::new();
         let Some(p) = self.active_profile() else { return out; };
         for w in p.stato.parole.iter().filter(|w| !w.archived) {
-            let lvl = if w.level.trim().is_empty() { "—".to_string() } else { w.level.trim().to_uppercase() };
+            let lvl = if w.level.trim().is_empty() { "â€”".to_string() } else { w.level.trim().to_uppercase() };
             *out.entry(lvl).or_insert(0) += 1;
         }
         out
@@ -633,7 +633,7 @@ impl Store {
 
     pub fn search_words(&self, query: &str, level: Option<&str>, include_archived: bool, limit: usize) -> Vec<WordEntity> {
         let Some(p) = self.active_profile() else { return vec![]; };
-        let lvl = level.map(|s| s.trim().to_uppercase()).filter(|s| !s.is_empty() && s != "ALL" && s != "—");
+        let lvl = level.map(|s| s.trim().to_uppercase()).filter(|s| !s.is_empty() && s != "ALL" && s != "â€”");
         let mut words: Vec<_> = p.stato.parole.iter()
             .filter(|w| include_archived || !w.archived)
             .filter(|w| lvl.as_ref().map(|l| w.level.trim().to_uppercase() == *l).unwrap_or(true))
@@ -714,7 +714,7 @@ impl Store {
         let ids: Vec<String> = p.stato.parole.iter()
             .filter(|w| !w.archived)
             .filter(|w| match level {
-                Some(lv) if !lv.is_empty() && lv != "ALL" && lv != "—" => w.level.trim().eq_ignore_ascii_case(lv.trim()),
+                Some(lv) if !lv.is_empty() && lv != "ALL" && lv != "â€”" => w.level.trim().eq_ignore_ascii_case(lv.trim()),
                 _ => true,
             })
             .map(|w| w.id.clone())
@@ -859,11 +859,11 @@ pub fn curriculum_topics_for_level(level: &str) -> &'static [(&'static str, &'st
 
 const A1_TOPICS: [(&str, &str); 20] = [
     ("Saluti e presentazioni", "Greetings and introductions"),
-    ("Numeri 0-100, età e date", "Numbers 0-100, age and dates"),
+    ("Numeri 0-100, etÃ  e date", "Numbers 0-100, age and dates"),
     ("La famiglia", "Family"),
     ("Pronomi personali e verbi sein/haben", "Personal pronouns and sein/haben"),
     ("Articoli der/die/das e plurali", "Articles der/die/das and plurals"),
-    ("Città e paese", "City and country"),
+    ("CittÃ  e paese", "City and country"),
     ("Cibo e bevande", "Food and drinks"),
     ("La giornata e le ore", "Daily routine and time"),
     ("Tempo libero e hobby", "Free time and hobbies"),
@@ -892,7 +892,7 @@ const A2_TOPICS: [(&str, &str); 20] = [
     ("Imperativo", "Imperative"),
     ("Pronomi relativi", "Relative pronouns"),
     ("Verbi separabili", "Separable verbs"),
-    ("Präteritum di sein e haben", "Präteritum of sein and haben"),
+    ("PrÃ¤teritum di sein e haben", "PrÃ¤teritum of sein and haben"),
     ("Lessico: lavoro e carriera", "Vocabulary: work and career"),
     ("Lessico: viaggi e turismo", "Vocabulary: travel and tourism"),
     ("Lessico: salute e medicina", "Vocabulary: health and medicine"),
@@ -913,13 +913,13 @@ const B1_TOPICS: [(&str, &str); 20] = [
     ("Verbi riflessivi", "Reflexive verbs"),
     ("Domande indirette", "Indirect questions"),
     ("Passivo con verbi modali", "Passive with modal verbs"),
-    ("Präteritum vs Perfetto", "Präteritum vs Perfekt"),
+    ("PrÃ¤teritum vs Perfetto", "PrÃ¤teritum vs Perfekt"),
     ("Konjunktiv II", "Konjunktiv II"),
     ("Lessico: lavoro e professione sanitaria", "Vocabulary: healthcare work"),
     ("Lessico: salute, corpo e sintomi", "Vocabulary: health, body and symptoms"),
     ("Lessico: relazioni e conflitti", "Vocabulary: relationships and conflicts"),
     ("Lessico: istruzione e formazione", "Vocabulary: education and training"),
-    ("Lessico: ambiente e sostenibilità", "Vocabulary: environment and sustainability"),
+    ("Lessico: ambiente e sostenibilitÃ ", "Vocabulary: environment and sustainability"),
     ("Lessico: tecnologia e innovazione", "Vocabulary: technology and innovation"),
     ("Lessico: cultura e tradizione", "Vocabulary: culture and tradition"),
     ("Lessico: economia e business", "Vocabulary: economy and business"),
@@ -937,8 +937,8 @@ pub fn lesson_topic(level: &str, number: i32) -> (String, String) {
         (it.to_string(), en.to_string())
     } else {
         (
-            format!("{it} — approfondimento {}: nuove parole e strutture", giro + 1),
-            format!("{en} — deepening {}: new words and structures", giro + 1),
+            format!("{it} â€” approfondimento {}: nuove parole e strutture", giro + 1),
+            format!("{en} â€” deepening {}: new words and structures", giro + 1),
         )
     }
 }
@@ -1119,12 +1119,12 @@ fn unit_a0_articoli() -> GrammarUnit {
             ("der Mann", "l'uomo / the man"),
             ("die Frau", "la donna / the woman"),
             ("das Kind", "il bambino / the child"),
-            ("die Bücher", "i libri / the books"),
+            ("die BÃ¼cher", "i libri / the books"),
         ],
         exercises: &[
-            GrammarUnitExercise { prompt_it: "Scegli l'articolo: ___ Mann", prompt_en: "Choose the article: ___ Mann", options: &["der", "die", "das"], correct_index: 0, answer_text: "", explanation_it: "Mann è maschile: der Mann.", explanation_en: "Mann is masculine: der Mann." },
-            GrammarUnitExercise { prompt_it: "Scegli l'articolo: ___ Frau", prompt_en: "Choose the article: ___ Frau", options: &["der", "die", "das"], correct_index: 1, answer_text: "", explanation_it: "Frau è femminile: die Frau.", explanation_en: "Frau is feminine: die Frau." },
-            GrammarUnitExercise { prompt_it: "Scegli l'articolo: ___ Kind", prompt_en: "Choose the article: ___ Kind", options: &["der", "die", "das"], correct_index: 2, answer_text: "", explanation_it: "Kind è neutro: das Kind.", explanation_en: "Kind is neuter: das Kind." },
+            GrammarUnitExercise { prompt_it: "Scegli l'articolo: ___ Mann", prompt_en: "Choose the article: ___ Mann", options: &["der", "die", "das"], correct_index: 0, answer_text: "", explanation_it: "Mann Ã¨ maschile: der Mann.", explanation_en: "Mann is masculine: der Mann." },
+            GrammarUnitExercise { prompt_it: "Scegli l'articolo: ___ Frau", prompt_en: "Choose the article: ___ Frau", options: &["der", "die", "das"], correct_index: 1, answer_text: "", explanation_it: "Frau Ã¨ femminile: die Frau.", explanation_en: "Frau is feminine: die Frau." },
+            GrammarUnitExercise { prompt_it: "Scegli l'articolo: ___ Kind", prompt_en: "Choose the article: ___ Kind", options: &["der", "die", "das"], correct_index: 2, answer_text: "", explanation_it: "Kind Ã¨ neutro: das Kind.", explanation_en: "Kind is neuter: das Kind." },
             GrammarUnitExercise { prompt_it: "Scegli l'articolo (plurale): ___ Kinder", prompt_en: "Choose the article (plural): ___ Kinder", options: &["der", "die", "das"], correct_index: 1, answer_text: "", explanation_it: "Il plurale al nominativo usa die.", explanation_en: "Plural nominative uses die." },
         ],
     }
@@ -1152,7 +1152,7 @@ fn unit_a0_pronomi_sein() -> GrammarUnit {
         ],
         examples: &[
             ("Ich bin Anna.", "Io sono Anna."),
-            ("Du bist müde.", "Tu sei stanco/a."),
+            ("Du bist mÃ¼de.", "Tu sei stanco/a."),
             ("Wir sind in Berlin.", "Siamo a Berlino."),
         ],
         exercises: &[
@@ -1175,9 +1175,9 @@ fn unit_a0_frase() -> GrammarUnit {
         objective_it: "Costruire frasi semplici con il verbo al secondo posto.",
         objective_en: "Build simple sentences with the verb in second position.",
         theory_it: &[
-            "Nella frase principale il verbo coniugato è sempre in posizione 2.",
-            "Il soggetto può stare in posizione 1 o 3: Ich lerne Deutsch. / Heute lerne ich Deutsch.",
-            "Le domande sì/no iniziano con il verbo: Lernst du Deutsch?",
+            "Nella frase principale il verbo coniugato Ã¨ sempre in posizione 2.",
+            "Il soggetto puÃ² stare in posizione 1 o 3: Ich lerne Deutsch. / Heute lerne ich Deutsch.",
+            "Le domande sÃ¬/no iniziano con il verbo: Lernst du Deutsch?",
         ],
         theory_en: &[
             "In a main clause the conjugated verb is always in position 2.",
@@ -1190,9 +1190,9 @@ fn unit_a0_frase() -> GrammarUnit {
             ("Wohnst du in Wien?", "Abiti a Vienna?"),
         ],
         exercises: &[
-            GrammarUnitExercise { prompt_it: "Quale frase è corretta?", prompt_en: "Which sentence is correct?", options: &["Ich heute lerne Deutsch.", "Heute lerne ich Deutsch.", "Heute ich lerne Deutsch."], correct_index: 1, answer_text: "", explanation_it: "Il verbo resta in seconda posizione: Heute (1) lerne (2) ich (3)...", explanation_en: "Verb stays in position 2: Heute (1) lerne (2) ich (3)..." },
-            GrammarUnitExercise { prompt_it: "Completa l'ordine corretto: ___ du Deutsch? (lernen)", prompt_en: "Complete the correct order: ___ du Deutsch? (lernen)", options: &["Du lernst", "Lernst", "Deutsch lernst"], correct_index: 1, answer_text: "", explanation_it: "Nelle domande sì/no il verbo va all'inizio.", explanation_en: "In yes/no questions the verb comes first." },
-            GrammarUnitExercise { prompt_it: "Quale frase è corretta?", prompt_en: "Which sentence is correct?", options: &["Wir spielen heute Fußball.", "Wir heute spielen Fußball.", "Spielen wir heute Fußball."], correct_index: 0, answer_text: "", explanation_it: "Frase affermativa: soggetto (1), verbo (2), resto.", explanation_en: "Statement: subject (1), verb (2), rest." },
+            GrammarUnitExercise { prompt_it: "Quale frase Ã¨ corretta?", prompt_en: "Which sentence is correct?", options: &["Ich heute lerne Deutsch.", "Heute lerne ich Deutsch.", "Heute ich lerne Deutsch."], correct_index: 1, answer_text: "", explanation_it: "Il verbo resta in seconda posizione: Heute (1) lerne (2) ich (3)...", explanation_en: "Verb stays in position 2: Heute (1) lerne (2) ich (3)..." },
+            GrammarUnitExercise { prompt_it: "Completa l'ordine corretto: ___ du Deutsch? (lernen)", prompt_en: "Complete the correct order: ___ du Deutsch? (lernen)", options: &["Du lernst", "Lernst", "Deutsch lernst"], correct_index: 1, answer_text: "", explanation_it: "Nelle domande sÃ¬/no il verbo va all'inizio.", explanation_en: "In yes/no questions the verb comes first." },
+            GrammarUnitExercise { prompt_it: "Quale frase Ã¨ corretta?", prompt_en: "Which sentence is correct?", options: &["Wir spielen heute FuÃŸball.", "Wir heute spielen FuÃŸball.", "Spielen wir heute FuÃŸball."], correct_index: 0, answer_text: "", explanation_it: "Frase affermativa: soggetto (1), verbo (2), resto.", explanation_en: "Statement: subject (1), verb (2), rest." },
         ],
     }
 }
@@ -1258,7 +1258,7 @@ fn unit_a1_sein_haben() -> GrammarUnit {
         ],
         exercises: &[
             GrammarUnitExercise { prompt_it: "Completa: Ich ___ eine Schwester. (haben)", prompt_en: "Complete: Ich ___ eine Schwester. (haben)", options: &["habe", "hast", "hat"], correct_index: 0, answer_text: "", explanation_it: "Con ich: ich habe.", explanation_en: "With ich: ich habe." },
-            GrammarUnitExercise { prompt_it: "Completa: Du ___ müde. (sein)", prompt_en: "Complete: Du ___ müde. (sein)", options: &["bin", "bist", "ist"], correct_index: 1, answer_text: "", explanation_it: "Con du: du bist.", explanation_en: "With du: du bist." },
+            GrammarUnitExercise { prompt_it: "Completa: Du ___ mÃ¼de. (sein)", prompt_en: "Complete: Du ___ mÃ¼de. (sein)", options: &["bin", "bist", "ist"], correct_index: 1, answer_text: "", explanation_it: "Con du: du bist.", explanation_en: "With du: du bist." },
             GrammarUnitExercise { prompt_it: "Scrivi la forma corretta: Er ___ (haben) ein Auto.", prompt_en: "Type the correct form: Er ___ (haben) ein Auto.", options: &[], correct_index: 0, answer_text: "hat", explanation_it: "Con er/sie/es: er hat.", explanation_en: "With er/sie/es: er hat." },
             GrammarUnitExercise { prompt_it: "Scrivi la forma corretta: Wir ___ (sein) bereit.", prompt_en: "Type the correct form: Wir ___ (sein) bereit.", options: &[], correct_index: 0, answer_text: "sind", explanation_it: "Con wir: wir sind.", explanation_en: "With wir: wir sind." },
         ],
@@ -1269,21 +1269,21 @@ fn unit_a1_modalverben() -> GrammarUnit {
     GrammarUnit {
         id: "a1-modalverben",
         level: "A1",
-        title_it: "Verbi modali: können, müssen, wollen",
-        title_en: "Modal verbs: können, müssen, wollen",
+        title_it: "Verbi modali: kÃ¶nnen, mÃ¼ssen, wollen",
+        title_en: "Modal verbs: kÃ¶nnen, mÃ¼ssen, wollen",
         subtitle_it: "Potere, dovere, volere",
         subtitle_en: "Can, must, want",
         objective_it: "Usare i modali principali con l'infinito in fondo.",
         objective_en: "Use common modals with the infinitive at the end.",
         theory_it: &[
             "I modali cambiano la vocale/radice in alcune persone: ich kann, du kannst, er kann; ich muss, du musst; ich will, du willst.",
-            "Nella frase principale il modale è coniugato in posizione 2 e l'infinito va alla fine.",
-            "Esempio: Ich kann Deutsch sprechen. / Wir müssen heute lernen.",
+            "Nella frase principale il modale Ã¨ coniugato in posizione 2 e l'infinito va alla fine.",
+            "Esempio: Ich kann Deutsch sprechen. / Wir mÃ¼ssen heute lernen.",
         ],
         theory_en: &[
             "Modals change stem in some forms: ich kann, du kannst, er kann; ich muss, du musst; ich will, du willst.",
             "In a main clause the conjugated modal is in position 2 and the infinitive goes to the end.",
-            "Example: Ich kann Deutsch sprechen. / Wir müssen heute lernen.",
+            "Example: Ich kann Deutsch sprechen. / Wir mÃ¼ssen heute lernen.",
         ],
         examples: &[
             ("Ich kann schwimmen.", "So nuotare."),
@@ -1291,10 +1291,10 @@ fn unit_a1_modalverben() -> GrammarUnit {
             ("Wir wollen nach Hause gehen.", "Vogliamo andare a casa."),
         ],
         exercises: &[
-            GrammarUnitExercise { prompt_it: "Completa: Ich ___ gut kochen. (können)", prompt_en: "Complete: Ich ___ gut kochen. (können)", options: &["kann", "kannst", "können"], correct_index: 0, answer_text: "", explanation_it: "Con ich: ich kann.", explanation_en: "With ich: ich kann." },
-            GrammarUnitExercise { prompt_it: "Completa: Du ___ heute lernen. (müssen)", prompt_en: "Complete: Du ___ heute lernen. (müssen)", options: &["muss", "musst", "müssen"], correct_index: 1, answer_text: "", explanation_it: "Con du: du musst.", explanation_en: "With du: du musst." },
-            GrammarUnitExercise { prompt_it: "Scegli la frase corretta.", prompt_en: "Choose the correct sentence.", options: &["Ich will spielen Fußball.", "Ich will Fußball spielen.", "Will ich Fußball spielen."], correct_index: 1, answer_text: "", explanation_it: "Il modale va in posizione 2 e l'infinito alla fine.", explanation_en: "Modal in position 2, infinitive at the end." },
-            GrammarUnitExercise { prompt_it: "Scrivi il modale corretto: Er ___ (können) helfen.", prompt_en: "Type the correct modal: Er ___ (können) helfen.", options: &[], correct_index: 0, answer_text: "kann", explanation_it: "Con er/sie/es: er kann.", explanation_en: "With er/sie/es: er kann." },
+            GrammarUnitExercise { prompt_it: "Completa: Ich ___ gut kochen. (kÃ¶nnen)", prompt_en: "Complete: Ich ___ gut kochen. (kÃ¶nnen)", options: &["kann", "kannst", "kÃ¶nnen"], correct_index: 0, answer_text: "", explanation_it: "Con ich: ich kann.", explanation_en: "With ich: ich kann." },
+            GrammarUnitExercise { prompt_it: "Completa: Du ___ heute lernen. (mÃ¼ssen)", prompt_en: "Complete: Du ___ heute lernen. (mÃ¼ssen)", options: &["muss", "musst", "mÃ¼ssen"], correct_index: 1, answer_text: "", explanation_it: "Con du: du musst.", explanation_en: "With du: du musst." },
+            GrammarUnitExercise { prompt_it: "Scegli la frase corretta.", prompt_en: "Choose the correct sentence.", options: &["Ich will spielen FuÃŸball.", "Ich will FuÃŸball spielen.", "Will ich FuÃŸball spielen."], correct_index: 1, answer_text: "", explanation_it: "Il modale va in posizione 2 e l'infinito alla fine.", explanation_en: "Modal in position 2, infinitive at the end." },
+            GrammarUnitExercise { prompt_it: "Scrivi il modale corretto: Er ___ (kÃ¶nnen) helfen.", prompt_en: "Type the correct modal: Er ___ (kÃ¶nnen) helfen.", options: &[], correct_index: 0, answer_text: "kann", explanation_it: "Con er/sie/es: er kann.", explanation_en: "With er/sie/es: er kann." },
         ],
     }
 }
@@ -1325,7 +1325,7 @@ fn unit_a2_perfekt_intro() -> GrammarUnit {
             ("Wir sind nach Hause gegangen.", "Siamo andati a casa."),
         ],
         exercises: &[
-            GrammarUnitExercise { prompt_it: "Quale ausiliare è tipico per 'machen'?", prompt_en: "Which auxiliary is typical for 'machen'?", options: &["sein", "haben", "werden"], correct_index: 1, answer_text: "", explanation_it: "machen forma il Perfekt con haben: ich habe gemacht.", explanation_en: "machen forms Perfekt with haben: ich habe gemacht." },
+            GrammarUnitExercise { prompt_it: "Quale ausiliare Ã¨ tipico per 'machen'?", prompt_en: "Which auxiliary is typical for 'machen'?", options: &["sein", "haben", "werden"], correct_index: 1, answer_text: "", explanation_it: "machen forma il Perfekt con haben: ich habe gemacht.", explanation_en: "machen forms Perfekt with haben: ich habe gemacht." },
             GrammarUnitExercise { prompt_it: "Completa: Ich ___ gestern gelernt. (haben)", prompt_en: "Complete: Ich ___ gestern gelernt. (haben)", options: &["habe", "bin", "hat"], correct_index: 0, answer_text: "", explanation_it: "Con ich + haben: ich habe gelernt.", explanation_en: "With ich + haben: ich habe gelernt." },
             GrammarUnitExercise { prompt_it: "Scegli il participio corretto di machen.", prompt_en: "Choose the correct participle of machen.", options: &["gemacht", "gemachen", "gemachte"], correct_index: 0, answer_text: "", explanation_it: "Regolare: ge- + mach + -t = gemacht.", explanation_en: "Regular: ge- + mach + -t = gemacht." },
             GrammarUnitExercise { prompt_it: "Scrivi il participio: lernen -> ___", prompt_en: "Type the participle: lernen -> ___", options: &[], correct_index: 0, answer_text: "gelernt", explanation_it: "lernen -> gelernt (ge- + lern + -t).", explanation_en: "lernen -> gelernt (ge- + lern + -t)." },
@@ -1355,13 +1355,13 @@ fn unit_a2_dativ() -> GrammarUnit {
         ],
         examples: &[
             ("Ich helfe dem Mann.", "Aiuto l'uomo."),
-            ("Sie gibt der Frau ein Buch.", "Dà un libro alla donna."),
+            ("Sie gibt der Frau ein Buch.", "DÃ  un libro alla donna."),
             ("Wir fahren mit dem Bus.", "Andiamo in autobus."),
         ],
         exercises: &[
             GrammarUnitExercise { prompt_it: "Completa: Ich helfe ___ Mann. (der)", prompt_en: "Complete: Ich helfe ___ Mann. (der)", options: &["den", "dem", "der"], correct_index: 1, answer_text: "", explanation_it: "Dativo maschile: der -> dem.", explanation_en: "Masculine dative: der -> dem." },
             GrammarUnitExercise { prompt_it: "Completa: Sie dankt ___ Frau. (die)", prompt_en: "Complete: Sie dankt ___ Frau. (die)", options: &["die", "der", "den"], correct_index: 1, answer_text: "", explanation_it: "Dativo femminile: die -> der.", explanation_en: "Feminine dative: die -> der." },
-            GrammarUnitExercise { prompt_it: "Scegli la preposizione che regge il dativo.", prompt_en: "Choose the preposition that takes dative.", options: &["für", "ohne", "mit"], correct_index: 2, answer_text: "", explanation_it: "mit richiede il dativo (es. mit dem Bus).", explanation_en: "mit takes the dative (e.g. mit dem Bus)." },
+            GrammarUnitExercise { prompt_it: "Scegli la preposizione che regge il dativo.", prompt_en: "Choose the preposition that takes dative.", options: &["fÃ¼r", "ohne", "mit"], correct_index: 2, answer_text: "", explanation_it: "mit richiede il dativo (es. mit dem Bus).", explanation_en: "mit takes the dative (e.g. mit dem Bus)." },
             GrammarUnitExercise { prompt_it: "Scrivi l'articolo: Ich spreche mit ___ Kind. (das)", prompt_en: "Type the article: Ich spreche mit ___ Kind. (das)", options: &[], correct_index: 0, answer_text: "dem", explanation_it: "Neutro al dativo: das -> dem.", explanation_en: "Neuter dative: das -> dem." },
         ],
     }
@@ -1375,11 +1375,11 @@ fn unit_a2_weil_dass() -> GrammarUnit {
         title_en: "Subordinate clauses with weil and dass",
         subtitle_it: "Il verbo va alla fine della subordinata",
         subtitle_en: "Verb goes to the end in subordinate clauses",
-        objective_it: "Costruire frasi con weil (perché) e dass (che).",
+        objective_it: "Costruire frasi con weil (perchÃ©) e dass (che).",
         objective_en: "Build sentences with weil (because) and dass (that).",
         theory_it: &[
             "Nelle subordinate introdotte da weil/dass il verbo coniugato va alla fine.",
-            "La subordinata può stare dopo o prima della principale: Ich bleibe zu Hause, weil ich krank bin. / Weil ich krank bin, bleibe ich zu Hause.",
+            "La subordinata puÃ² stare dopo o prima della principale: Ich bleibe zu Hause, weil ich krank bin. / Weil ich krank bin, bleibe ich zu Hause.",
             "Con modale: ... weil ich heute arbeiten muss.",
         ],
         theory_en: &[
@@ -1388,14 +1388,14 @@ fn unit_a2_weil_dass() -> GrammarUnit {
             "With modal: ... weil ich heute arbeiten muss.",
         ],
         examples: &[
-            ("Ich lerne Deutsch, weil ich in Wien arbeite.", "Studio tedesco perché lavoro a Vienna."),
-            ("Ich weiß, dass du müde bist.", "So che sei stanco/a."),
+            ("Ich lerne Deutsch, weil ich in Wien arbeite.", "Studio tedesco perchÃ© lavoro a Vienna."),
+            ("Ich weiÃŸ, dass du mÃ¼de bist.", "So che sei stanco/a."),
         ],
         exercises: &[
-            GrammarUnitExercise { prompt_it: "Quale frase è corretta?", prompt_en: "Which sentence is correct?", options: &["Ich bleibe, weil ich bin krank.", "Ich bleibe, weil ich krank bin.", "Weil ich krank bin, ich bleibe."], correct_index: 1, answer_text: "", explanation_it: "In subordinata il verbo va alla fine: weil ich krank bin.", explanation_en: "In subordinate clause the verb goes to the end: weil ich krank bin." },
+            GrammarUnitExercise { prompt_it: "Quale frase Ã¨ corretta?", prompt_en: "Which sentence is correct?", options: &["Ich bleibe, weil ich bin krank.", "Ich bleibe, weil ich krank bin.", "Weil ich krank bin, ich bleibe."], correct_index: 1, answer_text: "", explanation_it: "In subordinata il verbo va alla fine: weil ich krank bin.", explanation_en: "In subordinate clause the verb goes to the end: weil ich krank bin." },
             GrammarUnitExercise { prompt_it: "Completa: Ich denke, dass er heute ___ . (kommen)", prompt_en: "Complete: Ich denke, dass er heute ___ . (kommen)", options: &["kommt", "kommen", "kam"], correct_index: 0, answer_text: "", explanation_it: "Verbo coniugato alla fine della subordinata: dass er heute kommt.", explanation_en: "Conjugated verb at the end: dass er heute kommt." },
-            GrammarUnitExercise { prompt_it: "Scegli la congiunzione: Ich lerne, ___ ich die Prüfung habe.", prompt_en: "Choose the conjunction: Ich lerne, ___ ich die Prüfung habe.", options: &["dass", "weil", "ob"], correct_index: 1, answer_text: "", explanation_it: "weil esprime causa: perché ho l'esame.", explanation_en: "weil expresses reason/cause." },
-            GrammarUnitExercise { prompt_it: "Scrivi l'ultima parola: Ich weiß, dass du Recht ___ . (haben)", prompt_en: "Type the last word: Ich weiß, dass du Recht ___ . (haben)", options: &[], correct_index: 0, answer_text: "hast", explanation_it: "In subordinata il verbo coniugato va alla fine: dass du Recht hast.", explanation_en: "Conjugated verb at the end of subordinate clause: dass du Recht hast." },
+            GrammarUnitExercise { prompt_it: "Scegli la congiunzione: Ich lerne, ___ ich die PrÃ¼fung habe.", prompt_en: "Choose the conjunction: Ich lerne, ___ ich die PrÃ¼fung habe.", options: &["dass", "weil", "ob"], correct_index: 1, answer_text: "", explanation_it: "weil esprime causa: perchÃ© ho l'esame.", explanation_en: "weil expresses reason/cause." },
+            GrammarUnitExercise { prompt_it: "Scrivi l'ultima parola: Ich weiÃŸ, dass du Recht ___ . (haben)", prompt_en: "Type the last word: Ich weiÃŸ, dass du Recht ___ . (haben)", options: &[], correct_index: 0, answer_text: "hast", explanation_it: "In subordinata il verbo coniugato va alla fine: dass du Recht hast.", explanation_en: "Conjugated verb at the end of subordinate clause: dass du Recht hast." },
         ],
     }
 }
@@ -1406,28 +1406,28 @@ fn unit_a2_komparativ() -> GrammarUnit {
         level: "A2",
         title_it: "Comparativi e superlativi",
         title_en: "Comparatives and superlatives",
-        subtitle_it: "Confrontare persone, cose e qualità",
+        subtitle_it: "Confrontare persone, cose e qualitÃ ",
         subtitle_en: "Compare people, things, and qualities",
         objective_it: "Formare e usare comparativo e superlativo di base.",
         objective_en: "Form and use basic comparative and superlative forms.",
         theory_it: &[
-            "Comparativo: aggettivo + -er (+ spesso umlaut: alt -> älter), confronto con 'als'.",
+            "Comparativo: aggettivo + -er (+ spesso umlaut: alt -> Ã¤lter), confronto con 'als'.",
             "Superlativo: am + aggettivo + -sten (am schnellsten) oppure der/die/das + -ste in attributo.",
             "Irregolari comuni: gut -> besser -> am besten; viel -> mehr -> am meisten.",
         ],
         theory_en: &[
-            "Comparative: adjective + -er (often umlaut: alt -> älter), comparison with 'als'.",
+            "Comparative: adjective + -er (often umlaut: alt -> Ã¤lter), comparison with 'als'.",
             "Superlative: am + adjective + -sten (am schnellsten) or der/die/das + -ste as attribute.",
             "Common irregulars: gut -> besser -> am besten; viel -> mehr -> am meisten.",
         ],
         examples: &[
-            ("Mein Auto ist schneller als dein Auto.", "La mia auto è più veloce della tua."),
-            ("Sie ist die beste Spielerin.", "Lei è la migliore giocatrice."),
-            ("Im Sommer ist es am wärmsten.", "In estate fa più caldo (è il periodo più caldo)."),
+            ("Mein Auto ist schneller als dein Auto.", "La mia auto Ã¨ piÃ¹ veloce della tua."),
+            ("Sie ist die beste Spielerin.", "Lei Ã¨ la migliore giocatrice."),
+            ("Im Sommer ist es am wÃ¤rmsten.", "In estate fa piÃ¹ caldo (Ã¨ il periodo piÃ¹ caldo)."),
         ],
         exercises: &[
             GrammarUnitExercise { prompt_it: "Completa il comparativo: schnell -> ___", prompt_en: "Complete the comparative: schnell -> ___", options: &["schneller", "am schnellsten", "schnellste"], correct_index: 0, answer_text: "", explanation_it: "Comparativo regolare: schnell + -er = schneller.", explanation_en: "Regular comparative: schnell + -er = schneller." },
-            GrammarUnitExercise { prompt_it: "Scegli la forma corretta: gut -> ___ -> am besten", prompt_en: "Choose the correct form: gut -> ___ -> am besten", options: &["guter", "besser", "mehr"], correct_index: 1, answer_text: "", explanation_it: "gut è irregolare: besser.", explanation_en: "gut is irregular: besser." },
+            GrammarUnitExercise { prompt_it: "Scegli la forma corretta: gut -> ___ -> am besten", prompt_en: "Choose the correct form: gut -> ___ -> am besten", options: &["guter", "besser", "mehr"], correct_index: 1, answer_text: "", explanation_it: "gut Ã¨ irregolare: besser.", explanation_en: "gut is irregular: besser." },
             GrammarUnitExercise { prompt_it: "Completa: Dieses Buch ist ___ als jenes. (interessant)", prompt_en: "Complete: Dieses Buch ist ___ als jenes. (interessant)", options: &[], correct_index: 0, answer_text: "interessanter", explanation_it: "Comparativo: interessanter als ...", explanation_en: "Comparative: interessanter als ..." },
             GrammarUnitExercise { prompt_it: "Scegli il superlativo predicativo di schnell.", prompt_en: "Choose the predicative superlative of schnell.", options: &["am schnellsten", "schneller", "der schnellste"], correct_index: 0, answer_text: "", explanation_it: "Predicativo: am + -sten = am schnellsten.", explanation_en: "Predicative: am + -sten = am schnellsten." },
         ],
@@ -1442,7 +1442,7 @@ fn unit_b1_adjektivdeklination_intro() -> GrammarUnit {
         title_en: "Adjective declension (introduction)",
         subtitle_it: "Desinenze con articolo determinativo e indeterminativo",
         subtitle_en: "Endings with definite and indefinite articles",
-        objective_it: "Riconoscere le desinenze più comuni degli aggettivi attributivi.",
+        objective_it: "Riconoscere le desinenze piÃ¹ comuni degli aggettivi attributivi.",
         objective_en: "Recognize the most common attributive adjective endings.",
         theory_it: &[
             "L'aggettivo davanti al nome prende desinenze che dipendono da genere, caso e articolo.",
@@ -1455,9 +1455,9 @@ fn unit_b1_adjektivdeklination_intro() -> GrammarUnit {
             "With indefinite article in nominative: ein guter Mann, eine gute Frau, ein gutes Kind.",
         ],
         examples: &[
-            ("Der kleine Hund schläft.", "Il cagnolino dorme."),
+            ("Der kleine Hund schlÃ¤ft.", "Il cagnolino dorme."),
             ("Ich habe eine neue Tasche.", "Ho una borsa nuova."),
-            ("Das ist ein gutes Buch.", "Questo è un buon libro."),
+            ("Das ist ein gutes Buch.", "Questo Ã¨ un buon libro."),
         ],
         exercises: &[
             GrammarUnitExercise { prompt_it: "Completa: der ___ Mann (gut)", prompt_en: "Complete: der ___ Mann (gut)", options: &["gute", "guter", "gutes"], correct_index: 0, answer_text: "", explanation_it: "Maschile nominativo con articolo determinativo: der gute Mann.", explanation_en: "Masculine nominative with definite article: der gute Mann." },
@@ -1474,19 +1474,19 @@ fn unit_a2_praepositionen_dativ() -> GrammarUnit {
         level: "A2",
         title_it: "Preposizioni con dativo",
         title_en: "Prepositions with dative",
-        subtitle_it: "mit, nach, bei, von, zu, aus, seit, gegenüber",
-        subtitle_en: "mit, nach, bei, von, zu, aus, seit, gegenüber",
-        objective_it: "Usare le preposizioni più comuni che richiedono il dativo.",
+        subtitle_it: "mit, nach, bei, von, zu, aus, seit, gegenÃ¼ber",
+        subtitle_en: "mit, nach, bei, von, zu, aus, seit, gegenÃ¼ber",
+        objective_it: "Usare le preposizioni piÃ¹ comuni che richiedono il dativo.",
         objective_en: "Use common prepositions that take the dative.",
         theory_it: &[
-            "Alcune preposizioni reggono sempre il dativo: aus, bei, mit, nach, seit, von, zu, gegenüber.",
+            "Alcune preposizioni reggono sempre il dativo: aus, bei, mit, nach, seit, von, zu, gegenÃ¼ber.",
             "Dopo queste preposizioni l'articolo maschile/neutro diventa dem, il femminile der.",
-            "Esempio: mit dem Freund, bei der Ärztin, zu dem -> zum, zu der -> zur.",
+            "Esempio: mit dem Freund, bei der Ã„rztin, zu dem -> zum, zu der -> zur.",
         ],
         theory_en: &[
-            "Some prepositions always take the dative: aus, bei, mit, nach, seit, von, zu, gegenüber.",
+            "Some prepositions always take the dative: aus, bei, mit, nach, seit, von, zu, gegenÃ¼ber.",
             "After these, masculine/neuter article becomes dem, feminine becomes der.",
-            "Example: mit dem Freund, bei der Ärztin, zu dem -> zum, zu der -> zur.",
+            "Example: mit dem Freund, bei der Ã„rztin, zu dem -> zum, zu der -> zur.",
         ],
         examples: &[
             ("Ich fahre mit dem Bus.", "Vado in autobus."),
@@ -1496,7 +1496,7 @@ fn unit_a2_praepositionen_dativ() -> GrammarUnit {
         exercises: &[
             GrammarUnitExercise { prompt_it: "Completa: Ich fahre mit ___ Auto. (das)", prompt_en: "Complete: Ich fahre mit ___ Auto. (das)", options: &["das", "dem", "den"], correct_index: 1, answer_text: "", explanation_it: "mit + dativo neutro: dem Auto.", explanation_en: "mit + dative neuter: dem Auto." },
             GrammarUnitExercise { prompt_it: "Completa: Er wohnt bei ___ Tante. (die)", prompt_en: "Complete: Er wohnt bei ___ Tante. (die)", options: &["die", "der", "den"], correct_index: 1, answer_text: "", explanation_it: "bei + dativo femminile: der Tante.", explanation_en: "bei + dative feminine: der Tante." },
-            GrammarUnitExercise { prompt_it: "Scegli la preposizione che regge il dativo.", prompt_en: "Choose the preposition that takes dative.", options: &["durch", "für", "von"], correct_index: 2, answer_text: "", explanation_it: "von richiede il dativo; durch/für l'accusativo.", explanation_en: "von takes dative; durch/für take accusative." },
+            GrammarUnitExercise { prompt_it: "Scegli la preposizione che regge il dativo.", prompt_en: "Choose the preposition that takes dative.", options: &["durch", "fÃ¼r", "von"], correct_index: 2, answer_text: "", explanation_it: "von richiede il dativo; durch/fÃ¼r l'accusativo.", explanation_en: "von takes dative; durch/fÃ¼r take accusative." },
             GrammarUnitExercise { prompt_it: "Scrivi la forma contratta: zu + dem = ___", prompt_en: "Type the contraction: zu + dem = ___", options: &[], correct_index: 0, answer_text: "zum", explanation_it: "zu + dem si contrae in zum.", explanation_en: "zu + dem contracts to zum." },
         ],
     }
@@ -1523,14 +1523,14 @@ fn unit_b1_relativsaetze_intro() -> GrammarUnit {
             "In a relative clause the conjugated verb goes to the end.",
         ],
         examples: &[
-            ("Das ist der Mann, der hier wohnt.", "Questo è l'uomo che abita qui."),
+            ("Das ist der Mann, der hier wohnt.", "Questo Ã¨ l'uomo che abita qui."),
             ("Ich kenne die Frau, die du meinst.", "Conosco la donna che intendi."),
-            ("Das ist das Buch, das ich lese.", "Questo è il libro che leggo."),
+            ("Das ist das Buch, das ich lese.", "Questo Ã¨ il libro che leggo."),
         ],
         exercises: &[
             GrammarUnitExercise { prompt_it: "Completa: Der Mann, ___ dort steht, ist mein Lehrer.", prompt_en: "Complete: Der Mann, ___ dort steht, ist mein Lehrer.", options: &["der", "den", "dem"], correct_index: 0, answer_text: "", explanation_it: "Soggetto maschile nella relativa: der.", explanation_en: "Masculine subject in relative clause: der." },
             GrammarUnitExercise { prompt_it: "Completa: Das Kind, ___ ich sehe, spielt.", prompt_en: "Complete: Das Kind, ___ ich sehe, spielt.", options: &["der", "das", "dem"], correct_index: 1, answer_text: "", explanation_it: "Neutro, oggetto in relativa (accusativo = nominativo qui): das.", explanation_en: "Neuter object in relative clause: das." },
-            GrammarUnitExercise { prompt_it: "Completa: Die Frau, ___ du kennst, ist Ärztin. (accusativo)", prompt_en: "Complete: Die Frau, ___ du kennst, ist Ärztin. (accusative)", options: &["der", "die", "den"], correct_index: 1, answer_text: "", explanation_it: "Femminile accusativo nella relativa: die.", explanation_en: "Feminine accusative in relative clause: die." },
+            GrammarUnitExercise { prompt_it: "Completa: Die Frau, ___ du kennst, ist Ã„rztin. (accusativo)", prompt_en: "Complete: Die Frau, ___ du kennst, ist Ã„rztin. (accusative)", options: &["der", "die", "den"], correct_index: 1, answer_text: "", explanation_it: "Femminile accusativo nella relativa: die.", explanation_en: "Feminine accusative in relative clause: die." },
             GrammarUnitExercise { prompt_it: "Scrivi il pronome: Der Hund, ___ ich habe, ist klein. (accusativo maschile)", prompt_en: "Type the pronoun: Der Hund, ___ ich habe, ist klein. (masc. accusative)", options: &[], correct_index: 0, answer_text: "den", explanation_it: "Maschile accusativo nella relativa: den.", explanation_en: "Masculine accusative relative pronoun: den." },
         ],
     }
@@ -1547,8 +1547,8 @@ fn unit_b1_konnektoren() -> GrammarUnit {
         objective_it: "Usare connettori comuni per strutturare frasi e argomenti.",
         objective_en: "Use common connectors to structure sentences and arguments.",
         theory_it: &[
-            "deshalb (perciò) introduce una conseguenza: spesso il verbo segue subito (posizione 2) nella frase principale.",
-            "trotzdem (nonostante ciò) esprime contrasto rispetto a quanto detto prima.",
+            "deshalb (perciÃ²) introduce una conseguenza: spesso il verbo segue subito (posizione 2) nella frase principale.",
+            "trotzdem (nonostante ciÃ²) esprime contrasto rispetto a quanto detto prima.",
             "obwohl (sebbene) introduce una subordinata: il verbo coniugato va alla fine.",
         ],
         theory_en: &[
@@ -1557,15 +1557,15 @@ fn unit_b1_konnektoren() -> GrammarUnit {
             "obwohl (although) introduces a subordinate clause: the conjugated verb goes to the end.",
         ],
         examples: &[
-            ("Es regnet, deshalb bleibe ich zu Hause.", "Piove, perciò resto a casa."),
-            ("Ich bin müde, trotzdem arbeite ich.", "Sono stanco, eppure lavoro."),
+            ("Es regnet, deshalb bleibe ich zu Hause.", "Piove, perciÃ² resto a casa."),
+            ("Ich bin mÃ¼de, trotzdem arbeite ich.", "Sono stanco, eppure lavoro."),
             ("Ich gehe spazieren, obwohl es regnet.", "Vado a passeggiare sebbene piova."),
         ],
         exercises: &[
-            GrammarUnitExercise { prompt_it: "Scegli il connettore: Es ist kalt, ___ ziehe ich eine Jacke an.", prompt_en: "Choose the connector: Es ist kalt, ___ ziehe ich eine Jacke an.", options: &["obwohl", "deshalb", "weil"], correct_index: 1, answer_text: "", explanation_it: "Conseguenza: fa freddo, perciò metto la giacca.", explanation_en: "Consequence: it's cold, therefore I put on a jacket." },
+            GrammarUnitExercise { prompt_it: "Scegli il connettore: Es ist kalt, ___ ziehe ich eine Jacke an.", prompt_en: "Choose the connector: Es ist kalt, ___ ziehe ich eine Jacke an.", options: &["obwohl", "deshalb", "weil"], correct_index: 1, answer_text: "", explanation_it: "Conseguenza: fa freddo, perciÃ² metto la giacca.", explanation_en: "Consequence: it's cold, therefore I put on a jacket." },
             GrammarUnitExercise { prompt_it: "Scegli il connettore: ___ ich krank bin, gehe ich zur Arbeit.", prompt_en: "Choose the connector: ___ ich krank bin, gehe ich zur Arbeit.", options: &["Deshalb", "Trotzdem", "Obwohl"], correct_index: 2, answer_text: "", explanation_it: "obwohl introduce una concessione/contrasto (verbo alla fine nella subordinata).", explanation_en: "obwohl introduces concession/contrast (verb at the end in the clause)." },
             GrammarUnitExercise { prompt_it: "Completa: Ich habe wenig Zeit, ___ helfe ich dir.", prompt_en: "Complete: Ich habe wenig Zeit, ___ helfe ich dir.", options: &["trotzdem", "obwohl", "weil"], correct_index: 0, answer_text: "", explanation_it: "Contrasto: poco tempo, eppure ti aiuto.", explanation_en: "Contrast: little time, nevertheless I help you." },
-            GrammarUnitExercise { prompt_it: "Scrivi il connettore: Ich lerne viel, ___ möchte ich die Prüfung bestehen.", prompt_en: "Type the connector: Ich lerne viel, ___ möchte ich die Prüfung bestehen.", options: &[], correct_index: 0, answer_text: "deshalb", explanation_it: "Conseguenza: studio molto, perciò voglio superare l'esame.", explanation_en: "Consequence: I study a lot, therefore I want to pass the exam." },
+            GrammarUnitExercise { prompt_it: "Scrivi il connettore: Ich lerne viel, ___ mÃ¶chte ich die PrÃ¼fung bestehen.", prompt_en: "Type the connector: Ich lerne viel, ___ mÃ¶chte ich die PrÃ¼fung bestehen.", options: &[], correct_index: 0, answer_text: "deshalb", explanation_it: "Conseguenza: studio molto, perciÃ² voglio superare l'esame.", explanation_en: "Consequence: I study a lot, therefore I want to pass the exam." },
         ],
     }
 }
@@ -1593,11 +1593,11 @@ fn unit_b1_reflexive_verben() -> GrammarUnit {
         examples: &[
             ("Ich freue mich.", "Sono contento/a."),
             ("Er beeilt sich.", "Lui si sbrig/a."),
-            ("Wir interessieren uns für Musik.", "Ci interessiamo di musica."),
+            ("Wir interessieren uns fÃ¼r Musik.", "Ci interessiamo di musica."),
         ],
         exercises: &[
             GrammarUnitExercise { prompt_it: "Completa: Ich freue ___ .", prompt_en: "Complete: Ich freue ___ .", options: &["mich", "dich", "sich"], correct_index: 0, answer_text: "", explanation_it: "Con ich si usa mich.", explanation_en: "With ich use mich." },
-            GrammarUnitExercise { prompt_it: "Completa: Du wäschst ___ .", prompt_en: "Complete: Du wäschst ___ .", options: &["mich", "dich", "sich"], correct_index: 1, answer_text: "", explanation_it: "Con du si usa dich.", explanation_en: "With du use dich." },
+            GrammarUnitExercise { prompt_it: "Completa: Du wÃ¤schst ___ .", prompt_en: "Complete: Du wÃ¤schst ___ .", options: &["mich", "dich", "sich"], correct_index: 1, answer_text: "", explanation_it: "Con du si usa dich.", explanation_en: "With du use dich." },
             GrammarUnitExercise { prompt_it: "Completa: Sie (lei) beeilt ___ .", prompt_en: "Complete: Sie (she) beeilt ___ .", options: &["mich", "dich", "sich"], correct_index: 2, answer_text: "", explanation_it: "Con er/sie/es si usa sich.", explanation_en: "With er/sie/es use sich." },
             GrammarUnitExercise { prompt_it: "Scrivi il pronome: Wir freuen ___ auf das Wochenende.", prompt_en: "Type the pronoun: Wir freuen ___ auf das Wochenende.", options: &[], correct_index: 0, answer_text: "uns", explanation_it: "Con wir si usa uns.", explanation_en: "With wir use uns." },
         ],
@@ -1642,12 +1642,12 @@ fn unit_b1_praeteritum_perfekt() -> GrammarUnit {
     GrammarUnit {
         id: "b1-praeteritum-vs-perfekt",
         level: "B1",
-        title_it: "Präteritum vs Perfekt (uso)",
-        title_en: "Präteritum vs Perfekt (usage)",
+        title_it: "PrÃ¤teritum vs Perfekt (uso)",
+        title_en: "PrÃ¤teritum vs Perfekt (usage)",
         subtitle_it: "Quando usare il passato scritto o parlato",
         subtitle_en: "When to use written vs spoken past",
         objective_it: "Distinguere l'uso tipico di Praeteritum e Perfekt in tedesco.",
-        objective_en: "Distinguish typical usage of Präteritum and Perfekt in German.",
+        objective_en: "Distinguish typical usage of PrÃ¤teritum and Perfekt in German.",
         theory_it: &[
             "Nel parlato quotidiano il Perfekt e' il tempo passato piu' comune per raccontare eventi.",
             "Il Praeteritum e' frequente nella lingua scritta, nei racconti e con alcuni verbi (sein, haben, modali) anche nel parlato.",
@@ -1655,7 +1655,7 @@ fn unit_b1_praeteritum_perfekt() -> GrammarUnit {
         ],
         theory_en: &[
             "In everyday speech, Perfekt is the most common past tense for narrating events.",
-            "Präteritum is common in writing, narratives, and with some verbs (sein, haben, modals) even in speech.",
+            "PrÃ¤teritum is common in writing, narratives, and with some verbs (sein, haben, modals) even in speech.",
             "Spoken example: Ich habe gestern gearbeitet. / Written/narrative: Er ging nach Hause.",
         ],
         examples: &[
@@ -1665,9 +1665,9 @@ fn unit_b1_praeteritum_perfekt() -> GrammarUnit {
         ],
         exercises: &[
             GrammarUnitExercise { prompt_it: "Quale forma e' tipicamente piu' comune nel parlato per 'lavorare ieri'?", prompt_en: "Which form is typically more common in speech for 'worked yesterday'?", options: &["Ich arbeitete gestern.", "Ich habe gestern gearbeitet.", "Ich hatte gestern gearbeitet."], correct_index: 1, answer_text: "", explanation_it: "Nel parlato quotidiano si preferisce spesso il Perfekt.", explanation_en: "In everyday speech Perfekt is often preferred." },
-            GrammarUnitExercise { prompt_it: "Quale verbo e' spesso usato al Praeteritum anche nel parlato?", prompt_en: "Which verb is often used in Präteritum even in speech?", options: &["kaufen", "sein", "spielen"], correct_index: 1, answer_text: "", explanation_it: "sein, haben e i modali compaiono spesso al Praeteritum anche nel parlato.", explanation_en: "sein, haben and modals often appear in Präteritum even in speech." },
+            GrammarUnitExercise { prompt_it: "Quale verbo e' spesso usato al Praeteritum anche nel parlato?", prompt_en: "Which verb is often used in PrÃ¤teritum even in speech?", options: &["kaufen", "sein", "spielen"], correct_index: 1, answer_text: "", explanation_it: "sein, haben e i modali compaiono spesso al Praeteritum anche nel parlato.", explanation_en: "sein, haben and modals often appear in PrÃ¤teritum even in speech." },
             GrammarUnitExercise { prompt_it: "Completa (Perfekt): Wir ___ einen Film ___ . (sehen)", prompt_en: "Complete (Perfekt): Wir ___ einen Film ___ . (sehen)", options: &["haben ... gesehen", "sind ... gesehen", "haben ... sahen"], correct_index: 0, answer_text: "", explanation_it: "Perfekt di sehen: haben + gesehen.", explanation_en: "Perfekt of sehen: haben + gesehen." },
-            GrammarUnitExercise { prompt_it: "Scrivi la forma Praeteritum di 'haben' (ich).", prompt_en: "Type the Präteritum form of 'haben' (ich).", options: &[], correct_index: 0, answer_text: "hatte", explanation_it: "Praeteritum: ich hatte.", explanation_en: "Präteritum: ich hatte." },
+            GrammarUnitExercise { prompt_it: "Scrivi la forma Praeteritum di 'haben' (ich).", prompt_en: "Type the PrÃ¤teritum form of 'haben' (ich).", options: &[], correct_index: 0, answer_text: "hatte", explanation_it: "Praeteritum: ich hatte.", explanation_en: "PrÃ¤teritum: ich hatte." },
         ],
     }
 }
@@ -1744,30 +1744,30 @@ fn unit_a2_wechselpraepositionen() -> GrammarUnit {
     GrammarUnit {
         id: "a2-wechselpraepositionen",
         level: "A2",
-        title_it: "Preposizioni a doppio caso (Wechselpräpositionen)",
-        title_en: "Two-way prepositions (Wechselpräpositionen)",
+        title_it: "Preposizioni a doppio caso (WechselprÃ¤positionen)",
+        title_en: "Two-way prepositions (WechselprÃ¤positionen)",
         subtitle_it: "Dativo (dove?) o accusativo (verso dove?)",
         subtitle_en: "Dative (where?) or accusative (where to?)",
-        objective_it: "Scegliere dativo o accusativo con an, auf, in, neben, über, unter, vor, zwischen, hinter.",
-        objective_en: "Choose dative or accusative with an, auf, in, neben, über, unter, vor, zwischen, hinter.",
+        objective_it: "Scegliere dativo o accusativo con an, auf, in, neben, Ã¼ber, unter, vor, zwischen, hinter.",
+        objective_en: "Choose dative or accusative with an, auf, in, neben, Ã¼ber, unter, vor, zwischen, hinter.",
         theory_it: &[
-            "Le Wechselpräpositionen reggono il dativo per indicare posizione/stato (Wo?) e l'accusativo per direzione/movimento (Wohin?).",
-            "Preposizioni: an, auf, hinter, in, neben, über, unter, vor, zwischen.",
-            "Esempio: Ich bin in der Küche. (Wo? dativo) / Ich gehe in die Küche. (Wohin? accusativo).",
+            "Le WechselprÃ¤positionen reggono il dativo per indicare posizione/stato (Wo?) e l'accusativo per direzione/movimento (Wohin?).",
+            "Preposizioni: an, auf, hinter, in, neben, Ã¼ber, unter, vor, zwischen.",
+            "Esempio: Ich bin in der KÃ¼che. (Wo? dativo) / Ich gehe in die KÃ¼che. (Wohin? accusativo).",
         ],
         theory_en: &[
             "Two-way prepositions take the dative for location/state (Wo?) and the accusative for direction/movement (Wohin?).",
-            "Prepositions: an, auf, hinter, in, neben, über, unter, vor, zwischen.",
-            "Example: Ich bin in der Küche. (Where? dative) / Ich gehe in die Küche. (Where to? accusative).",
+            "Prepositions: an, auf, hinter, in, neben, Ã¼ber, unter, vor, zwischen.",
+            "Example: Ich bin in der KÃ¼che. (Where? dative) / Ich gehe in die KÃ¼che. (Where to? accusative).",
         ],
         examples: &[
-            ("Das Buch liegt auf dem Tisch.", "Il libro è sul tavolo. (posizione)"),
+            ("Das Buch liegt auf dem Tisch.", "Il libro Ã¨ sul tavolo. (posizione)"),
             ("Ich lege das Buch auf den Tisch.", "Metto il libro sul tavolo. (direzione)"),
             ("Wir sitzen im (in dem) Garten.", "Siamo seduti in giardino."),
         ],
         exercises: &[
-            GrammarUnitExercise { prompt_it: "Completa (posizione, Wo?): Ich bin in ___ Küche. (die)", prompt_en: "Complete (location, Wo?): Ich bin in ___ Küche. (die)", options: &["die", "der", "den"], correct_index: 1, answer_text: "", explanation_it: "Posizione -> dativo femminile: in der Küche.", explanation_en: "Location -> dative feminine: in der Küche." },
-            GrammarUnitExercise { prompt_it: "Completa (direzione, Wohin?): Ich gehe in ___ Küche. (die)", prompt_en: "Complete (direction, Wohin?): Ich gehe in ___ Küche. (die)", options: &["der", "die", "den"], correct_index: 1, answer_text: "", explanation_it: "Direzione -> accusativo femminile (uguale forma): in die Küche.", explanation_en: "Direction -> accusative feminine: in die Küche." },
+            GrammarUnitExercise { prompt_it: "Completa (posizione, Wo?): Ich bin in ___ KÃ¼che. (die)", prompt_en: "Complete (location, Wo?): Ich bin in ___ KÃ¼che. (die)", options: &["die", "der", "den"], correct_index: 1, answer_text: "", explanation_it: "Posizione -> dativo femminile: in der KÃ¼che.", explanation_en: "Location -> dative feminine: in der KÃ¼che." },
+            GrammarUnitExercise { prompt_it: "Completa (direzione, Wohin?): Ich gehe in ___ KÃ¼che. (die)", prompt_en: "Complete (direction, Wohin?): Ich gehe in ___ KÃ¼che. (die)", options: &["der", "die", "den"], correct_index: 1, answer_text: "", explanation_it: "Direzione -> accusativo femminile (uguale forma): in die KÃ¼che.", explanation_en: "Direction -> accusative feminine: in die KÃ¼che." },
             GrammarUnitExercise { prompt_it: "Scegli: Das Buch liegt auf ___ Tisch. (der, posizione)", prompt_en: "Choose: Das Buch liegt auf ___ Tisch. (der, location)", options: &["der", "den", "dem"], correct_index: 2, answer_text: "", explanation_it: "liegen = posizione -> dativo maschile: auf dem Tisch.", explanation_en: "liegen = location -> dative masculine: auf dem Tisch." },
             GrammarUnitExercise { prompt_it: "Scrivi l'articolo: Ich stelle die Lampe auf ___ Tisch. (der, direzione)", prompt_en: "Type the article: Ich stelle die Lampe auf ___ Tisch. (der, direction)", options: &[], correct_index: 0, answer_text: "den", explanation_it: "stellen = direzione -> accusativo maschile: auf den Tisch.", explanation_en: "stellen = direction -> accusative masculine: auf den Tisch." },
         ],
@@ -1782,28 +1782,28 @@ fn unit_b1_konjunktiv2_intro() -> GrammarUnit {
         title_en: "Konjunktiv II (introduction)",
         subtitle_it: "Desideri, richieste cortesi e situazioni irreali",
         subtitle_en: "Wishes, polite requests, and unreal situations",
-        objective_it: "Usare forme base del Konjunktiv II (würde, hätte, wäre, könnte).",
-        objective_en: "Use basic Konjunktiv II forms (würde, hätte, wäre, könnte).",
+        objective_it: "Usare forme base del Konjunktiv II (wÃ¼rde, hÃ¤tte, wÃ¤re, kÃ¶nnte).",
+        objective_en: "Use basic Konjunktiv II forms (wÃ¼rde, hÃ¤tte, wÃ¤re, kÃ¶nnte).",
         theory_it: &[
             "Il Konjunktiv II esprime desideri, ipotesi irreali e richieste cortesi.",
-            "Forme comuni: ich wäre (sarei), ich hätte (avrei), ich könnte (potrei), ich würde + infinito (farei).",
-            "Esempi: Ich hätte gern einen Kaffee. / Könntest du mir helfen? / Wenn ich Zeit hätte, würde ich reisen.",
+            "Forme comuni: ich wÃ¤re (sarei), ich hÃ¤tte (avrei), ich kÃ¶nnte (potrei), ich wÃ¼rde + infinito (farei).",
+            "Esempi: Ich hÃ¤tte gern einen Kaffee. / KÃ¶nntest du mir helfen? / Wenn ich Zeit hÃ¤tte, wÃ¼rde ich reisen.",
         ],
         theory_en: &[
             "Konjunktiv II expresses wishes, unreal hypotheses, and polite requests.",
-            "Common forms: ich wäre (would be), ich hätte (would have), ich könnte (could), ich würde + infinitive (would).",
-            "Examples: Ich hätte gern einen Kaffee. / Könntest du mir helfen? / Wenn ich Zeit hätte, würde ich reisen.",
+            "Common forms: ich wÃ¤re (would be), ich hÃ¤tte (would have), ich kÃ¶nnte (could), ich wÃ¼rde + infinitive (would).",
+            "Examples: Ich hÃ¤tte gern einen Kaffee. / KÃ¶nntest du mir helfen? / Wenn ich Zeit hÃ¤tte, wÃ¼rde ich reisen.",
         ],
         examples: &[
-            ("Ich hätte gern ein Wasser.", "Vorrei un'acqua."),
-            ("Könnten Sie das bitte wiederholen?", "Potrebbe ripeterlo, per favore?"),
-            ("Wenn ich reich wäre, würde ich viel reisen.", "Se fossi ricco, viaggerei molto."),
+            ("Ich hÃ¤tte gern ein Wasser.", "Vorrei un'acqua."),
+            ("KÃ¶nnten Sie das bitte wiederholen?", "Potrebbe ripeterlo, per favore?"),
+            ("Wenn ich reich wÃ¤re, wÃ¼rde ich viel reisen.", "Se fossi ricco, viaggerei molto."),
         ],
         exercises: &[
-            GrammarUnitExercise { prompt_it: "Completa (richiesta cortese): ___ Sie mir helfen?", prompt_en: "Complete (polite request): ___ Sie mir helfen?", options: &["Können", "Könnten", "Konnten"], correct_index: 1, answer_text: "", explanation_it: "Richiesta cortese: Konjunktiv II -> Könnten Sie...?", explanation_en: "Polite request: Konjunktiv II -> Könnten Sie...?" },
-            GrammarUnitExercise { prompt_it: "Scegli la forma corretta: Ich ___ gern einen Tee. (haben)", prompt_en: "Choose the correct form: Ich ___ gern einen Tee. (haben)", options: &["habe", "hatte", "hätte"], correct_index: 2, answer_text: "", explanation_it: "Desiderio cortese: ich hätte gern...", explanation_en: "Polite wish: ich hätte gern..." },
-            GrammarUnitExercise { prompt_it: "Completa: Wenn ich frei ___, würde ich kommen. (sein)", prompt_en: "Complete: Wenn ich frei ___, würde ich kommen. (sein)", options: &["bin", "war", "wäre"], correct_index: 2, answer_text: "", explanation_it: "Irreale/condizionale con sein: ich wäre.", explanation_en: "Unreal/conditional with sein: ich wäre." },
-            GrammarUnitExercise { prompt_it: "Scrivi la forma: ich ___ (sein, Konjunktiv II)", prompt_en: "Type the form: ich ___ (sein, Konjunktiv II)", options: &[], correct_index: 0, answer_text: "wäre", explanation_it: "Konjunktiv II di sein: ich wäre.", explanation_en: "Konjunktiv II of sein: ich wäre." },
+            GrammarUnitExercise { prompt_it: "Completa (richiesta cortese): ___ Sie mir helfen?", prompt_en: "Complete (polite request): ___ Sie mir helfen?", options: &["KÃ¶nnen", "KÃ¶nnten", "Konnten"], correct_index: 1, answer_text: "", explanation_it: "Richiesta cortese: Konjunktiv II -> KÃ¶nnten Sie...?", explanation_en: "Polite request: Konjunktiv II -> KÃ¶nnten Sie...?" },
+            GrammarUnitExercise { prompt_it: "Scegli la forma corretta: Ich ___ gern einen Tee. (haben)", prompt_en: "Choose the correct form: Ich ___ gern einen Tee. (haben)", options: &["habe", "hatte", "hÃ¤tte"], correct_index: 2, answer_text: "", explanation_it: "Desiderio cortese: ich hÃ¤tte gern...", explanation_en: "Polite wish: ich hÃ¤tte gern..." },
+            GrammarUnitExercise { prompt_it: "Completa: Wenn ich frei ___, wÃ¼rde ich kommen. (sein)", prompt_en: "Complete: Wenn ich frei ___, wÃ¼rde ich kommen. (sein)", options: &["bin", "war", "wÃ¤re"], correct_index: 2, answer_text: "", explanation_it: "Irreale/condizionale con sein: ich wÃ¤re.", explanation_en: "Unreal/conditional with sein: ich wÃ¤re." },
+            GrammarUnitExercise { prompt_it: "Scrivi la forma: ich ___ (sein, Konjunktiv II)", prompt_en: "Type the form: ich ___ (sein, Konjunktiv II)", options: &[], correct_index: 0, answer_text: "wÃ¤re", explanation_it: "Konjunktiv II di sein: ich wÃ¤re.", explanation_en: "Konjunktiv II of sein: ich wÃ¤re." },
         ],
     }
 }
@@ -1814,27 +1814,27 @@ fn unit_a2_praepositionen_akkusativ() -> GrammarUnit {
         level: "A2",
         title_it: "Preposizioni con accusativo",
         title_en: "Prepositions with accusative",
-        subtitle_it: "durch, für, gegen, ohne, um",
-        subtitle_en: "durch, für, gegen, ohne, um",
-        objective_it: "Usare le preposizioni più comuni che richiedono l'accusativo.",
+        subtitle_it: "durch, fÃ¼r, gegen, ohne, um",
+        subtitle_en: "durch, fÃ¼r, gegen, ohne, um",
+        objective_it: "Usare le preposizioni piÃ¹ comuni che richiedono l'accusativo.",
         objective_en: "Use common prepositions that take the accusative.",
         theory_it: &[
-            "Alcune preposizioni reggono sempre l'accusativo: durch, für, gegen, ohne, um.",
+            "Alcune preposizioni reggono sempre l'accusativo: durch, fÃ¼r, gegen, ohne, um.",
             "Dopo queste preposizioni l'articolo maschile diventa den; femminile/neutro restano die/das.",
-            "Esempio: für den Mann, ohne die Tasche, durch das Fenster.",
+            "Esempio: fÃ¼r den Mann, ohne die Tasche, durch das Fenster.",
         ],
         theory_en: &[
-            "Some prepositions always take the accusative: durch, für, gegen, ohne, um.",
+            "Some prepositions always take the accusative: durch, fÃ¼r, gegen, ohne, um.",
             "After these, the masculine article becomes den; feminine/neuter remain die/das.",
-            "Example: für den Mann, ohne die Tasche, durch das Fenster.",
+            "Example: fÃ¼r den Mann, ohne die Tasche, durch das Fenster.",
         ],
         examples: &[
-            ("Das Geschenk ist für dich.", "Il regalo è per te."),
+            ("Das Geschenk ist fÃ¼r dich.", "Il regalo Ã¨ per te."),
             ("Wir gehen durch den Park.", "Attraversiamo il parco."),
             ("Ich gehe ohne meinen Bruder.", "Vado senza mio fratello."),
         ],
         exercises: &[
-            GrammarUnitExercise { prompt_it: "Completa: Das ist für ___ Mann. (der)", prompt_en: "Complete: Das ist für ___ Mann. (der)", options: &["der", "den", "dem"], correct_index: 1, answer_text: "", explanation_it: "für + accusativo maschile: den Mann.", explanation_en: "für + accusative masculine: den Mann." },
+            GrammarUnitExercise { prompt_it: "Completa: Das ist fÃ¼r ___ Mann. (der)", prompt_en: "Complete: Das ist fÃ¼r ___ Mann. (der)", options: &["der", "den", "dem"], correct_index: 1, answer_text: "", explanation_it: "fÃ¼r + accusativo maschile: den Mann.", explanation_en: "fÃ¼r + accusative masculine: den Mann." },
             GrammarUnitExercise { prompt_it: "Completa: Wir fahren ohne ___ Auto. (das)", prompt_en: "Complete: Wir fahren ohne ___ Auto. (das)", options: &["dem", "das", "den"], correct_index: 1, answer_text: "", explanation_it: "Neutro all'accusativo resta das: ohne das Auto.", explanation_en: "Neuter accusative stays das: ohne das Auto." },
             GrammarUnitExercise { prompt_it: "Quale preposizione richiede l'accusativo?", prompt_en: "Which preposition takes the accusative?", options: &["mit", "bei", "gegen"], correct_index: 2, answer_text: "", explanation_it: "gegen regge l'accusativo; mit/bei il dativo.", explanation_en: "gegen takes accusative; mit/bei take dative." },
             GrammarUnitExercise { prompt_it: "Scrivi l'articolo: durch ___ Park (der)", prompt_en: "Type the article: durch ___ Park (der)", options: &[], correct_index: 0, answer_text: "den", explanation_it: "durch + accusativo maschile: den Park.", explanation_en: "durch + accusative masculine: den Park." },
@@ -1854,24 +1854,24 @@ fn unit_b1_passiv_modalverben_intro() -> GrammarUnit {
         objective_en: "Recognize and form passive sentences with modals (muss/kann/soll).",
         theory_it: &[
             "Con i verbi modali il passivo si forma: modale coniugato + Partizip II + werden (infinito finale).",
-            "Esempio: Das muss gemacht werden. / Die Tür kann geöffnet werden.",
+            "Esempio: Das muss gemacht werden. / Die TÃ¼r kann geÃ¶ffnet werden.",
             "Il modale va in posizione 2 nella frase principale; 'werden' resta alla fine.",
         ],
         theory_en: &[
             "With modal verbs the passive is formed: conjugated modal + Partizip II + werden (infinitive at the end).",
-            "Example: Das muss gemacht werden. / Die Tür kann geöffnet werden.",
+            "Example: Das muss gemacht werden. / Die TÃ¼r kann geÃ¶ffnet werden.",
             "The modal is in position 2 in the main clause; 'werden' stays at the end.",
         ],
         examples: &[
             ("Die Aufgabe muss heute gemacht werden.", "Il compito deve essere fatto oggi."),
-            ("Das Fenster kann geöffnet werden.", "La finestra può essere aperta."),
+            ("Das Fenster kann geÃ¶ffnet werden.", "La finestra puÃ² essere aperta."),
             ("Die Regeln sollen beachtet werden.", "Le regole devono essere rispettate."),
         ],
         exercises: &[
-            GrammarUnitExercise { prompt_it: "Scegli la forma corretta: Die Arbeit ___ erledigt werden. (müssen)", prompt_en: "Choose the correct form: Die Arbeit ___ erledigt werden. (müssen)", options: &["muss", "musst", "müssen"], correct_index: 0, answer_text: "", explanation_it: "Soggetto singolare (die Arbeit): muss erledigt werden.", explanation_en: "Singular subject (die Arbeit): muss erledigt werden." },
-            GrammarUnitExercise { prompt_it: "Completa: Das ___ gemacht werden. (können)", prompt_en: "Complete: Das ___ gemacht werden. (können)", options: &["kann", "kannst", "können"], correct_index: 0, answer_text: "", explanation_it: "Das -> kann gemacht werden.", explanation_en: "Das -> kann gemacht werden." },
-            GrammarUnitExercise { prompt_it: "Qual è l'ordine corretto?", prompt_en: "Which order is correct?", options: &["Das muss werden gemacht.", "Das muss gemacht werden.", "Das gemacht muss werden."], correct_index: 1, answer_text: "", explanation_it: "Modale + Partizip II + werden: muss gemacht werden.", explanation_en: "Modal + Partizip II + werden: muss gemacht werden." },
-            GrammarUnitExercise { prompt_it: "Scrivi il modale: Die Tür ___ geschlossen werden. (sollen, singolare)", prompt_en: "Type the modal: Die Tür ___ geschlossen werden. (sollen, singular)", options: &[], correct_index: 0, answer_text: "soll", explanation_it: "Singolare: die Tür soll geschlossen werden.", explanation_en: "Singular: die Tür soll geschlossen werden." },
+            GrammarUnitExercise { prompt_it: "Scegli la forma corretta: Die Arbeit ___ erledigt werden. (mÃ¼ssen)", prompt_en: "Choose the correct form: Die Arbeit ___ erledigt werden. (mÃ¼ssen)", options: &["muss", "musst", "mÃ¼ssen"], correct_index: 0, answer_text: "", explanation_it: "Soggetto singolare (die Arbeit): muss erledigt werden.", explanation_en: "Singular subject (die Arbeit): muss erledigt werden." },
+            GrammarUnitExercise { prompt_it: "Completa: Das ___ gemacht werden. (kÃ¶nnen)", prompt_en: "Complete: Das ___ gemacht werden. (kÃ¶nnen)", options: &["kann", "kannst", "kÃ¶nnen"], correct_index: 0, answer_text: "", explanation_it: "Das -> kann gemacht werden.", explanation_en: "Das -> kann gemacht werden." },
+            GrammarUnitExercise { prompt_it: "Qual Ã¨ l'ordine corretto?", prompt_en: "Which order is correct?", options: &["Das muss werden gemacht.", "Das muss gemacht werden.", "Das gemacht muss werden."], correct_index: 1, answer_text: "", explanation_it: "Modale + Partizip II + werden: muss gemacht werden.", explanation_en: "Modal + Partizip II + werden: muss gemacht werden." },
+            GrammarUnitExercise { prompt_it: "Scrivi il modale: Die TÃ¼r ___ geschlossen werden. (sollen, singolare)", prompt_en: "Type the modal: Die TÃ¼r ___ geschlossen werden. (sollen, singular)", options: &[], correct_index: 0, answer_text: "soll", explanation_it: "Singolare: die TÃ¼r soll geschlossen werden.", explanation_en: "Singular: die TÃ¼r soll geschlossen werden." },
         ],
     }
 }
@@ -1881,32 +1881,32 @@ fn unit_a2_praeteritum() -> GrammarUnit {
     GrammarUnit {
         id: "a2-praeteritum",
         level: "A2",
-        title_it: "Il Präteritum",
-        title_en: "Präteritum (simple past)",
+        title_it: "Il PrÃ¤teritum",
+        title_en: "PrÃ¤teritum (simple past)",
         subtitle_it: "Il passato della narrazione",
         subtitle_en: "The narrative past tense",
-        objective_it: "Usare il Präteritum con verbi regolari, irregolari e modali comuni.",
-        objective_en: "Use Präteritum with regular, irregular, and common modal verbs.",
+        objective_it: "Usare il PrÃ¤teritum con verbi regolari, irregolari e modali comuni.",
+        objective_en: "Use PrÃ¤teritum with regular, irregular, and common modal verbs.",
         theory_it: &[
-            "Il Präteritum è il passato semplice, frequente nello scritto e nei racconti.",
+            "Il PrÃ¤teritum Ã¨ il passato semplice, frequente nello scritto e nei racconti.",
             "Verbi regolari: radice + -te (machen -> machte). Irregolari: cambio di radice (gehen -> ging).",
             "Forme importanti: sein -> war, haben -> hatte, modali -> konnte, musste, wollte, durfte, sollte.",
         ],
         theory_en: &[
-            "Präteritum is the simple past, common in writing and narration.",
+            "PrÃ¤teritum is the simple past, common in writing and narration.",
             "Regular verbs: stem + -te (machen -> machte). Irregular verbs change the stem (gehen -> ging).",
             "Important forms: sein -> war, haben -> hatte, modals -> konnte, musste, wollte, durfte, sollte.",
         ],
         examples: &[
             ("Ich war gestern im Kino.", "Ieri ero al cinema."),
             ("Wir hatten keine Zeit.", "Non avevamo tempo."),
-            ("Er ging nach Berlin.", "Andò a Berlino."),
+            ("Er ging nach Berlin.", "AndÃ² a Berlino."),
         ],
         exercises: &[
-            GrammarUnitExercise { prompt_it: "Completa: Ich ___ gestern im Kino. (sein)", prompt_en: "Complete: Ich ___ gestern im Kino. (sein)", options: &["war", "warst", "bin"], correct_index: 0, answer_text: "", explanation_it: "sein al Präteritum: ich war.", explanation_en: "sein in Präteritum: ich war." },
-            GrammarUnitExercise { prompt_it: "Completa: Wir ___ keine Zeit. (haben)", prompt_en: "Complete: Wir ___ keine Zeit. (haben)", options: &["hatte", "hatten", "haben"], correct_index: 1, answer_text: "", explanation_it: "haben al Präteritum: wir hatten.", explanation_en: "haben in Präteritum: wir hatten." },
-            GrammarUnitExercise { prompt_it: "Scegli la forma corretta: Er ___ nach Berlin. (gehen)", prompt_en: "Choose the correct form: Er ___ nach Berlin. (gehen)", options: &["gehte", "ging", "gegangen"], correct_index: 1, answer_text: "", explanation_it: "gehen è irregolare: er ging.", explanation_en: "gehen is irregular: er ging." },
-            GrammarUnitExercise { prompt_it: "Scrivi la forma: ich ___ (machen, Präteritum)", prompt_en: "Type the form: ich ___ (machen, Präteritum)", options: &[], correct_index: 0, answer_text: "machte", explanation_it: "Verbo regolare: machen -> machte.", explanation_en: "Regular verb: machen -> machte." },
+            GrammarUnitExercise { prompt_it: "Completa: Ich ___ gestern im Kino. (sein)", prompt_en: "Complete: Ich ___ gestern im Kino. (sein)", options: &["war", "warst", "bin"], correct_index: 0, answer_text: "", explanation_it: "sein al PrÃ¤teritum: ich war.", explanation_en: "sein in PrÃ¤teritum: ich war." },
+            GrammarUnitExercise { prompt_it: "Completa: Wir ___ keine Zeit. (haben)", prompt_en: "Complete: Wir ___ keine Zeit. (haben)", options: &["hatte", "hatten", "haben"], correct_index: 1, answer_text: "", explanation_it: "haben al PrÃ¤teritum: wir hatten.", explanation_en: "haben in PrÃ¤teritum: wir hatten." },
+            GrammarUnitExercise { prompt_it: "Scegli la forma corretta: Er ___ nach Berlin. (gehen)", prompt_en: "Choose the correct form: Er ___ nach Berlin. (gehen)", options: &["gehte", "ging", "gegangen"], correct_index: 1, answer_text: "", explanation_it: "gehen Ã¨ irregolare: er ging.", explanation_en: "gehen is irregular: er ging." },
+            GrammarUnitExercise { prompt_it: "Scrivi la forma: ich ___ (machen, PrÃ¤teritum)", prompt_en: "Type the form: ich ___ (machen, PrÃ¤teritum)", options: &[], correct_index: 0, answer_text: "machte", explanation_it: "Verbo regolare: machen -> machte.", explanation_en: "Regular verb: machen -> machte." },
         ],
     }
 }
@@ -1922,9 +1922,9 @@ fn unit_b1_indirekte_rede() -> GrammarUnit {
         objective_it: "Riferire affermazioni e domande senza virgolette.",
         objective_en: "Report statements and questions without quotation marks.",
         theory_it: &[
-            "Nel discorso indiretto si riporta ciò che dice qualcuno; spesso si usa il Konjunktiv I (sei, habe, komme).",
-            "Se il Konjunktiv I coincide con l'indicativo, si può usare il Konjunktiv II per chiarezza.",
-            "Domande indirette: ob per sì/no, W-Wort per le altre; il verbo va alla fine.",
+            "Nel discorso indiretto si riporta ciÃ² che dice qualcuno; spesso si usa il Konjunktiv I (sei, habe, komme).",
+            "Se il Konjunktiv I coincide con l'indicativo, si puÃ² usare il Konjunktiv II per chiarezza.",
+            "Domande indirette: ob per sÃ¬/no, W-Wort per le altre; il verbo va alla fine.",
         ],
         theory_en: &[
             "In indirect speech you report what someone said; Konjunktiv I is often used (sei, habe, komme).",
@@ -1932,14 +1932,14 @@ fn unit_b1_indirekte_rede() -> GrammarUnit {
             "Indirect questions: ob for yes/no, a W-word for others; the verb goes to the end.",
         ],
         examples: &[
-            ("Er sagt, er sei müde.", "Dice che è stanco."),
+            ("Er sagt, er sei mÃ¼de.", "Dice che Ã¨ stanco."),
             ("Sie fragt, ob ich Zeit habe.", "Chiede se ho tempo."),
             ("Er fragt, wo ich wohne.", "Chiede dove abito."),
         ],
         exercises: &[
             GrammarUnitExercise { prompt_it: "Completa: Er sagt, er ___ krank. (sein)", prompt_en: "Complete: Er sagt, er ___ krank. (sein)", options: &["ist", "sei", "war"], correct_index: 1, answer_text: "", explanation_it: "Konjunktiv I di sein: er sei.", explanation_en: "Konjunktiv I of sein: er sei." },
             GrammarUnitExercise { prompt_it: "Completa: Sie sagt, sie ___ keine Zeit. (haben)", prompt_en: "Complete: Sie sagt, sie ___ keine Zeit. (haben)", options: &["hat", "habe", "hatte"], correct_index: 1, answer_text: "", explanation_it: "Konjunktiv I di haben: sie habe.", explanation_en: "Konjunktiv I of haben: sie habe." },
-            GrammarUnitExercise { prompt_it: "Domanda indiretta sì/no: Er fragt, ___ ich komme.", prompt_en: "Indirect yes/no question: Er fragt, ___ ich komme.", options: &["dass", "ob", "weil"], correct_index: 1, answer_text: "", explanation_it: "Le domande indirette sì/no usano ob.", explanation_en: "Indirect yes/no questions use ob." },
+            GrammarUnitExercise { prompt_it: "Domanda indiretta sÃ¬/no: Er fragt, ___ ich komme.", prompt_en: "Indirect yes/no question: Er fragt, ___ ich komme.", options: &["dass", "ob", "weil"], correct_index: 1, answer_text: "", explanation_it: "Le domande indirette sÃ¬/no usano ob.", explanation_en: "Indirect yes/no questions use ob." },
             GrammarUnitExercise { prompt_it: "Scrivi la forma: sie ___ (kommen, Konjunktiv I)", prompt_en: "Type the form: sie ___ (kommen, Konjunktiv I)", options: &[], correct_index: 0, answer_text: "komme", explanation_it: "Konjunktiv I: sie komme.", explanation_en: "Konjunktiv I: sie komme." },
         ],
     }
@@ -1957,7 +1957,7 @@ fn unit_b1_nominalisierung() -> GrammarUnit {
         objective_en: "Recognize and use nouns derived from verbs and adjectives.",
         theory_it: &[
             "In tedesco verbi e aggettivi possono diventare nomi; i nomi si scrivono sempre con la maiuscola.",
-            "L'infinito sostantivato è neutro: das Essen, das Lernen. Suffissi comuni: -ung, -heit, -keit, -schaft.",
+            "L'infinito sostantivato Ã¨ neutro: das Essen, das Lernen. Suffissi comuni: -ung, -heit, -keit, -schaft.",
             "Spesso con preposizioni: beim Lernen, zum Essen, nach dem Schlafen.",
         ],
         theory_en: &[
@@ -1966,13 +1966,13 @@ fn unit_b1_nominalisierung() -> GrammarUnit {
             "Often used with prepositions: beim Lernen, zum Essen, nach dem Schlafen.",
         ],
         examples: &[
-            ("Das Lernen macht Spaß.", "Imparare è divertente."),
-            ("Die Prüfung war schwierig.", "L'esame è stato difficile."),
-            ("Die Freiheit ist wichtig.", "La libertà è importante."),
+            ("Das Lernen macht SpaÃŸ.", "Imparare Ã¨ divertente."),
+            ("Die PrÃ¼fung war schwierig.", "L'esame Ã¨ stato difficile."),
+            ("Die Freiheit ist wichtig.", "La libertÃ  Ã¨ importante."),
         ],
         exercises: &[
             GrammarUnitExercise { prompt_it: "Scegli la forma corretta: ___ ist wichtig. (lernen)", prompt_en: "Choose the correct form: ___ ist wichtig. (lernen)", options: &["lernen", "Das Lernen", "der Lernen"], correct_index: 1, answer_text: "", explanation_it: "Infinito sostantivato neutro: das Lernen.", explanation_en: "Nominalized infinitive (neuter): das Lernen." },
-            GrammarUnitExercise { prompt_it: "Completa: Die ___ war schwierig. (prüfen)", prompt_en: "Complete: Die ___ war schwierig. (prüfen)", options: &["Prüfen", "Prüfung", "Prüfheit"], correct_index: 1, answer_text: "", explanation_it: "Da prüfen: die Prüfung (-ung).", explanation_en: "From prüfen: die Prüfung (-ung)." },
+            GrammarUnitExercise { prompt_it: "Completa: Die ___ war schwierig. (prÃ¼fen)", prompt_en: "Complete: Die ___ war schwierig. (prÃ¼fen)", options: &["PrÃ¼fen", "PrÃ¼fung", "PrÃ¼fheit"], correct_index: 1, answer_text: "", explanation_it: "Da prÃ¼fen: die PrÃ¼fung (-ung).", explanation_en: "From prÃ¼fen: die PrÃ¼fung (-ung)." },
             GrammarUnitExercise { prompt_it: "Completa: Die ___ ist wichtig. (frei)", prompt_en: "Complete: Die ___ ist wichtig. (frei)", options: &["Frei", "Freiheit", "Freikeit"], correct_index: 1, answer_text: "", explanation_it: "Da frei: die Freiheit (-heit).", explanation_en: "From frei: die Freiheit (-heit)." },
             GrammarUnitExercise { prompt_it: "Scrivi la forma: Ich gehe zum ___ (essen).", prompt_en: "Type the form: Ich gehe zum ___ (essen).", options: &[], correct_index: 0, answer_text: "Essen", explanation_it: "Nominalizzazione: zum Essen.", explanation_en: "Nominalization: zum Essen." },
         ],
@@ -1988,28 +1988,28 @@ fn unit_a2_riflessivi() -> GrammarUnit {
         title_en: "Reflexive verbs",
         subtitle_it: "sich freuen, sich interessieren, sich beeilen",
         subtitle_en: "sich freuen, sich interessieren, sich beeilen",
-        objective_it: "Usare i pronomi riflessivi e i verbi riflessivi più comuni.",
+        objective_it: "Usare i pronomi riflessivi e i verbi riflessivi piÃ¹ comuni.",
         objective_en: "Use reflexive pronouns and common reflexive verbs.",
         theory_it: &[
             "I verbi riflessivi hanno un pronome che rimanda al soggetto: mich, dich, sich, uns, euch, sich.",
-            "La maggior parte usa l'accusativo; con parti del corpo si usa spesso il dativo: Ich wasche mir die Hände.",
-            "Verbi frequenti: sich freuen, sich interessieren für, sich treffen, sich beeilen, sich erholen, sich setzen.",
+            "La maggior parte usa l'accusativo; con parti del corpo si usa spesso il dativo: Ich wasche mir die HÃ¤nde.",
+            "Verbi frequenti: sich freuen, sich interessieren fÃ¼r, sich treffen, sich beeilen, sich erholen, sich setzen.",
         ],
         theory_en: &[
             "Reflexive verbs have a pronoun referring back to the subject: mich, dich, sich, uns, euch, sich.",
-            "Most use the accusative; with body parts the dative is often used: Ich wasche mir die Hände.",
-            "Common verbs: sich freuen, sich interessieren für, sich treffen, sich beeilen, sich erholen, sich setzen.",
+            "Most use the accusative; with body parts the dative is often used: Ich wasche mir die HÃ¤nde.",
+            "Common verbs: sich freuen, sich interessieren fÃ¼r, sich treffen, sich beeilen, sich erholen, sich setzen.",
         ],
         examples: &[
             ("Ich freue mich auf den Urlaub.", "Non vedo l'ora che arrivino le vacanze."),
             ("Wir treffen uns um 8 Uhr.", "Ci incontriamo alle 8."),
-            ("Ich wasche mir die Hände.", "Mi lavo le mani."),
+            ("Ich wasche mir die HÃ¤nde.", "Mi lavo le mani."),
         ],
         exercises: &[
             GrammarUnitExercise { prompt_it: "Completa: Ich freue ___ auf den Urlaub.", prompt_en: "Complete: Ich freue ___ auf den Urlaub.", options: &["mich", "mir", "dich"], correct_index: 0, answer_text: "", explanation_it: "sich freuen all'accusativo: ich freue mich.", explanation_en: "sich freuen takes accusative: ich freue mich." },
-            GrammarUnitExercise { prompt_it: "Completa: Wir treffen ___ um 8 Uhr.", prompt_en: "Complete: Wir treffen ___ um 8 Uhr.", options: &["uns", "euch", "sich"], correct_index: 0, answer_text: "", explanation_it: "Con wir il pronome riflessivo è uns.", explanation_en: "With wir the reflexive pronoun is uns." },
-            GrammarUnitExercise { prompt_it: "Completa: Er beeilt ___.", prompt_en: "Complete: Er beeilt ___.", options: &["mich", "dich", "sich"], correct_index: 2, answer_text: "", explanation_it: "Con er/sie/es il pronome è sich.", explanation_en: "With er/sie/es the pronoun is sich." },
-            GrammarUnitExercise { prompt_it: "Scrivi il pronome: Ich wasche ___ die Hände. (dativo)", prompt_en: "Type the pronoun: Ich wasche ___ die Hände. (dative)", options: &[], correct_index: 0, answer_text: "mir", explanation_it: "Con una parte del corpo il riflessivo è al dativo: mir.", explanation_en: "With a body part the reflexive pronoun is dative: mir." },
+            GrammarUnitExercise { prompt_it: "Completa: Wir treffen ___ um 8 Uhr.", prompt_en: "Complete: Wir treffen ___ um 8 Uhr.", options: &["uns", "euch", "sich"], correct_index: 0, answer_text: "", explanation_it: "Con wir il pronome riflessivo Ã¨ uns.", explanation_en: "With wir the reflexive pronoun is uns." },
+            GrammarUnitExercise { prompt_it: "Completa: Er beeilt ___.", prompt_en: "Complete: Er beeilt ___.", options: &["mich", "dich", "sich"], correct_index: 2, answer_text: "", explanation_it: "Con er/sie/es il pronome Ã¨ sich.", explanation_en: "With er/sie/es the pronoun is sich." },
+            GrammarUnitExercise { prompt_it: "Scrivi il pronome: Ich wasche ___ die HÃ¤nde. (dativo)", prompt_en: "Type the pronoun: Ich wasche ___ die HÃ¤nde. (dative)", options: &[], correct_index: 0, answer_text: "mir", explanation_it: "Con una parte del corpo il riflessivo Ã¨ al dativo: mir.", explanation_en: "With a body part the reflexive pronoun is dative: mir." },
         ],
     }
 }
@@ -2026,7 +2026,7 @@ fn unit_a2_subordinate() -> GrammarUnit {
         objective_en: "Link clauses with subordinating conjunctions and put the verb at the end.",
         theory_it: &[
             "Nella frase subordinata il verbo coniugato va alla fine: Ich bleibe zu Hause, weil ich krank bin.",
-            "Congiunzioni comuni: weil (perché), dass (che), wenn (se/quando), als (quando, passato singolo), obwohl (sebbene), ob (se, domande indirette).",
+            "Congiunzioni comuni: weil (perchÃ©), dass (che), wenn (se/quando), als (quando, passato singolo), obwohl (sebbene), ob (se, domande indirette).",
             "Se la subordinata viene prima, la principale inizia con il verbo: Weil ich krank bin, bleibe ich zu Hause.",
         ],
         theory_en: &[
@@ -2035,7 +2035,7 @@ fn unit_a2_subordinate() -> GrammarUnit {
             "If the subordinate clause comes first, the main clause starts with the verb: Weil ich krank bin, bleibe ich zu Hause.",
         ],
         examples: &[
-            ("Ich bleibe zu Hause, weil ich krank bin.", "Resto a casa perché sono malato."),
+            ("Ich bleibe zu Hause, weil ich krank bin.", "Resto a casa perchÃ© sono malato."),
             ("Er sagt, dass er keine Zeit hat.", "Dice che non ha tempo."),
             ("Als ich klein war, wohnte ich in Rom.", "Quando ero piccolo, abitavo a Roma."),
         ],
@@ -2043,7 +2043,7 @@ fn unit_a2_subordinate() -> GrammarUnit {
             GrammarUnitExercise { prompt_it: "Completa: Ich bleibe zu Hause, ___ ich krank bin.", prompt_en: "Complete: Ich bleibe zu Hause, ___ ich krank bin.", options: &["weil", "denn", "aber"], correct_index: 0, answer_text: "", explanation_it: "weil introduce una subordinata con verbo alla fine.", explanation_en: "weil introduces a subordinate clause with the verb at the end." },
             GrammarUnitExercise { prompt_it: "Completa: Er sagt, ___ er keine Zeit hat.", prompt_en: "Complete: Er sagt, ___ he has no time.", options: &["weil", "dass", "wenn"], correct_index: 1, answer_text: "", explanation_it: "dass introduce una frase completiva.", explanation_en: "dass introduces a complement clause." },
             GrammarUnitExercise { prompt_it: "Evento passato singolo: ___ ich klein war, wohnte ich in Rom.", prompt_en: "Single past event: ___ ich klein war, wohnte ich in Rom.", options: &["Wenn", "Als", "Ob"], correct_index: 1, answer_text: "", explanation_it: "Per un singolo evento nel passato si usa als.", explanation_en: "For a single event in the past use als." },
-            GrammarUnitExercise { prompt_it: "Scrivi la congiunzione: Ich weiß nicht, ___ er kommt. (domanda indiretta sì/no)", prompt_en: "Type the conjunction: Ich weiß nicht, ___ er kommt. (indirect yes/no question)", options: &[], correct_index: 0, answer_text: "ob", explanation_it: "Le domande indirette sì/no usano ob.", explanation_en: "Indirect yes/no questions use ob." },
+            GrammarUnitExercise { prompt_it: "Scrivi la congiunzione: Ich weiÃŸ nicht, ___ er kommt. (domanda indiretta sÃ¬/no)", prompt_en: "Type the conjunction: Ich weiÃŸ nicht, ___ er kommt. (indirect yes/no question)", options: &[], correct_index: 0, answer_text: "ob", explanation_it: "Le domande indirette sÃ¬/no usano ob.", explanation_en: "Indirect yes/no questions use ob." },
         ],
     }
 }
@@ -2072,9 +2072,9 @@ fn unit_a2_relative() -> GrammarUnit {
             "With a preposition it stays in front: Der Mann, mit dem ich spreche...",
         ],
         examples: &[
-            ("Der Mann, der dort steht, ist mein Chef.", "L'uomo che sta là è il mio capo."),
-            ("Das Buch, das ich lese, ist spannend.", "Il libro che leggo è avvincente."),
-            ("Die Frau, der ich helfe, ist meine Nachbarin.", "La donna a cui aiuto è la mia vicina."),
+            ("Der Mann, der dort steht, ist mein Chef.", "L'uomo che sta lÃ  Ã¨ il mio capo."),
+            ("Das Buch, das ich lese, ist spannend.", "Il libro che leggo Ã¨ avvincente."),
+            ("Die Frau, der ich helfe, ist meine Nachbarin.", "La donna a cui aiuto Ã¨ la mia vicina."),
         ],
         exercises: &[
             GrammarUnitExercise { prompt_it: "Completa (soggetto): Der Mann, ___ dort steht, ist mein Chef.", prompt_en: "Complete (subject): Der Mann, ___ dort steht, ist mein Chef.", options: &["der", "den", "dem"], correct_index: 0, answer_text: "", explanation_it: "Soggetto maschile nella relativa: der.", explanation_en: "Masculine subject in the relative clause: der." },
@@ -2092,8 +2092,8 @@ fn unit_a1_possessivi_negazione() -> GrammarUnit {
         level: "A1",
         title_it: "Possessivi e negazione",
         title_en: "Possessives and negation",
-        subtitle_it: "Mio, tuo, suo… e come dire «non»",
-        subtitle_en: "My, your, his… and how to say “not/no”",
+        subtitle_it: "Mio, tuo, suoâ€¦ e come dire Â«nonÂ»",
+        subtitle_en: "My, your, hisâ€¦ and how to say â€œnot/noâ€",
         objective_it: "Usare i possessivi e distinguere kein da nicht.",
         objective_en: "Use possessives and distinguish kein from nicht.",
         theory_it: &[
@@ -2114,7 +2114,7 @@ fn unit_a1_possessivi_negazione() -> GrammarUnit {
         exercises: &[
             GrammarUnitExercise { prompt_it: "Completa (nominativo maschile): ___ Vater arbeitet hier. (ich)", prompt_en: "Complete (masculine nominative): ___ Vater arbeitet hier. (ich)", options: &["Mein", "Meine", "Meinen"], correct_index: 0, answer_text: "", explanation_it: "Maschile al nominativo: mein Vater.", explanation_en: "Masculine nominative: mein Vater." },
             GrammarUnitExercise { prompt_it: "Completa (accusativo maschile): Ich sehe ___ Bruder. (ich)", prompt_en: "Complete (masculine accusative): Ich sehe ___ Bruder. (ich)", options: &["mein", "meine", "meinen"], correct_index: 2, answer_text: "", explanation_it: "Accusativo maschile: meinen Bruder.", explanation_en: "Masculine accusative: meinen Bruder." },
-            GrammarUnitExercise { prompt_it: "Scegli la negazione corretta: Ich habe ___ Zeit.", prompt_en: "Choose the correct negation: Ich habe ___ Zeit.", options: &["kein", "keine", "nicht"], correct_index: 1, answer_text: "", explanation_it: "Zeit è femminile: keine Zeit.", explanation_en: "Zeit is feminine: keine Zeit." },
+            GrammarUnitExercise { prompt_it: "Scegli la negazione corretta: Ich habe ___ Zeit.", prompt_en: "Choose the correct negation: Ich habe ___ Zeit.", options: &["kein", "keine", "nicht"], correct_index: 1, answer_text: "", explanation_it: "Zeit Ã¨ femminile: keine Zeit.", explanation_en: "Zeit is feminine: keine Zeit." },
             GrammarUnitExercise { prompt_it: "Scrivi il possessivo: Das ist ___ Schwester. (er)", prompt_en: "Type the possessive: Das ist ___ Schwester. (er)", options: &[], correct_index: 0, answer_text: "seine", explanation_it: "Femminile al nominativo: seine Schwester.", explanation_en: "Feminine nominative: seine Schwester." },
         ],
     }
@@ -2132,7 +2132,7 @@ fn unit_a1_imperativo() -> GrammarUnit {
         objective_it: "Formare l'imperativo nelle forme du, ihr, Sie e wir.",
         objective_en: "Form the imperative in du, ihr, Sie, and wir forms.",
         theory_it: &[
-            "Forma du: radice del verbo (senza -st), es. Mach! Komm! La -e finale è spesso facoltativa.",
+            "Forma du: radice del verbo (senza -st), es. Mach! Komm! La -e finale Ã¨ spesso facoltativa.",
             "Forma ihr: radice + -t (Macht!); forma Sie: infinito + Sie (Machen Sie!); forma wir: infinito + wir (Gehen wir!).",
             "Irregolari importanti: sein -> sei/seid/seien Sie; con prefissi separabili il prefisso va in fondo: Steh auf!",
         ],
@@ -2142,7 +2142,7 @@ fn unit_a1_imperativo() -> GrammarUnit {
             "Important irregulars: sein -> sei/seid/seien Sie; separable prefixes go to the end: Steh auf!",
         ],
         examples: &[
-            ("Mach bitte die Tür zu!", "Per favore, chiudi la porta!"),
+            ("Mach bitte die TÃ¼r zu!", "Per favore, chiudi la porta!"),
             ("Kommt mit!", "Venite con noi!"),
             ("Warten Sie bitte hier!", "Aspetti qui, per favore!"),
             ("Sei ruhig!", "Stai calmo!"),
@@ -2180,13 +2180,13 @@ fn unit_b1_futur_intro() -> GrammarUnit {
             "Modal verbs and lassen take the infinitive without zu: Ich muss lernen.",
         ],
         examples: &[
-            ("Ich werde morgen nach Bozen fahren.", "Domani andrò a Bolzano."),
-            ("Ich versuche, pünktlich zu kommen.", "Cerco di arrivare puntuale."),
+            ("Ich werde morgen nach Bozen fahren.", "Domani andrÃ² a Bolzano."),
+            ("Ich versuche, pÃ¼nktlich zu kommen.", "Cerco di arrivare puntuale."),
             ("Ich habe vor, Deutsch zu lernen.", "Ho intenzione di imparare il tedesco."),
         ],
         exercises: &[
             GrammarUnitExercise { prompt_it: "Completa: Ich ___ morgen nach Bozen fahren. (werden)", prompt_en: "Complete: Ich ___ morgen nach Bozen fahren. (werden)", options: &["werde", "wirst", "wird"], correct_index: 0, answer_text: "", explanation_it: "ich + werden = werde.", explanation_en: "ich + werden = werde." },
-            GrammarUnitExercise { prompt_it: "Completa: Er ___ die Prüfung bestehen. (werden)", prompt_en: "Complete: Er ___ die Prüfung bestehen. (werden)", options: &["werde", "wird", "werden"], correct_index: 1, answer_text: "", explanation_it: "er + werden = wird.", explanation_en: "er + werden = wird." },
+            GrammarUnitExercise { prompt_it: "Completa: Er ___ die PrÃ¼fung bestehen. (werden)", prompt_en: "Complete: Er ___ die PrÃ¼fung bestehen. (werden)", options: &["werde", "wird", "werden"], correct_index: 1, answer_text: "", explanation_it: "er + werden = wird.", explanation_en: "er + werden = wird." },
             GrammarUnitExercise { prompt_it: "Scegli: Ich habe vergessen, die Rechnung ___ bezahlen.", prompt_en: "Choose: Ich habe vergessen, die Rechnung ___ bezahlen.", options: &["zu", "um", "ohne"], correct_index: 0, answer_text: "", explanation_it: "vergessen regge l'infinito con zu.", explanation_en: "vergessen takes the infinitive with zu." },
             GrammarUnitExercise { prompt_it: "Scrivi la forma: Wir ___ im Sommer reisen. (werden)", prompt_en: "Type the form: Wir ___ im Sommer reisen. (werden)", options: &[], correct_index: 0, answer_text: "werden", explanation_it: "wir + werden = werden.", explanation_en: "wir + werden = werden." },
         ],
@@ -2200,14 +2200,14 @@ fn unit_b1_doppelkonnektoren() -> GrammarUnit {
         level: "B1",
         title_it: "I connettori doppi",
         title_en: "Double connectors",
-        subtitle_it: "entweder…oder, weder…noch, je…desto",
-        subtitle_en: "entweder…oder, weder…noch, je…desto",
+        subtitle_it: "entwederâ€¦oder, wederâ€¦noch, jeâ€¦desto",
+        subtitle_en: "entwederâ€¦oder, wederâ€¦noch, jeâ€¦desto",
         objective_it: "Usare connettori doppi per collegare alternative, negazioni e confronti.",
         objective_en: "Use double connectors to link alternatives, negations, and comparisons.",
         theory_it: &[
-            "entweder ... oder = o ... o; weder ... noch = né ... né; sowohl ... als auch = sia ... sia.",
+            "entweder ... oder = o ... o; weder ... noch = nÃ© ... nÃ©; sowohl ... als auch = sia ... sia.",
             "nicht nur ... sondern auch = non solo ... ma anche; zwar ... aber = certo ... ma.",
-            "je ... desto/umso = quanto più ... tanto più. Nella parte con je il verbo va in fondo; con desto il verbo resta al secondo posto.",
+            "je ... desto/umso = quanto piÃ¹ ... tanto piÃ¹. Nella parte con je il verbo va in fondo; con desto il verbo resta al secondo posto.",
         ],
         theory_en: &[
             "entweder ... oder = either ... or; weder ... noch = neither ... nor; sowohl ... als auch = both ... and.",
@@ -2215,9 +2215,9 @@ fn unit_b1_doppelkonnektoren() -> GrammarUnit {
             "je ... desto/umso = the more ... the more. In the je-clause the verb goes to the end; in the desto-clause the verb stays in second position.",
         ],
         examples: &[
-            ("Entweder komme ich heute oder am Freitag.", "O vengo oggi o venerdì."),
-            ("Ich habe weder Zeit noch Geld.", "Non ho né tempo né soldi."),
-            ("Je mehr ich lerne, desto besser verstehe ich.", "Più imparo, meglio capisco."),
+            ("Entweder komme ich heute oder am Freitag.", "O vengo oggi o venerdÃ¬."),
+            ("Ich habe weder Zeit noch Geld.", "Non ho nÃ© tempo nÃ© soldi."),
+            ("Je mehr ich lerne, desto besser verstehe ich.", "PiÃ¹ imparo, meglio capisco."),
         ],
         exercises: &[
             GrammarUnitExercise { prompt_it: "Completa: Ich habe ___ Zeit ___ Geld.", prompt_en: "Complete: Ich habe ___ Zeit ___ Geld.", options: &["weder ... noch", "sowohl ... als auch", "entweder ... oder"], correct_index: 0, answer_text: "", explanation_it: "Due negazioni: weder ... noch.", explanation_en: "Two negations: weder ... noch." },
@@ -2234,28 +2234,28 @@ fn unit_b1_partizipien() -> GrammarUnit {
         level: "B1",
         title_it: "Participi e frasi ridotte",
         title_en: "Participles and reduced clauses",
-        subtitle_it: "lachend, gelesen, geöffnet",
-        subtitle_en: "lachend, gelesen, geöffnet",
+        subtitle_it: "lachend, gelesen, geÃ¶ffnet",
+        subtitle_en: "lachend, gelesen, geÃ¶ffnet",
         objective_it: "Riconoscere e usare il Partizip I e il Partizip II come aggettivi.",
         objective_en: "Recognize and use Partizip I and Partizip II as adjectives.",
         theory_it: &[
             "Partizip I: infinito + d (lachen -> lachend), azione contemporanea/attiva: der lachende Mann.",
             "Partizip II: ge-...-t/en (lesen -> gelesen), spesso risultato/passivo: das gelesene Buch.",
-            "Come aggettivi i participi prendono le normali desinenze: der lachende Mann, die geöffnete Tür.",
+            "Come aggettivi i participi prendono le normali desinenze: der lachende Mann, die geÃ¶ffnete TÃ¼r.",
         ],
         theory_en: &[
             "Partizip I: infinitive + d (lachen -> lachend), simultaneous/active action: der lachende Mann.",
             "Partizip II: ge-...-t/en (lesen -> gelesen), often result/passive: das gelesene Buch.",
-            "As adjectives, participles take normal adjective endings: der lachende Mann, die geöffnete Tür.",
+            "As adjectives, participles take normal adjective endings: der lachende Mann, die geÃ¶ffnete TÃ¼r.",
         ],
         examples: &[
-            ("Der lachende Mann ist mein Lehrer.", "L'uomo che ride è il mio insegnante."),
-            ("Das gelesene Buch liegt auf dem Tisch.", "Il libro letto è sul tavolo."),
-            ("Die geöffnete Tür ist kaputt.", "La porta aperta è rotta."),
+            ("Der lachende Mann ist mein Lehrer.", "L'uomo che ride Ã¨ il mio insegnante."),
+            ("Das gelesene Buch liegt auf dem Tisch.", "Il libro letto Ã¨ sul tavolo."),
+            ("Die geÃ¶ffnete TÃ¼r ist kaputt.", "La porta aperta Ã¨ rotta."),
         ],
         exercises: &[
             GrammarUnitExercise { prompt_it: "Partizip I di lachen:", prompt_en: "Partizip I of lachen:", options: &["lachend", "gelacht", "lachende"], correct_index: 0, answer_text: "", explanation_it: "Partizip I: infinito + d -> lachend.", explanation_en: "Partizip I: infinitive + d -> lachend." },
-            GrammarUnitExercise { prompt_it: "Partizip II di lesen:", prompt_en: "Partizip II of lesen:", options: &["lesend", "gelesen", "gelesene"], correct_index: 1, answer_text: "", explanation_it: "lesen è forte: gelesen.", explanation_en: "lesen is strong: gelesen." },
+            GrammarUnitExercise { prompt_it: "Partizip II di lesen:", prompt_en: "Partizip II of lesen:", options: &["lesend", "gelesen", "gelesene"], correct_index: 1, answer_text: "", explanation_it: "lesen Ã¨ forte: gelesen.", explanation_en: "lesen is strong: gelesen." },
             GrammarUnitExercise { prompt_it: "Completa (aggettivo, maschile): Der ___ Mann ist mein Lehrer. (lachen)", prompt_en: "Complete (adjective, masculine): Der ___ Mann ist mein Lehrer. (lachen)", options: &["lachend", "lachende", "gelachte"], correct_index: 1, answer_text: "", explanation_it: "Der + maschile: lachend + e -> lachende.", explanation_en: "Der + masculine: lachend + e -> lachende." },
             GrammarUnitExercise { prompt_it: "Scrivi la forma: Das ___ Buch liegt auf dem Tisch. (lesen, Partizip II, neutro)", prompt_en: "Type the form: Das ___ Buch liegt auf dem Tisch. (lesen, Partizip II, neuter)", options: &[], correct_index: 0, answer_text: "gelesene", explanation_it: "Das + neutro: gelesen + e -> gelesene.", explanation_en: "Das + neuter: gelesen + e -> gelesene." },
         ],
@@ -2274,21 +2274,21 @@ fn unit_a1_preposizioni_luogo() -> GrammarUnit {
         objective_it: "Scegliere la preposizione e il caso giusto per stato in luogo e moto a luogo.",
         objective_en: "Choose the right preposition and case for location and direction.",
         theory_it: &[
-            "Con Wo? (dove?, stato in luogo) si usa spesso il dativo: Ich bin in der Küche.",
+            "Con Wo? (dove?, stato in luogo) si usa spesso il dativo: Ich bin in der KÃ¼che.",
             "Con Wohin? (dove vai?, moto a luogo) si usa spesso l'accusativo: Ich gehe in die Schule.",
-            "Preposizioni miste: in, an, auf, unter, über, vor, hinter, neben, zwischen. Contrazioni comuni: im, am, ins, ans, zum, zur.",
-            "Con città/paesi spesso nach (nach Berlin), con persone/istituzioni spesso zu (zum Arzt, zur Schule).",
+            "Preposizioni miste: in, an, auf, unter, Ã¼ber, vor, hinter, neben, zwischen. Contrazioni comuni: im, am, ins, ans, zum, zur.",
+            "Con cittÃ /paesi spesso nach (nach Berlin), con persone/istituzioni spesso zu (zum Arzt, zur Schule).",
         ],
         theory_en: &[
-            "With Wo? (where?, location) dative is often used: Ich bin in der Küche.",
+            "With Wo? (where?, location) dative is often used: Ich bin in der KÃ¼che.",
             "With Wohin? (where to?, direction) accusative is often used: Ich gehe in die Schule.",
-            "Two-way prepositions: in, an, auf, unter, über, vor, hinter, neben, zwischen. Common contractions: im, am, ins, ans, zum, zur.",
+            "Two-way prepositions: in, an, auf, unter, Ã¼ber, vor, hinter, neben, zwischen. Common contractions: im, am, ins, ans, zum, zur.",
             "With cities/countries often nach (nach Berlin), with people/institutions often zu (zum Arzt, zur Schule).",
         ],
         examples: &[
             ("Ich bin in der Schule.", "Sono a scuola."),
             ("Ich gehe in die Schule.", "Vado a scuola."),
-            ("Das Buch liegt auf dem Tisch.", "Il libro è sul tavolo."),
+            ("Das Buch liegt auf dem Tisch.", "Il libro Ã¨ sul tavolo."),
             ("Wir fahren nach Berlin.", "Andiamo a Berlino."),
         ],
         exercises: &[
@@ -2309,7 +2309,7 @@ fn unit_a1_preposizioni_tempo() -> GrammarUnit {
         title_en: "Prepositions of time",
         subtitle_it: "um, am, im, seit, vor, nach, in",
         subtitle_en: "um, am, im, seit, vor, nach, in",
-        objective_it: "Collocare azioni nel tempo con le preposizioni più frequenti.",
+        objective_it: "Collocare azioni nel tempo con le preposizioni piÃ¹ frequenti.",
         objective_en: "Place actions in time with the most common prepositions.",
         theory_it: &[
             "um + ora (um 8 Uhr), am + giorno/data (am Montag), im + mese/stagione (im Januar, im Sommer).",
@@ -2322,7 +2322,7 @@ fn unit_a1_preposizioni_tempo() -> GrammarUnit {
             "vor + dative = ago (vor einer Woche); nach + dative = after (nach dem Essen).",
         ],
         examples: &[
-            ("Am Montag habe ich frei.", "Lunedì sono libero."),
+            ("Am Montag habe ich frei.", "LunedÃ¬ sono libero."),
             ("Der Kurs beginnt um 9 Uhr.", "Il corso inizia alle 9."),
             ("Ich wohne seit einem Jahr in Berlin.", "Vivo a Berlino da un anno."),
             ("Nach dem Essen gehen wir spazieren.", "Dopo mangiato andiamo a passeggiare."),
@@ -2348,20 +2348,20 @@ fn unit_a1_separabili() -> GrammarUnit {
         objective_it: "Riconoscere e usare i verbi con prefisso separabile nelle frasi principali.",
         objective_en: "Recognize and use separable-prefix verbs in main clauses.",
         theory_it: &[
-            "Prefissi separabili comuni: auf-, an-, aus-, ein-, mit-, zu-, ab-, vor-, zurück-, fern-.",
+            "Prefissi separabili comuni: auf-, an-, aus-, ein-, mit-, zu-, ab-, vor-, zurÃ¼ck-, fern-.",
             "Nella frase principale il verbo coniugato sta in seconda posizione e il prefisso va alla fine: Ich stehe um 6 Uhr auf.",
             "All'infinito il prefisso resta unito (aufstehen). Nel participio passato ge entra tra prefisso e verbo: aufgestanden.",
             "Prefissi inseparabili (be-, ge-, er-, ver-, ent-, emp-, miss-) non si separano.",
         ],
         theory_en: &[
-            "Common separable prefixes: auf-, an-, aus-, ein-, mit-, zu-, ab-, vor-, zurück-, fern-.",
+            "Common separable prefixes: auf-, an-, aus-, ein-, mit-, zu-, ab-, vor-, zurÃ¼ck-, fern-.",
             "In main clauses the conjugated verb is in second position and the prefix goes to the end: Ich stehe um 6 Uhr auf.",
             "In the infinitive the prefix stays attached (aufstehen). In the past participle ge comes between prefix and verb: aufgestanden.",
             "Inseparable prefixes (be-, ge-, er-, ver-, ent-, emp-, miss-) do not separate.",
         ],
         examples: &[
             ("Ich stehe um 6 Uhr auf.", "Mi alzo alle 6."),
-            ("Der Kurs fängt um 10 Uhr an.", "Il corso inizia alle 10."),
+            ("Der Kurs fÃ¤ngt um 10 Uhr an.", "Il corso inizia alle 10."),
             ("Wir kaufen im Supermarkt ein.", "Facciamo la spesa al supermercato."),
             ("Kommst du mit?", "Vieni con noi?"),
         ],
@@ -2383,28 +2383,28 @@ fn unit_a0_plurale() -> GrammarUnit {
         title_en: "Plural of nouns",
         subtitle_it: "Die Kinder, die Autos, die Frauen",
         subtitle_en: "Die Kinder, die Autos, die Frauen",
-        objective_it: "Formare i plurali più frequenti e usare l'articolo die.",
+        objective_it: "Formare i plurali piÃ¹ frequenti e usare l'articolo die.",
         objective_en: "Form common plurals and use the article die.",
         theory_it: &[
-            "Al plurale l'articolo è sempre die, ma il sostantivo cambia forma in modi diversi.",
+            "Al plurale l'articolo Ã¨ sempre die, ma il sostantivo cambia forma in modi diversi.",
             "Desinenze comuni: -e (Tisch -> Tische), -en (Frau -> Frauen), -er (Kind -> Kinder), -s (Auto -> Autos), nessuna (Lehrer -> Lehrer).",
-            "Alcuni plurali aggiungono l'umlaut: Stadt -> Städte, Mann -> Männer, Buch -> Bücher.",
+            "Alcuni plurali aggiungono l'umlaut: Stadt -> StÃ¤dte, Mann -> MÃ¤nner, Buch -> BÃ¼cher.",
         ],
         theory_en: &[
             "In the plural the article is always die, but the noun changes in different ways.",
             "Common endings: -e (Tisch -> Tische), -en (Frau -> Frauen), -er (Kind -> Kinder), -s (Auto -> Autos), none (Lehrer -> Lehrer).",
-            "Some plurals add an umlaut: Stadt -> Städte, Mann -> Männer, Buch -> Bücher.",
+            "Some plurals add an umlaut: Stadt -> StÃ¤dte, Mann -> MÃ¤nner, Buch -> BÃ¼cher.",
         ],
         examples: &[
             ("Die Kinder spielen im Park.", "I bambini giocano nel parco."),
-            ("Die Bücher sind interessant.", "I libri sono interessanti."),
+            ("Die BÃ¼cher sind interessant.", "I libri sono interessanti."),
             ("Die Autos sind neu.", "Le auto sono nuove."),
         ],
         exercises: &[
             GrammarUnitExercise { prompt_it: "Plurale di Kind:", prompt_en: "Plural of Kind:", options: &["die Kind", "die Kinder", "die Kindes"], correct_index: 1, answer_text: "", explanation_it: "Kind -> Kinder.", explanation_en: "Kind -> Kinder." },
             GrammarUnitExercise { prompt_it: "Plurale di Auto:", prompt_en: "Plural of Auto:", options: &["die Auten", "die Autos", "die Autoe"], correct_index: 1, answer_text: "", explanation_it: "Prestito con -s: die Autos.", explanation_en: "Loanword with -s: die Autos." },
-            GrammarUnitExercise { prompt_it: "Plurale di Frau:", prompt_en: "Plural of Frau:", options: &["die Fraus", "die Frauen", "die Fräue"], correct_index: 1, answer_text: "", explanation_it: "Frau -> Frauen.", explanation_en: "Frau -> Frauen." },
-            GrammarUnitExercise { prompt_it: "Scrivi il plurale: das Buch -> die ___", prompt_en: "Type the plural: das Buch -> die ___", options: &[], correct_index: 0, answer_text: "Bücher", explanation_it: "Buch -> Bücher (umlaut + -er).", explanation_en: "Buch -> Bücher (umlaut + -er)." },
+            GrammarUnitExercise { prompt_it: "Plurale di Frau:", prompt_en: "Plural of Frau:", options: &["die Fraus", "die Frauen", "die FrÃ¤ue"], correct_index: 1, answer_text: "", explanation_it: "Frau -> Frauen.", explanation_en: "Frau -> Frauen." },
+            GrammarUnitExercise { prompt_it: "Scrivi il plurale: das Buch -> die ___", prompt_en: "Type the plural: das Buch -> die ___", options: &[], correct_index: 0, answer_text: "BÃ¼cher", explanation_it: "Buch -> BÃ¼cher (umlaut + -er).", explanation_en: "Buch -> BÃ¼cher (umlaut + -er)." },
         ],
     }
 }
@@ -2418,28 +2418,28 @@ fn unit_a0_alfabeto() -> GrammarUnit {
         title_en: "Alphabet, sounds and pronunciation",
         subtitle_it: "Leggere e scrivere i suoni tedeschi di base",
         subtitle_en: "Read and write basic German sounds",
-        objective_it: "Riconoscere i suoni tedeschi più frequenti e leggere le prime parole.",
+        objective_it: "Riconoscere i suoni tedeschi piÃ¹ frequenti e leggere le prime parole.",
         objective_en: "Recognize common German sounds and read basic words.",
         theory_it: &[
-            "L'alfabeto tedesco ha 26 lettere più ä, ö, ü e ß (vale come ss).",
-            "Combinazioni chiave: ei = [ai] (mein), ie = [i:] lungo (sie), sch = [ʃ] (Schule), z = [ts] (Zeit).",
-            "v spesso suona [f] (Vater), w suona [v] (Wasser); s iniziale davanti a vocale è sonora [z] (Sonne).",
+            "L'alfabeto tedesco ha 26 lettere piÃ¹ Ã¤, Ã¶, Ã¼ e ÃŸ (vale come ss).",
+            "Combinazioni chiave: ei = [ai] (mein), ie = [i:] lungo (sie), sch = [Êƒ] (Schule), z = [ts] (Zeit).",
+            "v spesso suona [f] (Vater), w suona [v] (Wasser); s iniziale davanti a vocale Ã¨ sonora [z] (Sonne).",
         ],
         theory_en: &[
-            "The German alphabet has 26 letters plus ä, ö, ü and ß (equals ss).",
-            "Key combinations: ei = [ai] (mein), ie = long [i:] (sie), sch = [ʃ] (Schule), z = [ts] (Zeit).",
+            "The German alphabet has 26 letters plus Ã¤, Ã¶, Ã¼ and ÃŸ (equals ss).",
+            "Key combinations: ei = [ai] (mein), ie = long [i:] (sie), sch = [Êƒ] (Schule), z = [ts] (Zeit).",
             "v often sounds [f] (Vater), w sounds [v] (Wasser); initial s before a vowel is voiced [z] (Sonne).",
         ],
         examples: &[
-            ("Ich heiße Anna.", "Mi chiamo Anna."),
-            ("Die Schule ist schön.", "La scuola è bella."),
-            ("Das ist mein Vater.", "Questo è mio padre."),
+            ("Ich heiÃŸe Anna.", "Mi chiamo Anna."),
+            ("Die Schule ist schÃ¶n.", "La scuola Ã¨ bella."),
+            ("Das ist mein Vater.", "Questo Ã¨ mio padre."),
         ],
         exercises: &[
             GrammarUnitExercise { prompt_it: "Come si pronuncia \"ei\" in \"mein\"?", prompt_en: "How is \"ei\" pronounced in \"mein\"?", options: &["[ai]", "[i:]", "[oi]"], correct_index: 0, answer_text: "", explanation_it: "ei si pronuncia [ai].", explanation_en: "ei is pronounced [ai]." },
             GrammarUnitExercise { prompt_it: "Come si pronuncia \"ie\" in \"sie\"?", prompt_en: "How is \"ie\" pronounced in \"sie\"?", options: &["[ai]", "[i:]", "[e]"], correct_index: 1, answer_text: "", explanation_it: "ie indica una i lunga [i:].", explanation_en: "ie indicates a long [i:]." },
-            GrammarUnitExercise { prompt_it: "Quale parola contiene il suono [ʃ] (sch)?", prompt_en: "Which word contains the [ʃ] (sch) sound?", options: &["Sonne", "Schule", "Zeit"], correct_index: 1, answer_text: "", explanation_it: "Schule inizia con sch = [ʃ].", explanation_en: "Schule starts with sch = [ʃ]." },
-            GrammarUnitExercise { prompt_it: "Completa: Stra___e (strada)", prompt_en: "Complete: Stra___e (street)", options: &[], correct_index: 0, answer_text: "ß", explanation_it: "Straße si scrive con ß (vale ss).", explanation_en: "Straße is written with ß (equals ss)." },
+            GrammarUnitExercise { prompt_it: "Quale parola contiene il suono [Êƒ] (sch)?", prompt_en: "Which word contains the [Êƒ] (sch) sound?", options: &["Sonne", "Schule", "Zeit"], correct_index: 1, answer_text: "", explanation_it: "Schule inizia con sch = [Êƒ].", explanation_en: "Schule starts with sch = [Êƒ]." },
+            GrammarUnitExercise { prompt_it: "Completa: Stra___e (strada)", prompt_en: "Complete: Stra___e (street)", options: &[], correct_index: 0, answer_text: "ÃŸ", explanation_it: "StraÃŸe si scrive con ÃŸ (vale ss).", explanation_en: "StraÃŸe is written with ÃŸ (equals ss)." },
         ],
     }
 }
@@ -2451,31 +2451,31 @@ fn unit_a1_modali() -> GrammarUnit {
         level: "A1",
         title_it: "I verbi modali",
         title_en: "Modal verbs",
-        subtitle_it: "können, müssen, dürfen, wollen, sollen, mögen, möchten",
-        subtitle_en: "können, müssen, dürfen, wollen, sollen, mögen, möchten",
-        objective_it: "Esprimere possibilità, dovere, permesso e volontà con i verbi modali.",
+        subtitle_it: "kÃ¶nnen, mÃ¼ssen, dÃ¼rfen, wollen, sollen, mÃ¶gen, mÃ¶chten",
+        subtitle_en: "kÃ¶nnen, mÃ¼ssen, dÃ¼rfen, wollen, sollen, mÃ¶gen, mÃ¶chten",
+        objective_it: "Esprimere possibilitÃ , dovere, permesso e volontÃ  con i verbi modali.",
         objective_en: "Express possibility, necessity, permission, and desire with modal verbs.",
         theory_it: &[
-            "Modali principali: können (potere), müssen (dovere), dürfen (permesso), wollen (volere), sollen (consiglio/dovere), mögen (piacere), möchten (vorrei).",
-            "Ich/er/sie/es non prendono -t: ich kann, er muss. Il modale è in seconda posizione e l'infinito va alla fine: Ich kann heute nicht kommen.",
+            "Modali principali: kÃ¶nnen (potere), mÃ¼ssen (dovere), dÃ¼rfen (permesso), wollen (volere), sollen (consiglio/dovere), mÃ¶gen (piacere), mÃ¶chten (vorrei).",
+            "Ich/er/sie/es non prendono -t: ich kann, er muss. Il modale Ã¨ in seconda posizione e l'infinito va alla fine: Ich kann heute nicht kommen.",
             "Con verbi riflessivi il pronome sta tra modale e infinito: Ich muss mich ausruhen. Negazione: nicht prima dell'infinito, kein davanti al sostantivo.",
         ],
         theory_en: &[
-            "Main modals: können (can), müssen (must), dürfen (may), wollen (want), sollen (should), mögen (like), möchten (would like).",
+            "Main modals: kÃ¶nnen (can), mÃ¼ssen (must), dÃ¼rfen (may), wollen (want), sollen (should), mÃ¶gen (like), mÃ¶chten (would like).",
             "Ich/er/sie/es take no -t: ich kann, er muss. The modal is in second position and the infinitive goes to the end: Ich kann heute nicht kommen.",
             "With reflexive verbs the pronoun comes between modal and infinitive: Ich muss mich ausruhen. Negation: nicht before the infinitive, kein before a noun.",
         ],
         examples: &[
             ("Ich kann gut schwimmen.", "So nuotare bene."),
             ("Du musst heute arbeiten.", "Oggi devi lavorare."),
-            ("Er darf nicht rauchen.", "Non può fumare."),
-            ("Ich möchte einen Kaffee.", "Vorrei un caffè."),
+            ("Er darf nicht rauchen.", "Non puÃ² fumare."),
+            ("Ich mÃ¶chte einen Kaffee.", "Vorrei un caffÃ¨."),
         ],
         exercises: &[
-            GrammarUnitExercise { prompt_it: "Completa: Ich ___ gut schwimmen. (können)", prompt_en: "Complete: Ich ___ gut schwimmen. (können)", options: &["kann", "kannst", "können"], correct_index: 0, answer_text: "", explanation_it: "Con ich si usa kann (senza -t).", explanation_en: "With ich use kann (no -t)." },
-            GrammarUnitExercise { prompt_it: "Completa: Du ___ heute arbeiten. (müssen)", prompt_en: "Complete: Du ___ heute arbeiten. (müssen)", options: &["muss", "musst", "müssen"], correct_index: 1, answer_text: "", explanation_it: "Con du si usa musst.", explanation_en: "With du use musst." },
+            GrammarUnitExercise { prompt_it: "Completa: Ich ___ gut schwimmen. (kÃ¶nnen)", prompt_en: "Complete: Ich ___ gut schwimmen. (kÃ¶nnen)", options: &["kann", "kannst", "kÃ¶nnen"], correct_index: 0, answer_text: "", explanation_it: "Con ich si usa kann (senza -t).", explanation_en: "With ich use kann (no -t)." },
+            GrammarUnitExercise { prompt_it: "Completa: Du ___ heute arbeiten. (mÃ¼ssen)", prompt_en: "Complete: Du ___ heute arbeiten. (mÃ¼ssen)", options: &["muss", "musst", "mÃ¼ssen"], correct_index: 1, answer_text: "", explanation_it: "Con du si usa musst.", explanation_en: "With du use musst." },
             GrammarUnitExercise { prompt_it: "Metti l'infinito alla fine: Ich kann / Deutsch / sprechen.", prompt_en: "Put the infinitive at the end: Ich kann / Deutsch / sprechen.", options: &["Ich kann Deutsch sprechen.", "Ich kann sprechen Deutsch.", "Ich spreche kann Deutsch."], correct_index: 0, answer_text: "", explanation_it: "Il modale in seconda posizione, l'infinito alla fine.", explanation_en: "Modal in second position, infinitive at the end." },
-            GrammarUnitExercise { prompt_it: "Scrivi la forma: Ich ___ einen Tee. (möchten)", prompt_en: "Type the form: Ich ___ einen Tee. (möchten)", options: &[], correct_index: 0, answer_text: "möchte", explanation_it: "möchten: ich möchte.", explanation_en: "möchten: ich möchte." },
+            GrammarUnitExercise { prompt_it: "Scrivi la forma: Ich ___ einen Tee. (mÃ¶chten)", prompt_en: "Type the form: Ich ___ einen Tee. (mÃ¶chten)", options: &[], correct_index: 0, answer_text: "mÃ¶chte", explanation_it: "mÃ¶chten: ich mÃ¶chte.", explanation_en: "mÃ¶chten: ich mÃ¶chte." },
         ],
     }
 }
@@ -2588,7 +2588,7 @@ impl Store {
             let id = "ripasso-giornaliero".to_string();
             passi.push(PassoPercorso {
                 titolo: "Ripasso flashcard".into(),
-                descrizione: format!("{da_ripassare} parole in scadenza · ~{minuti} min"),
+                descrizione: format!("{da_ripassare} parole in scadenza Â· ~{minuti} min"),
                 tipo: TipoPasso::Ripasso,
                 priorita: 0,
                 stima_minuti: minuti,
@@ -2604,7 +2604,7 @@ impl Store {
             let urgente = plan.grammar_due >= 2;
             passi.push(PassoPercorso {
                 titolo: "Pratica grammaticale".into(),
-                descrizione: if let Some(u) = &prossima { format!("{} · ~8 min", u.title_it) } else { "Ripassa grammatica · ~8 min".into() },
+                descrizione: if let Some(u) = &prossima { format!("{} Â· ~8 min", u.title_it) } else { "Ripassa grammatica Â· ~8 min".into() },
                 tipo: TipoPasso::Grammatica,
                 priorita: 0,
                 stima_minuti: 8,
@@ -2620,7 +2620,7 @@ impl Store {
             let id = "vocabolario-giornaliero".to_string();
             passi.push(PassoPercorso {
                 titolo: "Nuove parole".into(),
-                descrizione: format!("{n} parole nuove · ~{minuti} min"),
+                descrizione: format!("{n} parole nuove Â· ~{minuti} min"),
                 tipo: TipoPasso::Vocabolario,
                 priorita: 0,
                 stima_minuti: minuti,
@@ -2659,7 +2659,7 @@ impl Store {
         let minuti_completati: i32 = limited.iter().filter(|p| p.completato).map(|p| p.stima_minuti).sum();
         let any_urgente = limited.iter().any(|p| p.urgente && !p.completato);
         let messaggio_motivazionale = if any_urgente {
-            "Oggi conviene concentrarsi sulle aree con il badge Priorità.".into()
+            "Oggi conviene concentrarsi sulle aree con il badge PrioritÃ .".into()
         } else if da_ripassare >= 20 {
             "Tante parole da ripassare. Inizia dal ripasso!".into()
         } else if da_ripassare >= 10 {
@@ -2667,7 +2667,7 @@ impl Store {
         } else if streak >= 7 {
             format!("Streak di {streak} giorni! Sei inarrestabile.")
         } else if limited.iter().all(|p| p.completato) && !limited.is_empty() {
-            "Prosegui così, stai facendo ottimi progressi.".into()
+            "Prosegui cosÃ¬, stai facendo ottimi progressi.".into()
         } else {
             "Buona sessione di studio!".into()
         };
@@ -2838,7 +2838,7 @@ impl Store {
     }
 }
 
-// ── Gender Trainer (allenamento articoli der/die/das) ──
+// â”€â”€ Gender Trainer (allenamento articoli der/die/das) â”€â”€
 
 /** Una domanda del Gender Trainer: il sostantivo senza articolo e l'articolo corretto. */
 #[derive(Debug, Clone)]
@@ -2922,86 +2922,187 @@ pub fn gender_opzioni(domanda: &GenderDomanda) -> Vec<String> {
     opzioni
 }
 
-// ── Gender Trainer (allenamento articoli der/die/das) ──
 
-/** Una domanda del Gender Trainer: il sostantivo senza articolo e l'articolo corretto. */
-#[derive(Debug, Clone)]
-pub struct GenderDomanda {
-    pub id: String,
-    pub parola: String,
-    pub articolo: String,
-    pub traduzione: String,
-    pub esempio: String,
-    pub livello: String,
+// ── Speech engines (Whistle STT + Phonon TTS, on-device via pip) ──
+
+/// Motore vocale locale gestibile dall'app (installazione automatica in un venv dedicato).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SpeechEngineKind {
+    Whistle, // speech-to-text (cactus-compute)
+    Phonon,  // text-to-speech (ptts / Gradium)
 }
 
-/** Genera domande del Gender Trainer dal pool di parole del profilo + lessico curato. */
-pub fn gender_domande(
-    parole_profilo: &[WordEntity],
-    livello_selezionato: &str,
-    limite: Option<usize>,
-) -> Vec<GenderDomanda> {
-    let max_ord = level_rank(livello_selezionato);
-    let mut viste: HashSet<String> = HashSet::new();
-
-    let da_profilo: Vec<GenderDomanda> = parole_profilo
-        .iter()
-        .filter_map(|w| {
-            let art = w.normalized_article()?;
-            if !matches!(art.as_str(), "der" | "die" | "das") {
-                return None;
-            }
-            if level_rank(&w.level) > max_ord {
-                return None;
-            }
-            let parola = w.german.trim().to_string();
-            if parola.is_empty() {
-                return None;
-            }
-            let chiave = format!("{}|{}", art, parola.to_lowercase());
-            if !viste.insert(chiave) {
-                return None;
-            }
-            Some(GenderDomanda {
-                id: format!("p_{}", w.id),
-                parola,
-                articolo: art,
-                traduzione: w.italian.trim().to_string(),
-                esempio: w.example.trim().to_string(),
-                livello: w.level.clone(),
-            })
-        })
-        .collect();
-
-    let mut tutte = da_profilo;
-    if let Some(lim) = limite {
-        if lim > 0 {
-            tutte.truncate(lim);
+impl SpeechEngineKind {
+    pub fn id(self) -> &'static str {
+        match self {
+            SpeechEngineKind::Whistle => "whistle",
+            SpeechEngineKind::Phonon => "phonon",
         }
     }
-    tutte
+    /// Pacchetto pip da installare.
+    pub fn package(self) -> &'static str {
+        match self {
+            SpeechEngineKind::Whistle => "cactus-compute",
+            SpeechEngineKind::Phonon => "ptts",
+        }
+    }
+    /// Modulo Python da verificare dopo l'installazione.
+    pub fn module(self) -> &'static str {
+        match self {
+            SpeechEngineKind::Whistle => "cactus",
+            SpeechEngineKind::Phonon => "ptts",
+        }
+    }
+    pub fn label(self) -> &'static str {
+        match self {
+            SpeechEngineKind::Whistle => "Whistle (Speech to Text)",
+            SpeechEngineKind::Phonon => "Phonon (Text to Speech)",
+        }
+    }
+    pub fn description(self) -> &'static str {
+        match self {
+            SpeechEngineKind::Whistle => "16.9 MB on-device STT - 7 languages incl. German - Apache 2.0",
+            SpeechEngineKind::Phonon => "On-device TTS - multilingual incl. German - Apache 2.0 (31m)",
+        }
+    }
 }
 
-/** 4 opzioni (3 distrattori + 1 corretta) per una domanda del Gender Trainer. */
-pub fn gender_opzioni(domanda: &GenderDomanda) -> Vec<String> {
-    let corretto = domanda.articolo.clone();
-    let pool = ["der", "die", "das"];
-    let distrattori: Vec<&str> = pool
-        .iter()
-        .filter(|&&a| a != corretto.as_str())
-        .copied()
-        .collect();
-    // Prendi i primi 3 distrattori, poi mescola corretto + distrattori.
-    let mut opzioni: Vec<String> = distrattori[..3].iter().map(|s| s.to_string()).collect();
-    opzioni.push(corretto);
-    // Deterministic shuffle (seed from domanda id) per non mescolare a ogni render.
-    let seed = domanda
-        .id
-        .bytes()
-        .fold(0u64, |acc, b| acc.wrapping_mul(31).wrapping_add(b as u64));
-    for i in (1..opzioni.len()).rev() {
-        let j = (seed as usize) % (i + 1);
-        opzioni.swap(i, j);
+/// Cartella dedicata ai motori vocali: `~/.tedesco-desktop/speech/venv`.
+pub fn speech_venv_dir(store: &Store) -> PathBuf {
+    store.base_dir.join("speech").join("venv")
+}
+
+/// Percorso di pip nel venv (Windows vs Unix).
+fn venv_pip(venv: &PathBuf) -> PathBuf {
+    if cfg!(windows) {
+        venv.join("Scripts").join("pip.exe")
+    } else {
+        venv.join("bin").join("pip")
     }
-    opzioni
+}
+
+/// Percorso di python nel venv.
+fn venv_python(venv: &PathBuf) -> PathBuf {
+    if cfg!(windows) {
+        venv.join("Scripts").join("python.exe")
+    } else {
+        venv.join("bin").join("python")
+    }
+}
+
+/// Comando python di sistema (per creare il venv).
+fn system_python() -> &'static str {
+    if cfg!(windows) { "python" } else { "python3" }
+}
+
+/// Crea il venv se non esiste. Ritorna Ok(()) se pronto.
+pub fn speech_ensure_venv(store: &Store) -> Result<(), String> {
+    let venv = speech_venv_dir(store);
+    if venv_python(&venv).exists() {
+        return Ok(());
+    }
+    fs::create_dir_all(venv.parent().unwrap_or(&venv)).map_err(|e| e.to_string())?;
+    let out = std::process::Command::new(system_python())
+        .args(["-m", "venv"])
+        .arg(&venv)
+        .output()
+        .map_err(|e| format!("python non trovato: {e}"))?;
+    if !out.status.success() {
+        return Err(format!(
+            "creazione venv fallita: {}",
+            String::from_utf8_lossy(&out.stderr).trim()
+        ));
+    }
+    Ok(())
+}
+
+/// Installa (o aggiorna) un motore vocale nel venv dedicato.
+pub fn speech_install(store: &Store, engine: SpeechEngineKind) -> Result<String, String> {
+    speech_ensure_venv(store)?;
+    let venv = speech_venv_dir(store);
+    let pip = venv_pip(&venv);
+    let out = std::process::Command::new(&pip)
+        .args(["install", "--upgrade", engine.package()])
+        .output()
+        .map_err(|e| format!("pip non disponibile: {e}"))?;
+    if !out.status.success() {
+        return Err(format!(
+            "installazione {} fallita: {}",
+            engine.label(),
+            String::from_utf8_lossy(&out.stderr).trim()
+        ));
+    }
+    Ok(format!("{} installato.", engine.label()))
+}
+
+/// Disinstalla un motore vocale dal venv dedicato (non rimuove il venv).
+pub fn speech_uninstall(store: &Store, engine: SpeechEngineKind) -> Result<String, String> {
+    let venv = speech_venv_dir(store);
+    let pip = venv_pip(&venv);
+    if !pip.exists() {
+        return Ok(format!("{} non era installato.", engine.label()));
+    }
+    let out = std::process::Command::new(&pip)
+        .args(["uninstall", "-y", engine.package()])
+        .output()
+        .map_err(|e| format!("pip non disponibile: {e}"))?;
+    if !out.status.success() {
+        return Err(format!(
+            "disinstallazione {} fallita: {}",
+            engine.label(),
+            String::from_utf8_lossy(&out.stderr).trim()
+        ));
+    }
+    Ok(format!("{} disinstallato.", engine.label()))
+}
+
+/// Rimuove l'intero venv (tutti i motori + dipendenze).
+pub fn speech_remove_all(store: &Store) -> Result<String, String> {
+    let venv = speech_venv_dir(store);
+    let dir = venv.parent().unwrap_or(&venv).to_path_buf();
+    if !dir.exists() {
+        return Ok("Nessuna installazione vocale presente.".to_string());
+    }
+    fs::remove_dir_all(&dir).map_err(|e| format!("rimozione cartella speech fallita: {e}"))?;
+    Ok("Tutti i motori vocali rimossi.".to_string())
+}
+
+/// Verifica se un motore è importabile nel venv.
+pub fn speech_is_installed(store: &Store, engine: SpeechEngineKind) -> bool {
+    let venv = speech_venv_dir(store);
+    let py = venv_python(&venv);
+    if !py.exists() {
+        return false;
+    }
+    let code = format!("import {}", engine.module());
+    std::process::Command::new(&py)
+        .args(["-c", &code])
+        .output()
+        .map(|o| o.status.success())
+        .unwrap_or(false)
+}
+
+/// Ritorna la versione installata del pacchetto, o stringa vuota.
+pub fn speech_version(store: &Store, engine: SpeechEngineKind) -> String {
+    let venv = speech_venv_dir(store);
+    let py = venv_python(&venv);
+    if !py.exists() {
+        return String::new();
+    }
+    let code = format!(
+        "import importlib.metadata as m; print(m.version('{}'))",
+        engine.package()
+    );
+    std::process::Command::new(&py)
+        .args(["-c", &code])
+        .output()
+        .ok()
+        .filter(|o| o.status.success())
+        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string())
+        .unwrap_or_default()
+}
+
+/// Percorso del venv come stringa (per la UI).
+pub fn speech_venv_path(store: &Store) -> String {
+    speech_venv_dir(store).to_string_lossy().to_string()
 }

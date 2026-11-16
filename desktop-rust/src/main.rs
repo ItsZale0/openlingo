@@ -1,7 +1,7 @@
-mod data;
+﻿mod data;
 
 use chrono::{Local};
-use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni};
+use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path};
 use eframe::egui;
 use std::collections::BTreeSet;
 
@@ -181,6 +181,7 @@ enum Screen {
     Vocabulary,
     Grammar,
     Gender,
+    Speech,
     Progress,
     Settings,
 }
@@ -255,6 +256,9 @@ struct OpenLingoApp {
     gender_feedback: String,
     gender_done: bool,
     gender_level: String,
+    // Speech engines state
+    speech_status: String,
+    speech_busy: bool,
 }
 
 fn ui_lang(store: &Store) -> &str {
@@ -339,6 +343,8 @@ impl OpenLingoApp {
             gender_feedback: String::new(),
             gender_done: false,
             gender_level: "A1".into(),
+            speech_status: String::new(),
+            speech_busy: false,
         };
         // Default to dark teal theme to better match mobile look (user can change in Settings)
         if app.store.prefs.tema_colore.trim().is_empty() {
@@ -437,6 +443,7 @@ impl OpenLingoApp {
             Screen::Vocabulary => tr(lang, "Words", "Parole"),
             Screen::Grammar => tr(lang, "Grammar", "Grammatica"),
             Screen::Gender => tr(lang, "Gender Trainer", "Allenatore Articoli"),
+            Screen::Speech => tr(lang, "Speech engines", "Motori vocali"),
             Screen::Progress => tr(lang, "Progress", "Progresso"),
             Screen::Settings => tr(lang, "Settings", "Impostazioni"),
         };
@@ -454,7 +461,7 @@ impl OpenLingoApp {
                         self.screen = Screen::Settings;
                     }
                 }
-                if ui.small_button("↻").on_hover_text(tr(lang, "Refresh", "Aggiorna")).clicked() {
+                if ui.small_button("â†»").on_hover_text(tr(lang, "Refresh", "Aggiorna")).clicked() {
                     self.refresh_review_queue();
                     self.status = tr(lang, "Refreshed.", "Aggiornato.").to_string();
                 }
@@ -468,6 +475,7 @@ impl OpenLingoApp {
                     (Screen::QuickStudy, tr(lang, "Lesson", "Lezione")),
                     (Screen::Grammar, tr(lang, "Grammar", "Grammatica")),
                     (Screen::Gender, tr(lang, "Gender Trainer", "Allenatore Articoli")),
+                    (Screen::Speech, tr(lang, "Speech", "Vocale")),
                     (Screen::Progress, tr(lang, "Progress", "Progresso")),
                     (Screen::Settings, tr(lang, "Settings", "Impostazioni")),
                 ];
@@ -494,12 +502,13 @@ impl OpenLingoApp {
         let lang = lang.as_str();
         ui.add_space(4.0);
         let nav_items = [
-            (Screen::Home, "🏠", tr(lang, "Home", "Home")),
-            (Screen::Review, "🔁", tr(lang, "Review", "Ripasso")),
-            (Screen::Exercises, "✏️", tr(lang, "Exercises", "Esercizi")),
-            (Screen::Vocabulary, "📚", tr(lang, "Words", "Parole")),
-            (Screen::Gender, "🔤", tr(lang, "Gender Trainer", "Allenatore Articoli")),
-            (Screen::Progress, "📈", tr(lang, "Progress", "Progresso")),
+            (Screen::Home, "ðŸ ", tr(lang, "Home", "Home")),
+            (Screen::Review, "ðŸ”", tr(lang, "Review", "Ripasso")),
+            (Screen::Exercises, "âœï¸", tr(lang, "Exercises", "Esercizi")),
+            (Screen::Vocabulary, "ðŸ“š", tr(lang, "Words", "Parole")),
+            (Screen::Gender, "ðŸ”¤", tr(lang, "Gender Trainer", "Allenatore Articoli")),
+            (Screen::Speech, "ðŸŽ™", tr(lang, "Speech", "Vocale")),
+            (Screen::Progress, "ðŸ“ˆ", tr(lang, "Progress", "Progresso")),
         ];
         let w = ui.available_width();
         let cols = nav_items.len() as f32;
@@ -634,7 +643,7 @@ impl OpenLingoApp {
                             .inner_margin(egui::Margin::same(20))
                             .show(ui, |ui| {
                                 ui.label(egui::RichText::new(if lang == "it" { u.title_it } else { u.title_en }).size(22.0).strong());
-                                ui.label(egui::RichText::new(format!("{} · {} · {} min", u.level, if lang == "it" { u.subtitle_it } else { u.subtitle_en }, 14)).color(ui.visuals().text_color()));
+                                ui.label(egui::RichText::new(format!("{} Â· {} Â· {} min", u.level, if lang == "it" { u.subtitle_it } else { u.subtitle_en }, 14)).color(ui.visuals().text_color()));
                                 ui.add_space(12.0);
                                 if ui.add(egui::Button::new(egui::RichText::new(tr(lang, "Continue", "Continua")).strong()).min_size(egui::vec2(140.0, 42.0)).rounding(egui::CornerRadius::same(16))).clicked() {
                                     self.grammar_unit_id = Some(u.id.to_string());
@@ -691,7 +700,7 @@ impl OpenLingoApp {
                                 ui.add_space(12.0);
                                 ui.vertical(|ui| {
                                     ui.label(egui::RichText::new(&topic).size(28.0).strong());
-                                    ui.label(egui::RichText::new(if lang == "it" { format!("{} · Obiettivo {}", plan.livello_corrente, plan.obiettivo_livello) } else { format!("{} · Goal {}", plan.livello_corrente, plan.obiettivo_livello) }).color(ui.visuals().strong_text_color()));
+                                    ui.label(egui::RichText::new(if lang == "it" { format!("{} Â· Obiettivo {}", plan.livello_corrente, plan.obiettivo_livello) } else { format!("{} Â· Goal {}", plan.livello_corrente, plan.obiettivo_livello) }).color(ui.visuals().strong_text_color()));
                                 });
                             });
                             ui.add_space(12.0);
@@ -864,9 +873,9 @@ impl OpenLingoApp {
                     // Testata-like header
                     ui.label(egui::RichText::new(tr(lang, "Review", "Ripasso")).size(32.0).strong());
                     ui.label(egui::RichText::new(if lang == "it" {
-                        format!("{due} in scadenza · {nuove} nuove da vedere · {mature} parole mature · ripetizione spaziata")
+                        format!("{due} in scadenza Â· {nuove} nuove da vedere Â· {mature} parole mature Â· ripetizione spaziata")
                     } else {
-                        format!("{due} due · {nuove} new to see · {mature} mature words · spaced repetition")
+                        format!("{due} due Â· {nuove} new to see Â· {mature} mature words Â· spaced repetition")
                     }).color(ui.visuals().strong_text_color()));
                     ui.add_space(16.0);
 
@@ -894,7 +903,7 @@ impl OpenLingoApp {
                                     ui.add_space(12.0);
                                     ui.label(egui::RichText::new(tr(lang,
                                         "Known cards come back after 1, 3, 7, 16, 35, 75, 150 or 300 days; missed cards come back tomorrow and lower ease.",
-                                        "Le carte sapute tornano tra 1, 3, 7, 16, 35, 75, 150 o 300 giorni; quelle sbagliate tornano domani e abbassano la facilità."
+                                        "Le carte sapute tornano tra 1, 3, 7, 16, 35, 75, 150 o 300 giorni; quelle sbagliate tornano domani e abbassano la facilitÃ ."
                                     )).small().color(ui.visuals().strong_text_color()));
                                     ui.add_space(16.0);
                                     ui.horizontal_wrapped(|ui| {
@@ -912,11 +921,11 @@ impl OpenLingoApp {
                                 .inner_margin(egui::Margin::same(20))
                                 .show(ui, |ui| {
                                     ui.label(egui::RichText::new(tr(lang, "No cards to review", "Nessuna carta da ripassare")).size(22.0).strong());
-                                    ui.label(egui::RichText::new(tr(lang, "The profile vocabulary is empty or everything is already in place", "Il lessico del profilo è vuoto oppure tutto è già al suo posto")).color(ui.visuals().strong_text_color()));
+                                    ui.label(egui::RichText::new(tr(lang, "The profile vocabulary is empty or everything is already in place", "Il lessico del profilo Ã¨ vuoto oppure tutto Ã¨ giÃ  al suo posto")).color(ui.visuals().strong_text_color()));
                                     ui.add_space(10.0);
                                     ui.label(tr(lang,
                                         "Add words from the word list: they enter the queue immediately and review starts from there.",
-                                        "Aggiungi parole dalla Wortliste: entrano subito nella coda e il ripasso parte da lì."
+                                        "Aggiungi parole dalla Wortliste: entrano subito nella coda e il ripasso parte da lÃ¬."
                                     ));
                                     ui.add_space(10.0);
                                     ui.label(egui::RichText::new(if lang == "it" { format!("Parole disponibili nella Wortliste: {total}") } else { format!("Words available in word list: {total}") }).color(ui.visuals().selection.stroke.color));
@@ -1056,7 +1065,7 @@ impl OpenLingoApp {
         self.exercise_total = 0;
         if self.exercise_queue.is_empty() {
             let lang = ui_lang(&self.store);
-            self.status = tr(lang, "No words available for this exercise mode/level.", "Nessuna parola disponibile per questa modalità/livello.").into();
+            self.status = tr(lang, "No words available for this exercise mode/level.", "Nessuna parola disponibile per questa modalitÃ /livello.").into();
         } else {
             let lang = ui_lang(&self.store);
             self.status = if lang == "it" { format!("Avviate {} domande.", self.exercise_queue.len()) } else { format!("Started {} questions.", self.exercise_queue.len()) };
@@ -1284,7 +1293,7 @@ impl OpenLingoApp {
                          Some(ExerciseMode::GuidedSession), false)
                     } else if plan.grammar_due > 0 {
                         (tr(lang, "Grammar review", "Ripasso grammatica"),
-                         if lang == "it" { format!("Hai {} unità di grammatica da ripassare.", plan.grammar_due) } else { format!("You have {} grammar units due for review.", plan.grammar_due) },
+                         if lang == "it" { format!("Hai {} unitÃ  di grammatica da ripassare.", plan.grammar_due) } else { format!("You have {} grammar units due for review.", plan.grammar_due) },
                          None, true)
                     } else if weak_count > 0 {
                         (tr(lang, "Weak words review", "Ripasso parole fragili"),
@@ -1367,7 +1376,7 @@ impl OpenLingoApp {
                     ui.add_space(6.0);
                     let review_cards = vec![
                         (ExerciseMode::GuidedSession, tr(lang, "Guided session", "Sessione libera"), tr(lang, "Due reviews + new words", "Ripassi in scadenza + parole nuove"),
-                            if lang == "it" { format!("{} dovute · {} nuove", plan.due_words, plan.new_words.min(20)) } else { format!("{} due · {} new", plan.due_words, plan.new_words.min(20)) }),
+                            if lang == "it" { format!("{} dovute Â· {} nuove", plan.due_words, plan.new_words.min(20)) } else { format!("{} due Â· {} new", plan.due_words, plan.new_words.min(20)) }),
                         (ExerciseMode::WeakWords, tr(lang, "Weak words", "Parole fragili"), tr(lang, "Focus on difficult words", "Concentrati sulle parole difficili"),
                             if lang == "it" { format!("Parole fragili: {weak_count}") } else { format!("Weak words: {weak_count}") }),
                     ];
@@ -1378,7 +1387,7 @@ impl OpenLingoApp {
                     ui.add_space(6.0);
                     let quiz_cards = vec![
                         (ExerciseMode::ArticleQuiz, tr(lang, "Articles", "Articoli"), tr(lang, "der/die/das for your words", "der/die/das sulle tue parole"),
-                            if lang == "it" { format!("Con articolo (≤ {}): {article_words_for_level}", self.exercise_level) } else { format!("With article (≤ {}): {article_words_for_level}", self.exercise_level) }),
+                            if lang == "it" { format!("Con articolo (â‰¤ {}): {article_words_for_level}", self.exercise_level) } else { format!("With article (â‰¤ {}): {article_words_for_level}", self.exercise_level) }),
                         (ExerciseMode::MeaningQuiz, tr(lang, "Meaning", "Significato"), tr(lang, "Pick the right meaning", "Scegli il significato giusto"),
                             if lang == "it" { format!("Parole attive: {active_words}") } else { format!("Active words: {active_words}") }),
                         (ExerciseMode::GermanQuiz, tr(lang, "German", "Tedesco"), tr(lang, "Pick the right German word", "Scegli la parola tedesca giusta"),
@@ -1405,7 +1414,7 @@ impl OpenLingoApp {
                     }
 
                     ui.add_space(16.0);
-                    ui.label(egui::RichText::new(tr(lang, "Other (from mobile app)", "Altre attività (app mobile)")).size(16.0).strong());
+                    ui.label(egui::RichText::new(tr(lang, "Other (from mobile app)", "Altre attivitÃ  (app mobile)")).size(16.0).strong());
                     ui.small(egui::RichText::new(tr(lang, "Not available in desktop yet.", "Non ancora disponibili su desktop.")).color(ui.visuals().strong_text_color()));
                     ui.add_space(8.0);
                     let more_modes = [
@@ -1493,7 +1502,7 @@ impl OpenLingoApp {
                             ui.horizontal_wrapped(|ui| {
                                 for lv in ["A1", "A2", "B1", "B2"] {
                                     let sel = self.vocab_level == lv;
-                                    let b = egui::Button::new(if sel { egui::RichText::new(format!("{} · 0/670", lv)).strong() } else { egui::RichText::new(format!("{} · 0/670", lv)) }).rounding(egui::CornerRadius::from(18));
+                                    let b = egui::Button::new(if sel { egui::RichText::new(format!("{} Â· 0/670", lv)).strong() } else { egui::RichText::new(format!("{} Â· 0/670", lv)) }).rounding(egui::CornerRadius::from(18));
                                     let b = if sel { b.fill(ui.visuals().faint_bg_color) } else { b.fill(ui.visuals().extreme_bg_color) };
                                     if ui.add(b).clicked() { self.vocab_level = lv.to_string(); }
                                 }
@@ -1511,11 +1520,11 @@ impl OpenLingoApp {
                         .show(ui, |ui| {
                             ui.label(egui::RichText::new(format!("Livello {}", active_lv)).size(22.0).strong());
                             ui.add_space(6.0);
-                            ui.label(tr(lang, "670 new words of A1 · 0 already in your lexicon · 33 to review", "670 parole nuove di A1 · 0 già nel tuo lessico · 33 da ripassare"));
+                            ui.label(tr(lang, "670 new words of A1 Â· 0 already in your lexicon Â· 33 to review", "670 parole nuove di A1 Â· 0 giÃ  nel tuo lessico Â· 33 da ripassare"));
                             ui.add_space(6.0);
                             ui.label(tr(lang, "Coverage up to A1: 670 of 650 words (cumulative target)", "Copertura fino a A1: 670 di 650 parole (obiettivo cumulativo)"));
                             ui.add_space(6.0);
-                            ui.label(tr(lang, "Themes: Adjectives · Animals · House · Food · Cities · Colors · Family · Days", "Temi: Aggettivi · Animali · Casa · Cibo · Città · Colori · Famiglia · Giorni"));
+                            ui.label(tr(lang, "Themes: Adjectives Â· Animals Â· House Â· Food Â· Cities Â· Colors Â· Family Â· Days", "Temi: Aggettivi Â· Animali Â· Casa Â· Cibo Â· CittÃ  Â· Colori Â· Famiglia Â· Giorni"));
                             ui.add_space(12.0);
                             ui.horizontal_wrapped(|ui| {
                                 if ui.add(egui::Button::new(tr(lang, "Add to review", "Aggiungi al ripasso")).rounding(egui::CornerRadius::from(14))).clicked() {
@@ -1601,7 +1610,7 @@ impl OpenLingoApp {
                     });
                     ui.add_space(10.0);
                     let selected_lv = self.vocab_level.clone();
-                    let level_arg = if selected_lv == "ALL" || selected_lv == "—" { None } else { Some(selected_lv.as_str()) };
+                    let level_arg = if selected_lv == "ALL" || selected_lv == "â€”" { None } else { Some(selected_lv.as_str()) };
                     ui.horizontal_wrapped(|ui| {
                         if ui.add(egui::Button::new(tr(lang, "Add to review", "Aggiungi al ripasso")).rounding(egui::CornerRadius::same(14))).clicked() {
                             match self.store.add_words_to_review(level_arg) {
@@ -1619,10 +1628,10 @@ impl OpenLingoApp {
                             self.screen = Screen::Review;
                         }
                         if ui.add(egui::Button::new(tr(lang, "Study new words", "Studia nuove parole")).rounding(egui::CornerRadius::same(14))).clicked() {
-                            if selected_lv == "ALL" || selected_lv == "—" { self.start_new_words_session(); } else { self.start_new_words_session_for_level(&selected_lv); }
+                            if selected_lv == "ALL" || selected_lv == "â€”" { self.start_new_words_session(); } else { self.start_new_words_session_for_level(&selected_lv); }
                         }
                         if ui.add(egui::Button::new(tr(lang, "Practice level", "Esercizi livello")).rounding(egui::CornerRadius::same(14))).clicked() {
-                            if selected_lv != "ALL" && selected_lv != "—" && selected_lv.len() <= 3 { self.exercise_level = selected_lv.clone(); }
+                            if selected_lv != "ALL" && selected_lv != "â€”" && selected_lv.len() <= 3 { self.exercise_level = selected_lv.clone(); }
                             self.exercise_mode = ExerciseMode::Mixed;
                             self.screen = Screen::Exercises;
                             self.start_exercise_session();
@@ -1686,7 +1695,7 @@ impl OpenLingoApp {
                             match self.store.add_word_ids_to_review(&ids) {
                                 Ok(added) => {
                                     self.status = if lang == "it" {
-                                        if added == 0 { "Le parole mostrate sono già nel ripasso.".into() } else { format!("Aggiunte {added} parole al ripasso.") }
+                                        if added == 0 { "Le parole mostrate sono giÃ  nel ripasso.".into() } else { format!("Aggiunte {added} parole al ripasso.") }
                                     } else if added == 0 { "Shown words are already in review.".into() } else { format!("Added {added} words to review.") };
                                     self.refresh_review_queue();
                                 }
@@ -1731,7 +1740,7 @@ impl OpenLingoApp {
                             }
                             if w.archived { ui.colored_label(egui::Color32::GRAY, tr(lang, "Archived", "Archiviata")); }
                             let primary_tag = w.tags.split(',').map(|s| s.trim()).find(|s| !s.is_empty() && *s != "custom");
-                            if let Some(tag) = primary_tag { ui.small(format!("• {tag}")); }
+                            if let Some(tag) = primary_tag { ui.small(format!("â€¢ {tag}")); }
                         });
                         ui.add_space(6.0);
                         ui.horizontal_wrapped(|ui| {
@@ -1767,7 +1776,7 @@ impl OpenLingoApp {
                     match self.store.add_word_ids_to_review(&[id]) {
                         Ok(added) => {
                             self.status = if lang == "it" {
-                                if added == 0 { "La parola è già nel ripasso.".into() } else { "Parola aggiunta al ripasso.".into() }
+                                if added == 0 { "La parola Ã¨ giÃ  nel ripasso.".into() } else { "Parola aggiunta al ripasso.".into() }
                             } else if added == 0 { "Word is already in review.".into() } else { "Word added to review.".into() };
                             self.refresh_review_queue();
                         }
@@ -1805,12 +1814,12 @@ impl OpenLingoApp {
                         .show(ui, |ui| {
                             ui.label(egui::RichText::new(format!("{} -> {}", plan.livello_corrente, plan.obiettivo_livello)).size(24.0).strong());
                             ui.add_space(6.0);
-                            ui.label(tr(lang, "20 minutes a day. Grammar leads the way. Each completed unit is a step towards mastery.", "20 minuti al giorno. La grammatica comanda il percorso. Ogni unità completata è un passo verso la padronanza."));
+                            ui.label(tr(lang, "20 minutes a day. Grammar leads the way. Each completed unit is a step towards mastery.", "20 minuti al giorno. La grammatica comanda il percorso. Ogni unitÃ  completata Ã¨ un passo verso la padronanza."));
                             ui.add_space(12.0);
                             let grammar_summary = self.store.grammar_mastery_summaries();
                             let total = crate::data::embedded_grammar_units().len();
                             let completed = grammar_summary.iter().filter(|s| s.completata).count();
-                            ui.label(format!("{} {} 56 {}", completed, tr(lang, "of", "di"), tr(lang, "units completed", "unità completate")));
+                            ui.label(format!("{} {} 56 {}", completed, tr(lang, "of", "di"), tr(lang, "units completed", "unitÃ  completate")));
                             ui.add_space(8.0);
                             ui.add(egui::ProgressBar::new(completed as f32 / total as f32).desired_height(8.0).rounding(egui::CornerRadius::same(8)));
                         });
@@ -1818,7 +1827,7 @@ impl OpenLingoApp {
                     ui.add_space(16.0);
                     // --- Next Unit ---
                     if let Some(next_unit) = self.store.prossima_unita() {
-                        ui.label(egui::RichText::new(tr(lang, "NEXT UNIT", "PROSSIMA UNITÀ")).size(14.0).strong());
+                        ui.label(egui::RichText::new(tr(lang, "NEXT UNIT", "PROSSIMA UNITÃ€")).size(14.0).strong());
                         ui.add_space(8.0);
                         egui::Frame::none()
                             .fill(ui.visuals().faint_bg_color)
@@ -1827,9 +1836,9 @@ impl OpenLingoApp {
                             .inner_margin(egui::Margin::same(20))
                             .show(ui, |ui| {
                                 ui.label(egui::RichText::new(if lang == "it" { next_unit.title_it } else { next_unit.title_en }).size(24.0).strong());
-                                ui.label(format!("{} · 14 min · {}", next_unit.level, if lang == "it" { next_unit.subtitle_it } else { next_unit.subtitle_en }));
+                                ui.label(format!("{} Â· 14 min Â· {}", next_unit.level, if lang == "it" { next_unit.subtitle_it } else { next_unit.subtitle_en }));
                                 ui.add_space(12.0);
-                                if ui.add(egui::Button::new(egui::RichText::new(tr(lang, "Start →", "Inizia →")).strong()).min_size(egui::vec2(160.0, 44.0)).rounding(egui::CornerRadius::same(22))).clicked() {
+                                if ui.add(egui::Button::new(egui::RichText::new(tr(lang, "Start â†’", "Inizia â†’")).strong()).min_size(egui::vec2(160.0, 44.0)).rounding(egui::CornerRadius::same(22))).clicked() {
                                     self.grammar_unit_id = Some(next_unit.id.to_string());
                                 }
                             });
@@ -1837,10 +1846,10 @@ impl OpenLingoApp {
                     }
 
                 ui.add_space(16.0);
-                ui.label(egui::RichText::new(tr(lang, "Grammar units", "Unità grammaticali")).size(24.0).strong());
+                ui.label(egui::RichText::new(tr(lang, "Grammar units", "UnitÃ  grammaticali")).size(24.0).strong());
                 ui.label(egui::RichText::new(tr(lang,
                     "Embedded units with theory and interactive exercises. Practice saves mastery to profile data.",
-                    "Unità integrate con teoria ed esercizi interattivi. La pratica salva la padronanza nei dati profilo.")).color(ui.visuals().strong_text_color()));
+                    "UnitÃ  integrate con teoria ed esercizi interattivi. La pratica salva la padronanza nei dati profilo.")).color(ui.visuals().strong_text_color()));
                 ui.add_space(10.0);
 
                 // Unit detail / practice (mobile-like lesson flow)
@@ -2338,7 +2347,7 @@ impl OpenLingoApp {
                         .inner_margin(egui::Margin::same(20))
                         .show(ui, |ui| {
                             ui.label(egui::RichText::new(tr(lang, "Your level", "Il tuo livello")).strong());
-                            ui.label(egui::RichText::new(format!("{} — {}", plan.livello_corrente, tr(lang, "Beginner", "Principiante"))).size(28.0).strong());
+                            ui.label(egui::RichText::new(format!("{} â€” {}", plan.livello_corrente, tr(lang, "Beginner", "Principiante"))).size(28.0).strong());
                             ui.add_space(6.0);
                             ui.label(tr(lang, "Every step counts. Keep studying!", "Ogni passo conta. Continua a studiare!"));
                             ui.add_space(12.0);
@@ -2398,14 +2407,114 @@ impl OpenLingoApp {
         });
     }
 
+    fn screen_speech(&mut self, ui: &mut egui::Ui) {
+        let lang_s = ui_lang(&self.store).to_string();
+        let lang = lang_s.as_str();
+
+        ui.label(egui::RichText::new(tr(lang, "Speech engines", "Motori vocali")).size(28.0).strong());
+        ui.add_space(8.0);
+        ui.label(egui::RichText::new(tr(
+            lang,
+            "On-device speech models. Install into a dedicated Python environment; nothing is sent online.",
+            "Modelli vocali locali. Installazione in un ambiente Python dedicato; nessun dato inviato online.",
+        )).color(ui.visuals().weak_text_color()));
+        ui.add_space(12.0);
+
+        // Percorso venv
+        egui::Frame::none()
+            .fill(ui.visuals().faint_bg_color)
+            .stroke(egui::Stroke::new(1.0, ui.visuals().widgets.noninteractive.bg_stroke.color))
+            .rounding(egui::CornerRadius::same(16))
+            .inner_margin(egui::Margin::same(14))
+            .show(ui, |ui| {
+                ui.label(egui::RichText::new(tr(lang, "Python environment", "Ambiente Python")).strong());
+                ui.add_space(4.0);
+                ui.small(speech_venv_path(&self.store));
+                ui.add_space(6.0);
+                if ui.small_button(tr(lang, "Remove all speech engines", "Rimuovi tutti i motori vocali")).clicked() {
+                    match speech_remove_all(&self.store) {
+                        Ok(msg) => self.speech_status = msg,
+                        Err(e) => self.speech_status = format!("Errore: {e}"),
+                    }
+                }
+            });
+        ui.add_space(16.0);
+
+        let engines = [SpeechEngineKind::Whistle, SpeechEngineKind::Phonon];
+        for engine in engines {
+            let installed = speech_is_installed(&self.store, engine);
+            let version = if installed { speech_version(&self.store, engine) } else { String::new() };
+            let status_text = if installed {
+                if version.is_empty() {
+                    tr(lang, "Installed", "Installato").to_string()
+                } else {
+                    format!("{} (v{})", tr(lang, "Installed", "Installato"), version)
+                }
+            } else {
+                tr(lang, "Not installed", "Non installato").to_string()
+            };
+
+            let card = egui::Frame::none()
+                .fill(ui.visuals().faint_bg_color)
+                .stroke(egui::Stroke::new(1.0, ui.visuals().widgets.noninteractive.bg_stroke.color))
+                .rounding(egui::CornerRadius::same(20))
+                .inner_margin(egui::Margin::same(16))
+                .show(ui, |ui| {
+                    ui.set_min_width(360.0);
+                    ui.horizontal(|ui| {
+                        ui.label(egui::RichText::new(engine.label()).size(20.0).strong());
+                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                            let (txt, color) = if installed {
+                                (status_text.clone(), ui.visuals().selection.stroke.color)
+                            } else {
+                                (status_text.clone(), ui.visuals().weak_text_color())
+                            };
+                            ui.label(egui::RichText::new(txt).color(color));
+                        });
+                    });
+                    ui.add_space(4.0);
+                    ui.label(egui::RichText::new(engine.description()).color(ui.visuals().weak_text_color()));
+                    ui.add_space(8.0);
+                    ui.small(format!("pip: {}  ·  id: {}", engine.package(), engine.id()));
+                    ui.add_space(12.0);
+                    ui.horizontal_wrapped(|ui| {
+                        if ui.add_enabled(!self.speech_busy, egui::Button::new(egui::RichText::new(tr(lang, "Install", "Installa")).strong()).min_size(egui::vec2(120.0, 40.0)).rounding(egui::CornerRadius::same(14))).clicked() {
+                            self.speech_busy = true;
+                            let store = self.store.clone();
+                            match speech_install(&store, engine) {
+                                Ok(msg) => self.speech_status = msg,
+                                Err(e) => self.speech_status = format!("Errore: {e}"),
+                            }
+                            self.speech_busy = false;
+                        }
+                        if installed && ui.add_enabled(!self.speech_busy, egui::Button::new(tr(lang, "Uninstall", "Disinstalla")).min_size(egui::vec2(120.0, 40.0)).rounding(egui::CornerRadius::same(14))).clicked() {
+                            self.speech_busy = true;
+                            let store = self.store.clone();
+                            match speech_uninstall(&store, engine) {
+                                Ok(msg) => self.speech_status = msg,
+                                Err(e) => self.speech_status = format!("Errore: {e}"),
+                            }
+                            self.speech_busy = false;
+                        }
+                    });
+                });
+            let _ = card;
+            ui.add_space(14.0);
+        }
+
+        if !self.speech_status.is_empty() {
+            ui.add_space(10.0);
+            ui.label(egui::RichText::new(&self.speech_status).color(ui.visuals().strong_text_color()));
+        }
+    }
     fn screen_settings(&mut self, ui: &mut egui::Ui) {
         let lang_s = ui_lang(&self.store).to_string();
         let lang = lang_s.as_str();
         fn fmt_ts(ms: i64) -> String {
-            if ms <= 0 { return "—".into(); }
+            if ms <= 0 { return "â€”".into(); }
             chrono::DateTime::<chrono::Utc>::from_timestamp_millis(ms)
                 .map(|dt| dt.with_timezone(&chrono::Local).format("%d/%m/%Y %H:%M").to_string())
-                .unwrap_or_else(|| "—".into())
+                .unwrap_or_else(|| "â€”".into())
         }
 
         egui::ScrollArea::vertical().auto_shrink([false, false]).show(ui, |ui| {
@@ -2436,7 +2545,7 @@ impl OpenLingoApp {
                                 .inner_margin(egui::Margin::symmetric(14, 12))
                                 .show(ui, |ui| {
                                     ui.horizontal_wrapped(|ui| {
-                                        let title = if selected { format!("● {}", p.config.nome_visualizzato) } else { format!("○ {}", p.config.nome_visualizzato) };
+                                        let title = if selected { format!("â— {}", p.config.nome_visualizzato) } else { format!("â—‹ {}", p.config.nome_visualizzato) };
                                         if ui.selectable_label(selected, egui::RichText::new(title).size(16.0).strong()).clicked() {
                                             self.store.set_active_profile(&p.id);
                                             let _ = self.store.save();
@@ -2555,7 +2664,7 @@ impl OpenLingoApp {
                             ui.label(egui::RichText::new(format!("{}: {}", tr(lang, "Current level", "Livello attuale"), current_level)).strong());
                             ui.small(egui::RichText::new(tr(lang,
                                 "Current level advances with tests and demonstrated competence, not by manual setting.",
-                                "Il livello attuale avanza solo con i test e con le competenze dimostrate, non perché lo imposti a mano.")).color(ui.visuals().strong_text_color()));
+                                "Il livello attuale avanza solo con i test e con le competenze dimostrate, non perchÃ© lo imposti a mano.")).color(ui.visuals().strong_text_color()));
                         });
                     });
 
@@ -2584,7 +2693,7 @@ impl OpenLingoApp {
                         ui.add_space(10.0);
                         let mut mode = self.store.prefs.tema_modalita.trim().to_lowercase();
                         if mode.is_empty() { mode = "system".into(); }
-                        ui.label(egui::RichText::new(tr(lang, "Theme mode", "Modalità tema")).strong());
+                        ui.label(egui::RichText::new(tr(lang, "Theme mode", "ModalitÃ  tema")).strong());
                         ui.horizontal_wrapped(|ui| {
                             for (id, en, it) in [("system", "System", "Sistema"), ("light", "Light", "Chiaro"), ("dark", "Dark", "Scuro")] {
                                 let sel = mode == id;
@@ -2639,7 +2748,7 @@ impl OpenLingoApp {
                             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                                 if ui.add(egui::Button::new(egui::RichText::new(tr(lang, "Import", "Importa")).strong()).min_size(egui::vec2(120.0, 40.0)).rounding(egui::CornerRadius::same(14))).clicked() {
                                     match self.store.importa_wortliste_seed() {
-                                        Ok(0) => self.status = tr(lang, "No new words: all already present.", "Nessuna parola nuova: erano già tutte presenti.").into(),
+                                        Ok(0) => self.status = tr(lang, "No new words: all already present.", "Nessuna parola nuova: erano giÃ  tutte presenti.").into(),
                                         Ok(n) => { self.refresh_review_queue(); self.status = if lang == "it" { format!("Aggiunte {n} parole.") } else { format!("Added {n} words.") }; }
                                         Err(e) => self.status = e,
                                     }
@@ -2669,7 +2778,7 @@ impl OpenLingoApp {
                                 if let Err(e) = self.store.imposta_feed_url(&self.feed_draft) {
                                     self.status = e;
                                 } else {
-                                    self.status = tr(lang, "Feed URL saved. Feed sync/download is not yet implemented in Rust desktop build.", "URL feed salvato. La sincronizzazione/download feed non è ancora implementata nella build Rust.").into();
+                                    self.status = tr(lang, "Feed URL saved. Feed sync/download is not yet implemented in Rust desktop build.", "URL feed salvato. La sincronizzazione/download feed non Ã¨ ancora implementata nella build Rust.").into();
                                 }
                             }
                             if ui.add_enabled(!busy, egui::Button::new(tr(lang, "Remove feed", "Rimuovi feed")).min_size(egui::vec2(140.0, 40.0)).rounding(egui::CornerRadius::same(14))).clicked() {
@@ -2679,7 +2788,7 @@ impl OpenLingoApp {
                             }
                         });
                         ui.add_space(6.0);
-                        ui.small(format!("{}: {} · {} {}", tr(lang, "Last sync", "Ultima sincronizzazione"), fmt_ts(self.store.ultima_sincronizzazione_cloud()), words_count, tr(lang, "words in lexicon", "parole nel lessico")));
+                        ui.small(format!("{}: {} Â· {} {}", tr(lang, "Last sync", "Ultima sincronizzazione"), fmt_ts(self.store.ultima_sincronizzazione_cloud()), words_count, tr(lang, "words in lexicon", "parole nel lessico")));
 
                         ui.add_space(12.0);
                         ui.separator();
@@ -2789,7 +2898,7 @@ impl OpenLingoApp {
                         });
                         ui.small(egui::RichText::new(tr(lang,
                             "\"Export all data\" creates a JSON with all profiles and preferences (token excluded). Import accepts bundle JSON and profili-shaped JSON.",
-                            "«Esporta tutti i dati» crea un JSON con tutti i profili e le preferenze (token escluso). L'import accetta bundle JSON e formato profili.")).color(ui.visuals().strong_text_color()));
+                            "Â«Esporta tutti i datiÂ» crea un JSON con tutti i profili e le preferenze (token escluso). L'import accetta bundle JSON e formato profili.")).color(ui.visuals().strong_text_color()));
                     });
 
                     ui.add_space(12.0);
@@ -2803,7 +2912,7 @@ impl OpenLingoApp {
                                 ui.label(egui::RichText::new(tr(lang, "Clear profile", "Svuota il profilo")).strong());
                                 ui.small(egui::RichText::new(tr(lang,
                                     "Removes words, reviews, completed units and today's plan. Lexicon can be reimported from Wortliste.",
-                                    "Rimuove parole, ripassi, unità completate e piano di oggi. Il lessico può essere reimportato dalla Wortliste.")).color(ui.visuals().strong_text_color()));
+                                    "Rimuove parole, ripassi, unitÃ  completate e piano di oggi. Il lessico puÃ² essere reimportato dalla Wortliste.")).color(ui.visuals().strong_text_color()));
                             });
                             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                                 if ui.add(egui::Button::new(tr(lang, "Clear", "Svuota")).min_size(egui::vec2(110.0, 40.0)).rounding(egui::CornerRadius::same(14))).clicked() {
@@ -2817,7 +2926,7 @@ impl OpenLingoApp {
                     ui.separator();
                     ui.add_space(8.0);
                     ui.horizontal_wrapped(|ui| {
-                        ui.small(egui::RichText::new("OpenLingo desktop · Rust").color(ui.visuals().strong_text_color()));
+                        ui.small(egui::RichText::new("OpenLingo desktop Â· Rust").color(ui.visuals().strong_text_color()));
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                             ui.small(egui::RichText::new(tr(lang,
                                 "Works offline: feed and backup update only when requested.",
@@ -2845,7 +2954,7 @@ impl OpenLingoApp {
                 .show(ui.ctx(), |ui| {
                     ui.label(tr(lang,
                         "This will delete active profile data on this computer. This cannot be undone.",
-                        "Verranno cancellati i dati del profilo attivo su questo computer. L'operazione non si può annullare."));
+                        "Verranno cancellati i dati del profilo attivo su questo computer. L'operazione non si puÃ² annullare."));
                     ui.add_space(12.0);
                     ui.horizontal(|ui| {
                         if ui.button(tr(lang, "Cancel", "Annulla")).clicked() {
@@ -2888,6 +2997,7 @@ impl eframe::App for OpenLingoApp {
                 Screen::Grammar => self.screen_grammar(ui),
                 Screen::Progress => self.screen_progress(ui),
                 Screen::Gender => self.screen_gender(ui),
+                Screen::Speech => self.screen_speech(ui),
                 Screen::Settings => self.screen_settings(ui),
             });
     }
@@ -3254,7 +3364,7 @@ mod tests {
     fn guided_session_builds_mixed_questions() {
         use crate::data::build_guided_session;
         let words = vec![
-            WordEntity { id:"1".into(), german:"Tisch".into(), article:Some("der".into()), italian:"tavolo".into(), level:"A1".into(), example:"Der Tisch ist groß.".into(), ..Default::default() },
+            WordEntity { id:"1".into(), german:"Tisch".into(), article:Some("der".into()), italian:"tavolo".into(), level:"A1".into(), example:"Der Tisch ist groÃŸ.".into(), ..Default::default() },
             WordEntity { id:"2".into(), german:"Lampe".into(), article:Some("die".into()), italian:"lampada".into(), level:"A1".into(), example:"Die Lampe ist neu.".into(), ..Default::default() },
             WordEntity { id:"3".into(), german:"Buch".into(), article:Some("das".into()), italian:"libro".into(), level:"A1".into(), example:"Das Buch ist gut.".into(), ..Default::default() },
             WordEntity { id:"4".into(), german:"Stuhl".into(), article:Some("der".into()), italian:"sedia".into(), level:"A1".into(), example:"Der Stuhl ist alt.".into(), ..Default::default() },
@@ -3315,4 +3425,30 @@ mod tests {
         assert_eq!(s2.percentuale, s.percentuale);
         let _ = fs::remove_dir_all(dir);
     }
+
+    #[test]
+    fn speech_engines_have_correct_packages_and_modules() {
+        // Whistle = STT via cactus-compute (module cactus)
+        assert_eq!(SpeechEngineKind::Whistle.package(), "cactus-compute");
+        assert_eq!(SpeechEngineKind::Whistle.module(), "cactus");
+        assert_eq!(SpeechEngineKind::Whistle.id(), "whistle");
+        // Phonon = TTS via ptts (module ptts)
+        assert_eq!(SpeechEngineKind::Phonon.package(), "ptts");
+        assert_eq!(SpeechEngineKind::Phonon.module(), "ptts");
+        assert_eq!(SpeechEngineKind::Phonon.id(), "phonon");
+    }
+
+    #[test]
+    fn speech_venv_path_is_under_app_data_dir() {
+        let dir = temp_dir("speech-path");
+        let store = Store::load_from(dir.clone());
+        let venv = speech_venv_dir(&store);
+        assert!(venv.starts_with(&dir), "venv must live under app data dir");
+        assert!(venv.to_string_lossy().contains("speech"));
+        assert!(venv.to_string_lossy().contains("venv"));
+        let path_str = speech_venv_path(&store);
+        assert!(path_str.contains("speech"), "venv path should mention speech folder: {path_str}");
+        let _ = fs::remove_dir_all(dir);
+    }
 }
+
