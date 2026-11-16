@@ -1,8 +1,8 @@
 {
-  "versionCode": 345,
-  "versionName": "1.51.22",
-  "changelog": "Fixed autoupdate: new release build ensures existing users can upgrade in-place; added modal verb conjugation validation; removed Google Doc guide.",
+  "versionCode": 346,
+  "versionName": "1.51.23",
+  "changelog": "Added Whistle (speech-to-text) and Phonon (text-to-speech) on-device speech engines with automatic install/uninstall on desktop; continued mobile/desktop parity.",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.22/OpenLingo-v1.51.22.apk",
-  "apkSha256": "5ba683149b0b20e18df4ae40c5a51539fdb4e14248c9fa25a3e481b1a7a66988"
+  "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.23/OpenLingo-v1.51.23.apk",
+  "apkSha256": ""
 }
