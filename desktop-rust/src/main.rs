@@ -1,7 +1,7 @@
 ﻿mod data;
 
 use chrono::{Local};
-use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche, sudtirol_varianti, sudtirol_lessico, sudtirol_frasi, sudtirol_dialoghi, dialoghi_ascolto, dialoghi_per_contesto, placement_domande, placement_valuta, sprechtuebungen_per_livello, esercizi_ascolto_per_livello};
+use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni, SpeechEngineKind, speech_install, speech_uninstall, speech_remove_all, speech_is_installed, speech_version, speech_venv_path, ErroriSRS, pronuncia_coppie, pronuncia_consigli, pronuncia_scioglilingua, pronuncia_frasi_cliniche, sudtirol_varianti, sudtirol_lessico, sudtirol_frasi, sudtirol_dialoghi, dialoghi_ascolto, dialoghi_per_contesto, placement_domande, placement_valuta, sprechtuebungen_per_livello, esercizi_ascolto_per_livello, domande_comprensione, domande_produzione};
 use eframe::egui;
 use std::collections::BTreeSet;
 
@@ -189,6 +189,7 @@ enum Screen {
     Placement,
     Sprech,
     Ascolto,
+    Comprensione,
     Progress,
     Settings,
 }
@@ -466,6 +467,7 @@ impl OpenLingoApp {
             Screen::Placement => tr(lang, "Placement test", "Test di ingresso"),
             Screen::Sprech => tr(lang, "Speaking", "Produzione orale"),
             Screen::Ascolto => tr(lang, "Listening", "Ascolto"),
+            Screen::Comprensione => tr(lang, "Reading & Writing", "Comprensione e Produzione"),
             Screen::Progress => tr(lang, "Progress", "Progresso"),
             Screen::Settings => tr(lang, "Settings", "Impostazioni"),
         };
@@ -505,6 +507,7 @@ impl OpenLingoApp {
                     (Screen::Placement, tr(lang, "Placement", "Test")),
                     (Screen::Sprech, tr(lang, "Speaking", "Orale")),
                     (Screen::Ascolto, tr(lang, "Listening", "Ascolto")),
+                    (Screen::Comprensione, tr(lang, "Reading", "Comprensione")),
                     (Screen::Progress, tr(lang, "Progress", "Progresso")),
                     (Screen::Settings, tr(lang, "Settings", "Impostazioni")),
                 ];
@@ -544,6 +547,7 @@ impl OpenLingoApp {
             (Screen::Placement, "\u{1F3AF}", tr(lang, "Test", "Test")),
             (Screen::Sprech, "\u{1F5E3}", tr(lang, "Orale", "Orale")),
             (Screen::Ascolto, "\u{1F3A7}", tr(lang, "Ascolto", "Ascolto")),
+            (Screen::Comprensione, "\u{1F4D6}", tr(lang, "Comprensione", "Comprensione")),
             (Screen::Progress, "\u{1F4C8}", tr(lang, "Progress", "Progresso")),
         ];
         let w = ui.available_width();
@@ -3130,6 +3134,83 @@ impl OpenLingoApp {
         }
     }
 
+    fn screen_comprensione(&mut self, ui: &mut egui::Ui) {
+        let lang_s = ui_lang(&self.store).to_string();
+        let lang = lang_s.as_str();
+
+        ui.label(egui::RichText::new(tr(lang, "Reading & Writing", "Comprensione e Produzione")).size(28.0).strong());
+        ui.add_space(6.0);
+        ui.label(egui::RichText::new(tr(
+            lang,
+            "Lesen (reading comprehension) and Schreiben (writing): multiple-choice questions from the Goethe-style question bank.",
+            "Lesen (comprensione della lettura) e Schreiben (scrittura): domande a scelta multipla dal questionario stile Goethe.",
+        )).color(ui.visuals().weak_text_color()));
+        ui.add_space(14.0);
+
+        // Tab: Comprensione / Produzione
+        let mut tab = 0usize;
+        if self.speech_status.starts_with("TAB:") {
+            tab = self.speech_status[4..].parse().unwrap_or(0);
+        }
+        ui.horizontal(|ui| {
+            if ui.selectable_label(tab == 0, tr(lang, "Comprensione (Lesen)", "Comprensione (Lesen)")).clicked() {
+                self.speech_status = "TAB:0".into();
+            }
+            if ui.selectable_label(tab == 1, tr(lang, "Produzione (Schreiben)", "Produzione (Schreiben)")).clicked() {
+                self.speech_status = "TAB:1".into();
+            }
+        });
+        ui.add_space(12.0);
+
+        let domande = if tab == 0 { domande_comprensione() } else { domande_produzione() };
+        let prefix = if tab == 0 { "comp" } else { "prod" };
+        let mut corrette = 0usize;
+        let mut risposte = 0usize;
+
+        for (qi, q) in domande.iter().enumerate() {
+            let key = (format!("{}_{}", prefix, q.id), 0usize);
+            let selected = self.dialoghi_answers.get(&key).copied();
+            egui::Frame::none()
+                .fill(ui.visuals().faint_bg_color)
+                .stroke(egui::Stroke::new(1.0, ui.visuals().widgets.noninteractive.bg_stroke.color))
+                .rounding(egui::CornerRadius::same(14))
+                .inner_margin(egui::Margin::same(12))
+                .show(ui, |ui| {
+                    ui.set_min_width(340.0);
+                    ui.horizontal(|ui| {
+                        ui.label(egui::RichText::new(format!("{}.", qi + 1)).strong());
+                        ui.label(egui::RichText::new(&q.domanda).strong());
+                        ui.label(egui::RichText::new(&q.livello).color(ui.visuals().weak_text_color()));
+                    });
+                    ui.add_space(6.0);
+                    ui.horizontal_wrapped(|ui| {
+                        for (oi, opt) in q.opzioni.iter().enumerate() {
+                            let is_sel = selected == Some(oi);
+                            let mut btn = egui::Button::new(opt.clone()).rounding(egui::CornerRadius::same(12));
+                            if is_sel { btn = btn.fill(ui.visuals().selection.bg_fill); }
+                            if ui.add(btn).clicked() {
+                                self.dialoghi_answers.insert(key.clone(), oi);
+                            }
+                        }
+                    });
+                    if let Some(sel) = selected {
+                        risposte += 1;
+                        ui.add_space(6.0);
+                        if sel == q.risposta_corretta {
+                            corrette += 1;
+                            ui.label(egui::RichText::new(tr(lang, "Correct!", "Corretto!")).color(ui.visuals().selection.stroke.color));
+                        } else {
+                            ui.label(egui::RichText::new(format!("{} {}", tr(lang, "Wrong. Correct:", "Sbagliato. Corretto:"), q.opzioni[q.risposta_corretta])).color(egui::Color32::from_rgb(220, 100, 100)));
+                        }
+                        ui.label(egui::RichText::new(&q.spiegazione).color(ui.visuals().weak_text_color()));
+                    }
+                });
+            ui.add_space(6.0);
+        }
+        ui.add_space(10.0);
+        ui.label(egui::RichText::new(format!("{}: {} / {}", tr(lang, "Score", "Punteggio"), corrette, domande.len())).strong());
+    }
+
     fn screen_settings(&mut self, ui: &mut egui::Ui) {
         let lang_s = ui_lang(&self.store).to_string();
         let lang = lang_s.as_str();
@@ -3628,6 +3709,7 @@ impl eframe::App for OpenLingoApp {
                 Screen::Placement => self.screen_placement(ui),
                 Screen::Sprech => self.screen_sprechtuebungen(ui),
                 Screen::Ascolto => self.screen_ascolto(ui),
+                Screen::Comprensione => self.screen_comprensione(ui),
                 Screen::Settings => self.screen_settings(ui),
             });
     }
@@ -4066,6 +4148,16 @@ mod tests {
         assert_eq!(SpeechEngineKind::Phonon.package(), "ptts");
         assert_eq!(SpeechEngineKind::Phonon.module(), "ptts");
         assert_eq!(SpeechEngineKind::Phonon.id(), "phonon");
+    }
+
+    #[test]
+    fn comprensione_produzione_data_is_complete() {
+        let comp = domande_comprensione();
+        let prod = domande_produzione();
+        assert_eq!(comp.len(), 10, "expected 10 comprehension questions");
+        assert_eq!(prod.len(), 10, "expected 10 production questions");
+        assert!(comp.iter().chain(prod.iter()).all(|q| q.opzioni.len() == 4 && q.risposta_corretta < 4));
+        assert!(comp.iter().chain(prod.iter()).all(|q| !q.domanda.is_empty() && !q.spiegazione.is_empty()));
     }
 
     #[test]

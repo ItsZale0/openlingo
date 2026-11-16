@@ -3917,3 +3917,40 @@ pub fn esercizi_ascolto() -> Vec<EsercizioAscolto> {
 pub fn esercizi_ascolto_per_livello(livello: &str) -> Vec<EsercizioAscolto> {
     esercizi_ascolto().into_iter().filter(|e| e.livello == livello).collect()
 }
+
+// ── Domande di comprensione (Lesen, portate da QuizData.kt) ──
+
+#[derive(Debug, Clone)]
+pub struct DomandaComprensione { pub id: String, pub domanda: String, pub opzioni: Vec<String>, pub risposta_corretta: usize, pub spiegazione: String, pub livello: String }
+
+pub fn domande_comprensione() -> Vec<DomandaComprensione> {
+    vec![
+        DomandaComprensione { id: "comp_1".into(), domanda: "Was bedeutet 'der Tisch'?".into(), opzioni: vec!["il tavolo".into(), "la sedia".into(), "la porta".into(), "la finestra".into()], risposta_corretta: 0, spiegazione: "'Der Tisch' significa 'il tavolo'.".into(), livello: "A1".into() },
+        DomandaComprensione { id: "comp_2".into(), domanda: "Was bedeutet 'die Küche'?".into(), opzioni: vec!["il bagno".into(), "la cucina".into(), "la camera".into(), "il soggiorno".into()], risposta_corretta: 1, spiegazione: "'Die Küche' significa 'la cucina'.".into(), livello: "A1".into() },
+        DomandaComprensione { id: "comp_3".into(), domanda: "Quale parola tedesca significa 'lavorare'?".into(), opzioni: vec!["wohnen".into(), "arbeiten".into(), "lernen".into(), "spielen".into()], risposta_corretta: 1, spiegazione: "'Arbeiten' significa 'lavorare'. 'Wohnen' = abitare, 'lernen' = imparare, 'spielen' = giocare.".into(), livello: "A1".into() },
+        DomandaComprensione { id: "comp_4".into(), domanda: "Come si dice 'la settimana' in tedesco?".into(), opzioni: vec!["der Tag".into(), "die Woche".into(), "der Monat".into(), "das Jahr".into()], risposta_corretta: 1, spiegazione: "'Die Woche' significa 'la settimana'. 'Der Tag' = il giorno, 'der Monat' = il mese, 'das Jahr' = l'anno.".into(), livello: "A1".into() },
+        DomandaComprensione { id: "comp_5".into(), domanda: "Was bedeutet 'Ich habe zwei Brüder.'?".into(), opzioni: vec!["Io ho due fratelli.".into(), "Io ho due sorelle.".into(), "Io vado dal fratello.".into(), "Io amo i miei fratelli.".into()], risposta_corretta: 0, spiegazione: "'Zwei Brüder' = due fratelli. 'Schwestern' = sorelle.".into(), livello: "A1".into() },
+        DomandaComprensione { id: "comp_6".into(), domanda: "Quale parola tedesca significa 'mangiare'?".into(), opzioni: vec!["trinken".into(), "essen".into(), "schlafen".into(), "lesen".into()], risposta_corretta: 1, spiegazione: "'Essen' significa 'mangiare'. 'Trinken' = bere, 'schlafen' = dormire, 'lesen' = leggere.".into(), livello: "A1".into() },
+        DomandaComprensione { id: "comp_7".into(), domanda: "Was bedeutet 'Das Wetter ist schön.'?".into(), opzioni: vec!["Il tempo è bello.".into(), "Il tempo è brutto.".into(), "Fa freddo.".into(), "Fa caldo.".into()], risposta_corretta: 0, spiegazione: "'Schön' = bello. 'Das Wetter' = il tempo (meteo).".into(), livello: "A1".into() },
+        DomandaComprensione { id: "comp_8".into(), domanda: "Come si dice 'domani' in tedesco?".into(), opzioni: vec!["gestern".into(), "heute".into(), "morgen".into(), "jetzt".into()], risposta_corretta: 2, spiegazione: "'Morgen' = domani. 'Gestern' = ieri, 'heute' = oggi, 'jetzt' = adesso.".into(), livello: "A1".into() },
+        DomandaComprensione { id: "comp_9".into(), domanda: "Was bedeutet 'Ich wohne in Berlin.'?".into(), opzioni: vec!["Abito a Berlino.".into(), "Lavoro a Berlino.".into(), "Vado a Berlino.".into(), "Amo Berlino.".into()], risposta_corretta: 0, spiegazione: "'Wohnen' = abitare. 'In Berlin' = a Berlino.".into(), livello: "A1".into() },
+        DomandaComprensione { id: "comp_10".into(), domanda: "Quale parola tedesca significa 'parlare'?".into(), opzioni: vec!["sagen".into(), "sprechen".into(), "hören".into(), "sehen".into()], risposta_corretta: 1, spiegazione: "'Sprechen' = parlare. 'Sagen' = dire, 'hören' = sentire, 'sehen' = vedere.".into(), livello: "A1".into() },
+    ]
+}
+
+// ── Domande di produzione (Schreiben, portate da QuizData.kt) ──
+
+pub fn domande_produzione() -> Vec<DomandaComprensione> {
+    vec![
+        DomandaComprensione { id: "prod_1".into(), domanda: "Ich ___ gern Kaffee trinken.".into(), opzioni: vec!["würde".into(), "werde".into(), "habe".into(), "bin".into()], risposta_corretta: 0, spiegazione: "Konjunktiv II per desideri irreali: 'würde' + infinito.".into(), livello: "B1".into() },
+        DomandaComprensione { id: "prod_2".into(), domanda: "Ich ___ gestern ins Kino gegangen.".into(), opzioni: vec!["bin".into(), "habe".into(), "war".into(), "hatte".into()], risposta_corretta: 0, spiegazione: "Perfekt con 'sein' per verbi di movimento: 'ich bin gegangen'.".into(), livello: "A1".into() },
+        DomandaComprensione { id: "prod_3".into(), domanda: "Er ___ die Hausaufgaben gemacht.".into(), opzioni: vec!["hat".into(), "ist".into(), "war".into(), "wird".into()], risposta_corretta: 0, spiegazione: "Perfekt con 'haben' per la maggior parte dei verbi: 'er hat gemacht'.".into(), livello: "A1".into() },
+        DomandaComprensione { id: "prod_4".into(), domanda: "Wir ___ nächste Woche nach Deutschland reisen.".into(), opzioni: vec!["werden".into(), "sind".into(), "haben".into(), "waren".into()], risposta_corretta: 0, spiegazione: "Futur con 'werden': 'wir werden reisen'.".into(), livello: "A2".into() },
+        DomandaComprensione { id: "prod_5".into(), domanda: "Ich freue mich ___ deinen Besuch.".into(), opzioni: vec!["auf".into(), "über".into(), "für".into(), "mit".into()], risposta_corretta: 0, spiegazione: "'Sich freuen auf' = attendere con gioia (futuro). 'Sich freuen über' = essere felice di (passato).".into(), livello: "A2".into() },
+        DomandaComprensione { id: "prod_6".into(), domanda: "Er hat mir gesagt, dass er ___ kommt.".into(), opzioni: vec!["nicht".into(), "kein".into(), "niemals".into(), "nichts".into()], risposta_corretta: 0, spiegazione: "'Dass' introduce una frase subordinata: 'dass er nicht viene'.".into(), livello: "B1".into() },
+        DomandaComprensione { id: "prod_7".into(), domanda: "Ich habe ein Buch ___.".into(), opzioni: vec!["gelesen".into(), "lesen".into(), "las".into(), "liest".into()], risposta_corretta: 0, spiegazione: "Perfekt: Partizip II 'gelesen' con 'haben'.".into(), livello: "A1".into() },
+        DomandaComprensione { id: "prod_8".into(), domanda: "Sie ___ seit drei Jahren in Deutschland.".into(), opzioni: vec!["wohnt".into(), "wohnte".into(), "wohnen".into(), "gewohnt".into()], risposta_corretta: 0, spiegazione: "Presente con 'seit' + periodo: 'sie wohnt seit...'.".into(), livello: "A2".into() },
+        DomandaComprensione { id: "prod_9".into(), domanda: "Ich ___ dir helfen, wenn du willst.".into(), opzioni: vec!["kann".into(), "konnte".into(), "könnte".into(), "können".into()], risposta_corretta: 0, spiegazione: "Presente indicativo: 'ich kann' (possibilità attuale).".into(), livello: "A1".into() },
+        DomandaComprensione { id: "prod_10".into(), domanda: "Er hat mir ___ erzählt.".into(), opzioni: vec!["alles".into(), "jedes".into(), "vieles".into(), "manches".into()], risposta_corretta: 0, spiegazione: "'Alles' = tutto (neutro). 'Er hat mir alles erzählt' = mi ha raccontato tutto.".into(), livello: "A2".into() },
+    ]
+}
