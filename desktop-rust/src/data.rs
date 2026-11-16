@@ -2921,3 +2921,87 @@ pub fn gender_opzioni(domanda: &GenderDomanda) -> Vec<String> {
     }
     opzioni
 }
+
+// ── Gender Trainer (allenamento articoli der/die/das) ──
+
+/** Una domanda del Gender Trainer: il sostantivo senza articolo e l'articolo corretto. */
+#[derive(Debug, Clone)]
+pub struct GenderDomanda {
+    pub id: String,
+    pub parola: String,
+    pub articolo: String,
+    pub traduzione: String,
+    pub esempio: String,
+    pub livello: String,
+}
+
+/** Genera domande del Gender Trainer dal pool di parole del profilo + lessico curato. */
+pub fn gender_domande(
+    parole_profilo: &[WordEntity],
+    livello_selezionato: &str,
+    limite: Option<usize>,
+) -> Vec<GenderDomanda> {
+    let max_ord = level_rank(livello_selezionato);
+    let mut viste: HashSet<String> = HashSet::new();
+
+    let da_profilo: Vec<GenderDomanda> = parole_profilo
+        .iter()
+        .filter_map(|w| {
+            let art = w.normalized_article()?;
+            if !matches!(art.as_str(), "der" | "die" | "das") {
+                return None;
+            }
+            if level_rank(&w.level) > max_ord {
+                return None;
+            }
+            let parola = w.german.trim().to_string();
+            if parola.is_empty() {
+                return None;
+            }
+            let chiave = format!("{}|{}", art, parola.to_lowercase());
+            if !viste.insert(chiave) {
+                return None;
+            }
+            Some(GenderDomanda {
+                id: format!("p_{}", w.id),
+                parola,
+                articolo: art,
+                traduzione: w.italian.trim().to_string(),
+                esempio: w.example.trim().to_string(),
+                livello: w.level.clone(),
+            })
+        })
+        .collect();
+
+    let mut tutte = da_profilo;
+    if let Some(lim) = limite {
+        if lim > 0 {
+            tutte.truncate(lim);
+        }
+    }
+    tutte
+}
+
+/** 4 opzioni (3 distrattori + 1 corretta) per una domanda del Gender Trainer. */
+pub fn gender_opzioni(domanda: &GenderDomanda) -> Vec<String> {
+    let corretto = domanda.articolo.clone();
+    let pool = ["der", "die", "das"];
+    let distrattori: Vec<&str> = pool
+        .iter()
+        .filter(|&&a| a != corretto.as_str())
+        .copied()
+        .collect();
+    // Prendi i primi 3 distrattori, poi mescola corretto + distrattori.
+    let mut opzioni: Vec<String> = distrattori[..3].iter().map(|s| s.to_string()).collect();
+    opzioni.push(corretto);
+    // Deterministic shuffle (seed from domanda id) per non mescolare a ogni render.
+    let seed = domanda
+        .id
+        .bytes()
+        .fold(0u64, |acc, b| acc.wrapping_mul(31).wrapping_add(b as u64));
+    for i in (1..opzioni.len()).rev() {
+        let j = (seed as usize) % (i + 1);
+        opzioni.swap(i, j);
+    }
+    opzioni
+}
