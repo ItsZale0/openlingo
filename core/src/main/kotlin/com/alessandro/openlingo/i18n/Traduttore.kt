@@ -447,6 +447,13 @@ object Traduttore {
             "sapere" to "to know (fact)",
             "conoscere" to "to know (person)",
             "pensare" to "to think",
+            // ── Aggiungi parola da esercizio (AI) ──
+            "Aggiungi al vocabolario" to "Add to vocabulary",
+            "Aggiungi parola al lessico" to "Add word to lexicon",
+            "L'AI sta cercando articolo e significato..." to "AI is looking up article and meaning...",
+            "Aggiungi e ripassa" to "Add and review",
+            "Annulla" to "Cancel",
+            "Errore" to "Error",
     )
 
     private fun esattoChunk1(): Map<String, String> = mapOf(

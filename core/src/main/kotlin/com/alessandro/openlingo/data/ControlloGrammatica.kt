@@ -34,7 +34,7 @@ object ControlloGrammatica {
     // ── Coniugazione modali (presente indicativo) per riconoscere errori grossolani ──
     private val coniugazioniModale: Map<String, Map<String, String>> = mapOf(
         "koennen" to mapOf("ich" to "kann", "du" to "kannst", "er" to "kann", "sie" to "kann", "es" to "kann",
-            "wir" to "koennen", "ihr" to "koeennt", "sie" to "koennen", "Sie" to "koennen"),
+            "wir" to "koennen", "ihr" to "koennt", "sie" to "koennen", "Sie" to "koennen"),
         "muessen" to mapOf("ich" to "muss", "du" to "musst", "er" to "muss", "sie" to "muss", "es" to "muss",
             "wir" to "muessen", "ihr" to "muesst", "sie" to "muessen", "Sie" to "muessen"),
         "duerfen" to mapOf("ich" to "darf", "du" to "darfst", "er" to "darf", "sie" to "darf", "es" to "darf",
@@ -67,25 +67,32 @@ object ControlloGrammatica {
 
         val soggetto = trovaSoggettoFrase(parole, buco) ?: return emptyList()
 
-        val corrette = mutableListOf<Int>()
-        var haOpzioniModali = false
+        // Forme corrette per il soggetto, Per OGNI modale (kann/muss/darf/soll/will/mag ...).
+        // Una forma coniugata come "kann" NON inizia con l'infinitivo "koennen", quindi
+        // il vecchio controllo startswith la ignorava e segnalava falsi errori.
+        val attesiPerSoggetto: Set<String> = coniugazioniModale.values
+            .mapNotNull { it[soggetto] }
+            .map { chiave(it).lowercase(Locale.ROOT) }
+            .toSet()
+        if (attesiPerSoggetto.isEmpty()) return emptyList()
 
-        opzioni.forEachIndexed { idx, op ->
-            val k = chiave(op).lowercase(Locale.ROOT)
-            if (k.isEmpty()) return@forEachIndexed
-            val lemma = coniugazioniModale.keys.firstOrNull { k.startsWith(it) } ?: return@forEachIndexed
-            haOpzioniModali = true
-            val atteso =coniugazioniModale[lemma]?.get(soggetto) ?: return@forEachIndexed
-            if (chiave(atteso) == k) corrette.add(idx)
+        // Tutte le forme modali conosciute (infinitivi + forme coniugate), per capire
+        // se l'esercizio sta effettivamente testando un modale.
+        val formeModaliNote: Set<String> = buildSet {
+            coniugazioniModale.keys.forEach { add(chiave(it).lowercase(Locale.ROOT)) }
+            coniugazioniModale.values.forEach { map -> map.values.forEach { add(chiave(it).lowercase(Locale.ROOT)) } }
         }
 
-        if (!haOpzioniModali) return emptyList()
-        // Se nessuna opzione è coniugata correttamente per il soggetto, l'esercizio è difettoso.
-        return when {
-            corrette.isEmpty() -> listOf(
-                "Modal verb conjugated wrong for subject '$soggetto': no option matches the expected form."
-            )
-            else -> emptyList() // esercizio ok, almeno una forma è corretta
+        val opzioniNorm = opzioni.map { chiave(it).lowercase(Locale.ROOT) }.filter { it.isNotEmpty() }
+        val sembraTestModale = opzioniNorm.any { it in formeModaliNote }
+        val haFormaCorretta = opzioniNorm.any { it in attesiPerSoggetto }
+
+        // Segnala solo se l'esercizio test chiaramente un modale ma nessuna opzione
+        // e' una forma corretta per il soggetto (errore grossolano certo).
+        return if (sembraTestModale && !haFormaCorretta) {
+            listOf("Modal verb conjugated wrong for subject '$soggetto': no option matches the expected form.")
+        } else {
+            emptyList()
         }
     }
     private val nomi: Map<String, Genere> = buildMap {

@@ -70,6 +70,22 @@ class TutorService(
         )
     }
 
+    /** Chiamata AI generica con system prompt arbitrario (per estrazione dati strutturati). */
+    suspend fun chatRaw(
+        config: ConfigurazioneAI,
+        system: String,
+        testoUtente: String,
+        maxTokens: Int = 512,
+        temperature: Double = 0.1
+    ): String = clientAI.chat(
+        config = config,
+        system = system,
+        cronologia = listOf(MessaggioAI("user", testoUtente)),
+        maxTokens = maxTokens,
+        temperature = temperature,
+        reasoningEffort = reasoningEffort
+    )
+
     /**
      * Valutazione STRUTTURATA della produzione scritta, su criteri ufficiali Goethe.
      *

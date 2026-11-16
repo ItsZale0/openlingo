@@ -275,6 +275,7 @@ fun UnitaGrammaticaScreen(
             )
         } else if (esercizio != null) {
             EsercizioUnitaCard(
+                vm = vm,
                 unita = unita,
                 esercizio = esercizio,
                 indice = indice,
@@ -770,6 +771,7 @@ private fun EsempioCard(
 
 @Composable
 internal fun EsercizioUnitaCard(
+    vm: OpenLingoViewModel,
     unita: UnitaGrammatica,
     esercizio: EsercizioUnita,
     indice: Int,
@@ -839,10 +841,10 @@ internal fun EsercizioUnitaCard(
                     .clip(MaterialTheme.shapes.extraSmall)
             )
             Spacer(Modifier.height(Spaziature.md))
-            Text(
-                t(esercizio.domanda),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
+            TestoConAggiungiParola(
+                testo = t(esercizio.domanda),
+                vm = vm,
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
             )
             if (esercizio.suggerimento.isNotBlank() && !verificato) {
                 Spacer(Modifier.height(2.dp))

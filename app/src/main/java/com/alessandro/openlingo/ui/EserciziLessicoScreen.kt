@@ -233,11 +233,13 @@ private fun EsercizioCorrente(
                 )
                 Spacer(Modifier.height(8.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        t(esercizio.domanda),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    TestoConAggiungiParola(
+                        testo = t(esercizio.domanda),
+                        vm = vm,
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        ),
                         modifier = Modifier.weight(1f)
                     )
                     if (esercizio.tipo == TipoEsercizioLessico.ASCOLTO) {

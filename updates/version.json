@@ -1,8 +1,8 @@
 {
-  "versionCode": 346,
-  "versionName": "1.51.23",
-  "changelog": "Added Whistle (speech-to-text) and Phonon (text-to-speech) on-device speech engines with automatic install/uninstall on desktop; continued mobile/desktop parity.",
+  "versionCode": 347,
+  "versionName": "1.51.24",
+  "changelog": "New: select a word in exercises and add it to vocabulary via AI (meaning, article, example) - it enters both lexicon and review. Fixed modal-conjugation validator.",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.23/OpenLingo-v1.51.23.apk",
-  "apkSha256": "277566eaba5d861ec1cabb69aae81922b99b2368b05c81ca027bc45e7c355edc"
+  "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.24/OpenLingo-v1.51.24.apk",
+  "apkSha256": "8073e9dd0c69b5000238a21fe52a901e67a76b92386c88c46d3afb0c3b319f99"
 }

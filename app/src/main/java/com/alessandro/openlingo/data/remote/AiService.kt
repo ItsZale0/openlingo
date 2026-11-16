@@ -1,6 +1,8 @@
 package com.alessandro.openlingo.data.remote
 
 import com.alessandro.openlingo.data.local.ConfigurazioneAI
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 /**
  * Facade per le operazioni AI dell'app.
@@ -14,6 +16,19 @@ class AiService(
     private val generatoreEsercizi: GeneratoreEsercizi = GeneratoreEsercizi(),
     private val generatoreLezioni: GeneratoreLezioni = GeneratoreLezioni()
 ) {
+    /**
+     * Chiamata AI generica con system prompt arbitrario: usata per estrarre
+     * dati strutturati (es. parola da aggiungere al vocabolario) senza passare
+     * dal prompt didattico del tutor.
+     */
+    suspend fun chatRaw(
+        config: ConfigurazioneAI,
+        system: String,
+        testoUtente: String,
+        maxTokens: Int = 512,
+        temperature: Double = 0.1
+    ): String = tutor.chatRaw(config, system, testoUtente, maxTokens, temperature)
+
     suspend fun chiediAlTutor(
         config: ConfigurazioneAI,
         cronologia: List<Pair<String, String>>,

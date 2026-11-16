@@ -1,7 +1,9 @@
 package com.alessandro.openlingo.ui
 
 import com.alessandro.openlingo.i18n.t
-
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -876,6 +878,61 @@ class OpenLingoViewModel(application: Application) : AndroidViewModel(applicatio
             }
         }
     }
+
+    /**
+     * Estrae articolo, significato ed esempio di una parola tedesca selezionata
+     * durante un esercizio, e la aggiunge al lessico (e automaticamente al ripasso).
+     * Ritorna true se la parola e' stata aggiunta.
+     */
+    suspend fun analizzaEAggiungiParola(testoSelezionato: String): Result<ParolaEstratta> = runCatching {
+        val grezzo = aiService.chatRaw(
+            config = configurazioneAI(),
+            system = """
+                Sei un lessicografo tedesco-italiano. Dalla parola o frase tra virgolette che ti do', estrai UNA sola parola tedesca da imparare.
+                Rispondi SOLO con un JSON valido, senza testo prima o dopo, senza ```json:
+                {"tedesco":"<parola tedesca SENZA articolo>","articolo":"<der|die|das>","italiano":"<significato italiano>","esempio":"<breve frase d'esempio in tedesco>","livello":"<A1|A2|B1|B2>"}
+                Regole:
+                - "tedesco" e' il sostantivo/parola senza articolo (es. "Tisch", non "der Tisch").
+                - "articolo" e' der/die/das per i sostantivi; per altri tipi di parola metti uber (es. "uber").
+                - "italiano" e' il significato principale, chiaro e breve.
+                - "esempio" e' una frase tedesca semplice e corretta che usa la parola.
+                - "livello" e' il livello CEFR approssimativo della parola.
+                Non inventare: se il testo non contiene tedesco, restituisci la parola cosi' com'e' con articolo "uber".
+            """.trimIndent(),
+            testoUtente = "\"${testoSelezionato.take(200)}\"",
+            maxTokens = 256,
+            temperature = 0.1
+        )
+        val json = kotlinx.serialization.json.Json.parseToJsonElement(grezzo).jsonObject
+        val tedesco = json["tedesco"]?.jsonPrimitive?.content?.trim().orEmpty()
+        if (tedesco.isEmpty()) throw IllegalArgumentException("Estrazione parola fallita")
+        val articolo = json["articolo"]?.jsonPrimitive?.content?.trim()?.takeIf { it in setOf("der", "die", "das") }
+        val italiano = json["italiano"]?.jsonPrimitive?.content?.trim().orEmpty().ifEmpty { tedesco }
+        val esempio = json["esempio"]?.jsonPrimitive?.content?.trim().orEmpty()
+        val livello = json["livello"]?.jsonPrimitive?.content?.trim()?.takeIf { it in setOf("A1", "A2", "B1", "B2") } ?: "A1"
+        ParolaEstratta(tedesco, articolo, italiano, esempio, livello)
+    }
+
+    /** Conferma e salva una parola estratta: aggiunge al lessico e al ripasso. */
+    fun confermaParolaEstratta(p: ParolaEstratta) {
+        aggiungiParolaCustom(
+            german = p.tedesco,
+            italian = p.italiano,
+            example = p.esempio,
+            article = p.articolo,
+            pronunciation = null,
+            lesson = 0,
+            tags = "ai-selezione"
+        )
+    }
+
+    data class ParolaEstratta(
+        val tedesco: String,
+        val articolo: String?,
+        val italiano: String,
+        val esempio: String,
+        val livello: String
+    )
 
     fun eliminaParolaCustom(id: String) {
         viewModelScope.launch {
