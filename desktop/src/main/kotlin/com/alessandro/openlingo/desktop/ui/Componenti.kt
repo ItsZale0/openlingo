@@ -1,6 +1,5 @@
 package com.alessandro.openlingo.desktop.ui
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -64,11 +63,16 @@ fun CardSezione(
     colore: Color = MaterialTheme.colorScheme.surfaceContainer,
     contenuto: @Composable ColumnScope.() -> Unit
 ) {
+    // Nessun bordo traslucido: su tema scuro la gerarchia e' portata dalla
+    // lightness della surface (surfaceContainerHigh), non da un alone/bordo.
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = colore),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+        colors = CardDefaults.cardColors(
+            containerColor = if (colore == MaterialTheme.colorScheme.surfaceContainer) {
+                MaterialTheme.colorScheme.surfaceContainerHigh
+            } else colore
+        )
     ) {
         Column(Modifier.fillMaxWidth().padding(18.dp)) {
             if (titolo != null) {
