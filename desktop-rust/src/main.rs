@@ -1,7 +1,7 @@
 mod data;
 
 use chrono::{Local};
-use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic};
+use data::{Store, WordEntity, ExerciseQuestion, ExerciseKind, build_article_quiz, build_meaning_quiz, build_german_choice_quiz, build_typing_quiz, build_cloze_quiz, build_mixed_quiz, build_guided_session, check_typing_answer, curriculum_lessons, lesson_topic, GenderDomanda, gender_domande, gender_opzioni};
 use eframe::egui;
 use std::collections::BTreeSet;
 
@@ -180,6 +180,7 @@ enum Screen {
     Exercises,
     Vocabulary,
     Grammar,
+    Gender,
     Progress,
     Settings,
 }
@@ -246,6 +247,14 @@ struct OpenLingoApp {
     settings_op_in_progress: String,
     show_reset_confirm: bool,
     cloud_download_pending: Option<String>,
+    // Gender Trainer state
+    gender_queue: Vec<GenderDomanda>,
+    gender_index: usize,
+    gender_correct: usize,
+    gender_total: usize,
+    gender_feedback: String,
+    gender_done: bool,
+    gender_level: String,
 }
 
 fn ui_lang(store: &Store) -> &str {
@@ -323,6 +332,13 @@ impl OpenLingoApp {
             settings_op_in_progress: String::new(),
             show_reset_confirm: false,
             cloud_download_pending: None,
+            gender_queue: Vec::new(),
+            gender_index: 0,
+            gender_correct: 0,
+            gender_total: 0,
+            gender_feedback: String::new(),
+            gender_done: false,
+            gender_level: "A1".into(),
         };
         // Default to dark teal theme to better match mobile look (user can change in Settings)
         if app.store.prefs.tema_colore.trim().is_empty() {
@@ -420,6 +436,7 @@ impl OpenLingoApp {
             Screen::Exercises => tr(lang, "Exercises", "Esercizi"),
             Screen::Vocabulary => tr(lang, "Words", "Parole"),
             Screen::Grammar => tr(lang, "Grammar", "Grammatica"),
+            Screen::Gender => tr(lang, "Gender Trainer", "Allenatore Articoli"),
             Screen::Progress => tr(lang, "Progress", "Progresso"),
             Screen::Settings => tr(lang, "Settings", "Impostazioni"),
         };
@@ -450,6 +467,7 @@ impl OpenLingoApp {
                 let quick = [
                     (Screen::QuickStudy, tr(lang, "Lesson", "Lezione")),
                     (Screen::Grammar, tr(lang, "Grammar", "Grammatica")),
+                    (Screen::Gender, tr(lang, "Gender Trainer", "Allenatore Articoli")),
                     (Screen::Progress, tr(lang, "Progress", "Progresso")),
                     (Screen::Settings, tr(lang, "Settings", "Impostazioni")),
                 ];
@@ -480,6 +498,7 @@ impl OpenLingoApp {
             (Screen::Review, "🔁", tr(lang, "Review", "Ripasso")),
             (Screen::Exercises, "✏️", tr(lang, "Exercises", "Esercizi")),
             (Screen::Vocabulary, "📚", tr(lang, "Words", "Parole")),
+            (Screen::Gender, "🔤", tr(lang, "Gender Trainer", "Allenatore Articoli")),
             (Screen::Progress, "📈", tr(lang, "Progress", "Progresso")),
         ];
         let w = ui.available_width();
@@ -2173,6 +2192,109 @@ impl OpenLingoApp {
         });
     }
 
+    fn screen_gender(&mut self, ui: &mut egui::Ui) {
+        let lang = ui_lang(&self.store).to_string();
+        let lang = lang.as_str();
+        let Some(profile) = self.store.active_profile() else {
+            ui.label(tr(lang, "No active profile.", "Nessun profilo attivo."));
+            return;
+        };
+        let words = self.store.active_profile().map(|p| p.stato.parole.clone()).unwrap_or_default();
+        let level = if self.gender_level.trim().is_empty() { "A1" } else { self.gender_level.as_str() };
+
+        // Genera domande se necessario
+        if self.gender_queue.is_empty() {
+            self.gender_queue = gender_domande(&words, level, Some(20));
+            self.gender_index = 0;
+            self.gender_correct = 0;
+            self.gender_total = self.gender_queue.len();
+            self.gender_done = false;
+        }
+
+        ui.label(egui::RichText::new(tr(lang, "Gender Trainer", "Allenatore Articoli")).size(28.0).strong());
+        ui.add_space(12.0);
+
+        if self.gender_done {
+            ui.label(egui::RichText::new(tr(lang, "Session completed!", "Sessione completata!")).size(24.0).strong());
+            ui.add_space(12.0);
+            ui.label(tr(lang, "Correct answers:", "Risposte corrette:"));
+            ui.label(egui::RichText::new(format!("{} / {}", self.gender_correct, self.gender_total)).size(20.0).strong());
+            ui.add_space(16.0);
+            if ui.add(egui::Button::new(egui::RichText::new(tr(lang, "Restart", "Ricomincia")).strong()).min_size(egui::vec2(160.0, 44.0)).rounding(egui::CornerRadius::same(16))).clicked() {
+                self.gender_queue.clear();
+                self.gender_feedback.clear();
+            }
+            return;
+        }
+
+        if self.gender_queue.is_empty() {
+            ui.label(tr(lang, "No questions available. Add words with article to your profile.", "Nessuna domanda disponibile. Aggiungi parole con articolo al tuo profilo."));
+            return;
+        }
+
+        let q = &self.gender_queue[self.gender_index];
+        ui.label(egui::RichText::new(tr(lang, "Question", "Domanda")).size(20.0).strong());
+        ui.label(egui::RichText::new(&q.parola).size(24.0).strong());
+        ui.add_space(8.0);
+        ui.label(egui::RichText::new(tr(lang, "Translation:", "Traduzione:")).size(16.0));
+        ui.label(egui::RichText::new(&q.traduzione).size(18.0));
+        if !q.esempio.is_empty() {
+            ui.add_space(4.0);
+            ui.label(egui::RichText::new(tr(lang, "Example:", "Esempio:")).size(14.0));
+            ui.label(egui::RichText::new(&q.esempio).size(16.0).italics());
+        }
+
+        ui.add_space(16.0);
+        let mut selected: Option<usize> = None;
+        egui::Frame::none()
+            .fill(ui.visuals().faint_bg_color)
+            .stroke(egui::Stroke::new(1.0, ui.visuals().widgets.noninteractive.bg_stroke.color))
+            .rounding(egui::CornerRadius::same(22))
+            .inner_margin(egui::Margin::same(16))
+            .show(ui, |ui| {
+                ui.set_min_width(280.0);
+                for (i, opt) in gender_opzioni(q).into_iter().enumerate() {
+                    let btn = egui::Button::new(egui::RichText::new(opt.clone()).size(18.0))
+                        .fill(if selected == Some(i) { ui.visuals().selection.bg_fill } else { ui.visuals().widgets.inactive.bg_fill })
+                        .rounding(egui::CornerRadius::same(16));
+                    if ui.add(btn).clicked() {
+                        selected = Some(i);
+                    }
+                }
+            });
+
+        if let Some(idx) = selected {
+            let guessed = gender_opzioni(q).get(idx).cloned().unwrap_or_default();
+            let correct = q.articolo.clone();
+            if guessed == correct {
+                self.gender_correct += 1;
+                self.gender_feedback = tr(lang, "Correct!", "Corretto!").to_string();
+            } else {
+                self.gender_feedback = format!("{} {} {}", tr(lang, "Wrong. Correct:", "Sbagliato. Corretto:"), correct, tr(lang, "for", "per"));
+            }
+            self.gender_index += 1;
+            if self.gender_index >= self.gender_queue.len() {
+                self.gender_done = true;
+            }
+        }
+
+        ui.add_space(12.0);
+        ui.label(&self.gender_feedback);
+        ui.add_space(12.0);
+        ui.label(tr(lang, "Progress:", "Progresso:"));
+        let pct = (self.gender_index as f32 / self.gender_total as f32 * 100.0).clamp(0.0, 100.0);
+        ui.add(egui::ProgressBar::new(pct / 100.0).desired_height(10.0).rounding(egui::CornerRadius::same(8)));
+        ui.add_space(10.0);
+        ui.label(format!("{} / {}", self.gender_index, self.gender_total));
+        ui.add_space(16.0);
+        ui.horizontal_wrapped(|ui| {
+            if ui.add(egui::Button::new(egui::RichText::new(tr(lang, "Next", "Avanti")).strong()).min_size(egui::vec2(150.0, 44.0)).rounding(egui::CornerRadius::same(16))).clicked() {
+                self.gender_queue.clear();
+                self.gender_feedback.clear();
+            }
+        });
+    }
+
     fn screen_progress(&mut self, ui: &mut egui::Ui) {
         let lang = ui_lang(&self.store).to_string();
         let lang = lang.as_str();
@@ -2765,6 +2887,7 @@ impl eframe::App for OpenLingoApp {
                 Screen::Vocabulary => self.screen_vocabulary(ui),
                 Screen::Grammar => self.screen_grammar(ui),
                 Screen::Progress => self.screen_progress(ui),
+                Screen::Gender => self.screen_gender(ui),
                 Screen::Settings => self.screen_settings(ui),
             });
     }
