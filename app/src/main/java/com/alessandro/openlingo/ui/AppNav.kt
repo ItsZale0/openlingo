@@ -1,6 +1,9 @@
 ﻿package com.alessandro.openlingo.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -245,8 +248,11 @@ fun AppNav(
             }
         }
 
-        // FAB globale: aggiungi qualsiasi parola al lessico da qualsiasi schermata
-        AggiungiParolaFab(vm = vm)
+        // FAB globale: in basso a sinistra, lontano dalla bolla del tutor (BottomEnd)
+        AggiungiParolaFab(
+            vm = vm,
+            modifier = Modifier.align(Alignment.BottomStart).padding(16.dp)
+        )
 
         // Bolla del tutor: sopra ogni schermata, come Meta AI su WhatsApp
         TutorBubble(vm = vm)

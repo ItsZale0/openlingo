@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
  * Funziona in tutta l'app, non solo negli esercizi.
  */
 @Composable
-fun AggiungiParolaFab(vm: OpenLingoViewModel) {
+fun AggiungiParolaFab(vm: OpenLingoViewModel, modifier: Modifier = Modifier) {
     var aperto by remember { mutableStateOf(false) }
     var testo by remember { mutableStateOf("") }
     var estratta by remember { mutableStateOf<OpenLingoViewModel.ParolaEstratta?>(null) }
@@ -45,6 +45,7 @@ fun AggiungiParolaFab(vm: OpenLingoViewModel) {
     val scope = rememberCoroutineScope()
 
     FloatingActionButton(
+        modifier = modifier,
         onClick = {
             aperto = true
             testo = ""

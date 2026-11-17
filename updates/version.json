@@ -1,8 +1,8 @@
 {
-  "versionCode": 349,
-  "versionName": "1.51.26",
-  "changelog": "The app is now named OpenLingo everywhere: notifications, backup User-Agent/messages, AI headers and APK cache names.",
+  "versionCode": 350,
+  "versionName": "1.51.27",
+  "changelog": "Moved the Add-word button to the bottom-left of the screen, away from the tutor bubble.",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.26/OpenLingo-v1.51.26.apk",
-  "apkSha256": "0b046a14629a9d78cfecb31c7277d7ff7a46bdef9e6172c483cc715a47040569"
+  "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.27/OpenLingo-v1.51.27.apk",
+  "apkSha256": ""
 }
