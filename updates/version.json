@@ -4,5 +4,5 @@
   "changelog": "The app is now named OpenLingo everywhere: notifications, backup User-Agent/messages, AI headers and APK cache names.",
   "minVersionCode": 0,
   "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.26/OpenLingo-v1.51.26.apk",
-  "apkSha256": ""
+  "apkSha256": "0b046a14629a9d78cfecb31c7277d7ff7a46bdef9e6172c483cc715a47040569"
 }
