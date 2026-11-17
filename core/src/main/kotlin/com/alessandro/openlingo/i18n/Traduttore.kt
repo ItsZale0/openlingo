@@ -5342,7 +5342,6 @@ object Traduttore {
             "Nessun profilo da salvare" to "No profile to save",
             "Stato dati non ancora caricato: backup evitato" to "Data not loaded yet: backup skipped",
             "Caricamento annullato per non sovrascriverlo." to "Loading cancelled to avoid overwriting it.",
-            "Backup automatico Deutsch" to "OpenLingo automatic backup",
             "Backup automatico OpenLingo" to "OpenLingo automatic backup",
             "URL del feed non configurato" to "Feed URL not configured",
             "Risposta vuota dal server" to "Empty response from the server",

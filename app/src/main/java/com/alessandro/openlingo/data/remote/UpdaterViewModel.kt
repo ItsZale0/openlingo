@@ -167,7 +167,7 @@ class UpdaterViewModel(application: Application) : AndroidViewModel(application)
 
     fun apkGiaScaricato(version: VersionInfo): Boolean {
         val dir = File(getApplication<Application>().cacheDir, "updates")
-        val apk = File(dir, "Deutsch-v${version.versionName}.apk")
+        val apk = File(dir, "OpenLingo-v${version.versionName}.apk")
         return apk.exists() && VerificaApk.isApkValido(apk, version.apkSha256)
     }
 
@@ -177,7 +177,7 @@ class UpdaterViewModel(application: Application) : AndroidViewModel(application)
         // Se l'APK è già scaricato e valido, salta il download
         if (apkGiaScaricato(version)) {
             val dir = File(getApplication<Application>().cacheDir, "updates")
-            val apk = File(dir, "Deutsch-v${version.versionName}.apk")
+            val apk = File(dir, "OpenLingo-v${version.versionName}.apk")
             android.util.Log.d("Updater", "APK già scaricato: ${apk.length()} byte")
             _state.value = UpdateState.ReadyToInstall(apk)
             return
@@ -199,11 +199,11 @@ class UpdaterViewModel(application: Application) : AndroidViewModel(application)
                         }
                     }
 
-                    val apk = File(dir, "Deutsch-v${version.versionName}.apk")
+                    val apk = File(dir, "OpenLingo-v${version.versionName}.apk")
 
                     // Prova l'URL dichiarato, poi una variante con nome file minuscolo:
                     // l'asset su GitHub e' case-sensitive e il task può divergere.
-                    val urlAlternative = version.apkUrl.replace("Deutsch-v", "deutsch-v")
+                    val urlAlternative = version.apkUrl.replace("OpenLingo-v", "openlingo-v")
                     val fonti = listOf(version.apkUrl, urlAlternative).distinct()
                     val riuscita = fonti.any { url -> scaricaApk(url, apk, version.apkSha256) }
                     if (!riuscita) throw IOException("Download fallito da tutte le fonti")

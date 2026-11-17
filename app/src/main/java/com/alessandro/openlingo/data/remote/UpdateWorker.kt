@@ -107,10 +107,10 @@ class UpdateWorker(
     private fun scaricaApk(versione: VersionInfo): File {
         val dir = File(applicationContext.cacheDir, "updates").apply { mkdirs() }
         dir.listFiles()?.filter { it.extension == "apk" }?.forEach { it.delete() }
-        val apk = File(dir, "Deutsch-v${versione.versionName}.apk")
+        val apk = File(dir, "OpenLingo-v${versione.versionName}.apk")
         val fonti = listOf(
             versione.apkUrl,
-            versione.apkUrl.replace("Deutsch-v", "deutsch-v")
+            versione.apkUrl.replace("OpenLingo-v", "openlingo-v")
         ).distinct()
         for (url in fonti) {
             val ok = runCatching {

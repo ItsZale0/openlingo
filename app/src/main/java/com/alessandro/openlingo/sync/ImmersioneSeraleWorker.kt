@@ -23,7 +23,7 @@ import com.alessandro.openlingo.ui.MainActivity
 import java.util.concurrent.TimeUnit
 
 /**
- * Passo 5 del metodo (Deutsch Hub), il "bonus pre-sonno": un promemoria serale
+ * Passo 5 del metodo (OpenLingo Hub), il "bonus pre-sonno": un promemoria serale
  * per i 15-20 minuti di ascolto passivo. Notifica 100% locale: WorkManager,
  * nessun servizio di rete. Notifica solo se il profilo attivo ha la
  * Modalità Immersione attiva; il testo propone una frase del livello, così

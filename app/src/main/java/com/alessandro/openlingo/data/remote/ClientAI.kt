@@ -160,7 +160,7 @@ class ClientAI(
         // Header richiesti/consigliati da OpenRouter per identificare l'app.
         if (config.provider == ProviderAI.OPENROUTER) {
             builder.header("HTTP-Referer", "https://github.com/ItsZale0/openlingo")
-            builder.header("X-Title", "Deutsch")
+            builder.header("X-Title", "OpenLingo")
         }
 
         val request = builder
