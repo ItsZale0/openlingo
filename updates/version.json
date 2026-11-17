@@ -1,8 +1,8 @@
 {
-  "versionCode": 347,
-  "versionName": "1.51.24",
-  "changelog": "New: select a word in exercises and add it to vocabulary via AI (meaning, article, example) - it enters both lexicon and review. Fixed modal-conjugation validator.",
+  "versionCode": 348,
+  "versionName": "1.51.25",
+  "changelog": "Global Add-word FAB: highlight/copy any word in any screen and AI adds it to lexicon + review.",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.24/OpenLingo-v1.51.24.apk",
-  "apkSha256": "8073e9dd0c69b5000238a21fe52a901e67a76b92386c88c46d3afb0c3b319f99"
+  "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.25/OpenLingo-v1.51.25.apk",
+  "apkSha256": ""
 }

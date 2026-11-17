@@ -245,6 +245,9 @@ fun AppNav(
             }
         }
 
+        // FAB globale: aggiungi qualsiasi parola al lessico da qualsiasi schermata
+        AggiungiParolaFab(vm = vm)
+
         // Bolla del tutor: sopra ogni schermata, come Meta AI su WhatsApp
         TutorBubble(vm = vm)
 
