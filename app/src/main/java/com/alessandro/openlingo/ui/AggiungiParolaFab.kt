@@ -42,6 +42,7 @@ fun AggiungiParolaFab(vm: OpenLingoViewModel, modifier: Modifier = Modifier) {
     var estratta by remember { mutableStateOf<OpenLingoViewModel.ParolaEstratta?>(null) }
     var errore by remember { mutableStateOf<String?>(null) }
     var caricamento by remember { mutableStateOf(false) }
+    var giaPresente by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     FloatingActionButton(
@@ -51,6 +52,7 @@ fun AggiungiParolaFab(vm: OpenLingoViewModel, modifier: Modifier = Modifier) {
             testo = ""
             estratta = null
             errore = null
+            giaPresente = false
         },
         containerColor = MaterialTheme.colorScheme.primaryContainer,
         contentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -104,12 +106,20 @@ fun AggiungiParolaFab(vm: OpenLingoViewModel, modifier: Modifier = Modifier) {
                             },
                             style = MaterialTheme.typography.bodyMedium
                         )
+                        if (giaPresente) {
+                            Spacer(Modifier.padding(top = 6.dp))
+                            Text(
+                                t("Questa parola e' gia' nel tuo lessico."),
+                                color = MaterialTheme.colorScheme.tertiary,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
                     }
                 }
             },
             confirmButton = {
                 Button(
-                    enabled = !caricamento && (estratta != null || testo.isNotBlank()),
+                    enabled = !caricamento && !giaPresente && (estratta != null || testo.isNotBlank()),
                     onClick = {
                         if (estratta != null) {
                             vm.confermaParolaEstratta(estratta!!)
@@ -117,16 +127,26 @@ fun AggiungiParolaFab(vm: OpenLingoViewModel, modifier: Modifier = Modifier) {
                         } else {
                             caricamento = true
                             errore = null
+                            giaPresente = false
                             scope.launch {
                                 vm.analizzaEAggiungiParola(testo.trim())
-                                    .onSuccess { estratta = it }
+                                    .onSuccess {
+                                        estratta = it
+                                        giaPresente = vm.parolaGiaPresente(it.tedesco)
+                                    }
                                     .onFailure { errore = it.message ?: t("Errore") }
                                 caricamento = false
                             }
                         }
                     }
                 ) {
-                    Text(if (estratta != null) t("Aggiungi e ripassa") else t("Cerca con AI"))
+                    Text(
+                        when {
+                            giaPresente -> t("Gia' presente")
+                            estratta != null -> t("Aggiungi e ripassa")
+                            else -> t("Cerca con AI")
+                        }
+                    )
                 }
             },
             dismissButton = {

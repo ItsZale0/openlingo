@@ -5,6 +5,8 @@ package com.alessandro.openlingo.ui
 import com.alessandro.openlingo.i18n.t
 
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
@@ -26,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 
@@ -83,6 +86,7 @@ fun TestoConAggiungiParola(
 
     if (dialogRichiesto) {
         DialogAggiuntaParola(
+            vm = vm,
             parolaSelezionata = parolaSelezionata,
             caricamento = caricamento,
             errore = errore,
@@ -127,6 +131,7 @@ fun AggiungiParolaButton(
 
     if (dialogRichiesto) {
         DialogAggiuntaParola(
+            vm = vm,
             parolaSelezionata = parola,
             caricamento = caricamento,
             errore = errore,
@@ -139,6 +144,7 @@ fun AggiungiParolaButton(
 
 @Composable
 private fun DialogAggiuntaParola(
+    vm: OpenLingoViewModel,
     parolaSelezionata: String,
     caricamento: Boolean,
     errore: String?,
@@ -158,6 +164,7 @@ private fun DialogAggiuntaParola(
                 errore != null -> Text(t("Errore: ") + errore)
                 estratta != null -> {
                     val p = estratta
+                    val gia = vm.parolaGiaPresente(p.tedesco)
                     Text(
                         buildString {
                             append(p.articolo?.let { "$it " } ?: "")
@@ -167,12 +174,23 @@ private fun DialogAggiuntaParola(
                             append("[${p.livello}]")
                         }
                     )
+                    if (gia) {
+                        Spacer(Modifier.height(6.dp))
+                        Text(
+                            t("Questa parola e' gia' nel tuo lessico."),
+                            color = MaterialTheme.colorScheme.tertiary,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
                 }
             }
         },
         confirmButton = {
-            Button(enabled = estratta != null, onClick = { estratta?.let(onConferma) }) {
-                Text(t("Aggiungi e ripassa"))
+            Button(
+                enabled = estratta != null && !vm.parolaGiaPresente(estratta!!.tedesco),
+                onClick = { estratta?.let(onConferma) }
+            ) {
+                Text(if (estratta != null && vm.parolaGiaPresente(estratta!!.tedesco)) t("Gia' presente") else t("Aggiungi e ripassa"))
             }
         },
         dismissButton = {

@@ -284,6 +284,9 @@ class WordRepository(
         nuove.size
     }
 
+    /** Tutte le parole correnti, accesso sincrono (per controlli duplicate). */
+    fun tutteLeParole(): List<WordEntity> = _words.value
+
     fun observeWords() = wordsFlow
         // L'ordinamento di migliaia di parole e' lavoro CPU: va fatto sul
         // dispatcher di default, mai sul thread principale della UI.
@@ -621,6 +624,30 @@ class WordRepository(
         _words.value = _words.value.filterNot { it.id == id }
         _reviews.value = _reviews.value - id
         salvaSuProfilo()
+    }
+
+    /**
+     * Rimuove i duplicati dal lessico: chiavi normalizzate (minuscole, spazi
+     * compressi, articolo iniziale der/die/das ignorato). Tiene la prima
+     * occorrenza e elimina i review orfani. Ritorna quante voci sono state rimosse.
+     */
+    suspend fun rimuoviDuplicati(): Int = withContext(io) {
+        val viste = HashSet<String>()
+        val daTenere = mutableListOf<WordEntity>()
+        val daRimuovere = mutableListOf<String>()
+        for (w in _words.value) {
+            val k = w.german.trim().lowercase()
+                .replace(Regex("^\\s*(der|die|das|den|dem|des)\\s+"), "")
+                .replace(Regex("\\s+"), " ")
+                .trim()
+            if (k.isNotEmpty() && viste.add(k)) daTenere.add(w)
+            else daRimuovere.add(w.id)
+        }
+        if (daRimuovere.isEmpty()) return@withContext 0
+        _words.value = daTenere
+        _reviews.value = _reviews.value.filterKeys { it !in daRimuovere }
+        salvaSuProfilo()
+        daRimuovere.size
     }
 
     companion object {

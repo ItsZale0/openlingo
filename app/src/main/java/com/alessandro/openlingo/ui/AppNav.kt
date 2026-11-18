@@ -54,6 +54,8 @@ fun AppNav(
     // l'app torna in primo piano. Prima ogni ON_RESUME faceva una richiesta HTTP.
     LaunchedEffect(Unit) {
         updater.checkForUpdateSeNecessario()
+        // Pulisce eventuali duplicati gia' presenti nel lessico.
+        vm.pulisciDuplicatiLessico()
     }
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {

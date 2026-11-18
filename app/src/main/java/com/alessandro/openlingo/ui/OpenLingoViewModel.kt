@@ -842,6 +842,14 @@ class OpenLingoViewModel(application: Application) : AndroidViewModel(applicatio
 
     // ---- Parole ----
 
+    /** Rimuove i duplicati gia' presenti nel lessico (chiamato all'avvio). */
+    fun pulisciDuplicatiLessico() {
+        viewModelScope.launch {
+            val rimossi = repo.rimuoviDuplicati()
+            if (rimossi > 0) _messaggio.value = t("Duplicati rimossi dal lessico: ") + rimossi
+        }
+    }
+
     fun archivia(id: String) {
         viewModelScope.launch { repo.setArchived(id, true) }
     }
@@ -914,7 +922,34 @@ class OpenLingoViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     /** Conferma e salva una parola estratta: aggiunge al lessico e al ripasso. */
-    fun confermaParolaEstratta(p: ParolaEstratta) {
+    /**
+     * True se il lessico contiene gia' la parola (confronto tollerante:
+     * minuscole, spazi e articolo iniziale der/die/das ignorato).
+     */
+    fun parolaGiaPresente(tedesco: String): Boolean {
+        val target = tedesco.trim().lowercase()
+            .replace(Regex("^\\s*(der|die|das|den|dem|des)\\s+"), "")
+            .replace(Regex("\\s+"), " ")
+            .trim()
+        if (target.isEmpty()) return false
+        return repo.tutteLeParole().any { w ->
+            val esistente = w.german.trim().lowercase()
+                .replace(Regex("^\\s*(der|die|das|den|dem|des)\\s+"), "")
+                .replace(Regex("\\s+"), " ")
+                .trim()
+            esistente == target
+        }
+    }
+
+    /**
+     * Conferma l'aggiunta della parola estratta. Se e' gia' nel lessico non
+     * aggiunge nulla e restituisce false, cosi' la UI puo' avvisare l'utente.
+     */
+    fun confermaParolaEstratta(p: ParolaEstratta): Boolean {
+        if (parolaGiaPresente(p.tedesco)) {
+            _messaggio.value = t("La parola e' gia' nel lessico: ") + p.tedesco
+            return false
+        }
         aggiungiParolaCustom(
             german = p.tedesco,
             italian = p.italiano,
@@ -924,6 +959,7 @@ class OpenLingoViewModel(application: Application) : AndroidViewModel(applicatio
             lesson = 0,
             tags = "ai-selezione"
         )
+        return true
     }
 
     data class ParolaEstratta(

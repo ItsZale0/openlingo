@@ -1,8 +1,8 @@
 {
-  "versionCode": 350,
-  "versionName": "1.51.27",
-  "changelog": "Moved the Add-word button to the bottom-left of the screen, away from the tutor bubble.",
+  "versionCode": 351,
+  "versionName": "1.51.28",
+  "changelog": "Adding a word now checks the lexicon first: duplicates are detected (ignoring case, article and extra spaces) and the add button is disabled. Existing duplicates are cleaned up at startup.",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.27/OpenLingo-v1.51.27.apk",
-  "apkSha256": "2b3822ea80557124b5889e664ba229b97ef29a95d41f050b4d1aa5328bd167fe"
+  "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.28/OpenLingo-v1.51.28.apk",
+  "apkSha256": ""
 }
