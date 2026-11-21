@@ -1120,11 +1120,15 @@ internal fun unitaA1PreposizioniLuogo(): UnitaGrammatica = unitaGrammatica(
     minuti = 15,
     prerequisiti = listOf("a1-akkusativ"),
     regola = listOf(
-        "Le preposizioni in, an, auf, unter, über, vor, hinter, neben, zwischen possono reggere dativo o accusativo.",
-        "Con Wo? (dove? stato in luogo) si usa il dativo: Ich bin in der Küche.",
-        "Con Wohin? (dove? moto a luogo) si usa l'accusativo: Ich gehe in die Schule.",
-        "Le contrazioni più comuni sono im, am, ins, ans, zum, zur, beim, vom: ins Kino, am Tisch, zur Schule.",
-        "Con città e paesi si usa spesso nach: nach Berlin, nach Italien. Con le persone e alcuni luoghi si usa zu: zum Arzt, zur Lehrerin."
+        "IL SENSO PRIMA DI TUTTO: tedesco distingue due domande che in italiano suonano entrambe 'dove?'.",
+        "WO? = 'dove si trova?' (stato fermo, nessun movimento): Ich bin in der Küche = 'Sono in cucina'. Se sei gia' li e non ti muovi, usa il DATIVO.",
+        "WOHIN? = 'dove vai?' (movimento, qualcuno/qualcosa si sposta): Ich gehe in die Schule = 'Vado a scuola'. C'e' un movimento, quindi usa l'ACCUSATIVO.",
+        "IL TRUCCO: chiediti 'si sta fermi o ci si sta muovendo?'. Fermo = dativo. In movimento = accusativo. La preposizione resta la stessa: cambia solo l'articolo.",
+        "LE PREPOSIZIONI 'A DUE CASI' sono: in, an, auf, unter, über, vor, hinter, neben, zwischen. Tutte seguono la regola Wo? -> dativo, Wohin? -> accusativo.",
+        "GLI ARTICOLI CAMBIANO COSI': dativo dem/der/dem/den, accusativo den/die/das/die. Esempio: in dem -> in der (cucina), in das -> in die (scuola).",
+        "LE CONTRAZIONI (preposizione + articolo fusi) sono obbligatorie nel parlato: in + dem = im (im Kino), an + dem = am (am Tisch), in + das = ins (ins Kino), zu + dem = zum (zum Arzt), zu + der = zur (zur Schule), bei + dem = beim, von + dem = vom.",
+        "ATTENZIONE: 'zur Schule' non e' un caso speciale — e' zu + der School fusa. Per questo e' dativo anche se esprime movimento: le istituzioni (scuola, chiesa, dottore) vogliono zu + dativo.",
+        "CITTA E PAESI: non hanno articolo, si usa nach senza contrazione — nach Berlin, nach Italien, nach Hause (a casa). Non si dice 'nach der Schule' per 'vado a scuola'."
     ),
     tabelle = listOf(
         tabellaUnita(
@@ -1155,30 +1159,38 @@ internal fun unitaA1PreposizioniLuogo(): UnitaGrammatica = unitaGrammatica(
         )
     ),
     esempi = listOf(
-        esempioUnita("Ich bin in der Küche.", "Sono in cucina."),
-        esempioUnita("Ich gehe in die Schule.", "Vado a scuola."),
-        esempioUnita("Das Buch liegt auf dem Sofa.", "Il libro è sul tavolo."),
-        esempioUnita("Ich lege das Buch auf den Tisch.", "Metto il libro sul tavolo."),
-        esempioUnita("Wir fahren nach Berlin.", "Andiamo a Berlino.")
+        esempioUnita("Ich bin in der Küche.", "Sono in cucina.", "WO? Sono fermo in cucina -> dativo 'in der'."),
+        esempioUnita("Ich gehe in die Schule.", "Vado a scuola.", "WOHIN? Mi muovo verso la scuola -> accusativo 'in die'."),
+        esempioUnita("Das Buch liegt auf dem Tisch.", "Il libro è sul tavolo.", "WO? Il libro sta fermo sul tavolo -> dativo 'auf dem'."),
+        esempioUnita("Ich lege das Buch auf den Tisch.", "Metto il libro sul tavolo.", "WOHIN? Il libro si muove -> accusativo 'auf den'."),
+        esempioUnita("Ich wohne in Berlin.", "Abito a Berlino.", "Le città non hanno articolo: 'in Berlin', non 'in der Berlin'."),
+        esempioUnita("Wir fahren nach Berlin.", "Andiamo a Berlino.", "Città/paesi con movimento -> 'nach' senza articolo."),
+        esempioUnita("Ich gehe zum Arzt.", "Vado dal medico.", "Le persone vogliono 'zu' + dativo: zu + dem = zum."),
+        esempioUnita("Das ist mein Zuhause - ich bin zu Hause.", "Questa è la mia casa - sono a casa.", "Espressione fissa: 'zu Hause' = a casa, senza articolo.")
     ),
     errori = listOf(
         erroreUnita(
             "Ich gehe in der Schule.",
             "Ich gehe in die Schule.",
-            "Wohin? richiede l'accusativo: in die Schule."
+            "Hai usato il dativo ma c'e' movimento (gehe = vado). Wohin? vuole l'accusativo: in die."
         ),
         erroreUnita(
             "Ich bin in die Schule.",
-            "Ich bin in der Küche.",
-            "Wo? richiede il dativo: in der Küche."
+            "Ich bin in der Schule.",
+            "Hai usato l'accusativo ma sei fermo (bin = sono). Wo? vuole il dativo: in der."
         ),
         erroreUnita(
             "Ich gehe nach der Schule.",
             "Ich gehe zur Schule.",
-            "Con le istituzioni si usa zu + dativo: zu der Schule -> zur Schule."
+            "'Nach' si usa solo con citta'/paesi. La scuola e' un'istituzione: zu + dem/der -> zur."
+        ),
+        erroreUnita(
+            "Ich wohne in der Berlin.",
+            "Ich wohne in Berlin.",
+            "Le citta' non hanno articolo: non 'in der Berlin', semplicemente 'in Berlin'."
         )
     ),
-    merksatz = "Wo? -> dativo. Wohin? -> accusativo. La preposizione non cambia, cambia l'articolo.",
+    merksatz = "Fermo (Wo?) -> dativo · In movimento (Wohin?) -> accusativo. Stessa preposizione, articolo diverso.",
     esercizi = listOf(
         sceltaUnita(
             "luogo-01",
@@ -1274,11 +1286,17 @@ internal fun unitaA1PreposizioniTempo(): UnitaGrammatica = unitaGrammatica(
     minuti = 13,
     prerequisiti = listOf("a1-praesens"),
     regola = listOf(
-        "um si usa con l'ora: um 8 Uhr.",
-        "am si usa con i giorni e le date: am Montag, am 1. Mai.",
-        "im si usa con mesi e stagioni: im Januar, im Sommer.",
-        "in si usa per un periodo futuro: in einer Woche, in zwei Tagen.",
-        "seit + dativo indica «da/per» un periodo che continua; vor + dativo indica «fa»; nach + dativo indica «dopo»."
+        "IL SENSO: le preposizioni di tempo rispondono alla domanda 'Wann?' (quando?) o 'Wie lange?' (per quanto tempo?). Non si traducono sempre con 'in': in tedesco cambiano secondo l'unita' di tempo.",
+        "ORE PUNTUALI -> 'um': um 8 Uhr (alle 8). E' un punto esatto nel tempo.",
+        "GIORNI E DATE -> 'am' (= an + dem): am Montag (lunedi'), am 1. Mai (il 1 maggio). Il giorno e' visto come un punto su un calendario.",
+        "MESI E STAGIONI -> 'im' (= in + dem): im Januar (a gennaio), im Sommer (in estate). Sono 'contenitori' di tempo piu' grandi.",
+        "ANNI -> 'im': im 2024. Stessa logica dei mesi.",
+        "PERIODO FUTURO -> 'in' + dativo: in einer Woche (tra una settimana), in zwei Tagen (tra due giorni). Indica 'tra quanto tempo'.",
+        "DA UN PUNTO FINO A ORA -> 'seit' + dativo: seit einem Jahr (da un anno), seit Montag (da lunedi'). L'azione e' ancora in corso.",
+        "TEMPO PASSATO -> 'vor' + dativo: vor einer Woche (una settimana fa). Indica quanto tempo e' passato.",
+        "DOPO -> 'nach' + dativo: nach dem Essen (dopo mangiato), nach der Arbeit (dopo il lavoro).",
+        "FINO A / A PARTIRE DA -> 'bis' (bis morgen = fino a domani) e 'ab' (ab Montag = a partire da lunedi').",
+        "IL TRUCCO: non chiederti come si dice in italiano, ma che tipo di tempo e': ora = um, giorno = am, mese/stagione = im, durata che continua = seit."
     ),
     tabelle = listOf(
         tabellaUnita(
@@ -1309,11 +1327,13 @@ internal fun unitaA1PreposizioniTempo(): UnitaGrammatica = unitaGrammatica(
         )
     ),
     esempi = listOf(
-        esempioUnita("Am Montag habe ich frei.", "Lunedì sono libero."),
-        esempioUnita("Im Januar ist es kalt.", "In gennaio fa freddo."),
-        esempioUnita("Der Kurs beginnt um 9 Uhr.", "Il corso inizia alle 9."),
-        esempioUnita("Ich wohne seit einem Jahr in Berlin.", "Vivo a Berlino da un anno."),
-        esempioUnita("Nach dem Essen gehen wir spazieren.", "Dopo mangiato andiamo a passeggiare.")
+        esempioUnita("Am Montag habe ich frei.", "Lunedì sono libero.", "Giorno della settimana -> am."),
+        esempioUnita("Im Januar ist es kalt.", "In gennaio fa freddo.", "Mese -> im."),
+        esempioUnita("Der Kurs beginnt um 9 Uhr.", "Il corso inizia alle 9.", "Ora esatta -> um."),
+        esempioUnita("Ich wohne seit einem Jahr in Berlin.", "Vivo a Berlino da un anno.", "Durata che continua fino a ora -> seit + dativo."),
+        esempioUnita("Ich bin vor einer Woche nach Berlin gefahren.", "Sono andato a Berlino una settimana fa.", "Tempo passato -> vor + dativo."),
+        esempioUnita("Nach dem Essen gehen wir spazieren.", "Dopo mangiato andiamo a passeggiare.", "Dopo -> nach + dativo."),
+        esempioUnita("Der Kurs beginnt in zwei Tagen.", "Il corso inizia tra due giorni.", "Periodo futuro -> in + dativo.")
     ),
     errori = listOf(
         erroreUnita(
@@ -1329,10 +1349,15 @@ internal fun unitaA1PreposizioniTempo(): UnitaGrammatica = unitaGrammatica(
         erroreUnita(
             "seit ein Jahr",
             "seit einem Jahr",
-            "seit regge il dativo: seit einem Jahr."
+            "Hai messo l'accusativo ma 'seit' vuole il dativo: seit einem Jahr."
+        ),
+        erroreUnita(
+            "Ich warte seit 2 Stunden.",
+            "Ich warte seit zwei Stunden.",
+            "Dopo 'seit' si scrive il numero per esteso e il dativo: seit zwei Stunden."
         )
     ),
-    merksatz = "um + ora, am + giorno, im + mese/stagione, in + futuro, seit/vor + dativo.",
+    merksatz = "um = ora · am = giorno · im = mese/stagione · in = tra quanto · seit = da (ancora in corso) · vor = fa.",
     esercizi = listOf(
         sceltaUnita(
             "tempo-01",

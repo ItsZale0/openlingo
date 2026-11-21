@@ -164,12 +164,14 @@ internal fun unitaA2Wechselpraepositionen(): UnitaGrammatica = unitaGrammatica(
     minuti = 16,
     prerequisiti = listOf("a1-preposizioni-luogo", "a2-dativo"),
     regola = listOf(
-        "Le preposizioni miste sono nove: an, auf, in, über, unter, vor, hinter, neben, zwischen.",
-        "Rispondono a Wo? (dove?) con il dativo quando indicano posizione: Ich bin in der Schule.",
-        "Rispondono a Wohin? (dove vai?) con l'accusativo quando indicano movimento o direzione: Ich gehe in die Schule.",
-        "Alcuni verbi aiutano: liegen, stehen, sitzen, hängen (stato) vogliono il dativo; legen, stellen, setzen, hängen (movimento) vogliono l'accusativo.",
-        "Contrazioni frequenti: in + das = ins, an + das = ans, in + dem = im, an + dem = am, bei + dem = beim.",
-        "Attenzione: il dativo plurale aggiunge -n: in den Häusern, mit den Kindern."
+        "PERCHE' SI CHIAMANO 'MISTE': perche' le stesse nove preposizioni (an, auf, in, über, unter, vor, hinter, neben, zwischen) possono volere dativo O accusativo. Non c'e' una preposizione 'giusta' in assoluto: dipende da cosa vuoi dire.",
+        "IL SENSO E' LA CHIAVE: se descrivi DOVE QUALCOSA STA (posizione, fermo) usi il dativo; se descrivi DOVE QUALCOSA VA (movimento, direzione) usi l'accusativo.",
+        "WO? (dove sta?) -> dativo: Das Buch liegt auf dem Sofa = 'Il libro e' sul divano' (e' gia' li, fermo).",
+        "WOHIN? (dove va?) -> accusativo: Ich lege das Buch auf den Tisch = 'Metto il libro sul tavolo' (lo sposto).",
+        "IL VERBO TI AIUTA: liegen/stare a letto, stehen/stare in piedi, sitzen/sedere, hängen/essere appeso indicano stato -> dativo. leggen/mettere, stellen/porre, setzen/sedersi, hängen/appendersi indicano movimento -> accusativo.",
+        "NOTA BENE: 'hängen' esiste in entrambi i sensi — 'Das Bild hängt an der Wand' (e' appeso, dativo) vs 'Ich hänge das Bild an die Wand' (lo appendo, accusativo). Stesso verbo, senso diverso.",
+        "LE CONTRAZIONI son regole di pronuncia, non di caso: in + das = ins, an + das = ans, in + dem = im, an + dem = am, bei + dem = beim. 'Ins Zimmer' e' accusativo perche' 'das' e' accusativo.",
+        "IL DATIVO PLURALE AGGIUNGE -N al nome: in den Häusern, auf den Tischen, mit den Kindern. L'accusativo plurale non aggiunge niente: in die Häuser."
     ),
     tabelle = listOf(
         tabellaUnita(
@@ -199,11 +201,13 @@ internal fun unitaA2Wechselpraepositionen(): UnitaGrammatica = unitaGrammatica(
         )
     ),
     esempi = listOf(
-        esempioUnita("Ich bin in der Schule.", "Sono a scuola."),
-        esempioUnita("Ich gehe in die Schule.", "Vado a scuola."),
-        esempioUnita("Das Buch liegt auf dem Sofa.", "Il libro è sul tavolo."),
-        esempioUnita("Ich lege das Buch auf den Tisch.", "Metto il libro sul tavolo."),
-        esempioUnita("Die Katze sitzt unter dem Sofa.", "Il gatto è sotto il divano.")
+        esempioUnita("Ich bin in der Schule.", "Sono a scuola.", "Stato fermo -> dativo 'in der'."),
+        esempioUnita("Ich gehe in die Schule.", "Vado a scuola.", "Movimento -> accusativo 'in die'."),
+        esempioUnita("Das Buch liegt auf dem Sofa.", "Il libro è sul divano.", "'Liegen' (essere disteso) indica stato -> dativo 'auf dem'."),
+        esempioUnita("Ich lege das Buch auf den Tisch.", "Metto il libro sul tavolo.", "'Legen' (mettere) indica movimento -> accusativo 'auf den'."),
+        esempioUnita("Die Katze sitzt unter dem Sofa.", "Il gatto è sotto il divano.", "'Sitzen' (sedersi/essere seduti) -> dativo 'unter dem'."),
+        esempioUnita("Das Bild hängt an der Wand.", "Il quadro è appeso alla parete.", "Appeso (stato) -> dativo 'an der'."),
+        esempioUnita("Ich hänge das Bild an die Wand.", "Appendo il quadro alla parete.", "Appendo (movimento) -> accusativo 'an die'.")
     ),
     errori = listOf(
         erroreUnita(

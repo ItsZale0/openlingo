@@ -1,8 +1,8 @@
 {
-  "versionCode": 351,
-  "versionName": "1.51.28",
-  "changelog": "Adding a word now checks the lexicon first: duplicates are detected (ignoring case, article and extra spaces) and the add button is disabled. Existing duplicates are cleaned up at startup.",
+  "versionCode": 352,
+  "versionName": "1.51.29",
+  "changelog": "Grammar lessons rewritten to be clear, simple and complete: preposition lessons now explain the meaning before the rule (stato fermo vs movimento), with practical tips, contractions and annotated examples.",
   "minVersionCode": 0,
-  "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.28/OpenLingo-v1.51.28.apk",
-  "apkSha256": "ba53fa328615f490a19c3fbb87fda3912b6470880f05bd7b143223a52558ac33"
+  "apkUrl": "https://github.com/ItsZale0/openlingo/releases/download/v1.51.29/OpenLingo-v1.51.29.apk",
+  "apkSha256": ""
 }
